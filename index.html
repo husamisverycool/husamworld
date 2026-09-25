@@ -1,0 +1,351 @@
+<!doctype html>
+<!--
+
+        .  *        .        *           .
+     *        __/\__       .      husam.world
+   .    ~~~  /  ||  \  ~~~            ~ a tiny island ~
+      ~~~~~~/___||___\~~~~~~   .
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   hi, source-reader. you're my favourite kind of visitor.
+   everything here is hand-written: no framework, no build step, no trackers.
+   the island is generated from the <section>s below. add one and a building appears.
+
+   psst: try typing "husam" (or "night", "dawn", "noon", "dusk") anywhere on the page.
+
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Husam — husam.world</title>
+  <meta name="description" content="Husam's corner of the internet: projects, writing, notes and experiments, living on a tiny island that follows your local time.">
+  <meta name="theme-color" content="#f6f3ec">
+  <meta property="og:title" content="husam.world">
+  <meta property="og:description" content="A tiny island of projects, writing and experiments. It's the same time there as it is where you are.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpolygon points='32,10 60,24 32,38 4,24' fill='%236fae5a'/%3E%3Cpolygon points='4,24 32,38 32,48 4,34' fill='%238a6a45'/%3E%3Cpolygon points='32,38 60,24 60,34 32,48' fill='%236d5236'/%3E%3Ccircle cx='32' cy='14' r='6' fill='%23f2b134'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Decide the lens before first paint so there's no flash.
+    (function () {
+      var lens = null;
+      try { lens = localStorage.getItem('hw:lens'); } catch (e) {}
+      if (!lens) {
+        var wide = matchMedia('(min-width: 800px)').matches;
+        var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        lens = wide && !still ? 'world' : 'reader';
+      }
+      document.documentElement.dataset.lens = lens;
+      document.documentElement.classList.add('js');
+    })();
+  </script>
+</head>
+<body>
+
+<a class="skip" href="#reader">Skip to content</a>
+
+<div id="hello" aria-hidden="true"><span></span></div>
+
+<header class="topbar">
+  <a class="brand" href="#home" aria-label="husam.world, home">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><polygon points="32,12 58,25 32,38 6,25" class="b-top"/><polygon points="6,25 32,38 32,48 6,35" class="b-l"/><polygon points="32,38 58,25 58,35 32,48" class="b-r"/></svg>
+    <span>husam<em>.world</em></span>
+  </a>
+  <div class="tools">
+    <div class="lens-toggle" role="group" aria-label="View">
+      <button type="button" data-lens-set="world" aria-pressed="false">Island</button>
+      <button type="button" data-lens-set="reader" aria-pressed="false">Read</button>
+    </div>
+    <button type="button" class="pill time-pill" id="timePill" aria-haspopup="dialog" aria-expanded="false" title="Change the time of day">
+      <svg class="ico-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/></svg>
+      <svg class="ico-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"/></svg>
+      <span id="timeLabel">--:--</span>
+    </button>
+    <button type="button" class="pill icon-pill" id="soundBtn" aria-pressed="false" title="Sound (off)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="wave" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/><path class="mute" d="M16 9l5 6M21 9l-5 6"/></svg>
+      <span class="sr">Toggle sound</span>
+    </button>
+    <button type="button" class="pill cmd-pill" id="cmdBtn" aria-haspopup="dialog" aria-label="Search and commands">
+      <svg class="ico-search" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+      <kbd>⌘K</kbd><span class="cmd-text">Search</span>
+    </button>
+  </div>
+</header>
+
+<div id="timePop" class="pop" role="dialog" aria-label="Time of day" hidden>
+  <p class="pop-title">On the island it's <strong id="phaseName">day</strong></p>
+  <input id="timeRange" type="range" min="0" max="24" step="0.05" aria-label="Time of day">
+  <div class="pop-row">
+    <button type="button" data-time="6.6">Dawn</button>
+    <button type="button" data-time="12">Noon</button>
+    <button type="button" data-time="18.6">Dusk</button>
+    <button type="button" data-time="23">Night</button>
+    <button type="button" data-time="now" class="strong">Now</button>
+  </div>
+  <p class="pop-foot">It follows your clock unless you change it.</p>
+</div>
+
+<!-- ============ THE ISLAND (built by world.js from the sections below) ============ -->
+<div id="world" aria-hidden="true">
+  <div class="sky">
+    <div class="stars"></div>
+    <div class="sun"></div>
+    <div class="moon"></div>
+    <div class="cloud c1"></div><div class="cloud c2"></div><div class="cloud c3"></div><div class="cloud c4"></div>
+  </div>
+  <div class="world-stage"></div>
+  <p class="world-hint"><span>Click a building to visit it · </span><button type="button" data-lens-set="reader">or just read →</button></p>
+</div>
+
+<aside id="panel" aria-labelledby="panelPlace" aria-hidden="true">
+  <div class="panel-head">
+    <p class="panel-kicker"><span id="panelNum">01</span> · <span id="panelKicker">Home</span></p>
+    <p class="panel-place" id="panelPlace">Town Hall</p>
+    <div class="panel-nav">
+      <button type="button" id="panelPrev" aria-label="Walk to previous place">←</button>
+      <button type="button" id="panelNext" aria-label="Walk to next place">→</button>
+      <button type="button" id="panelClose" aria-label="Close">✕</button>
+    </div>
+  </div>
+  <div class="panel-body" tabindex="-1"></div>
+</aside>
+
+<!-- ============ THE CONTENT — single source of truth ============
+     Each <section data-building="…"> becomes a place on the island.
+     data-place  = the name on the island
+     data-kicker = the plain name
+     building types: hall, workshop, library, garden, observatory, lighthouse, post
+-->
+<main id="reader">
+
+  <section id="home" data-building="hall" data-place="Town Hall" data-kicker="Home">
+    <header class="sec-head">
+      <p class="kicker"><span class="num"></span>Town Hall</p>
+      <h1 class="hero">
+        <span class="hero-name">Husam</span>
+        <span class="hero-is">is <span class="rotator" aria-live="off">
+          <span>building things for the web</span>
+          <span>a student of how things work</span>
+          <span>probably sketching something</span>
+          <span>collecting beautiful websites</span>
+          <span>happy you stopped by</span>
+        </span></span>
+      </h1>
+    </header>
+    <!-- EDIT: your two-sentence intro. Who you are, what you do, what you care about. -->
+    <p class="lede">This is my corner of the internet: projects, writing, half-finished notes and odd experiments. You can walk around the island or just read the page. It's the same stuff either way.</p>
+    <p>Right now I'm mostly working on <a href="#p-one">my best project</a>, writing about <a href="#w-one">things I've figured out</a>, and growing a few ideas in <a href="#garden">the garden</a>. There's a <a href="#now">now page</a> if you want the latest.</p>
+    <ul class="facts">
+      <li><span>Based in</span>Your city</li>
+      <li><span>Studying / working at</span>Your school or company</li>
+      <li><span>Into</span>design, code, and making things</li>
+      <li><span>Say hi</span><a href="#contact">send a postcard</a></li>
+    </ul>
+  </section>
+
+  <section id="work" data-building="workshop" data-place="The Workshop" data-kicker="Work">
+    <header class="sec-head">
+      <p class="kicker"><span class="num"></span>The Workshop</p>
+      <h2>Selected work</h2>
+    </header>
+    <p class="sec-intro">Things I've made, shipped, or broken in interesting ways. <!-- EDIT --></p>
+
+    <div class="projects">
+      <!-- EDIT: one <article> per project. Swap the .thumb div for an <img> when you have one. -->
+      <article class="project" id="p-one" data-cmd>
+        <div class="thumb" data-seed="your best project" aria-hidden="true"></div>
+        <div class="project-body">
+          <p class="meta"><span>2026</span><span>Design &amp; build</span></p>
+          <h3>Your best project</h3>
+          <p>One or two sentences: what it is, who it's for, and the most interesting problem you solved. Lead with the result if you have a number.</p>
+          <ul class="tags"><li>design</li><li>web</li><li>product</li></ul>
+          <p class="links"><a href="#">Visit ↗</a><a href="#">Case study</a></p>
+        </div>
+      </article>
+
+      <article class="project" id="p-two" data-cmd>
+        <div class="thumb" data-seed="something you shipped" aria-hidden="true"></div>
+        <div class="project-body">
+          <p class="meta"><span>2025</span><span>Solo project</span></p>
+          <h3>Something you shipped</h3>
+          <p>A project with real users or a real deadline. Mention the stack only if it's interesting, and say what you'd do differently now.</p>
+          <ul class="tags"><li>engineering</li><li>tools</li></ul>
+          <p class="links"><a href="#">Code ↗</a></p>
+        </div>
+      </article>
+
+      <article class="project" id="p-three" data-cmd>
+        <div class="thumb" data-seed="a thing that failed" aria-hidden="true"></div>
+        <div class="project-body">
+          <p class="meta"><span>2025</span><span>Team of 4</span></p>
+          <h3>A thing that failed (interestingly)</h3>
+          <p>Honest write-ups of things that didn't work are rare, and people remember them. What was the bet, and what did you learn?</p>
+          <ul class="tags"><li>research</li><li>lessons</li></ul>
+          <p class="links"><a href="#w-two">Read the post-mortem</a></p>
+        </div>
+      </article>
+
+      <article class="project" id="p-four" data-cmd>
+        <div class="thumb" data-seed="the side quest" aria-hidden="true"></div>
+        <div class="project-body">
+          <p class="meta"><span>Ongoing</span><span>For fun</span></p>
+          <h3>The side quest</h3>
+          <p>The weird personal thing: a zine, a bot, a physical object, a game jam entry. This is often the project people ask about.</p>
+          <ul class="tags"><li>play</li><li>art</li></ul>
+          <p class="links"><a href="#l-island">See also: this island</a></p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="writing" data-building="library" data-place="The Library" data-kicker="Writing">
+    <header class="sec-head">
+      <p class="kicker"><span class="num"></span>The Library</p>
+      <h2>Writing</h2>
+    </header>
+    <p class="sec-intro">Longer pieces, finished and edited. The rough drafts live in <a href="#garden">the garden</a>.</p>
+    <!-- EDIT: link each title to the full post -->
+    <ol class="shelf">
+      <li id="w-one" data-cmd><a href="#"><time datetime="2026-08">Aug 2026</time><span class="t">Things I've figured out this year</span><span class="r">8 min</span></a></li>
+      <li id="w-two" data-cmd><a href="#"><time datetime="2026-05">May 2026</time><span class="t">Post-mortem: the project that didn't work</span><span class="r">12 min</span></a></li>
+      <li id="w-three" data-cmd><a href="#"><time datetime="2026-02">Feb 2026</time><span class="t">An essay about something you care about</span><span class="r">6 min</span></a></li>
+      <li id="w-four" data-cmd><a href="#"><time datetime="2025-11">Nov 2025</time><span class="t">A tutorial you wish existed when you started</span><span class="r">15 min</span></a></li>
+    </ol>
+  </section>
+
+  <section id="garden" data-building="garden" data-place="The Garden" data-kicker="Notes">
+    <header class="sec-head">
+      <p class="kicker"><span class="num"></span>The Garden</p>
+      <h2>Notes in progress</h2>
+    </header>
+    <p class="sec-intro">Unfinished thinking, published anyway. Each note is marked with how grown it is: <span class="stage" data-stage="seedling">seedling</span>, <span class="stage" data-stage="budding">budding</span>, or <span class="stage" data-stage="evergreen">evergreen</span>.</p>
+    <div class="notes">
+      <article class="note" id="n-places" data-cmd data-stage="budding">
+        <span class="stage" data-stage="budding">budding</span>
+        <h3>Websites as places</h3>
+        <p>The personal sites I remember feel like places, not documents. You <em>visit</em> them. That's why this one is an island: the same content can be <a href="#n-lenses">read two ways</a>, but only one of them feels like going somewhere.</p>
+      </article>
+      <article class="note" id="n-lenses" data-cmd data-stage="evergreen">
+        <span class="stage" data-stage="evergreen">evergreen</span>
+        <h3>Two lenses, one source</h3>
+        <p>Spectacle should never cost the reader anything. Everything here is written once as plain HTML; the island is generated from it. If the island ever gets in the way, the Read button is always there. Related: <a href="#n-time">local time</a>.</p>
+      </article>
+      <article class="note" id="n-time" data-cmd data-stage="seedling">
+        <span class="stage" data-stage="seedling">seedling</span>
+        <h3>A website that shares your clock</h3>
+        <p>What if a site knew it was 2am where you are and dimmed the lights? A small thing, but it makes the page feel like it's in the same room as you. Early thoughts, built into <a href="#n-places">this island</a>.</p>
+      </article>
+      <article class="note" id="n-taste" data-cmd data-stage="seedling">
+        <span class="stage" data-stage="seedling">seedling</span>
+        <h3>A note you're still figuring out</h3>
+        <p>EDIT: garden notes can be two sentences long. The point is to think in public. Link notes to each other and the "Linked from" lists appear automatically.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="lab" data-building="observatory" data-place="The Observatory" data-kicker="Lab">
+    <header class="sec-head">
+      <p class="kicker"><span class="num"></span>The Observatory</p>
+      <h2>Experiments</h2>
+    </header>
+    <p class="sec-intro">Small, strange, unfinished things. Some are useful by accident.</p>
+    <div class="lab">
+      <a class="exp" id="l-island" data-cmd href="#colophon">
+        <div class="thumb" data-seed="husam.world" aria-hidden="true"></div>
+        <h3>This island</h3>
+        <p>A seeded isometric world drawn in SVG, following your local time.</p>
+      </a>
+      <a class="exp" id="l-two" data-cmd href="#">
+        <div class="thumb" data-seed="a creative coding sketch" aria-hidden="true"></div>
+        <h3>A creative-coding sketch</h3>
+        <p>EDIT: a toy, a shader, a generative poster, a tiny tool.</p>
+      </a>
+      <a class="exp" id="l-three" data-cmd href="#">
+        <div class="thumb" data-seed="a weekend hack" aria-hidden="true"></div>
+        <h3>A weekend hack</h3>
+        <p>EDIT: the thing you built in 48 hours because you couldn't stop thinking about it.</p>
+      </a>
+    </div>
+  </section>
+
+  <section id="now" data-building="lighthouse" data-place="The Lighthouse" data-kicker="Now">
+    <header class="sec-head">
+      <p class="kicker"><span class="num"></span>The Lighthouse</p>
+      <h2>What I'm doing now</h2>
+    </header>
+    <p class="sec-intro">A <a href="https://nownownow.com/about" rel="noopener">now page</a>: what I'm up to at the moment. Updated <time id="nowUpdated" datetime="2026-09-25">25 September 2026</time>.</p>
+    <!-- EDIT: keep this honest and current. Update the datetime above when you do. -->
+    <dl class="now-list">
+      <div><dt>Building</dt><dd>Whatever has your attention this month.</dd></div>
+      <div><dt>Learning</dt><dd>A skill you're bad at and getting better at.</dd></div>
+      <div><dt>Reading</dt><dd>The book on your nightstand.</dd></div>
+      <div><dt>Listening</dt><dd>An album on repeat.</dd></div>
+      <div><dt>Looking for</dt><dd>Internships, collaborators, good conversations. Whatever's true.</dd></div>
+    </dl>
+  </section>
+
+  <section id="contact" data-building="post" data-place="The Post Office" data-kicker="Contact">
+    <header class="sec-head">
+      <p class="kicker"><span class="num"></span>The Post Office</p>
+      <h2>Send a postcard</h2>
+    </header>
+    <p class="sec-intro">Questions, ideas, collaborations, or just hello. Everything gets read.</p>
+    <!-- EDIT: put your real email in data-email -->
+    <form class="postcard" id="postcard" data-email="hello@example.com">
+      <div class="pc-left">
+        <label for="pc-msg" class="sr">Your message</label>
+        <textarea id="pc-msg" name="msg" rows="6" placeholder="Dear Husam," required></textarea>
+        <label for="pc-from" class="sr">Your name</label>
+        <input id="pc-from" name="from" type="text" placeholder="— your name" autocomplete="name">
+      </div>
+      <div class="pc-right">
+        <div class="stamp" aria-hidden="true"><svg viewBox="0 0 64 64"><polygon points="32,14 56,26 32,38 8,26" class="b-top"/><polygon points="8,26 32,38 32,46 8,34" class="b-l"/><polygon points="32,38 56,26 56,34 32,46" class="b-r"/></svg><span>husam.world</span></div>
+        <p class="pc-addr">Husam<br>The Post Office<br>husam.world</p>
+        <div class="pc-actions">
+          <button type="submit" class="btn">Send postcard</button>
+          <button type="button" class="btn ghost" id="copyEmail">Copy email</button>
+        </div>
+      </div>
+    </form>
+    <ul class="elsewhere">
+      <!-- EDIT -->
+      <li><a href="#" rel="me">GitHub</a></li>
+      <li><a href="#" rel="me">LinkedIn</a></li>
+      <li><a href="#" rel="me">Are.na</a></li>
+      <li><a href="#">Résumé (PDF)</a></li>
+    </ul>
+  </section>
+
+  <footer class="colophon" id="colophon">
+    <div>
+      <h2>Colophon</h2>
+      <p>Hand-built with plain HTML, CSS and JavaScript. No framework, no build step, no cookies, no trackers. The island is a seeded isometric map drawn in SVG from the sections of this page, and lit by your local clock. Type is <a href="https://fonts.google.com/specimen/Instrument+Serif">Instrument Serif</a> and <a href="https://vercel.com/font">Geist</a>. Sounds are generated live in the browser.</p>
+      <p>Inspired by Bruno Simon, Maggie Appleton, Josh Comeau, Rauno Freiberg, gwern.net, Lynn Fisher, and the whole <a href="https://personalsit.es">personal web</a>.</p>
+    </div>
+    <nav class="webring" aria-label="Webring">
+      <!-- EDIT: join a webring, or make one with friends -->
+      <a href="#">← prev</a><span>a webring</span><a href="#">next →</a>
+    </nav>
+    <p class="fine">© <span id="year">2026</span> Husam · <a href="#home">back to the top</a></p>
+  </footer>
+</main>
+
+<div id="palette" role="dialog" aria-modal="true" aria-label="Command menu" hidden>
+  <div class="pal-box">
+    <input id="palInput" type="text" placeholder="Go somewhere, find something, change the time…" autocomplete="off" spellcheck="false" aria-controls="palList" aria-activedescendant="">
+    <ul id="palList" role="listbox"></ul>
+    <p class="pal-foot"><kbd>↑</kbd><kbd>↓</kbd> move <kbd>↵</kbd> go <kbd>esc</kbd> close</p>
+  </div>
+</div>
+
+<div id="preview" role="tooltip" hidden></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="world.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
