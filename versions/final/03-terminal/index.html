@@ -135,6 +135,7 @@ tbody tr:hover td{background:#0d0d0d}
 .px .wink{color:var(--gry);font-style:italic}
 .desc p{color:var(--wht);max-width:62em}
 .desc p+p{margin-top:.7em}
+.desl{border:0;border-right:1px solid var(--rule)}
 .fnlist li{display:grid;grid-template-columns:3em 1fr;gap:10px;padding:5px 0;border-bottom:1px dotted #222}
 .fnlist a{border:0;font-weight:700}
 .fnlist span{color:var(--gry)}
@@ -154,7 +155,7 @@ tbody tr:hover td{background:#0d0d0d}
 .chart{position:relative;min-height:320px;outline-offset:-2px}
 .chart svg{display:block;width:100%;height:auto}
 .chart .ax{fill:var(--gry);font-family:var(--mono);font-size:10px}
-.chart .ann{fill:var(--wht);font-family:var(--mono);font-size:10px}
+.chart .ann{fill:var(--wht);font-family:var(--mono);font-size:10px;paint-order:stroke;stroke:#000;stroke-width:4px;stroke-linejoin:round}
 .readout{min-height:2.2em;padding:6px 10px;border-top:1px solid var(--rule);font-size:12px;color:var(--wht)}
 .readout .k{color:var(--amb)}
 .nojs-chart{padding:14px 10px;color:var(--gry);font-size:12px}
@@ -268,6 +269,7 @@ tbody tr:hover td{background:#0d0d0d}
 @media (max-width:1100px){
   .des{grid-template-columns:1fr}
   .fa{grid-template-columns:1fr}
+  .desl{border-right:0;border-bottom:1px solid var(--rule)}
 }
 @media (max-width:959px){
   :root{--fs:12.5px}
@@ -296,6 +298,10 @@ tbody tr:hover td{background:#0d0d0d}
   .hist-t td:nth-child(2){width:2em}
   .status .clk span:nth-child(2){display:none}
   .lede{font-size:14px}
+  .sh .pg{display:none}
+  .st td.num{white-space:normal}
+  .mbar{width:56px}
+  .ph2{flex-wrap:wrap}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -340,7 +346,7 @@ tbody tr:hover td{background:#0d0d0d}
 <section class="screen is-active" id="des" aria-labelledby="des-h">
   <header class="sh"><span class="fn">DES</span><h2 id="des-h">Security description</h2><span class="pg">SOKR &lt;Equity&gt; · Page 1/1</span></header>
   <div class="grid des">
-    <div class="panel" style="border:0;border-right:1px solid var(--rule)">
+    <div class="panel desl">
       <div class="hero">
         <p class="tkr"><b>SOKR</b> &lt;Equity&gt; · Private · Est. Fresno, CA · Listed: Cambridge &amp; San Francisco</p>
         <h1>Husam Sokar<span class="cur" aria-hidden="true"></span></h1>
@@ -468,7 +474,7 @@ tbody tr:hover td{background:#0d0d0d}
             <tr data-d="2021-09" data-n="5" data-l="Board member, Muslim Community Association of Fresno" data-ann=""><td>Sep 2021</td><td class="num">5</td><td>Board member, Muslim Community Association of Fresno</td></tr>
             <tr data-d="2021-05" data-n="4" data-l="Lead Advocate, CAIR, Sacramento · AB 1766 + four more CA bills" data-ann="AB 1766 + 4 bills"><td>May 2021</td><td class="num">4</td><td>Lead Advocate, CAIR, Sacramento <span class="g">· AB 1766 + four more CA bills</span></td></tr>
             <tr data-d="2020-03" data-n="3" data-l="Starts Electric Deals at 14 · Facebook + eBay stores, ~$28K revenue" data-ann="Electric Deals, age 14"><td>Mar 2020</td><td class="num">3</td><td>Starts Electric Deals at 14 <span class="g">· Facebook + eBay stores, ~$28K revenue</span></td></tr>
-            <tr data-d="2018-01" data-n="2" data-l="Volunteer teacher, Masjid Fresno Saturday School · 2018–2021" data-ann=""><td>2018</td><td class="num">2</td><td>Volunteer teacher, Masjid Fresno Saturday School <span class="g">· 2018–2021</span></td></tr>
+            <tr data-d="2018-01" data-n="2" data-l="Volunteer, Masjid Fresno Saturday School · 2018–2021" data-ann=""><td>2018</td><td class="num">2</td><td>Volunteer, Masjid Fresno Saturday School <span class="g">· 2018–2021</span></td></tr>
             <tr data-d="2015-01" data-n="1" data-l="Volunteer, Central California Food Bank · most Sundays, 2015–2021" data-ann="Food bank, Sundays"><td>2015</td><td class="num">1</td><td>Volunteer, Central California Food Bank <span class="g">· most Sundays, 2015–2021</span></td></tr>
           </tbody>
         </table>
@@ -500,7 +506,7 @@ tbody tr:hover td{background:#0d0d0d}
 
 <!-- ======================= FA ======================= -->
 <section class="screen" id="fa" aria-labelledby="fa-h">
-  <header class="sh"><span class="fn">FA</span><h2 id="fa-h">Operator financials</h2><span class="pg">Reported figures · no estimates added</span></header>
+  <header class="sh"><span class="fn">FA</span><h2 id="fa-h">Operator financials</h2><span class="pg">Reported figures</span></header>
   <div class="sbody grid fa">
     <div class="panel">
       <div class="ph2"><h3>MCA Fresno · statement of operations</h3><span>May 2022–Dec 2025</span></div>
@@ -686,7 +692,7 @@ tbody tr:hover td{background:#0d0d0d}
       <li><b>CA MOCK TRIAL</b>FINALS MVP</li>
       <li><b>WSJ</b>04/16/25 · CONTRIBUTOR</li>
       <li><b>THE NATION</b>10/11/24 · CONTRIBUTOR</li>
-      <li><b>CN</b>[EMAIL]</li>
+
     </ul>
     <ul aria-hidden="true">
       <li><b>SOKR</b><i>&#9650;</i> STEALTH</li>
@@ -708,7 +714,7 @@ tbody tr:hover td{background:#0d0d0d}
       <li><b>CA MOCK TRIAL</b>FINALS MVP</li>
       <li><b>WSJ</b>04/16/25 · CONTRIBUTOR</li>
       <li><b>THE NATION</b>10/11/24 · CONTRIBUTOR</li>
-      <li><b>CN</b>[EMAIL]</li>
+
     </ul>
   </div></div>
 </aside>
@@ -946,7 +952,7 @@ function drawChart(){
   var step = (yTop-yMin)>20?5:((yTop-yMin)>8?2:1);
   for(var v=Math.ceil(yMin/step)*step; v<=yTop; v+=step){
     s+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="#1b1b1b"/>';
-    s+='<text class="ax" x="'+(W-m.r+8)+'" y="'+(Y(v)+3.5)+'">'+v+'</text>';
+    if(Math.abs(Y(v)-Y(EV.length))>12) s+='<text class="ax" x="'+(W-m.r+8)+'" y="'+(Y(v)+3.5)+'">'+v+'</text>';
   }
   /* x grid: years */
   var yStep = (x1-x0)>6 ? (W<600?2:1) : 1;
@@ -971,8 +977,8 @@ function drawChart(){
   /* annotations */
   var anns=vis.filter(function(e){ return e.ann; });
   anns.forEach(function(e,i){
-    var ax=X(e.t), ay=Y(e.n), up = ay-26 > m.t+4;
-    var ty = up ? ay-30 : ay+26;
+    var ax=X(e.t), ay=Y(e.n), off=30+(i%2)*16, up = ay-off > m.t+10;
+    var ty = up ? ay-off : ay+off;
     var anchor = ax > W-m.r-130 ? 'end' : 'start';
     s+='<line x1="'+ax+'" x2="'+ax+'" y1="'+(ay-(up?4:-4))+'" y2="'+(ty+(up?6:-11))+'" stroke="#f3f1ea" stroke-opacity=".5" stroke-dasharray="2 2"/>';
     s+='<text class="ann" text-anchor="'+anchor+'" x="'+(ax+(anchor==='end'?-4:4))+'" y="'+ty+'">'+e.ann+'</text>';

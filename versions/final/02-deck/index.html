@@ -73,7 +73,7 @@ p{margin:0}
 /* ---------- 1 title ---------- */
 #title .s-body{display:flex;flex-direction:column;gap:22px;min-height:70svh;justify-content:flex-end}
 #name{font-size:clamp(64px,15.2vw,262px);font-variation-settings:"wdth" 78,"opsz" 96;font-weight:800;letter-spacing:-.045em;line-height:.84;margin-left:-.04em}
-#name .ch{display:inline-block;white-space:pre}
+#name .wd{white-space:nowrap}#name .ch{display:inline-block}
 html.typing #name .ch{visibility:hidden}
 html.typing #name .ch.on{visibility:visible}
 .caret{display:inline-block;width:.09em;height:.72em;background:var(--sun);margin-left:.03em;vertical-align:baseline;animation:blink .9s steps(1) infinite}
@@ -151,8 +151,8 @@ html.typing #name .ch.on{visibility:visible}
 .quad .ax{position:absolute;color:var(--ink-2);white-space:nowrap}
 .quad .ax-l{left:0;top:calc(100% + 8px)}
 .quad .ax-r{right:0;top:calc(100% + 8px)}
-.quad .ax-t{left:0;bottom:calc(100% + 8px)}
-.quad .ax-b{right:0;bottom:calc(100% + 8px)}
+.quad .ax-t{left:50%;bottom:calc(100% + 8px);transform:translateX(-50%)}
+.quad .ax-b{left:50%;top:calc(100% + 8px);transform:translateX(-50%)}
 .quad .qname{position:absolute;font-family:var(--display);font-variation-settings:"wdth" 75,"opsz" 96;font-weight:800;font-size:clamp(20px,3vw,44px);letter-spacing:-.03em;color:rgba(34,51,238,.13);line-height:.9;pointer-events:none}
 .qn-tl{left:10px;top:10px}.qn-tr{right:10px;top:10px;text-align:right}.qn-bl{left:10px;bottom:10px}.qn-br{right:10px;bottom:10px;text-align:right}
 .pt{position:absolute;left:calc(var(--x) * 1%);bottom:calc(var(--y) * 1%);width:0;height:0}
@@ -208,6 +208,7 @@ html.typing #name .ch.on{visibility:visible}
 
 /* ---------- deck chrome ---------- */
 .chrome{display:none}
+.ov-title{display:none}
 
 /* ================= DESKTOP DECK ================= */
 @media (min-width:821px) and (min-height:561px){
@@ -219,7 +220,8 @@ html.typing #name .ch.on{visibility:visible}
   .s-head span:nth-child(2){display:block}
   .s-head span:last-child{text-align:right}
   .s-body{width:100%}
-  #title .s-body{min-height:0;gap:clamp(20px,3vh,34px)}
+  #title{justify-content:flex-end}
+  #title .s-body{min-height:0;gap:clamp(20px,3vh,34px);padding-bottom:4vh}
   .title-bottom{display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:end}
   .problem{grid-template-columns:1.6fr 1fr;align-items:end;gap:56px}
   .fit-head{grid-template-columns:1fr 1fr;align-items:end;gap:48px;margin-bottom:clamp(24px,5vh,56px)}
@@ -263,7 +265,6 @@ html.typing #name .ch.on{visibility:visible}
   html.ov .slide::after{content:attr(data-label);position:absolute;left:0;top:100%;margin-top:calc(8px * var(--inv));font-family:var(--display);font-variation-settings:"wdth" 85;font-weight:650;font-size:calc(13px * var(--inv));color:var(--ink);white-space:nowrap}
   html.ov .slide:hover,html.ov .slide:focus-visible{outline:calc(4px * var(--inv)) solid var(--tomato);outline-offset:0}
   html.ov .slide.is-cur{box-shadow:0 0 0 calc(4px * var(--inv)) var(--ink)}
-  .ov-title{display:none}
   html.ov .ov-title{display:flex;position:fixed;z-index:35;top:24px;left:48px;right:48px;justify-content:space-between;align-items:baseline;pointer-events:none}
   .ov-title .d{font-size:34px}
   .ov-sizer{position:absolute;left:0;top:0;width:1px;height:var(--ovh,0)}
@@ -291,7 +292,7 @@ html.intro{overflow:hidden}
 
 /* card mode tweaks */
 @media (max-width:820px), (max-height:560px){
-  .big .num{font-size:clamp(100px,30vw,220px)}
+  .big .num{font-size:clamp(72px,23vw,220px)}
   .fourteen .agebig{font-size:clamp(140px,44vw,300px)}
   .quad{margin:32px 4px 34px}
   .quad .ax{font-size:11px;letter-spacing:.05em}
@@ -481,14 +482,10 @@ html.intro{overflow:hidden}
         </ol>
       </div>
       <figure class="quad" data-st aria-label="Two-by-two chart of Husam's own roles: inside institutions versus building from scratch, words versus numbers">
-        <span class="ax ax-l lbl">← Inside institutions</span>
-        <span class="ax ax-r lbl">Building from scratch →</span>
+        <span class="ax ax-l lbl">← Institutions</span>
+        <span class="ax ax-r lbl">From scratch →</span>
         <span class="ax ax-t lbl">↑ Numbers</span>
         <span class="ax ax-b lbl">Words ↓</span>
-        <span class="qname qn-tl" aria-hidden="true">Audit<br>it</span>
-        <span class="qname qn-tr" aria-hidden="true">Ship<br>it</span>
-        <span class="qname qn-bl" aria-hidden="true">Argue<br>it</span>
-        <span class="qname qn-br" aria-hidden="true">Rally<br>it</span>
         <span class="pt" style="--x:10;--y:80"><span class="dot">1</span><span class="pl-t">Law-firm billing</span></span>
         <span class="pt" style="--x:22;--y:91"><span class="dot">2</span><span class="pl-t">Harvard Youth Poll</span></span>
         <span class="pt" style="--x:30;--y:67"><span class="dot">3</span><span class="pl-t">Econometrics research</span></span>
@@ -810,7 +807,7 @@ html.intro{overflow:hidden}
   var txt = nameEl.textContent;
   nameEl.setAttribute('aria-label', txt);
   function splitName(){
-    nameEl.innerHTML = txt.split('').map(function(c){ return '<span class="ch" aria-hidden="true">'+c+'</span>'; }).join('');
+    nameEl.innerHTML = txt.split(' ').map(function(w){ return '<span class="wd">'+w.split('').map(function(c){ return '<span class="ch" aria-hidden="true">'+c+'</span>'; }).join('')+'</span>'; }).join(' ');
   }
   var loader = document.getElementById('loader');
   var introOn = root.classList.contains('intro');

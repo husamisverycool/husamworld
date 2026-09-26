@@ -1,3 +1,6 @@
 versions/*/shot-*.png
 versions/final/*/shot-*.png
 versions/final/*/*.png
+world/_shots/
+world/_shots/
+world/**/*.png

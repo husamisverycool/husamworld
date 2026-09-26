@@ -30,7 +30,7 @@
   --mono:"Courier Prime","Courier New",Courier,monospace;
 }
 *{box-sizing:border-box}
-html{background:var(--paper);-webkit-text-size-adjust:100%}
+html{background:var(--paper);-webkit-text-size-adjust:100%;overflow-x:clip}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:17.5px;line-height:1.56;overflow-x:hidden}
 ::selection{background:var(--blue);color:#fff}
 a{color:var(--blue);text-decoration-thickness:1px;text-underline-offset:2px}
@@ -229,7 +229,11 @@ table.ex td:first-child{white-space:nowrap;font-family:var(--mono);font-size:13.
   .stamp .s1{font-size:15px}
   .stamp .s2{font-size:12px}
   .stamp .s3{font-size:8.5px}
-  .stamp{padding:6px 9px 5px}
+  .stamp{padding:6px 9px 5px;margin:8px 10px 8px 0}
+  .cover-top{overflow:hidden;padding:4px 0}
+  .cover-top .l{flex:1;min-width:0}
+  .cover-top .l b{display:block}
+  .tx-bar{width:70px}
 }
 @media (max-width:560px){
   body{font-size:17px}
