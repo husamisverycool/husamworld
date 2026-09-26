@@ -76,7 +76,6 @@ html.os-live #page{display:none}
 .popup.off{opacity:0;pointer-events:none}
 .pbox{background:#000;border:7px solid #fff;padding:24px;color:#fff;font:16px/1.3 var(--hh);letter-spacing:.8px;max-width:500px}
 .pbox p{margin:0}
-.pwarn{color:yellow;margin-top:12px!important}
 .pbtns{display:flex;justify-content:center;margin-top:16px}
 .bios-btn{background:#000;border:solid #fff;border-width:4px 3px;color:#fff;font:inherit;letter-spacing:inherit;padding:0;cursor:pointer}
 .bios-btn span{display:block;padding:8px}
@@ -229,7 +228,7 @@ html.os-live #page{display:none}
 .task{flex:1 1 0;max-width:220px;min-width:0;height:24px;display:flex;align-items:center;gap:5px;padding:0 6px 0 4px;font:14px/1 var(--ui);background:var(--lg);border:0;box-shadow:var(--out);text-align:left;cursor:pointer;color:#000}
 .task img{width:16px;height:16px;flex:none}
 .task span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.task.on{box-shadow:var(--in);background:var(--dither);font-weight:700}
+.task.on{box-shadow:var(--in);background:var(--dither)}
 .task:focus-visible{outline:1px dotted #000;outline-offset:-4px}
 #tray{height:24px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px 0 3px;box-shadow:var(--thin-in)}
 #tray button{background:none;border:0;padding:0 2px;height:20px;display:flex;align-items:center;cursor:pointer;color:#000;font:12px/1 var(--ui)}
@@ -607,7 +606,7 @@ html.noglass .g-scan,html.noglass .g-flick,html.noglass .g-smudge{display:none}
   </div>
   <div class="popup off" id="popup" role="dialog" aria-labelledby="popup-title" aria-describedby="popup-msg">
     <div class="pbox">
-      <p id="popup-title">HusamOS 95 &middot; The Garage</p>
+      <p id="popup-title">The Garage Showcase 2026</p>
       <p id="popup-msg"><span id="popup-text">Click start to begin</span>&nbsp;<span class="cursor" aria-hidden="true"></span></p>
       <div class="pbtns"><button class="bios-btn" id="start-btn" type="button"><span>START</span></button></div>
       <p class="palt"><a href="#page">or read it as a page</a></p>
@@ -2630,8 +2629,9 @@ const APPS = {
   /* ---------- The Garage: Henry's "My Showcase" home (a small website in a window), rebuilt for the builds ---------- */
   showcase: {
     title: 'The Garage - Showcase 2026', icon: 'computer', minSize: [380, 280], status: '\u00a9 Copyright 2026 Husam Sokar',
-    size: () => [1040, 740],
-    pos: (ww, hh, W, H) => [W >= 1280 ? Math.min(W - ww - 8, 212) : Math.max(8, Math.round((W - ww) / 2)), Math.max(8, Math.round((H - hh) / 2))],
+    // big, like Henry's (1116 of 1280), but its bottom edge stays above the bottom-left 72px corner kept for the world button
+    size: () => [Math.min(1040, innerWidth - 16), Math.min(740, innerHeight - 32 - 52)],
+    pos: (ww, hh, W, H) => [W >= 1280 ? Math.min(W - ww - 8, 212) : Math.max(8, Math.round((W - ww) / 2)), Math.max(8, Math.round((H - 44 - hh) / 2))],
     mount(b, w) {
       // Henry's ResumeDownload box ("Looking for my resume? / Click here to download it!"), pointing at each program
       const get = (id, q, a) => `<div class="sc-get"><img src="${ICONS[DESK.find(d => d.id === id).icon]}" alt=""><div><h3>${q}</h3><button class="lk" type="button" data-open="${id}">${a}</button></div></div>`;

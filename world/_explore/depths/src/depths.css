@@ -64,6 +64,8 @@ html.under .ctl:hover,html.under .ctl[aria-expanded="true"]{background:rgba(255,
 /* ---------- the ocean ---------- */
 .ocean{position:relative;z-index:2}
 html:not(.js) .ocean{background:linear-gradient(180deg,#0a8ea0 0,#05505e 4%,#01161d 12%,#000 20%)}
+/* uppercase is Neal's own: .zone-title{color:#eabdff;font-size:48px;font-weight:700;text-transform:uppercase} and
+   .animal-name{color:#f7f1e3;font-size:16px;font-weight:lighter;margin-top:5px;opacity:.9;text-transform:uppercase}; no letter-spacing in either */
 .zone-title{font:700 48px/1.12 var(--cond);color:var(--lilac);text-transform:uppercase;text-align:center}
 .zone-range{display:block;font:400 24px/1.6 var(--cond);color:#fff;text-transform:none;padding-top:8px;margin-top:10px}
 .blurb{font:400 24px/1.6 var(--cond);color:#fff;text-align:center}
