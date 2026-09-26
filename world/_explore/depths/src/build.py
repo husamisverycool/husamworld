@@ -135,7 +135,7 @@ RAFT = [
     ('National African American Recognition Program', 'National recognition.', art.f_orange),
     ('International Geography Olympiad', 'Team USA qualifier: 7th nationally, with a perfect qualifying score.', art.f_globe),
     ('National History Day', 'Valley Champion, twice.', art.f_bottle),
-    ('Summa Cum Laude', 'Clovis Community College. The highest Latin honor.', art.f_cap),
+    ('Summa Cum Laude', 'The highest Latin honor.', art.f_cap),
 ]
 TOTAL = count_measured + len(RAFT)
 POOL_COUNT = {1: 'one', 15: 'fifteen'}.get(len([x for x in SPECS + [FLOOR] if x['id'] != 'quest-excellence']), str(len([x for x in SPECS + [FLOOR] if x['id'] != 'quest-excellence'])))
