@@ -390,7 +390,7 @@
   var ctlBox = D.querySelector('.controls'), ctlSy = -1, TEXTY = /^(P|H1|H2|H3|LI|FIGCAPTION|A)$/;
   function duck(sy) {
     if (!ctlBox || sy === ctlSy) return; ctlSy = sy;
-    if (ctlBox.contains(D.activeElement) || !jumpMenu.hidden || sinking) { ctlBox.classList.remove('ducked'); return; }
+    if (ctlBox.contains(D.activeElement) || (jumpMenu && !jumpMenu.hidden) || sinking) { ctlBox.classList.remove('ducked'); return; }
     var r = ctlBox.getBoundingClientRect(), hit = false;
     for (var i = 0; i < 5 && !hit; i++) {
       var x = r.left + 4 + (r.width - 8) * i / 4;
