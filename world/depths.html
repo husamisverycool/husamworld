@@ -254,7 +254,7 @@ html.sinking #sinkBtn{background:var(--cream);color:var(--navy)}
   .zone-range{font-size:17px}
   .spec-art{max-width:140px}
 }
-@media (max-width:600px){.depth-line{font-size:21px}}
+@media (max-width:600px){.depth-line{font-size:21px}.descender-sticky{width:40vw;margin-right:3%}}
 @media (max-width:500px){
   .title{font-size:48px;line-height:1.05}
   .title-credit{font-size:18px;margin-top:10px}
@@ -540,7 +540,11 @@ html.sinking #sinkBtn{background:var(--cream);color:var(--navy)}
       put(el, best[0], span, best[1], h);
     });
     var d = $('descender');
-    if (d) { d.style.top = ((1000 - 1) * K) + 'px'; d.style.height = ((NMAX - 1000) * K) + 'px'; d.style.left = '0'; d.style.width = '100%'; }
+    if (d) {
+      var fl = scale.querySelector('[data-kind="floor"]'), dTop = (1000 - 1) * K;
+      var dEnd = fl ? parseFloat(fl.style.top) - 24 : (NMAX - 1) * K;
+      d.style.top = dTop + 'px'; d.style.height = Math.max(0, dEnd - dTop) + 'px'; d.style.left = '0'; d.style.width = '100%';
+    }
     measure();
     var sc = scale.querySelector('[data-screens]');
     if (sc) {

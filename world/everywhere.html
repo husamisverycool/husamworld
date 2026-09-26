@@ -82,8 +82,6 @@ button{font:inherit;color:inherit}
 .codes button:hover,.codes button[aria-pressed="true"]{background:var(--hi);color:#000}
 .codes button:hover b,.codes button[aria-pressed="true"] b{color:#000}
 .hint{position:absolute;z-index:2;right:2ch;bottom:calc(var(--lh) * 1.5);max-width:44ch;text-align:right;color:var(--mid);background:#000}
-.hint .touch{display:none}
-@media (hover:none){.hint .mouse{display:none}.hint .touch{display:inline}}
 @media (max-width:899px){
   .hero{display:flex;flex-direction:column}
   .hint{position:relative;right:auto;bottom:auto;text-align:left;max-width:none;margin:auto 2ch calc(var(--lh) * 1.5) 2ch;padding-left:76px;background:none}
@@ -269,7 +267,7 @@ html.intro .skip{display:block}
     </div>
   </div>
   <div class="hpad" aria-hidden="true"></div>
-  <p class="hint"><span class="mouse">Pick a code, or a marker on the globe. Drag to turn it.</span><span class="touch">Tap a code or a marker. Swipe sideways to turn the globe.</span></p>
+  <p class="hint">Pick a code, or a marker on the globe. Drag the globe sideways to turn it.</p>
 </header>
 
 <section class="sect" id="departures" aria-labelledby="dep-h">
@@ -836,8 +834,6 @@ function computeFieldMask() {
     rng.selectNodeContents(el);
     Array.prototype.forEach.call(rng.getClientRects(), function (r) { if (r.width > 0) mark(r, 1); });
   });
-  var hs = getComputedStyle(hint);
-  if (hs.position !== 'absolute') { var hrr = hint.getBoundingClientRect(); hb = Math.max(hb, hrr.bottom - hr.top); }
   $$('.hcols > div').forEach(function (el) {
     var r = el.getBoundingClientRect(); if (!r.width || getComputedStyle(el).display === 'none') return;
     hb = Math.max(hb, r.bottom - hr.top);
