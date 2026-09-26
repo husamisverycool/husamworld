@@ -261,7 +261,8 @@ html.intro .skip{display:block}
       </ul>
     </div>
     <div class="wide-only">
-      <p id="hdate">Cambridge, MA:</p>
+      <p>Cambridge, MA:</p>
+      <p id="hday">&nbsp;</p>
       <p><span class="hi" id="hclock">--:--:--</span></p>
       <p class="gap">Sun overhead:</p>
       <p id="hsun">--</p>
@@ -1310,7 +1311,8 @@ function nyParts() {
   if (fmtNY) { var o = {}; fmtNY.formatToParts(d).forEach(function (p) { o[p.type] = p.value; }); return { h: o.hour, m: o.minute, s: o.second }; }
   return { h: String(d.getHours()).padStart(2, '0'), m: String(d.getMinutes()).padStart(2, '0'), s: String(d.getSeconds()).padStart(2, '0') };
 }
-var hclock = $('#hclock'), hsun = $('#hsun');
+var hclock = $('#hclock'), hsun = $('#hsun'), hday = $('#hday');
+try { hday.textContent = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'long', month: 'short', day: 'numeric' }).format(new Date()); } catch (e) {}
 function tickClocks() {
   var t = nyParts();
   if (!INTRO.active) hclock.textContent = t.h + ':' + t.m + ':' + t.s;
