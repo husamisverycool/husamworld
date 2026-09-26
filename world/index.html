@@ -6,7 +6,7 @@
 <title>Husam Sokar</title>
 <meta name="description" content="Husam Sokar's world: a tiny planet with one road wrapped around it, from Fresno to Cambridge. Drive it; every landmark is a door.">
 <meta name="theme-color" content="#7fc6d8">
-<script>(function(){var h=document.documentElement;h.className+=' js';try{history.scrollRestoration='manual'}catch(e){}if(location.hash.indexOf('#from-')===0)h.className+=' from';try{if(matchMedia('(prefers-reduced-motion: reduce)').matches)h.className+=' rm'}catch(e){}})();</script>
+<script>(function(){var h=document.documentElement;h.className+=' js';try{history.scrollRestoration='manual'}catch(e){}if(location.hash.indexOf('#from-')===0)h.className+=' from';if(window.WebGLRenderingContext)h.className+=' has-world';try{if(matchMedia('(prefers-reduced-motion: reduce)').matches)h.className+=' rm'}catch(e){}})();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Barlow+Condensed:wght@700;800&family=Barlow:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
@@ -147,6 +147,9 @@ html.coarse .toast.show{transform:translate(-50%,0);opacity:1}
 .atlas{position:relative;min-height:100vh;color:var(--ink)}
 html.has-world .atlas{position:fixed;inset:0;z-index:40;overflow-y:auto;overscroll-behavior:contain;visibility:hidden;pointer-events:none}
 html.has-world.map-open .atlas{visibility:visible}
+/* touch screens: the list scrolls itself (iOS won't scroll a layer that ignores touches), and the planet stays draggable beside it */
+html.has-world.coarse .atlas-panel{height:calc(100% - 72px);min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+html.has-world.coarse .atlas{overflow:hidden}
 .atlas-bar{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;pointer-events:none}
 .atlas-bar>*{pointer-events:auto}
 .atlas-kicker{margin:0;font:400 15px/1 var(--display);background:var(--ink);color:var(--cream);padding:9px 11px 8px}
