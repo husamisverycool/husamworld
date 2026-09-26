@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map Room: prototype C (crate label + bulletin board)</title>
+<link href="https://fonts.googleapis.com/css2?family=Ultra&family=Yellowtail&family=Anton&family=Permanent+Marker&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1c2a6e;--cream:#f6e7a1;--red:#d8412f;--grape:#6c2a57;--leaf:#3d6b3a;--sun:#f08a24;--cork:#c49a6c}
+*{box-sizing:border-box}
+body{margin:0;background:#3a2f26;color:#1a1a1a;font:17px/1.45 Georgia,serif}
+.wrap{max-width:1280px;margin:0 auto;padding:24px 20px 90px}
+.label{display:block;width:100%;height:auto;border:0;box-shadow:0 12px 24px -12px rgba(0,0,0,.7)}
+.board{margin-top:26px;padding:28px;border:14px solid #7b5a3c;border-radius:4px;
+ background-color:var(--cork);
+ background-image:radial-gradient(#a57a4e 1.2px,transparent 1.6px),radial-gradient(#d8b489 1px,transparent 1.4px);background-size:9px 11px,13px 7px;
+ display:grid;grid-template-columns:repeat(12,1fr);gap:22px;align-items:start}
+.fly{position:relative;background:#fff;padding:22px 18px 16px;box-shadow:0 3px 0 rgba(0,0,0,.08),0 10px 14px -8px rgba(0,0,0,.55);transform:rotate(var(--r,0deg))}
+.fly::before{content:"";position:absolute;top:8px;left:50%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff8a7a,var(--pin,#c0271a) 60%);box-shadow:2px 3px 2px rgba(0,0,0,.35)}
+.fly h2{font:400 30px/1 Anton,Impact,sans-serif;text-transform:uppercase;margin:6px 0 8px;letter-spacing:.01em}
+.fly p{margin:0 0 6px;font-size:15px}
+.canary{background:#fff3a0}.pink{background:#ffc7d1}.green{background:#cfeec0}.gold{background:#ffd98a}
+.marker{font-family:"Permanent Marker",cursive}
+.hand{font-family:"Nanum Pen Script",cursive;color:#1f3a9e;font-size:26px;line-height:1}
+.tabs{display:flex;margin:12px -18px -16px;border-top:1px dashed #555}
+.tabs button{all:unset;flex:1;writing-mode:vertical-rl;transform:rotate(180deg);font:600 11px/1.1 Arial,sans-serif;padding:8px 2px;border-left:1px dashed #555;text-align:center;cursor:pointer;height:96px;background:inherit;transition:transform .6s cubic-bezier(.3,.6,.4,1),opacity .6s}
+.tabs button:first-child{border-left:0}
+.tabs button.torn{transform:rotate(200deg) translate(-20px,-160px);opacity:0}
+.tabs button:focus-visible{outline:3px solid #1f3a9e}
+.thermo{display:flex;gap:16px;align-items:flex-end}
+.big{font:400 58px/1 Ultra,serif;color:var(--red)}
+@media (max-width:900px){.board{grid-template-columns:1fr;padding:18px;border-width:10px}.fly{grid-column:auto!important}.wrap{padding:16px 16px 90px}}
+@media (prefers-reduced-motion:reduce){.tabs button{transition:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<svg class="label" viewBox="0 0 1200 380" role="img" aria-label="A grape-lug crate label: Fresno and Clovis, home grown, Central Valley, California">
+ <defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c2a6e"/><stop offset=".62" stop-color="#3b3f8f"/><stop offset=".63" stop-color="#e78b3a"/><stop offset="1" stop-color="#f6c05a"/></linearGradient>
+  <path id="arc" d="M300,230 Q600,40 900,230"/>
+ </defs>
+ <rect width="1200" height="380" fill="#1c2a6e"/>
+ <rect x="10" y="10" width="1180" height="360" fill="none" stroke="#f6e7a1" stroke-width="4"/>
+ <g transform="translate(330,70)">
+  <rect width="540" height="230" fill="url(#sky)"/>
+  <circle cx="270" cy="150" r="54" fill="#f08a24"/>
+  <path d="M0,150 L60,95 L110,130 L170,70 L230,125 L300,60 L370,120 L430,80 L500,130 L540,110 L540,160 L0,160Z" fill="#6c5aa8" opacity=".9"/>
+  <path d="M0,160 H540 V230 H0Z" fill="#3d6b3a"/>
+  <path d="M270,162 L-200,240 M270,162 L-60,240 M270,162 L80,240 M270,162 L220,240 M270,162 L320,240 M270,162 L460,240 M270,162 L600,240 M270,162 L740,240" stroke="#244a26" stroke-width="7"/>
+ </g>
+ <text font-family="Ultra,serif" font-size="92" fill="#8e1d12" transform="translate(6,7)"><textPath href="#arc" startOffset="50%" text-anchor="middle">FRESNO·CLOVIS</textPath></text>
+ <text font-family="Ultra,serif" font-size="92" fill="#f6e7a1" stroke="#111" stroke-width="2"><textPath href="#arc" startOffset="50%" text-anchor="middle">FRESNO·CLOVIS</textPath></text>
+ <text x="170" y="210" text-anchor="middle" font-family="Yellowtail,cursive" font-size="72" fill="#f6e7a1" stroke="#111" stroke-width="1.5" transform="rotate(-8 170 210)">Home</text>
+ <text x="170" y="275" text-anchor="middle" font-family="Yellowtail,cursive" font-size="72" fill="#f6e7a1" stroke="#111" stroke-width="1.5" transform="rotate(-8 170 275)">Grown</text>
+ <text x="190" y="305" text-anchor="middle" font-family="Anton,Arial" font-size="16" fill="#f6e7a1" letter-spacing="6">BRAND</text>
+ <text x="1030" y="170" text-anchor="middle" font-family="Anton,Arial" font-size="40" fill="#f6e7a1">CENTRAL</text>
+ <text x="1030" y="215" text-anchor="middle" font-family="Anton,Arial" font-size="40" fill="#f6e7a1">VALLEY</text>
+ <text x="1030" y="250" text-anchor="middle" font-family="Anton,Arial" font-size="18" fill="#f08a24" letter-spacing="3">2015 – 2025</text>
+ <rect x="10" y="322" width="1180" height="48" fill="#d8412f"/>
+ <text x="600" y="354" text-anchor="middle" font-family="Anton,Arial" font-size="22" fill="#f6e7a1" letter-spacing="4">GROWN &amp; RAISED IN FRESNO &amp; CLOVIS, CALIFORNIA</text>
+</svg>
+
+<div class="board">
+ <article class="fly canary" style="grid-column:span 5;--r:-1.5deg">
+  <h2>Muslim Community Association of Fresno</h2>
+  <p><b>VP &amp; Executive Director</b>, May 2022 – Dec 2025.</p>
+  <p>Board member from Sep 2021; before the top job, Director of Outreach, Director of Relations, Director of External Relations.</p>
+  <p class="hand">youth-driven, all of it</p>
+ </article>
+ <article class="fly pink" style="grid-column:span 4;--r:2deg;--pin:#1f5fbf">
+  <h2>Raised: $240K+</h2>
+  <div class="thermo"><svg width="60" height="180" viewBox="0 0 60 180" aria-hidden="true"><rect x="20" y="8" width="20" height="140" rx="10" fill="#fff" stroke="#111" stroke-width="2"/><rect x="24" y="12" width="12" height="136" fill="#d8412f"/><circle cx="30" cy="155" r="20" fill="#d8412f" stroke="#111" stroke-width="2"/></svg>
+  <p class="marker" style="font-size:20px">for Syrian and Afghan refugees and Pakistan flood victims</p></div>
+ </article>
+ <article class="fly" style="grid-column:span 3;--r:-3deg;--pin:#e3b614">
+  <p class="big">150+</p><h2 style="font-size:24px">community events</h2>
+  <p>Clothing and food drives. Mentoring groups at local mosques and Islamic schools.</p>
+ </article>
+ <article class="fly green" style="grid-column:span 5;--r:1deg">
+  <h2>$500K pledge secured</h2>
+  <p>For Fresno’s first Muslim women’s transitional home, addressing homelessness and domestic abuse.</p>
+ </article>
+ <article class="fly gold" style="grid-column:span 3;--r:-2deg;--pin:#2a8a3a">
+  <h2>Sundays</h2><p>Central California Food Bank. Most Sundays, 2015–2021.</p>
+ </article>
+ <article class="fly" style="grid-column:span 4;--r:2.5deg">
+  <h2>Saturday School</h2><p>Masjid Fresno. Most Saturdays, 2018–2021.</p>
+ </article>
+ <article class="fly canary" style="grid-column:span 6;--r:-1deg;--pin:#1f5fbf">
+  <h2>MSA · Clovis Community College</h2><p>Director of Community Relations, 2022.</p>
+ </article>
+ <article class="fly" style="grid-column:span 6;--r:1.5deg">
+  <h2>Tutor</h2><p>Instilt Educate, 2023. Take a tab:</p>
+  <div class="tabs"><button>Tutor · Instilt Educate · 2023</button><button>Tutor · Instilt Educate · 2023</button><button>Tutor · Instilt Educate · 2023</button><button>Tutor · Instilt Educate · 2023</button><button>Tutor · Instilt Educate · 2023</button><button>Tutor · Instilt Educate · 2023</button></div>
+ </article>
+</div>
+</main>
+<script>
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>b.classList.add('torn')));
+</script>
+</body>
+</html>

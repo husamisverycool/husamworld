@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Airport</title>
+<meta name="description" content="Prototype C: Harvard and abroad as thermal-printed boarding passes and luggage tags.">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --counter:#8e9296;   /* brushed steel check-in counter */
+  --counter2:#7d8185;
+  --paper:#fbfbf8;     /* thermal paper */
+  --ink:#141414;
+  --red:#a70003;       /* the thermal second colour; also the Crimson's */
+  --gray:#6b6b6b;
+  --cond:"Barlow Condensed","Arial Narrow",sans-serif;
+  --mono:"Fira Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{background:var(--counter)}
+body{margin:0;color:var(--ink);font:400 14px/1.4 var(--mono);overflow-x:clip;
+  background:repeating-linear-gradient(90deg,var(--counter) 0 2px,var(--counter2) 2px 3px,var(--counter) 3px 7px)}
+h1,h2,h3,p,ul,dl,dd{margin:0;padding:0}ul{list-style:none}
+:focus-visible{outline:3px solid #ffd200;outline-offset:3px}
+.top{max-width:1180px;margin:0 auto;padding:48px 20px 20px;color:#fff;display:flex;flex-wrap:wrap;gap:20px 60px;align-items:flex-end}
+.top h1{font:600 clamp(64px,11vw,150px)/.85 var(--cond);letter-spacing:-.01em;text-transform:uppercase}
+.top p{max-width:40ch;font-size:15px}
+.slot{max-width:1180px;margin:30px auto 0;padding:0 20px}
+.slot h2{font:600 30px/1 var(--cond);text-transform:uppercase;color:#fff;letter-spacing:.02em;margin-bottom:14px;border-top:2px solid #fff;padding-top:10px}
+/* ---- the pass (Thompson's hierarchy; thermal: black + one red) ---- */
+.passes{display:grid;gap:26px}
+.pass{display:grid;grid-template-columns:minmax(0,1fr) 190px;background:var(--paper);box-shadow:0 1px 0 #0003,0 12px 24px -12px #0006;position:relative;
+  clip-path:inset(0 0 var(--hide,0%) 0);transition:clip-path 1.6s steps(24,end)}
+.main{padding:18px 22px 16px}
+.stub{padding:18px 18px 16px;border-left:2px dashed #bbb;position:relative;cursor:pointer;transition:transform .5s cubic-bezier(.3,.7,.3,1),opacity .5s}
+.stub.torn{transform:translate(30px,40px) rotate(8deg);opacity:0}
+.hdr{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gray)}
+.hdr b{color:var(--red);font-weight:500}
+.stripe{background:var(--ink);color:var(--paper);display:flex;align-items:center;gap:18px;margin:12px -22px;padding:6px 22px}
+.stripe .c{font:700 clamp(46px,6vw,76px)/1 var(--cond);letter-spacing:.01em}
+.stripe .to{font:500 14px/1.2 var(--mono);opacity:.85}
+.stripe .ar{font:400 44px/1 var(--cond)}
+dl.f{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 14px;margin-top:8px}
+dl.f dt{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gray)}
+dl.f dd{font:600 24px/1.05 var(--cond);text-transform:uppercase}
+dl.f dd.r{color:var(--red)}
+.note{margin-top:12px;font-size:13px;max-width:62ch}
+.bar{height:34px;margin-top:14px;display:block;width:100%}
+.stub .c{font:700 58px/1 var(--cond)}
+.stub dl.f{grid-template-columns:1fr}
+.stub dl.f dd{font-size:20px}
+.stub .hint{font-size:10px;color:var(--gray);margin-top:10px;letter-spacing:.08em;text-transform:uppercase}
+/* ---- luggage tags on the belt ---- */
+.belt{display:flex;gap:18px;overflow-x:auto;padding:14px 20px 30px;scroll-snap-type:x mandatory;max-width:1180px;margin:0 auto}
+.tag{flex:none;scroll-snap-align:start;width:200px;background:var(--paper);padding:14px 14px 18px;position:relative;box-shadow:0 10px 20px -12px #0007}
+.tag::before{content:"";position:absolute;left:50%;top:8px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--counter);box-shadow:inset 0 0 0 3px #ccc}
+.tag .code{font:700 64px/1 var(--cond);margin-top:22px;letter-spacing:-.01em}
+.tag h3{font:600 20px/1.05 var(--cond);text-transform:uppercase;margin-top:6px}
+.tag .role{font-size:12px;margin-top:6px;color:var(--red);text-transform:uppercase;letter-spacing:.06em}
+.tag p{font-size:12px;margin-top:6px}
+.tag .num{font-size:11px;letter-spacing:.2em;margin-top:10px;color:var(--gray)}
+.tag svg{display:block;width:100%;height:26px;margin-top:4px}
+footer{max-width:1180px;margin:0 auto;padding:30px 20px 120px;color:#fff;font-size:12px}
+@media (max-width:720px){
+  .pass{grid-template-columns:1fr}
+  .stub{border-left:0;border-top:2px dashed #bbb}
+  dl.f{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){.pass{transition:none}.stub{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <h1>The<br>Airport</h1>
+  <p>Harvard College, sophomore: Applied Math in Government and Economics. Four trips have left Cambridge. The passes below print as you reach them; tear a stub to keep it.</p>
+</header>
+
+<section class="slot" aria-labelledby="bp">
+  <h2 id="bp">Boarding passes</h2>
+  <div class="passes">
+    <article class="pass" data-code="KOR">
+      <div class="main">
+        <p class="hdr"><span>Boarding pass · <b>The Harvard Crimson</b></span><span>Sokar/Husam</span></p>
+        <div class="stripe"><span class="c">BOS</span><span class="ar">→</span><span class="c">KOR</span><span class="to">Cambridge to<br>South Korea</span></div>
+        <dl class="f"><div><dt>Flight</dt><dd>THC</dd></div><div><dt>Class</dt><dd class="r">Workshop lead</dd></div><div><dt>Length</dt><dd>2 weeks</dd></div><div><dt>Also</dt><dd>Mentor</dd></div></dl>
+        <p class="note">Two weeks of workshops on writing, leadership and journalism, as a Global Programs Associate for the nation's oldest daily college newspaper (est. 1873).</p>
+        <svg class="bar" data-bar="KOR THC"></svg>
+      </div>
+      <div class="stub" tabindex="0" role="button" aria-label="Tear off the stub"><p class="hdr"><span>Stub</span></p><p class="c">KOR</p><dl class="f"><div><dt>Class</dt><dd>Workshop lead</dd></div></dl><p class="hint">Tap to tear</p></div>
+    </article>
+    <article class="pass" data-code="LTU">
+      <div class="main">
+        <p class="hdr"><span>Boarding pass · <b>Harvard Hillel Travel Program</b></span><span>Sokar/Husam</span></p>
+        <div class="stripe"><span class="c">BOS</span><span class="ar">→</span><span class="c">LTU · POL · HUN</span></div>
+        <dl class="f"><div><dt>Flight</dt><dd>HIL</dd></div><div><dt>Class</dt><dd class="r">Fellow</dd></div><div><dt>Purpose</dt><dd>Research tour</dd></div><div><dt>Stops</dt><dd>3</dd></div></dl>
+        <p class="note">A research tour of Lithuania, Poland and Hungary.</p>
+        <svg class="bar" data-bar="LTU HIL"></svg>
+      </div>
+      <div class="stub" tabindex="0" role="button" aria-label="Tear off the stub"><p class="hdr"><span>Stub</span></p><p class="c">HUN</p><dl class="f"><div><dt>Class</dt><dd>Fellow</dd></div></dl><p class="hint">Tap to tear</p></div>
+    </article>
+    <article class="pass" data-code="PRI">
+      <div class="main">
+        <p class="hdr"><span>Boarding pass · <b>Catalyst</b></span><span>Sokar/Husam</span></p>
+        <div class="stripe"><span class="c">BOS</span><span class="ar">→</span><span class="c">PRI</span><span class="to">Cambridge to<br>Puerto Rico</span></div>
+        <dl class="f"><div><dt>Flight</dt><dd>CAT</dd></div><div><dt>Class</dt><dd class="r">Scholar</dd></div><div><dt>Purpose</dt><dd>Service-learning</dd></div><div><dt>Program</dt><dd>Sustainability</dd></div></dl>
+        <svg class="bar" data-bar="PRI CAT"></svg>
+      </div>
+      <div class="stub" tabindex="0" role="button" aria-label="Tear off the stub"><p class="hdr"><span>Stub</span></p><p class="c">PRI</p><dl class="f"><div><dt>Class</dt><dd>Scholar</dd></div></dl><p class="hint">Tap to tear</p></div>
+    </article>
+    <article class="pass" data-code="EUR">
+      <div class="main">
+        <p class="hdr"><span>Boarding pass · <b>Harvard Model Congress Europe</b></span><span>Sokar/Husam</span></p>
+        <div class="stripe"><span class="c">BOS</span><span class="ar">→</span><span class="c">EUR</span><span class="to">Cambridge to<br>Europe</span></div>
+        <dl class="f"><div><dt>Flight</dt><dd>HMCE</dd></div><div><dt>Class</dt><dd class="r">Staff</dd></div><div><dt>Delegates</dt><dd>500+</dd></div><div><dt>Countries</dt><dd>20+</dd></div></dl>
+        <svg class="bar" data-bar="EUR HMCE"></svg>
+      </div>
+      <div class="stub" tabindex="0" role="button" aria-label="Tear off the stub"><p class="hdr"><span>Stub</span></p><p class="c">EUR</p><dl class="f"><div><dt>Class</dt><dd>Staff</dd></div></dl><p class="hint">Tap to tear</p></div>
+    </article>
+  </div>
+</section>
+
+<section class="slot" aria-labelledby="bg">
+  <h2 id="bg">Baggage claim: Cambridge</h2>
+</section>
+<ul class="belt" aria-label="Luggage tags for the roles that stay in Cambridge">
+  <li class="tag"><p class="code">HMC</p><h3>Harvard Model Congress</h3><p class="role">Chair (Senior Staff)</p><p>Directing Boston: 1,500+ delegates, 100+ schools.</p><p class="num">0 0000 00001</p><svg data-bar="HMC"></svg></li>
+  <li class="tag"><p class="code">THC</p><h3>Crimson Business Board</h3><p class="role">Project Team Lead</p><p>TPR/AlgoEd camps with The Princeton Review and AlgoEd.</p><p class="num">0 0000 00002</p><svg data-bar="THCB"></svg></li>
+  <li class="tag"><p class="code">RAD</p><h3>Radcliffe Emerging Leaders</h3><p class="role">Mentor</p><p>Boston high-school sophomores.</p><p class="num">0 0000 00003</p><svg data-bar="RAD"></svg></li>
+  <li class="tag"><p class="code">HCF</p><h3>China Forum</h3><p class="role">Operations</p><p>America's largest conference on US-China relations.</p><p class="num">0 0000 00004</p><svg data-bar="HCCF"></svg></li>
+  <li class="tag"><p class="code">IRC</p><h3>Intl Relations Council</h3><p class="role">Asst Dir. Operations</p><p>HMUN · HNMUN.</p><p class="num">0 0000 00005</p><svg data-bar="HIRC"></svg></li>
+  <li class="tag"><p class="code">LIH</p><h3>Leadership Institute</h3><p class="role">Associate</p><p>Youth Lead the Change.</p><p class="num">0 0000 00006</p><svg data-bar="LIHC"></svg></li>
+  <li class="tag"><p class="code">FOP</p><h3>Outdoor Program</h3><p class="role">Leader</p><p class="num">0 0000 00007</p><svg data-bar="FOP"></svg></li>
+  <li class="tag"><p class="code">HON</p><h3>Honor Council</h3><p class="role">Member</p><p class="num">0 0000 00008</p><svg data-bar="HON"></svg></li>
+  <li class="tag"><p class="code">SPK</p><h3>SPARK Fellow</h3><p class="role">Summer 2025</p><p>7 weeks, $2,000.</p><p class="num">0 0000 00009</p><svg data-bar="SPRK"></svg></li>
+  <li class="tag"><p class="code">FNG</p><h3>Fong Family Fellow</h3><p class="role">Winter</p><p>A month, $1,000.</p><p class="num">0 0000 00010</p><svg data-bar="FONG"></svg></li>
+</ul>
+<footer>Prototype C. Pass hierarchy after Tyler Thompson's "Boarding Pass / Fail"; thermal black plus one red; IATA-style bag tags.</footer>
+<script>
+/* interleaved-2-of-5-looking bars from a string (decorative, deterministic) */
+function bars(svg) {
+  var s = svg.getAttribute('data-bar'), h = 2166136261, x = 0, out = '';
+  for (var i = 0; i < 90; i++) {
+    h ^= s.charCodeAt(i % s.length) + i; h = Math.imul(h, 16777619) >>> 0;
+    var w = 1 + (h & 3) % 3, gap = 1 + ((h >> 3) & 1);
+    out += '<rect x="' + x + '" y="0" width="' + w + '" height="30" fill="#141414"/>'; x += w + gap;
+  }
+  svg.setAttribute('viewBox', '0 0 ' + x + ' 30'); svg.setAttribute('preserveAspectRatio', 'none'); svg.setAttribute('aria-hidden', 'true'); svg.innerHTML = out;
+}
+document.querySelectorAll('[data-bar]').forEach(bars);
+var RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* the thermal print: each pass is revealed top-down in steps when it scrolls in */
+if (!RM && 'IntersectionObserver' in window) {
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.style.setProperty('--hide', '0%'); io.unobserve(e.target); } }); }, { threshold: 0.2 });
+  document.querySelectorAll('.pass').forEach(function (p, i) { if (i > 0) { p.style.setProperty('--hide', '100%'); io.observe(p); } });
+}
+document.querySelectorAll('.stub').forEach(function (s) {
+  function tear() { s.classList.toggle('torn'); }
+  s.addEventListener('click', tear);
+  s.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tear(); } });
+});
+</script>
+</body>
+</html>

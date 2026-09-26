@@ -1,0 +1,60 @@
+<!doctype html>
+<!-- Prototype B: type specimen (Typotheque / Khatt). Arabic drafted for Husam to proofread. -->
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>B · Specimen</title>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@160..700&family=Noto+Kufi+Arabic:wght@100..900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#0044FF;--orange:#FF6600;--ink:#000;--grey:#8A8A8A;--soft:#F8F8F8;--rule:#E4E4E4;--f:"Readex Pro",system-ui,sans-serif}
+*{box-sizing:border-box}html,body{margin:0;background:#fff;color:var(--ink)}body{font:14px/1.5 var(--f);overflow-x:hidden}
+header{display:flex;align-items:center;gap:14px;padding:10px}
+.logo{width:60px;height:60px;background:var(--orange);color:#fff;display:grid;grid-template-columns:1fr 1fr;place-items:center;font-size:20px;line-height:1}
+.crumb{font-size:16px}
+.hero{margin:0 10px;background:var(--soft);border-radius:10px;padding:10px;display:grid;grid-template-columns:240px 1fr 1fr;gap:40px}
+.tile{width:240px;height:240px;border-radius:10px;background:var(--blue);color:#fff;display:grid;place-items:center;font:500 150px/1 var(--f)}
+.hero h1{font-size:20px;font-weight:500;margin:34px 0 12px}
+table{border-collapse:collapse;width:100%;margin-top:70px}td{border-bottom:1px solid var(--rule);padding:9px 0;vertical-align:top}td:first-child{color:var(--grey);font-size:11px;width:40%}
+.tools{display:flex;gap:10px;margin:10px}.pill{border-radius:9999px;padding:18px 20px;background:var(--soft);border:0;font:inherit}
+.pill.on{background:var(--blue);color:#fff}
+input[type=text]{border-radius:9999px;border:0;background:var(--soft);padding:18px 28px;font:inherit;width:260px}
+input[type=range]{accent-color:var(--blue)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--rule);margin:0 10px}
+.cell{border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);height:220px;padding:14px 20px;position:relative;overflow:hidden}
+.cell .big{font-size:64px;line-height:1.1;white-space:nowrap;direction:rtl;text-align:right;-webkit-mask:linear-gradient(to left,#000 55%,transparent 92%);mask:linear-gradient(to left,#000 55%,transparent 92%);margin-top:18px}
+.cell .big.l{direction:ltr;text-align:left;-webkit-mask:linear-gradient(to right,#000 55%,transparent 92%);mask:linear-gradient(to right,#000 55%,transparent 92%)}
+.cell .cap{position:absolute;left:20px;bottom:14px;right:20px;color:#555;font-size:12px}
+.cell a{color:#00B6DE;position:absolute;right:20px;bottom:14px;text-decoration:none}
+.cell .cmp{position:absolute;top:10px;right:20px;color:#AA8866}
+.khatt{margin:40px 10px;background:#5B2C83;color:#D7F24B;border-radius:10px;padding:40px;display:grid;grid-template-columns:1fr auto;gap:20px;font:700 clamp(40px,7vw,96px)/.9 var(--f)}
+.khatt .v{writing-mode:vertical-rl;font-family:"Noto Kufi Arabic";color:#FF8A3D;font-size:.8em}
+@media(max-width:800px){.hero{grid-template-columns:1fr}.tile{width:100%;height:180px}.grid{grid-template-columns:1fr 1fr}.cell{height:180px}.cell .big{font-size:44px}.tools{flex-wrap:wrap}input[type=text]{width:100%}}
+</style>
+</head>
+<body>
+<header><div class="logo" aria-hidden="true"><span>E</span><span lang="ar">ع</span><span lang="ar">ع</span><span>E</span></div><div class="crumb">The Bridge › <span lang="ar">العربية</span> + English</div></header>
+<section class="hero"><div class="tile" lang="ar" aria-hidden="true">ض</div>
+<div><h1>Two scripts, one writer</h1><p>Arabic is called <span lang="ar">لغة الضاد</span>, the language of the <span lang="ar">ض</span>. I work in it and in English, and I translate professionally between them.</p><p>Type your own line below; both scripts share one weight axis.</p></div>
+<table><tr><td>Languages</td><td>English, Arabic</td></tr><tr><td>Direction</td><td>Left to right · <span lang="ar">من اليمين إلى اليسار</span></td></tr><tr><td>Certified</td><td>California State Seal of Biliteracy in Arabic</td></tr><tr><td>Translated for</td><td>White House in Arabic, 2022–2024</td></tr><tr><td>Readers and viewers</td><td>350,000+ (150,000+ readers, 200,000+ viewers)</td></tr><tr><td>Quotation marks</td><td>“…” · «…»</td></tr><tr><td>Numerals</td><td>0–9 · ٠١٢٣٤٥٦٧٨٩</td></tr></table></section>
+<div class="tools"><button class="pill on">Arabic</button><button class="pill">English</button><input type="text" id="tt" placeholder="Enter your own text…"><label class="pill">Weight <input type="range" id="wg" min="160" max="700" value="400"></label></div>
+<section class="grid" id="grid">
+<div class="cell"><span class="cmp">Senior English Writer</span><div class="big" lang="ar">البيت الأبيض بالعربية</div><div class="cap">White House in Arabic · Jul 2022–Apr 2024</div></div>
+<div class="cell"><span class="cmp">Editor</span><div class="big" lang="ar">مرح البقاعي</div><div class="cap">Under Marah Bukai, Washington Bureau Chief, Al-Arab</div></div>
+<div class="cell"><span class="cmp">Article</span><div class="big" lang="ar">تسريبات المالكي</div><div class="cap">MalikiLeaks: When Sectarianism Rules Iraq</div><a href="https://whia.us/en/5276/">Read ↗</a></div>
+<div class="cell"><span class="cmp">Article</span><div class="big" lang="ar">اعتصام التيار الصدري</div><div class="cap">The Sadrist Movement’s Sit-In…</div><a href="https://whia.us/en/6115/">Read ↗</a></div>
+<div class="cell"><span class="cmp">Press</span><div class="big l">The Wall Street Journal</div><div class="cap">Contributor · Apr 16, 2025</div></div>
+<div class="cell"><span class="cmp">Press</span><div class="big l">The Nation</div><div class="cap">Contributor · Oct 11, 2024</div></div>
+<div class="cell"><span class="cmp">Finalist</span><div class="big l">Princeton Summer Journalism</div><div class="cap">~60 of 900+</div></div>
+<div class="cell"><span class="cmp">Press Officer</span><div class="big l">Youth Climate Action Team</div><div class="cap">2023–2024</div></div>
+</section>
+<section class="khatt" aria-label="Biliteracy"><div>BI–<br>LIT–<br>ER–<br>ACY</div><div class="v" lang="ar">لغتان</div></section>
+<script>
+const g=document.getElementById('grid'),tt=document.getElementById('tt'),wg=document.getElementById('wg');
+const orig=[...g.querySelectorAll('.big')].map(b=>b.textContent);
+tt.addEventListener('input',()=>g.querySelectorAll('.big').forEach((b,i)=>b.textContent=tt.value||orig[i]));
+wg.addEventListener('input',()=>g.style.fontWeight=wg.value);
+// two-alphabet scramble on hover
+const A='ابتثجحخدذرزسشصضطظعغفقكلمنهوي',L='abcdefghijklmnopqrstuvwxyz';
+g.querySelectorAll('.big').forEach(b=>b.addEventListener('pointerenter',()=>{const t=b.textContent;let n=0;const id=setInterval(()=>{n++;b.textContent=[...t].map((c,i)=>c===' '||i<n*2?c:(Math.random()<.5?A:L)[Math.random()*26|0]).join('');if(n*2>=t.length){clearInterval(id);b.textContent=t}},40)}));
+</script>
+</body></html>

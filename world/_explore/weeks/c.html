@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plaza prototype C: twelve postcards</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500&family=Gochi+Hand&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#26231f;--card:#fbf8f1;--card2:#fff;--sans:'Jost','Futura','Century Gothic',sans-serif;--hand:'Gochi Hand','Marker Felt',cursive;
+--bill:#2a78d6;--speech:#eb6834;--translation:#1baf7a;--n1:#eda100;--triptik:#e87ba4;--os:#008300;--depths:#4a3aa7;--everywhere:#e34948}
+*{box-sizing:border-box}body{margin:0;background:#fff;color:#555;font:16px/1.7 var(--sans);overflow-x:hidden}
+h1{font:400 clamp(22px,3.4vw,40px)/1.35 var(--sans);letter-spacing:.3em;text-align:center;color:#111;margin:48px 16px 8px}
+.lede{max-width:640px;margin:0 auto 36px;text-align:center;padding:0 16px}
+.wall{max-width:1240px;margin:0 auto;padding:0 20px 80px;display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:36px 28px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pc{aspect-ratio:3/2;background:var(--card);box-shadow:0 1px 2px #0002,0 6px 14px -8px #0003;position:relative;overflow:hidden}
+.pc.back{background:var(--card2);font-family:var(--hand);color:#222;padding:8px 10px;font-size:11px;line-height:1.25}
+.pc.back h3{font:400 15px var(--hand);margin:0 0 2px;text-decoration:underline}
+.pc.back .div{position:absolute;left:62%;top:10%;bottom:8%;border-left:1px solid #555}
+.pc.back .to{position:absolute;left:66%;top:40%;right:6%;font-size:13px}.pc.back .to i{display:block;border-bottom:1px solid #999;height:14px;margin-top:4px}
+.pc.back .stamp{position:absolute;right:8px;top:8px;width:30px;height:36px;border:2px dotted #b33;background:#f3d7d7}
+.pc.back .key{width:58%}.pc.back .key div{display:flex;gap:6px;align-items:center}
+.cap{text-align:center;font-size:14px;color:#666;margin:10px 0 0}
+svg{display:block;width:100%;height:100%}
+.tip{position:fixed;pointer-events:none;background:#fff;border:1px solid #222;font:14px/1.3 var(--hand);padding:6px 9px;max-width:240px;z-index:9}
+@media (max-width:600px){.wall{grid-template-columns:1fr}.pair{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<h1>Twelve postcards:<br>a year of weeks on each</h1>
+<p class="lede">One card per year. Each little fan is a week, one ink line for every thing going on, coloured by the district it belongs to. The small circles at the foot are weekends. The back of each card is the key.</p>
+<div class="wall" id="wall"></div>
+<div class="tip" id="tip" hidden></div>
+<svg width="0" height="0" style="position:absolute"><filter id="wob"><feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="2.2"/></filter></svg>
+<script src="data.js"></script>
+<script>
+var NS='http://www.w3.org/2000/svg';function E(t,a,p){var n=document.createElementNS(NS,t);for(var k in a)n.setAttribute(k,a[k]);if(p)p.appendChild(n);return n;}
+var wall=document.getElementById('wall'),tip=document.getElementById('tip');
+function rnd(s){var x=Math.sin(s)*1e4;return x-Math.floor(x);}
+for(var y=2015;y<=2026;y++){(function(y){
+  var ws=WK.filter(function(w){return w.y===y});
+  var box=document.createElement('div');var pair=document.createElement('div');pair.className='pair';box.appendChild(pair);
+  var f=document.createElement('div');f.className='pc';pair.appendChild(f);
+  var s=E('svg',{viewBox:'0 0 390 260'},f);var g=E('g',{filter:'url(#wob)'},s);
+  ws.forEach(function(w,i){var c=i%13,r=Math.floor(i/13),cx=22+c*28.5,base=52+r*60;
+    var hit=E('g',{},g);
+    if(w.future){E('circle',{cx:cx,cy:base,r:1.2,fill:'#bbb'},hit);}
+    else{ var ps=[];parts(w).forEach(function(p){for(var k=0;k<p.n;k++)ps.push(p.d)});
+      E('line',{x1:cx,y1:base,x2:cx,y2:base-(ps.length?8:3),stroke:'#333','stroke-width':.8},hit);
+      ps.forEach(function(d,k){var a=-Math.PI/2+(k-(ps.length-1)/2)*0.32,L=26+rnd(w.i*7+k)*6;E('line',{x1:cx,y1:base-8,x2:cx+Math.cos(a)*L,y2:base-8+Math.sin(a)*L,stroke:'var(--'+d+')','stroke-width':1.3,'stroke-linecap':'round'},hit);});
+      if(w.sun)E('circle',{cx:cx-3,cy:base+5,r:2.2,fill:'none',stroke:'#333','stroke-width':.8},hit);
+      if(w.sat)E('circle',{cx:cx+3,cy:base+5,r:2.2,fill:'#333'},hit);}
+    E('rect',{x:cx-14,y:base-42,width:28,height:52,fill:'transparent'},hit);
+    hit.addEventListener('pointermove',function(ev){tip.hidden=false;tip.textContent='Week of '+longDay(w.s,1)+': '+(w.future?'not yet':cardText(w)+((w.sun||w.sat)?' · weekend dots: the Map Room':''));tip.style.left=Math.min(innerWidth-250,ev.clientX+12)+'px';tip.style.top=(ev.clientY+14)+'px';});
+    hit.addEventListener('pointerleave',function(){tip.hidden=true});
+  });
+  var b=document.createElement('div');b.className='pc back';pair.appendChild(b);
+  var past=ws.filter(function(w){return !w.future}),mx=0,on=0,dd={};past.forEach(function(w){if(w.n>mx)mx=w.n;if(w.n)on++;for(var k in w.by)dd[k]=1});
+  var key='<div class="key"><h3>DEAR PLAZA – '+y+'</h3>HOW TO READ IT:<div><svg width="20" height="16" viewBox="0 0 20 16"><path d="M10 15V9M10 9L4 2M10 9L10 1M10 9L16 2" stroke="#333" fill="none"/></svg>each fan = a week, each line = one thing</div>';
+  Object.keys(dd).forEach(function(k){key+='<div><svg width="20" height="8"><line x1="1" y1="4" x2="19" y2="4" stroke="var(--'+k+')" stroke-width="2"/></svg>'+DISTRICTS[k].name+'</div>'});
+  if(past.some(function(w){return w.sun}))key+='<div>○ most Sundays &nbsp; ● most Saturdays</div>';
+  key+='<div>most at once: '+mx+' · weeks with anything: '+on+'</div></div>';
+  b.innerHTML=key+'<div class="div"></div><div class="stamp"></div><div class="to">To:<i></i><i></i><i></i></div>';
+  var cap=document.createElement('p');cap.className='cap';cap.textContent=y+': a year of '+(mx?('up to '+mx+' at once'):'weekends');box.appendChild(cap);
+  wall.appendChild(box);})(y);}
+</script>
+</body>
+</html>

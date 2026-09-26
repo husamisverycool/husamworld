@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plaza prototype B: the annual report</title>
+<link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Hanken+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--coral:#ff6468;--taupe:#9f928a;--slate:#374659;--paper:#fff;--ink:#5f5650;
+--serif:'Rozha One','Bodoni 72','Didot',Georgia,serif;--sans:'Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
+--bill:#2a78d6;--speech:#eb6834;--translation:#1baf7a;--n1:#eda100;--triptik:#e87ba4;--os:#008300;--depths:#4a3aa7;--everywhere:#e34948}
+*{box-sizing:border-box}body{margin:0;background:#f3f1ef;color:var(--ink);font:14px/1.45 var(--sans);overflow-x:hidden}
+a{color:inherit}
+.page{max-width:1120px;margin:24px auto;background:var(--paper);padding:48px 56px 56px;position:relative}
+.cover{background:var(--coral);color:#fff}
+.cover .kick{display:flex;gap:40px;font-size:12px;letter-spacing:.02em;max-width:560px}
+.cover .kick b{font-family:var(--serif);font-weight:400;font-size:15px}
+.cover h1{font:400 clamp(64px,12vw,150px)/.9 var(--serif);margin:10px 0 18px;letter-spacing:-.01em;color:#ffd6d7}
+.bub{display:block;width:100%;height:auto}
+h2.pt{font:400 clamp(48px,8vw,96px)/.95 var(--serif);color:var(--taupe);margin:0 0 26px;letter-spacing:-.01em}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 28px}
+.mod{border-top:1px solid var(--coral);padding:8px 0 22px}
+.mod h3{font:400 17px/1.1 var(--serif);color:var(--coral);margin:0 0 3px}
+.mod h3 a{text-decoration:none}.mod h3 a:hover{text-decoration:underline}
+.cap{font-size:10.5px;color:#9a918b;margin:0 0 6px;border-bottom:1px solid #f6c9ca;padding-bottom:4px}
+.num{font:400 clamp(40px,5vw,60px)/1 var(--serif);color:var(--taupe);margin:6px 0 2px}
+.sub{display:grid;grid-template-columns:1fr 1fr;gap:10px;border-top:1px solid #f6c9ca;padding-top:5px;margin-top:6px}
+.sub b{display:block;font:400 14px var(--serif);color:var(--coral)}.sub span{font-size:10px;color:#9a918b}
+.spark{display:block;width:100%;height:46px}
+.years .mod .spark{height:58px}
+@media (max-width:860px){.page{padding:28px 18px 32px;margin:0 0 12px}.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 16px}}
+</style>
+</head>
+<body>
+<section class="page cover">
+  <div class="kick"><b>The Plaza Annual Report</b><span>Twelve years, one question: how many things at once? Each bubble is a week. The bigger it is, the more was going on. Slate bubbles are the weeks at the top.</span></div>
+  <h1>2015–<br>2026</h1>
+  <svg class="bub" id="bub" aria-label="Bubbles, one per week, in twelve year columns"></svg>
+</section>
+<section class="page">
+  <h2 class="pt">Totals</h2>
+  <div class="grid" id="totals"></div>
+</section>
+<section class="page">
+  <h2 class="pt">Districts</h2>
+  <div class="grid" id="districts"></div>
+</section>
+<section class="page years">
+  <h2 class="pt">Years</h2>
+  <div class="grid" id="years"></div>
+</section>
+<script src="data.js"></script>
+<script>
+var NS='http://www.w3.org/2000/svg';
+function E(t,a,p){var n=document.createElementNS(NS,t);for(var k in a)n.setAttribute(k,a[k]);if(p)p.appendChild(n);return n;}
+var PAST=WK.filter(function(w){return !w.future;});
+/* cover: 12 columns, bubbles stacked by count, like the FAR14 cover */
+(function(){var s=document.getElementById('bub'),W=1000,H=420;s.setAttribute('viewBox','0 0 '+W+' '+H);
+  for(var y=2015;y<=2026;y++){var col=(y-2015),cx0=col*(W/12)+W/24;var ws=PAST.filter(function(w){return w.y===y}).slice().sort(function(a,b){return a.n-b.n});
+    var yy=10;ws.forEach(function(w,k){var r=w.n?2+w.n*1.9:1.6;var x=cx0+((k%3)-1)*(W/40)+(k%2?4:-4);yy+=r*0.62;E('circle',{cx:x,cy:yy+r,r:r,fill:w.n===PKM.max?'#374659':w.n?'#fff':'#ffb3b5',opacity:w.n?.95:.8},s);});
+    var t=E('text',{x:cx0,y:H-4,'text-anchor':'middle','font-family':'Rozha One',fill:'#fff','font-size':16},s);t.textContent=y;}
+})();
+function spark(vals,max,color,hi){var s=E('svg',{class:'spark',viewBox:'0 0 '+vals.length*4+' 46',preserveAspectRatio:'none'});
+  vals.forEach(function(v,i){if(v>0)E('rect',{x:i*4,y:44-v/max*42,width:3,height:v/max*42,fill:(hi&&hi(i))?'#ff6468':color},s)});E('line',{x1:0,x2:vals.length*4,y1:45.5,y2:45.5,stroke:'#cfc7c1','stroke-width':1},s);return s;}
+function mod(parent,o){var d=document.createElement('div');d.className='mod';
+  d.innerHTML='<h3>'+(o.href?'<a href="../../'+o.href+'">'+o.h+' →</a>':o.h)+'</h3><p class="cap">'+o.cap+'</p>';
+  if(o.spark)d.appendChild(o.spark);
+  d.insertAdjacentHTML('beforeend','<div class="num">'+o.num+'</div><p class="cap">'+o.numcap+'</p><div class="sub"><div><b>'+o.a[0]+'</b><span>'+o.a[1]+'</span></div><div><b>'+o.b[0]+'</b><span>'+o.b[1]+'</span></div></div>');
+  parent.appendChild(d);}
+var byYear=[];for(var y=2015;y<=2026;y++)byYear.push(PAST.filter(function(w){return w.y===y}));
+var T=document.getElementById('totals');
+var hist=[0,0,0,0,0,0,0,0];PAST.forEach(function(w){hist[w.n]++});
+mod(T,{h:'At once',cap:'Most things going on in a single week',spark:spark(PAST.map(function(w){return w.n}),7,'#9f928a',function(i){return PAST[i].n===7}),num:PKM.max,numcap:'Things in one week, the most so far',a:[PKM.runs.length+' times','reached'],b:[hist[0]+'','weeks with none']});
+mod(T,{h:'Busiest stretch',cap:'Longest run at the top',spark:spark(PAST.slice(-60).map(function(w){return w.nm}),7,'#9f928a',function(i){var j=PAST.length-60+i;return j>=PKM.best[0]&&j<=PKM.best[1]}),num:(PKM.best[1]-PKM.best[0]+1),numcap:'Weeks in a row at 7',a:[shortDay(WK[PKM.best[0]].s),'from'],b:[shortDay(WK[PKM.best[1]].e,1),'to']});
+var wk=PAST.filter(function(w){return w.sun||w.sat}).length,both=PAST.filter(function(w){return w.sun&&w.sat}).length;
+mod(T,{h:'Weekends',cap:'Weeks with a standing weekend commitment',href:'triptik.html',spark:spark(byYear.map(function(a){return a.filter(function(w){return w.sun}).length+a.filter(function(w){return w.sat}).length}),104,'#9f928a'),num:wk,numcap:'Weeks, 2015–2021: most Sundays, then Saturdays too',a:[both+'','weeks with both'],b:['7 yrs','of Sundays']});
+mod(T,{h:'Service',cap:'Lifetime hours, President’s Volunteer Service Award',spark:null,num:'4,000+',numcap:'Service hours, lifetime',a:['Lifetime','award level'],b:['Hours','not weeks']});
+var D=document.getElementById('districts');
+ORDER.forEach(function(k){var per=byYear.map(function(a){return a.reduce(function(s,w){return s+(w.by[k]||0)},0)});var weeks=PAST.filter(function(w){return w.by[k]}).length;
+  var mx=0,first=null,best=0,by=0;per.forEach(function(v,i){if(v>mx)mx=v;if(v&&first===null)first=2015+i;if(v>best){best=v;by=2015+i}});
+  var hi=0;PAST.forEach(function(w){if((w.by[k]||0)>hi)hi=w.by[k]});
+  mod(D,{h:DISTRICTS[k].name.replace('the ','The '),href:DISTRICTS[k].href,cap:'Things going on, summed by year, 2015–2026',spark:spark(per,Math.max.apply(null,per)||1,'#9f928a'),num:weeks,numcap:'Weeks with at least one thing here',a:[first||'—','first week'],b:[hi+' at once','most in one week']});});
+var Y=document.getElementById('years');
+byYear.forEach(function(a,i){var y=2015+i,mx=0,on=0;a.forEach(function(w){if(w.n>mx)mx=w.n;if(w.n)on++});var dd={};a.forEach(function(w){for(var k in w.by)dd[k]=1});
+  var s=E('svg',{class:'spark',viewBox:'0 0 208 58',preserveAspectRatio:'none'});
+  a.forEach(function(w,j){var yy=56;parts(w).forEach(function(p){var h=p.n*7.5;E('rect',{x:j*4,y:yy-h,width:3,height:h,fill:'var(--'+p.d+')'},s);yy-=h;});if(w.sun)E('circle',{cx:j*4+1.5,cy:57,r:1,fill:'#9f928a'},s);});
+  mod(Y,{h:String(y),cap:'Each bar a week, stacked by district',spark:s,num:mx,numcap:'Most at once',a:[on+'','weeks with anything'],b:[Object.keys(dd).length+'','districts']});});
+</script>
+</body>
+</html>

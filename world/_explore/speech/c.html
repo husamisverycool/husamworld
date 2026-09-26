@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Chamber · C: Fight Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Alfa+Slab+One&family=Rye&family=Archivo+Narrow:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--stock:#F2C230;--ink:#151515;--red:#C8102E;--blue:#1F3A93;--wall:#2B2622}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--wall);color:var(--ink);font-family:"Archivo Narrow",sans-serif;overflow-x:hidden}
+:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.poster{max-width:760px;margin:6vh auto;background:var(--stock);padding:28px 28px 36px;position:relative;box-shadow:0 30px 60px rgba(0,0,0,.5);
+ background-image:radial-gradient(rgba(0,0,0,.06) 1px,transparent 1.2px);background-size:5px 5px}
+.poster>*{text-align:center}
+.band{background:var(--red);color:var(--stock);font:400 clamp(22px,4vw,34px) Anton;letter-spacing:.08em;padding:6px 0;text-transform:uppercase}
+.fill{font-family:Anton;text-transform:uppercase;line-height:.88;white-space:nowrap;display:block}
+.slab{font-family:"Alfa Slab One";text-transform:uppercase;line-height:1;display:block}
+.vs{font:400 clamp(28px,5vw,44px) Rye;color:var(--red);margin:6px 0}
+.mis{text-shadow:2px 1px 0 rgba(31,58,147,.55)}
+.rule{height:6px;background:var(--ink);margin:14px 0}
+.under{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;text-align:left;margin-top:14px}
+.under div{border-top:3px solid var(--ink);padding-top:6px}
+.under b{font:400 24px Anton;text-transform:uppercase;display:block;line-height:1}
+.under span{font-size:15px}
+.foot{display:flex;justify-content:space-between;font:700 14px "Archivo Narrow";text-transform:uppercase;margin-top:18px;border-top:3px solid var(--ink);padding-top:8px}
+.tape{max-width:760px;margin:10vh auto;background:#111;color:#fff;padding:30px 24px}
+.tape h2{font:400 clamp(40px,7vw,72px) Anton;text-transform:uppercase;text-align:center;color:var(--stock);line-height:1}
+.tape table{width:100%;border-collapse:collapse;margin-top:20px;font-size:18px}
+.tape td,.tape th{padding:12px 8px;border-bottom:1px solid #333;text-align:center}
+.tape th{font:400 15px Anton;letter-spacing:.1em;color:#aaa;text-transform:uppercase}
+.tape td:first-child{text-align:right;color:#bbb}.tape td:last-child{text-align:left;font:400 24px Anton;color:var(--stock)}
+.belt{max-width:760px;margin:10vh auto 16vh;text-align:center;color:#fff}
+.belt svg{width:100%;height:auto}
+.belt p{font:400 22px Anton;letter-spacing:.06em;text-transform:uppercase;margin-top:12px}
+.bell{position:fixed;right:18px;bottom:18px;width:84px;height:84px;border-radius:50%;background:var(--red);color:#fff;border:3px solid var(--stock);font:400 18px Anton;cursor:pointer}
+.snd{position:fixed;top:14px;right:14px;background:var(--ink);color:var(--stock);border:2px solid var(--stock);font:400 15px Anton;padding:6px 12px;cursor:pointer;z-index:5}
+@media (max-width:700px){.poster{margin:16px}.under{grid-template-columns:1fr}.tape,.belt{margin-left:16px;margin-right:16px}.tape td{font-size:15px}}
+</style>
+</head>
+<body>
+<button class="snd" id="snd" aria-pressed="false">SOUND OFF</button>
+<article class="poster" aria-label="Fight card">
+ <div class="band">One contender · every format</div>
+ <span class="fill mis" style="font-size:clamp(40px,8vw,74px);margin-top:14px">Main event</span>
+ <span class="fill" style="font-size:clamp(46px,11vw,110px);color:var(--red)">Congressional</span>
+ <span class="fill" style="font-size:clamp(70px,17vw,168px)">Debate</span>
+ <div class="vs">at the</div>
+ <span class="slab mis" style="font-size:clamp(26px,5.6vw,52px);color:var(--blue)">NSDA National Final</span>
+ <span class="fill" style="font-size:clamp(34px,7vw,66px);margin-top:8px">1 of 20 · from 50,000+</span>
+ <div class="rule"></div>
+ <span class="slab" style="font-size:clamp(20px,4vw,34px)">Semifinalist · 4× qualifier · legislation author</span>
+ <div class="rule"></div>
+ <div class="under">
+  <div><b style="color:var(--red)">Mock Trial · MVP</b><span>California Finals · 1 of 128 from 5,000+</span></div>
+  <div><b>UOP Invitational · 3× Champ</b><span>Parli · Oral Interp · Best Speaker</span></div>
+  <div><b>CHSSA Congress · Semis</b><span>Top 15 in California</span></div>
+  <div><b style="color:var(--blue)">Berkeley National Congress · 3rd</b><span>Berkeley National Congress Tournament</span></div>
+  <div><b>CHSSA Public Forum · Octos</b><span>Octofinalist</span></div>
+  <div><b>Ethics Bowl · Quarters</b><span>California state quarterfinalist, top 8</span></div>
+ </div>
+ <div class="foot"><span>Student Leadership Council · 1 of 23</span><span>TED Student Talks · 2023</span></div>
+</article>
+
+<section class="tape"><h2>Tale of the tape</h2>
+<table><thead><tr><th>The field</th><th>Event</th><th>Where he finished</th></tr></thead><tbody>
+<tr><td>50,000+</td><td>NSDA Congress</td><td>1 of 20</td></tr>
+<tr><td>5,000+</td><td>CA Mock Trial</td><td>1 of 128 · MVP</td></tr>
+<tr><td>500+</td><td>NSDA legislation</td><td>1 of 41</td></tr>
+<tr><td>140,000+ members</td><td>Leadership Council</td><td>1 of 23</td></tr>
+<tr><td>California</td><td>CHSSA Congress</td><td>Top 15</td></tr>
+<tr><td>California</td><td>Ethics Bowl</td><td>Top 8</td></tr>
+</tbody></table></section>
+
+<section class="belt"><svg viewBox="0 0 700 220" role="img" aria-label="A championship belt with three plates: Parliamentary Debate, Oral Interpretation, Best Speaker">
+ <rect x="0" y="70" width="700" height="80" rx="12" fill="#6b1420"/>
+ <rect x="0" y="80" width="700" height="4" fill="#caa23a"/><rect x="0" y="136" width="700" height="4" fill="#caa23a"/>
+ <g font-family="Anton" text-anchor="middle">
+ <ellipse cx="350" cy="110" rx="130" ry="100" fill="#e6c25a" stroke="#8a6a16" stroke-width="6"/>
+ <text x="350" y="92" font-size="22" fill="#3a2a05">UOP INVITATIONAL</text><text x="350" y="138" font-size="54" fill="#3a2a05">3× CHAMP</text>
+ <rect x="80" y="84" width="120" height="52" rx="8" fill="#e6c25a" stroke="#8a6a16" stroke-width="4"/><text x="140" y="116" font-size="16" fill="#3a2a05">PARLI</text>
+ <rect x="500" y="84" width="120" height="52" rx="8" fill="#e6c25a" stroke="#8a6a16" stroke-width="4"/><text x="560" y="116" font-size="16" fill="#3a2a05">ORAL INTERP</text>
+ <text x="350" y="178" font-size="18" fill="#3a2a05">BEST SPEAKER</text></g></svg>
+ <p>Parliamentary Debate · Oral Interpretation · Best Speaker</p></section>
+<button class="bell" id="bell">Ring the bell</button>
+<script>
+let ac=null,on=false;const sb=document.getElementById('snd');sb.onclick=()=>{on=!on;sb.textContent=on?'SOUND ON':'SOUND OFF';sb.setAttribute('aria-pressed',on);if(on)ac=ac||new AudioContext()};
+function bell(){if(!on)return;const t=ac.currentTime;[1,2.76,5.4].forEach((m,i)=>{const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=620*m;g.gain.setValueAtTime(.2/(i+1),t);g.gain.exponentialRampToValueAtTime(.0001,t+1.6);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+1.7)})}
+document.getElementById('bell').onclick=()=>{bell();setTimeout(bell,260);setTimeout(bell,520)};
+// fit each .fill line to the poster measure
+function fit(){document.querySelectorAll('.poster .fill').forEach(el=>{el.style.transform='';const w=el.parentNode.clientWidth-56,s=el.scrollWidth;if(s>w)el.style.transform=`scaleX(${w/s})`;})}
+addEventListener('load',fit);addEventListener('resize',fit);
+</script>
+</body>
+</html>

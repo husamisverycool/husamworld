@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- Prototype A: facing-page edition (Library of Arabic Literature livery). Arabic drafted for Husam to proofread. -->
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A · Facing pages</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#00285B;--deep:#001838;--sky:#5BB8E0;--paper:#F6F3EC;--ink:#1B1D22;--grey:#6C6A64;--rule:#CFC9BC;--p:.5;
+--lat:"Source Serif 4",Georgia,serif;--ara:"Amiri","Noto Naskh Arabic",serif}
+*{box-sizing:border-box}html,body{margin:0;background:var(--paper);color:var(--ink)}
+body{font:18px/1.55 var(--lat);overflow-x:hidden}
+[lang=ar]{font-family:var(--ara)}
+.cover{background:var(--navy);color:#fff;min-height:92vh;display:grid;place-items:center;text-align:center;position:relative;padding:48px 16px}
+.cover .ar{font:700 clamp(64px,12vw,168px)/1 var(--ara);color:var(--sky)}
+.cover .en{letter-spacing:.32em;font-size:clamp(14px,1.6vw,20px);margin-top:28px;text-transform:uppercase}
+.band{position:absolute;left:0;right:0;bottom:10vh;height:28px;background:var(--sky);color:var(--navy);font-size:11px;letter-spacing:.6em;display:flex;align-items:center;justify-content:center;text-transform:uppercase}
+.toc{max-width:980px;margin:72px auto;padding:0 24px;display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.toc ol{list-style:none;margin:0;padding:0}.toc li{display:flex;gap:8px;align-items:baseline;font-variant:small-caps;letter-spacing:.05em}
+.toc li::after{content:"";flex:1;border-bottom:1px dotted var(--grey);order:1}
+.toc li span:last-child{order:2}
+.toc [dir=rtl] li{font-variant:normal;font-size:20px}
+.folio{position:relative;max-width:1180px;margin:0 auto;padding:0 24px 80px}
+.pair{display:grid;grid-template-columns:calc((100% - 72px)*var(--p)) 72px 1fr;align-items:start;margin:0 0 28px}
+.pair>.en{grid-column:1}.pair>.ar{grid-column:3;direction:rtl;font-size:21px;line-height:1.85}
+.sec{font-weight:600;color:var(--navy);margin-inline-end:.4em}
+.pair.on .en,.pair.on .ar{background:linear-gradient(transparent 0,rgba(91,184,224,.18) 0)}
+h2{font-weight:400;letter-spacing:.2em;text-transform:uppercase;font-size:14px;color:var(--navy);margin:64px 0 24px}
+h2 .ar{letter-spacing:0;font-size:22px;float:right;text-transform:none}
+.seam{position:absolute;top:0;bottom:0;width:1px;background:var(--rule);left:calc(24px + (100% - 48px - 72px)*var(--p) + 36px)}
+.grip{position:sticky;top:45vh;margin-left:-14px;width:28px;height:44px;border:1px solid var(--navy);background:var(--paper);cursor:ew-resize;border-radius:0;display:block}
+svg.th{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+svg.th path{fill:none;stroke:var(--navy);stroke-opacity:.14}
+svg.th path.on{stroke:var(--sky);stroke-opacity:1;stroke-width:1.5}
+a{color:var(--navy)}
+@media (max-width:700px){.pair{grid-template-columns:1fr}.pair>.ar{grid-column:1;border-top:1px solid var(--rule);padding-top:8px}.seam,.grip{display:none}.toc{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<section class="cover"><div><div class="ar" lang="ar" dir="rtl">الجسر</div><div class="en">The Bridge · English and Arabic</div></div><div class="band">Language · Writing · Press</div></section>
+<nav class="toc" aria-label="Contents"><ol><li><span>Two languages</span><span>1</span></li><li><span>White House in Arabic</span><span>2</span></li><li><span>Six articles</span><span>3</span></li><li><span>In print</span><span>4</span></li></ol>
+<ol dir="rtl" lang="ar"><li><span>لغتان</span><span>١</span></li><li><span>البيت الأبيض بالعربية</span><span>٢</span></li><li><span>ست مقالات</span><span>٣</span></li><li><span>في الصحافة</span><span>٤</span></li></ol></nav>
+<main class="folio" id="folio"><div class="seam"><button class="grip" aria-label="Drag to give either language more room"></button></div><svg class="th" id="th"></svg>
+<h2>Two languages <span class="ar" lang="ar" dir="rtl">لغتان</span></h2>
+<div class="pair" data-k="1"><p class="en"><span class="sec">§1.1</span>I work in English and Arabic, and I translate professionally between them.</p><p class="ar" lang="ar"><span class="sec">١٫١</span>أعمل بالإنجليزية والعربية، وأترجم بينهما ترجمةً احترافية.</p></div>
+<div class="pair" data-k="2"><p class="en"><span class="sec">§1.2</span>California certified the Arabic: the State Seal of Biliteracy in Arabic.</p><p class="ar" lang="ar"><span class="sec">١٫٢</span>وقد اعتمدت ولاية كاليفورنيا عربيتي بمنحي ختم الولاية لثنائية اللغة في العربية.</p></div>
+<h2>White House in Arabic <span class="ar" lang="ar" dir="rtl">البيت الأبيض بالعربية</span></h2>
+<div class="pair" data-k="3"><p class="en"><span class="sec">§2.1</span>From July 2022 to April 2024 I was Senior English Writer, first as an intern, at White House in Arabic. I edited and translated press briefings, op-eds and documentary scripts between Arabic and English.</p><p class="ar" lang="ar"><span class="sec">٢٫١</span>من يوليو ٢٠٢٢ حتى أبريل ٢٠٢٤ عملتُ كاتباً أول باللغة الإنجليزية، ومتدرباً قبل ذلك، في «البيت الأبيض بالعربية». حرّرتُ وترجمتُ بين العربية والإنجليزية إحاطاتٍ صحفية ومقالاتِ رأي ونصوصَ أفلامٍ وثائقية.</p></div>
+<div class="pair" data-k="4"><p class="en"><span class="sec">§2.2</span>I worked under Marah Bukai, Washington Bureau Chief of Al-Arab Media Organization. The work reached 350,000+ readers and viewers: 150,000+ readers and 200,000+ viewers.</p><p class="ar" lang="ar"><span class="sec">٢٫٢</span>عملتُ تحت إشراف مرح البقاعي، مديرة مكتب واشنطن في مؤسسة العرب الإعلامية. وبلغ العمل أكثر من ٣٥٠ ألف قارئ ومشاهد: أكثر من ١٥٠ ألف قارئ و٢٠٠ ألف مشاهد.</p></div>
+<h2>Six articles <span class="ar" lang="ar" dir="rtl">ست مقالات</span></h2>
+<div class="pair" data-k="5"><p class="en"><span class="sec">§3.1</span><a href="https://whia.us/en/5461/">Mustafa Al-Kazemi’s Crucial Role in the MENA Region</a></p><p class="ar" lang="ar"><span class="sec">٣٫١</span>الدور المحوري لمصطفى الكاظمي في الشرق الأوسط وشمال أفريقيا</p></div>
+<div class="pair" data-k="6"><p class="en"><span class="sec">§3.2</span><a href="https://whia.us/en/6115/">The Sadrist Movement’s Sit-In Sends Iraq into Political Turmoil</a></p><p class="ar" lang="ar"><span class="sec">٣٫٢</span>اعتصام التيار الصدري يُدخل العراق في اضطراب سياسي</p></div>
+<div class="pair" data-k="7"><p class="en"><span class="sec">§3.3</span><a href="https://whia.us/en/5276/">MalikiLeaks: When Sectarianism Rules Iraq</a></p><p class="ar" lang="ar"><span class="sec">٣٫٣</span>تسريبات المالكي: حين تحكم الطائفيةُ العراق</p></div>
+<h2>In print <span class="ar" lang="ar" dir="rtl">في الصحافة</span></h2>
+<div class="pair" data-k="8"><p class="en"><span class="sec">§4.1</span>Contributor, <a href="https://www.wsj.com/us-news/education/harvard-bound-students-stand-firm-while-some-columbia-prospects-think-twice-013d9afa">“Harvard-Bound Students Stand Firm While Some Columbia Prospects Think Twice,”</a> The Wall Street Journal, April 16, 2025.</p><p class="ar" lang="ar"><span class="sec">٤٫١</span>مساهم في تقرير «الطلاب المتجهون إلى هارفارد يثبتون على قرارهم فيما يتردد بعض المقبولين في كولومبيا»، وول ستريت جورنال، ١٦ أبريل ٢٠٢٥.</p></div>
+</main>
+<script>
+const folio=document.getElementById('folio'),th=document.getElementById('th');let P=.5;
+function draw(){const r=folio.getBoundingClientRect();th.setAttribute('viewBox',`0 0 ${r.width} ${r.height}`);th.innerHTML='';
+ if(innerWidth<=700)return;folio.querySelectorAll('.pair').forEach(p=>{const a=p.querySelector('.en .sec').getBoundingClientRect(),b=p.querySelector('.ar .sec').getBoundingClientRect();
+ const x1=a.left-r.left+a.width+4,y1=a.top-r.top+a.height/2,x2=b.left-r.left-4,y2=b.top-r.top+b.height/2,m=(x1+x2)/2;
+ const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',`M${x1},${y1} C${m},${y1} ${m},${y2} ${x2},${y2}`);path.dataset.k=p.dataset.k;if(p.classList.contains('on'))path.classList.add('on');th.appendChild(path)})}
+folio.addEventListener('pointerover',e=>{const p=e.target.closest('.pair');folio.querySelectorAll('.pair').forEach(q=>q.classList.toggle('on',q===p));th.querySelectorAll('path').forEach(x=>x.classList.toggle('on',p&&x.dataset.k===p.dataset.k))});
+const grip=document.querySelector('.grip');let drag=false;grip.addEventListener('pointerdown',e=>{drag=true;grip.setPointerCapture(e.pointerId)});
+grip.addEventListener('pointermove',e=>{if(!drag)return;const r=folio.getBoundingClientRect();P=Math.min(.72,Math.max(.28,(e.clientX-r.left-24-36)/(r.width-48-72)));document.documentElement.style.setProperty('--p',P);draw()});
+grip.addEventListener('pointerup',()=>drag=false);addEventListener('resize',draw);addEventListener('load',draw);document.fonts&&document.fonts.ready.then(draw);
+</script>
+</body></html>

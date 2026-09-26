@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plaza prototype A: the week grid, name-free</title>
+<link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;700&family=Comic+Neue:wght@700&family=Noto+Sans:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#333;--title:#4d96c6;--link:#1c6391;--navy:#000080;--red:#cb060c;--rule:#ddd;
+--sans:'Noto Sans',Helvetica,Arial,sans-serif;--chart:'Arimo',Arial,sans-serif;--hand:'Comic Neue','Comic Sans MS',cursive;
+--bill:#2a78d6;--speech:#eb6834;--translation:#1baf7a;--n1:#eda100;--triptik:#e87ba4;--os:#008300;--depths:#4a3aa7;--everywhere:#e34948}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:17px/1.65 var(--sans);overflow-x:hidden}
+a{color:var(--link);text-decoration:none}
+.col{max-width:780px;margin:0 auto;padding:0 20px}
+h1{font:700 40px/1.2 var(--sans);color:var(--title);margin:36px 0 10px}
+.by{color:#888;font-size:14px;margin-bottom:18px}
+.note{border:1px solid #ccc;background:#f5f5f5;font-style:italic;font-size:15px;padding:12px 16px;margin:0 0 20px}
+.scrolly{position:relative;max-width:1180px;margin:0 auto;padding:0 20px;display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:40px}
+.viz{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;margin:0}
+.viz h2{font:700 30px/1.15 var(--chart);color:var(--navy);text-align:center;margin:0 0 6px}.viz h2 em{font-style:normal;color:var(--red)}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font:12px var(--chart);margin-top:8px}
+.legend a{color:#222;display:inline-flex;align-items:center;gap:5px}.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.steps{padding:40vh 0 30vh}.step{min-height:85vh;display:flex;align-items:center}
+.step p{margin:0 0 .8em}.step .yr{font-weight:700;color:var(--navy)}
+.card{position:absolute;pointer-events:auto;background:#fff;border:1px solid #333;padding:8px 10px;font:13px/1.4 var(--chart);max-width:260px;box-shadow:3px 3px 0 #0001}
+.card b{display:block}.card a{display:block}
+.fig{width:100%;max-width:300px;margin:8px 0}
+@media (max-width:860px){.scrolly{grid-template-columns:1fr}.viz{height:auto;top:0;background:#fff;padding:8px 0;z-index:2}.step{min-height:70vh}.step>div{background:#fff;border:1px solid #ddd;padding:12px 14px}}
+</style>
+</head>
+<body>
+<div class="col">
+  <h1>Every Week Since 2015</h1>
+  <div class="by">Prototype A · the Wait But Why grid, with every name removed</div>
+  <div class="note"><b>Note:</b> This page doesn't say what any of it was. It only counts how many things were going on at once, and says which district of this world each one lives in. Tap a week.</div>
+  <p>The busiest stretch: <strong><span id="pk">7</span> things at once</strong>, every week from <strong id="pkr">October 1 to December 31, 2025</strong>.</p>
+</div>
+<section class="scrolly">
+  <figure class="viz">
+    <h2>Twelve Years in <em>Weeks</em></h2>
+    <div style="position:relative" id="wrap"><svg id="svg"></svg><div class="card" id="card" hidden></div></div>
+    <div class="legend" id="legend"></div>
+  </figure>
+  <div class="steps">
+    <div class="step" data-s="all"><div><p>Each row is a year. Each box is a week. The darker the box, the more things were going on at once. The dots in the corners are weekends.</p></div></div>
+    <div class="step" data-s="weekends"><div><p><span class="yr">2015–2019.</span> For five years the weekdays are empty. The only marks are the weekend dots: most Sundays from 2015, and from 2018 most Saturdays too.</p>
+      <svg class="fig" viewBox="0 0 300 150" aria-hidden="true"><g fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"><circle cx="70" cy="40" r="16"/><path d="M70 56v44M70 70l-18 16M70 70l20 -10M70 100l-14 30M70 100l14 30"/></g><circle cx="65" cy="37" r="1.6"/><circle cx="75" cy="37" r="1.6"/><path d="M64 45q6 5 12 0" stroke="#111" fill="none" stroke-width="1.6"/><path d="M130 22h150a8 8 0 0 1 8 8v40a8 8 0 0 1-8 8H130a8 8 0 0 1-8-8V30a8 8 0 0 1 8-8z" fill="#fff" stroke="#111" stroke-width="2"/><path d="M122 60L88 44" stroke="#111" stroke-width="1.5"/><text x="205" y="46" text-anchor="middle" font-family="Comic Neue" font-weight="700" font-size="14">Weekdays: free.</text><text x="205" y="64" text-anchor="middle" font-family="Comic Neue" font-weight="700" font-size="14">Weekends: not.</text></svg>
+    </div></div>
+    <div class="step" data-s="y2020"><div><p><span class="yr">2020.</span> The first weekday boxes fill in: one thing at a time, all in the Garage.</p></div></div>
+    <div class="step" data-s="y2022"><div><p><span class="yr">2022.</span> The boxes go dark. By October, 7 things at once, for 4 weeks.</p></div></div>
+    <div class="step" data-s="y2024"><div><p><span class="yr">2024.</span> The widest week: things in 5 different districts at once.</p></div></div>
+    <div class="step" data-s="peak"><div><p><span class="yr">2025.</span> Back to 7, and this time it held for 13 weeks straight.</p></div></div>
+    <div class="step" data-s="all"><div><p>That's every week. Tap any box to see which districts it touched.</p></div></div>
+  </div>
+</section>
+<div style="height:40vh"></div>
+<script src="data.js"></script>
+<script>
+var NS='http://www.w3.org/2000/svg',svg=document.getElementById('svg');
+var P=13,B=10,LM=40,TM=24,WD=LM+52*P,HT=TM+12*P*1.6+10;
+svg.setAttribute('viewBox','0 0 '+WD+' '+HT);
+function E(t,a,p){var n=document.createElementNS(NS,t);for(var k in a)n.setAttribute(k,a[k]);(p||svg).appendChild(n);return n;}
+var SHADE=['#fff','#d6d6ef','#b0b0de','#8a8acd','#6464bc','#3e3eab','#1e1e97','#000080'];
+E('text',{x:LM,y:12,'font-family':'Arimo','font-size':11,fill:'#000080'}).textContent='Week of the Year ⟶';
+var boxes=[];
+WK.forEach(function(w){
+  var r=w.y-2015,x=LM+w.w*P,y=TM+r*P*1.6;
+  if(w.w===0){var t=E('text',{x:LM-6,y:y+B-1,'text-anchor':'end','font-family':'Arimo','font-size':10});t.textContent=w.y;}
+  var g=E('g',{tabindex:0});
+  var rc=E('rect',{x:x,y:y,width:B,height:B,fill:w.future?'#fff':SHADE[Math.min(7,w.n)],stroke:w.i===CUR?'#cb060c':'#555','stroke-width':w.i===CUR?1.6:.6},g);
+  if(w.sun&&!w.future)E('circle',{cx:x+2,cy:y+B+3,r:1.5,fill:'var(--triptik)'},g);
+  if(w.sat&&!w.future)E('circle',{cx:x+B-2,cy:y+B+3,r:1.5,fill:'var(--triptik)'},g);
+  g.addEventListener('pointerenter',function(){show(w,x,y)});g.addEventListener('focus',function(){show(w,x,y)});g.addEventListener('click',function(){show(w,x,y)});
+  boxes.push({w:w,g:g});
+});
+var ann=E('g',{});
+function state(s){
+  ann.innerHTML='';
+  boxes.forEach(function(b){var w=b.w,on=true;
+    if(s==='weekends')on=w.y<=2019;if(s==='y2020')on=w.y===2020;if(s==='y2022')on=w.y===2022;if(s==='y2024')on=w.y===2024;
+    if(s==='peak')on=w.nm===PKM.max&&w.y>=2025;
+    b.g.style.opacity=on?1:.18;b.g.style.transition='opacity .4s';});
+  var hi=null;if(s==='peak')hi=PKM.best;if(s==='y2022')hi=PKM.runs[0];
+  if(s==='y2024'){var m=0,mi=0;WK.forEach(function(w){var k=Object.keys(w.by).length;if(k>m){m=k;mi=w.i}});hi=[mi,mi];}
+  if(hi){var a=WK[hi[0]],x=LM+a.w*P+B/2,y=TM+(a.y-2015)*P*1.6+B/2;E('circle',{cx:x,cy:y,r:9,fill:'none',stroke:'#cb060c','stroke-width':2},ann);E('line',{x1:x+9,y1:y-6,x2:WD-20,y2:y-30,stroke:'#cb060c'},ann);}
+}
+var card=document.getElementById('card');
+function show(w,x,y){var ps=parts(w);card.hidden=false;card.innerHTML='';var b=document.createElement('b');b.textContent='Week of '+longDay(w.s,1);card.appendChild(b);
+  if(w.future){card.appendChild(document.createTextNode('Hasn’t happened yet.'));}
+  else{ if(!ps.length){var s=document.createElement('span');s.textContent='Nothing on the weekdays.';card.appendChild(s);}
+  ps.forEach(function(p,j){var a=document.createElement('a');a.href='../../'+p.href;a.textContent=(j===0?p.n+(p.n===1?' thing':' things'):p.n)+' in '+p.name;card.appendChild(a);});
+  if(w.sun||w.sat){var a2=document.createElement('a');a2.href='../../triptik.html';a2.textContent=(w.sun&&w.sat?'Most Saturdays and Sundays':'Most Sundays')+': the Map Room';card.appendChild(a2);} }
+  var r=svg.getBoundingClientRect(),k=r.width/WD;card.style.left=Math.min(r.width-240,x*k)+'px';card.style.top=(y*k+16)+'px';}
+var lg=document.getElementById('legend');ORDER.forEach(function(k){var a=document.createElement('a');a.href='../../'+DISTRICTS[k].href;a.innerHTML='<i style="background:var(--'+k+')"></i>';a.appendChild(document.createTextNode(DISTRICTS[k].name));lg.appendChild(a);});
+var steps=[].slice.call(document.querySelectorAll('.step'));
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)state(e.target.dataset.s)})},{rootMargin:'-50% 0px -50% 0px'});steps.forEach(function(s){io.observe(s)});
+state('all');
+</script>
+</body>
+</html>

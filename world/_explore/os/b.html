@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Garage · prototype B (classic Mac)</title>
+<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Silkscreen&family=Tinos:wght@400;700&display=swap" rel="stylesheet">
+<!-- Prototype B: System 7 / Mac OS 9. Values from system.css (pinstripes, 2px 2px dialog shadow, 22px scrollbars)
+     and platinum.css (#dedede surface, 11px boxes). A garage glyph in place of the Happy Mac face. -->
+<style>
+:root{--k:#000;--w:#fff;--g:#a5a5a5;--pl:#dedede;--pf:#cecece;--ps:#9c9c9c;--hl:#ccccff;
+  --chi:"Pixelify Sans","Chicago",Geneva,sans-serif;--gen:"Silkscreen","Geneva",sans-serif;--ser:"Tinos","Times New Roman",serif}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#000}
+body{font:13px/1.35 var(--chi);color:#000}
+.dither{background:#fff conic-gradient(#000 25%,#fff 0 50%,#000 0 75%,#fff 0) 0 0/2px 2px}
+/* boot */
+#boot{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:#8c8c8c conic-gradient(#6f6f6f 25%,#a8a8a8 0 50%,#6f6f6f 0 75%,#a8a8a8 0) 0 0/2px 2px}
+#boot .mac{width:96px;image-rendering:pixelated}
+#welcome{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border:1px solid #000;box-shadow:2px 2px 0 #000;padding:6px}
+#welcome div{border:2px solid #000;padding:20px 34px;text-align:center}
+#welcome h1{margin:0 0 4px;font:700 28px/1.1 var(--ser)}
+#welcome p{margin:0;font:12px var(--chi)}
+#exts{position:absolute;left:84px;bottom:14px;display:flex;gap:6px}
+#exts figure{margin:0;width:34px;text-align:center;font:9px var(--gen);color:#000;animation:pop .01s}
+#exts img{width:32px;image-rendering:pixelated}
+@keyframes pop{from{opacity:0}}
+/* desktop */
+#desk{position:fixed;inset:0;background:#6d7fa0 conic-gradient(#5f7294 25%,#7b8db0 0 50%,#5f7294 0 75%,#7b8db0 0) 0 0/2px 2px}
+#mbar{position:absolute;left:0;right:0;top:0;height:22px;background:#fff;border-bottom:1px solid #000;display:flex;align-items:center;gap:2px;padding:0 10px;z-index:1000}
+#mbar button{font:700 13px var(--chi);background:none;border:0;padding:2px 10px;height:20px;cursor:pointer}
+#mbar button:hover,#mbar button[aria-expanded=true]{background:#000;color:#fff}
+#mbar .app{margin-left:auto;display:flex;align-items:center;gap:6px;font:700 13px var(--chi)}
+#mbar img{width:16px;image-rendering:pixelated}
+.drop{position:absolute;top:21px;background:#fff;border:1px solid #000;box-shadow:2px 2px 0 #000;min-width:210px;padding:2px 0;z-index:1001}
+.drop button{display:block;width:100%;text-align:left;font:13px var(--chi);background:none;border:0;padding:3px 16px;cursor:pointer}
+.drop button:hover{background:#000;color:#fff}
+.drop hr{border:0;border-top:1px dotted #000;margin:3px 0}
+#icons{position:absolute;right:14px;top:36px;display:flex;flex-direction:column;gap:18px;align-items:center}
+.ico{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;cursor:pointer;width:84px}
+.ico img{width:40px;height:40px;image-rendering:pixelated}
+.ico span{font:10px var(--gen);background:#fff;padding:0 3px;color:#000}
+.ico.sel img{filter:brightness(.45)}
+.ico.sel span{background:#000;color:#fff}
+.win{position:absolute;background:#fff;border:1px solid #000;box-shadow:2px 2px 0 #000;display:flex;flex-direction:column;min-width:260px;max-width:calc(100vw - 16px)}
+.tbar{height:20px;flex:none;display:flex;align-items:center;gap:6px;padding:0 6px;border-bottom:1px solid #000;cursor:grab;touch-action:none;
+  background:repeating-linear-gradient(#000 0 1px,#fff 1px 2px) 0 4px/100% 11px no-repeat,#fff}
+.win.inactive .tbar{background:#fff}
+.tbar b{margin:0 auto;background:#fff;padding:0 8px;font:700 13px var(--chi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.box{width:13px;height:13px;flex:none;background:#fff;border:1px solid #000;padding:0;cursor:pointer;box-shadow:inset 0 0 0 1px #fff}
+.box:active{background:repeating-linear-gradient(45deg,#000 0 1px,#fff 1px 3px)}
+.win.inactive .box{visibility:hidden}
+.info{height:20px;border-bottom:1px solid #000;font:10px var(--gen);display:flex;justify-content:space-between;align-items:center;padding:0 10px}
+.body{flex:1;overflow:auto;min-height:0}
+.body::-webkit-scrollbar{width:16px}
+.body::-webkit-scrollbar-track{background:conic-gradient(#000 25%,#fff 0 50%,#000 0 75%,#fff 0) 0 0/4px 4px;border-left:1px solid #000}
+.body::-webkit-scrollbar-thumb{background:#fff;border:1px solid #000}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:18px 6px;padding:18px 12px}
+.grid .ico span{background:none}
+.doc{padding:18px 22px 22px;font:16px/1.45 var(--ser)}
+.doc h2{font:700 22px var(--ser);margin:0 0 6px}
+.doc p{margin:0 0 10px}
+.bars{display:grid;grid-template-columns:130px 1fr auto;gap:6px 10px;align-items:center;font:12px var(--chi);margin:12px 0}
+.bar{height:12px;border:1px solid #000;background:#fff}
+.bar i{display:block;height:100%;background:repeating-linear-gradient(90deg,#000 0 1px,#8080c0 1px 2px)}
+.lock{display:flex;gap:12px;align-items:center;margin:10px 0;padding:10px;border:2px solid #000;font:12px var(--chi)}
+.btn{font:13px var(--chi);background:#fff;border:1px solid #000;border-radius:6px;min-width:59px;padding:2px 14px;cursor:pointer}
+.btn.def{box-shadow:0 0 0 2px #fff,0 0 0 4px #000}
+.btn:active{background:#000;color:#fff}
+@media (max-width:640px){
+  .win{left:6px!important;right:6px;width:auto!important;top:auto!important}
+  #icons{flex-direction:row;right:auto;left:84px;top:auto;bottom:10px;gap:4px}
+  #mbar button{padding:2px 6px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="boot" aria-hidden="true"><canvas class="mac" id="happy" width="24" height="30"></canvas><div id="exts"></div></div>
+<main id="desk">
+  <h1 style="position:absolute;left:-9999px">The Garage: things Husam built (prototype B, classic Mac)</h1>
+  <nav id="mbar" aria-label="Menu bar">
+    <button type="button" data-m="g" aria-expanded="false" aria-label="Garage menu"><img id="gl1" alt=""></button>
+    <button type="button" data-m="file" aria-expanded="false">File</button>
+    <button type="button" data-m="view" aria-expanded="false">View</button>
+    <button type="button" data-m="special" aria-expanded="false">Special</button>
+    <span class="app"><img id="gl2" alt="">Garage</span>
+  </nav>
+  <div id="icons"></div>
+  <div id="wins"></div>
+</main>
+<script>
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function pix(w,h,rows){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');const P={'#':'#000','.':'#fff','o':'#dcd3bf','y':'#ffd24a','b':'#8080c0','g':'#a5a5a5'};rows.forEach((r,y)=>[...r].forEach((ch,x)=>{if(P[ch]){g.fillStyle=P[ch];g.fillRect(x,y,1,1)}}));return c}
+// garage-in-a-compact-Mac: the Happy Mac outline, a roll-up door where the face would be
+const HAPPY=pix(24,30,["  ####################  "," #oooooooooooooooooooo# "," #o################oo# "," #o#..............#oo# "," #o#......##......#oo# "," #o#.....#..#.....#oo# "," #o#....#....#....#oo# "," #o#...#......#...#oo# "," #o#...########...#oo# "," #o#...#......#...#oo# "," #o#...########...#oo# "," #o#...#yyyyyy#...#oo# "," #o#...#yyyyyy#...#oo# "," #o#..............#oo# "," #o################oo# "," #oooooooooooooooooooo# "," #oooooooooooooooooooo# "," #ooo####ooooooooooooo# "," #oooooooooooo#######o# "," #oooooooooooooooooooo# "," ###################### "," #oooooooooooooooooooo# "," ###################### "]);
+$('#happy').getContext('2d').drawImage(HAPPY,0,0);
+const GL=pix(16,16,["       ##       ","     ##..##     ","   ##......##   "," ##..........## ","#..############.#",".#.#........#.#.",".#.##########.#.",".#.#........#.#.",".#.##########.#.",".#.#yyyyyyyy#.#.",".#.#yyyyyyyy#.#.",".#.#yyyyyyyy#.#.","################"]);
+$('#gl1').src=$('#gl2').src=GL.toDataURL();
+const FOLDER=pix(32,32,["","","","","      #######","     #.......#","    #.........##################","    #..............................#","    ################################","    #..............................#","    #..............................#","    #..............................#","    #..............................#","    #..............................#","    #..............................#","    #..............................#","    #..............................#","    #..............................#","    #..............................#","    #..............................#","    #..............................#","    #..............................#","    ################################"].map(r=>r.padEnd(32)));
+const LOCKED=pix(32,32,["","","","","      #######","     #.......#","    #.........##################","    #..............................#","    ################################","    #..............................#","    #..............................#","    #...........######.............#","    #..........#......#............#","    #..........#......#............#","    #.........##########...........#","    #.........#yyyyyyyy#...........#","    #.........#yyy##yyy#...........#","    #.........#yyy##yyy#...........#","    #.........#yyyyyyyy#...........#","    #.........##########...........#","    #..............................#","    #..............................#","    ################################"].map(r=>r.padEnd(32)));
+const DOC=pix(32,32,["      ##############","      #...........#.#","      #...........#..#","      #...........####","      #..############.#","      #..............#","      #..##########..#","      #..............#","      #..##########..#","      #..............#","      #..#######.....#","      #..............#","      #..##########..#","      #..............#","      #..##########..#","      #..............#","      #..............#","      ################"].map(r=>r.padEnd(32)));
+const HD=pix(32,32,["","","","","","","","","  ############################","  #..........................#","  #..........................#","  #..........................#","  #.##.......................#","  #.##.......................#","  #..........................#","  ############################"].map(r=>r.padEnd(32)));
+const TRASH=pix(32,32,["","","            ######","       ################","       #..............#","       ################","        #.#..#..#..#.#","        #.#..#..#..#.#","        #.#..#..#..#.#","        #.#..#..#..#.#","        #.#..#..#..#.#","        #.#..#..#..#.#","        #.#..#..#..#.#","        #.#..#..#..#.#","        #............#","        ##############"].map(r=>r.padEnd(32)));
+const I={folder:FOLDER.toDataURL(),locked:LOCKED.toDataURL(),doc:DOC.toDataURL(),hd:HD.toDataURL(),trash:TRASH.toDataURL()};
+
+const ITEMS={
+ stealth:{n:'stealth',i:'locked',kind:'locked folder',size:[440,300],html:`<div class="doc"><h2>stealth</h2><div class="lock"><img src="${I.locked}" width="32" alt=""><span>This folder is locked. You can see one item: the Get Info note.</span></div><p>Co-founder &amp; CEO of a stealth startup, backed by DoorDash's early team.</p><p>Spent summer 2026 building it full-time in San Francisco.</p></div>`},
+ deals:{n:'Electric Deals',i:'folder',kind:'folder, 2 stores',size:[520,420],html:`<div class="doc"><h2>Electric Deals</h2><p>Two online stores, March to October 2020. Age 14 to 15.</p><p style="font:12px var(--chi)">About This Store: revenue</p><div class="bars"><span>Facebook (arbitrage)</span><span class="bar"><i style="width:100%"></i></span><span>~$20,000</span><span>eBay (drop-ship)</span><span class="bar"><i style="width:40%"></i></span><span>~$8,000</span></div><p>Facebook store: 131+ positive reviews, 400+ products shipped, ~43% margin.</p><p>eBay store: 150+ positive reviews, ~39% margin.</p></div>`},
+ bayloop:{n:'bayloop',i:'doc',kind:'SimpleText document',size:[460,300],html:`<div class="doc"><h2>bayloop</h2><p>Founder &amp; President, October 2023 to December 2024. A Fresno-based think tank fighting restrictive zoning.</p><p>Organized 7 youth phone banks across the Central Valley. Legislative research with the National Low-Income Housing Coalition.</p></div>`},
+ jetson:{n:'Jetson',i:'doc',kind:'alias',size:[400,220],html:`<div class="doc"><h2>Jetson</h2><p>Paid intern, summer 2023. Fintech for teens. 1 of 40 from 1,000+ applicants.</p></div>`},
+ office:{n:'Back office',i:'doc',kind:'SimpleText document',size:[420,220],html:`<div class="doc"><h2>Back office</h2><p>Grew up doing billing and back-office operations as an admin assistant at his father's law firm.</p></div>`},
+ grants:{n:'Grants',i:'folder',kind:'folder, 4 items',size:[480,330],html:`<div class="doc"><h2>Grants</h2><p>LeapYear: $30K grant, backed by Hank Couture and Charlton Soesanto.</p><p>Startups @ Harvard: non-dilutive grant, backed by XFund.</p><p>Telora Fellowship: finalist ($55K grant + 6-month residency, 1 of 16 from 1K+). Withdrew.</p><p>GripTape Challenger: grant, 2023.</p></div>`}
+};
+let z=10,top0=40;
+function openWin(id){
+  const ex=$(`.win[data-id="${id}"]`); if(ex){focus(ex);return}
+  const it=id==='hd'?{n:'Garage HD',size:[560,340],html:`<div class="info"><span>6 items</span><span>built 2020 to 2026</span></div><div class="grid">${Object.entries(ITEMS).map(([k,v])=>`<button class="ico" data-open="${k}"><img src="${I[v.i]}" alt=""><span>${v.n}</span></button>`).join('')}</div>`}:ITEMS[id];
+  const w=document.createElement('section');w.className='win';w.dataset.id=id;w.setAttribute('aria-label',it.n);
+  const W=innerWidth,[ww,hh]=it.size;const n=$$('.win').length;
+  Object.assign(w.style,{left:Math.max(8,Math.min(W-ww-110,60+n*28))+'px',top:(top0+n*24)+'px',width:ww+'px',height:Math.min(hh,innerHeight-top0-n*24-20)+'px'});
+  w.innerHTML=`<div class="tbar"><button class="box" aria-label="Close ${it.n}"></button><b>${it.n}</b><button class="box" aria-label="Zoom"></button></div><div class="body">${it.html}</div>`;
+  $('#wins').append(w);focus(w);
+  $('.box',w).onclick=()=>w.remove();
+  $$('.box',w)[1].onclick=()=>{w.classList.toggle('zoom');if(w.classList.contains('zoom')){w._r=w.getAttribute('style');Object.assign(w.style,{left:'8px',top:'30px',width:(innerWidth-120)+'px',height:(innerHeight-40)+'px'})}else w.setAttribute('style',w._r)};
+  const bar=$('.tbar',w);
+  bar.addEventListener('pointerdown',e=>{if(e.target.closest('.box'))return;focus(w);const sx=e.clientX,sy=e.clientY,l=w.offsetLeft,t=w.offsetTop;bar.setPointerCapture(e.pointerId);
+    const mv=ev=>{w.style.left=(l+ev.clientX-sx)+'px';w.style.top=Math.max(22,t+ev.clientY-sy)+'px'};const up=()=>{bar.removeEventListener('pointermove',mv)};bar.addEventListener('pointermove',mv);bar.addEventListener('pointerup',up,{once:true})});
+  w.addEventListener('pointerdown',()=>focus(w));
+}
+function focus(w){$$('.win').forEach(x=>x.classList.toggle('inactive',x!==w));w.style.zIndex=++z}
+document.addEventListener('dblclick',e=>{const b=e.target.closest('[data-open]');if(b)openWin(b.dataset.open)});
+document.addEventListener('click',e=>{const b=e.target.closest('.ico');$$('.ico.sel').forEach(x=>x.classList.remove('sel'));if(b){b.classList.add('sel');if(matchMedia('(pointer:coarse)').matches||e.detail===0)openWin(b.dataset.open)}});
+$('#icons').innerHTML=[['hd','Garage HD','hd'],['stealth','stealth','locked'],['trash','Trash','trash']].map(([k,n,i])=>`<button class="ico" data-open="${k}"><img src="${I[i]}" alt=""><span>${n}</span></button>`).join('');
+ITEMS.trash={n:'Trash',i:'trash',size:[320,180],html:'<div class="doc"><p>The Trash is empty. Nothing built here was thrown away.</p></div>'};
+// menus
+const MENUS={g:[['About This Garage…',()=>openWin('hd')]],file:[['Open Garage HD',()=>openWin('hd')],['Close All',()=>$$('.win').forEach(w=>w.remove())]],view:[['by Icon',()=>{}]],special:[['Back to the world',()=>location.href='../../index.html#from-os']]};
+$$('#mbar [data-m]').forEach(b=>b.onclick=e=>{e.stopPropagation();$$('.drop').forEach(d=>d.remove());const open=b.getAttribute('aria-expanded')==='true';$$('#mbar [data-m]').forEach(x=>x.setAttribute('aria-expanded','false'));if(open)return;b.setAttribute('aria-expanded','true');const d=document.createElement('div');d.className='drop';d.style.left=b.offsetLeft+'px';MENUS[b.dataset.m].forEach(([l,f])=>{const it=document.createElement('button');it.textContent=l;it.onclick=()=>{d.remove();b.setAttribute('aria-expanded','false');f()};d.append(it)});$('#desk').append(d)});
+document.addEventListener('click',()=>{$$('.drop').forEach(d=>d.remove());$$('#mbar [data-m]').forEach(x=>x.setAttribute('aria-expanded','false'))});
+// boot: happy garage, Welcome box, extensions march (the grants)
+async function boot(){
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  if(RM||location.hash.startsWith('#from-')){$('#boot').remove();openWin('hd');return}
+  let skip=false;const sk=()=>skip=true;addEventListener('keydown',sk,{once:true});$('#boot').addEventListener('click',sk);
+  await wait(1400);if(!skip){$('#happy').remove();const wb=document.createElement('div');wb.id='welcome';wb.innerHTML='<div><h1>Welcome to the Garage.</h1><p>Starting up…</p></div>';$('#boot').append(wb);
+    for(const n of ['LeapYear','XFund','Telora','GripTape']){if(skip)break;await wait(420);const f=document.createElement('figure');f.innerHTML=`<img src="${I.doc}" alt=""><figcaption>${n}</figcaption>`;$('#exts').append(f)}
+    if(!skip)await wait(700)}
+  $('#boot').remove();openWin('hd');if(innerWidth>900)openWin('stealth');
+}
+boot();
+</script>
+</body>
+</html>

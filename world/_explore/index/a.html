@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prototype A: the flat road, 2025 polish</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800&family=Amatic+SC:wght@700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#f3b86a;font-family:Nunito,Arial,sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.tag{position:fixed;left:16px;top:16px;font:800 16px Nunito;color:#fff;text-shadow:0 1px 3px #0006}
+.panel{position:fixed;right:0;top:16px;display:flex;flex-direction:column;gap:8px}
+.panel button{height:44px;padding:0 16px;border:0;border-radius:10px 0 0 10px;color:#fff;font:800 15px Nunito;background:radial-gradient(#c21515,#46123b);box-shadow:inset 3px 0 0 -2px #ffffff59}
+.start{position:fixed;left:50%;top:60%;transform:translate(-50%,-50%);font:700 64px 'Amatic SC',cursive;color:#fff;text-shadow:0 2px 8px #0004;transition:opacity .4s;pointer-events:none}
+html.started .start{opacity:0}
+.hud{position:fixed;left:50%;bottom:26px;transform:translate(-50%,160%);transition:transform .5s cubic-bezier(.4,1.6,.65,1);background:radial-gradient(#251f2b,#1d1721);color:#fff;border-radius:14px;padding:14px 18px;max-width:calc(100vw - 32px);width:420px;box-shadow:inset 0 0 0 3px #1d1721,inset 0 0 0 4px #ffffff59}
+.hud.show{transform:translate(-50%,0)}
+.hud b{display:block;font:700 34px/1 'Amatic SC'}
+.hud span{font:600 15px Nunito;opacity:.9}
+.joy{position:fixed;left:16px;bottom:16px;width:150px;height:150px;border:2px solid #fff;border-radius:50%;opacity:.5;display:none;touch-action:none}
+.joy i{position:absolute;left:45px;top:45px;width:60px;height:60px;border:2px solid #fff;border-radius:50%}
+html.coarse.started .joy{display:block}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="tag">Prototype A &middot; flat road, 2025 polish</div>
+<div class="panel"><button type="button">Map</button><button type="button">Sound</button></div>
+<div class="start">Press Enter or tap to start</div>
+<div class="hud" id="hud"><b id="hn"></b><span id="ht"></span></div>
+<div class="joy" id="joy"><i id="knob"></i></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+<script>
+var D = [
+ {id:'bill', name:'The Capitol', t:'Ever watched an idea learn to walk?'},
+ {id:'speech', name:'The Chamber', t:'You have the floor. Better use it.'},
+ {id:'translation', name:'The Bridge', t:'Every word has another side.'},
+ {id:'n1', name:'The Polling Station', t:'Everyone has an opinion. Someone has to count.'},
+ {id:'triptik', name:'The Map Room', t:'Every road remembers where it started.'},
+ {id:'os', name:'The Garage', t:'Mind the cables. Something is booting.'},
+ {id:'depths', name:'The Pier', t:'How deep does it go? Hold your breath.'},
+ {id:'weeks', name:'The Plaza', t:'Where does the time go? Here, mostly.'},
+ {id:'everywhere', name:'The Airport', t:'Now boarding: somewhere far.'},
+ {id:'mail', name:'The Mailbox', t:'Say hello. It delivers.'}
+];
+var html = document.documentElement, V3 = THREE.Vector3;
+if (matchMedia('(pointer: coarse)').matches) html.classList.add('coarse');
+var renderer = new THREE.WebGLRenderer({canvas: document.getElementById('c'), antialias: !html.classList.contains('coarse')});
+renderer.setPixelRatio(Math.min(devicePixelRatio, html.classList.contains('coarse') ? 1.5 : 2));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+var scene = new THREE.Scene();
+// Bruno 2025 day-cycle presets: light colour, shadow colour, two-colour fog, reveal colour
+var hr = new Date().getHours() + new Date().getMinutes()/60;
+var P = hr < 6 || hr > 20.5 ? {light:'#7f8bff', li:1.1, shadow:'#2f00db', fa:'#10266f', fb:'#490a42', rev:'#b678ff'} : hr < 8 ? {light:'#ffa882', li:1.2, shadow:'#db004f', fa:'#f885ff', fb:'#ff7d24', rev:'#ff9d9d'} : hr > 18 ? {light:'#ff8181', li:1.2, shadow:'#4e009c', fa:'#3e53ff', fb:'#ff4ce4', rev:'#ff86d9'} : {light:'#ffd2c2', li:1.3, shadow:'#6d3fff', fa:'#f7c46c', fb:'#e98a4a', rev:'#5f7dff'};
+// the background is a radial gradient in screen space; fog dissolves into the same colours
+var bgC = document.createElement('canvas'); bgC.width = bgC.height = 256; var bx = bgC.getContext('2d'), gr = bx.createRadialGradient(128,110,10,128,128,190); gr.addColorStop(0, P.fa); gr.addColorStop(1, P.fb); bx.fillStyle = gr; bx.fillRect(0,0,256,256);
+scene.background = new THREE.CanvasTexture(bgC); scene.fog = new THREE.Fog(new THREE.Color(P.fa).lerp(new THREE.Color(P.fb), .45), 40, 95);
+var camera = new THREE.PerspectiveCamera(25, 1, .5, 300);
+var hemi = new THREE.HemisphereLight(P.light, P.shadow, .75); scene.add(hemi);
+var sun = new THREE.DirectionalLight(P.light, P.li); sun.position.set(-18, 30, 12); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); var sc = sun.shadow.camera; sc.left = sc.bottom = -45; sc.right = sc.top = 45; sc.far = 120; scene.add(sun, sun.target);
+function M(c) { return new THREE.MeshLambertMaterial({color: c}); }
+var PAL = ['#e9b35e','#d99c4c','#3b3a44','#fff4dc','#f4ead2','#df6a4d','#b27a4a','#a7aeb9','#6aa153','#4f8a45','#6cc3d5','#f2c230','#4f8fd0','#e35645','#2b3140','#fff3c2'].map(M);
+PAL[15] = new THREE.MeshBasicMaterial({color: '#fff3c2'});
+var BOX = new THREE.BoxGeometry(1,1,1).translate(0,.5,0), CYL = new THREE.CylinderGeometry(.5,.5,1,16).translate(0,.5,0), CONE = new THREE.ConeGeometry(.5,1,8).translate(0,.5,0), SPH = new THREE.IcosahedronGeometry(.5,2).translate(0,.5,0), DOME = new THREE.SphereGeometry(.5,18,10,0,Math.PI*2,0,Math.PI/2);
+function add(G, geo, p, x, y, z, sx, sy, sz, ry) { var m = new THREE.Mesh(geo, PAL[p]); m.position.set(x,y,z); m.scale.set(sx,sy,sz); m.rotation.y = ry || 0; m.castShadow = m.receiveShadow = true; G.add(m); return m; }
+var ground = new THREE.Mesh(new THREE.CircleGeometry(70, 64).rotateX(-Math.PI/2), PAL[0]); ground.receiveShadow = true; scene.add(ground);
+// one winding road
+var road = new THREE.CatmullRomCurve3([[-34,0,26],[-18,0,24],[-8,0,10],[-20,0,-4],[-12,0,-18],[4,0,-16],[12,0,-2],[26,0,2],[30,0,-16],[36,0,-28]].map(function (p) { return new V3(p[0], p[1], p[2]); }));
+(function () { var pts = road.getSpacedPoints(400), pos = [], dp = []; for (var i = 0; i < pts.length-1; i++) { var a = pts[i], b = pts[i+1], f = b.clone().sub(a).normalize(), s = new V3(-f.z, 0, f.x).multiplyScalar(1.7); pos.push(a.clone().add(s), a.clone().sub(s), b.clone().add(s), a.clone().sub(s), b.clone().sub(s), b.clone().add(s)); if (i % 6 < 3) { var s2 = s.clone().multiplyScalar(.07); dp.push(a.clone().add(s2), a.clone().sub(s2), b.clone().add(s2), a.clone().sub(s2), b.clone().sub(s2), b.clone().add(s2)); } } var g = new THREE.BufferGeometry().setFromPoints(pos); g.computeVertexNormals(); var rm = PAL[2].clone(); rm.side = THREE.DoubleSide; var m = new THREE.Mesh(g, rm); m.position.y = .02; m.receiveShadow = true; scene.add(m); var g2 = new THREE.BufferGeometry().setFromPoints(dp); g2.computeVertexNormals(); var dm = PAL[3].clone(); dm.side = THREE.DoubleSide; var m2 = new THREE.Mesh(g2, dm); m2.position.y = .04; scene.add(m2); })();
+var BUILD = {
+ bill: function (F) { add(F,BOX,4,0,0,0,7,1.2,5); for (var i=-2;i<=2;i++) add(F,CYL,3,i*1.3,1.2,1.8,.5,2.6,.5); add(F,BOX,4,0,3.8,0,6.4,.6,4.4); add(F,CYL,4,0,4.4,0,3.2,1.2,3.2); add(F,DOME,11,0,5.6,0,3.4,3.4,3.4); },
+ speech: function (F) { add(F,BOX,6,0,0,0,2.2,3.2,1.6,.2); add(F,BOX,6,0,3.1,-.2,2.8,.3,2.1,.2); add(F,CYL,6,2.6,0,1.2,.9,1.6,.9); add(F,BOX,6,1.6,2.2,1.8,1.8,.6,.6,.7); },
+ translation: function (F) { add(F,BOX,7,-5,0,0,1,4,3); add(F,BOX,7,5,0,0,1,4,3); add(F,BOX,7,0,4,0,11,.6,3); add(F,BOX,12,0,5.4,1.6,6,1.8,.3); },
+ n1: function (F) { add(F,BOX,4,0,0,0,5,3,4); add(F,BOX,5,0,3,0,5.6,.6,4.6); for (var i=0;i<5;i++) add(F,BOX,i%2?11:13,-3.8,0,-1.5+i*.8,.6,1+i*.7,.6); },
+ triptik: function (F) { add(F,BOX,4,0,0,0,4,2.6,3); add(F,BOX,5,0,2.6,0,5,.4,3.8); add(F,BOX,13,3.4,0,0,.8,2.6,.8); add(F,SPH,11,3.4,2.6,0,1,1,1); },
+ os: function (F) { add(F,BOX,7,0,0,0,6,3.6,5); add(F,BOX,6,0,3.6,0,6.6,.5,5.6); add(F,BOX,14,0,.1,2.52,4,2.8,.1); add(F,BOX,15,0,1.4,2.2,1.2,.9,.4); },
+ depths: function (F) { add(F,CYL,10,0,-.9,0,12,1,12); add(F,BOX,6,0,1.2,0,3,.3,9); for (var i=0;i<4;i++) add(F,CYL,6,1.2,0,i*2-3,.4,1.2,.4); },
+ weeks: function (F) { for (var x=-3;x<=3;x++) for (var z=-3;z<=3;z++) add(F,BOX,(x*7+z*3+50)%4===0?15:(x+z)%2?4:3,x*1.1,0,z*1.1,1,.18,1); },
+ everywhere: function (F) { add(F,BOX,4,0,0,0,8,2.4,4); add(F,CYL,7,4.8,0,-1,1.2,6.5,1.2); add(F,CYL,14,4.8,6.5,-1,2.2,1.2,2.2); add(F,SPH,12,-3,2.4,-.5,3,3,3); },
+ mail: function (F) { add(F,CYL,6,0,0,0,.25,1.4,.25); add(F,BOX,12,0,1.4,0,.9,.8,1.4); add(F,BOX,13,.5,1.8,.4,.1,.6,.1); }
+};
+var statics = [];
+D.forEach(function (d, i) { var t = .09 + i*.09, p = road.getPointAt(t), f = road.getTangentAt(t), s = new V3(-f.z, 0, f.x).multiplyScalar(i % 2 ? 7.5 : -7.5); var G = new THREE.Group(); G.position.copy(p).add(s); G.lookAt(p); scene.add(G); BUILD[d.id](G); d.pos = G.position.clone(); d.pad = p.clone().add(s.clone().multiplyScalar(.42)); statics.push({p: d.pos, r: d.id === 'weeks' || d.id === 'depths' ? 0 : d.id === 'mail' ? 1 : 3.4});
+  // Bruno 2025 interactive point: a diamond with a label that slides out
+  var c = document.createElement('canvas'), x = c.getContext('2d'); x.font = '700 64px "Amatic SC", cursive'; var w = Math.ceil(x.measureText(d.name).width) + 90; c.width = w; c.height = 64; x.fillStyle = '#251f2b'; x.fillRect(40, 0, w - 40, 64); x.fillStyle = '#fff'; x.font = '700 60px "Amatic SC", cursive'; x.textBaseline = 'middle'; x.fillText(d.name, 60, 34); var tex = new THREE.CanvasTexture(c);
+  var lab = new THREE.Mesh(new THREE.PlaneGeometry(w/64*.8, .8).translate(w/64*.4, 0, 0), new THREE.MeshBasicMaterial({map: tex, transparent: true, depthTest: false, fog: false})); lab.renderOrder = 4;
+  var dia = new THREE.Mesh(new THREE.PlaneGeometry(.9,.9), new THREE.MeshBasicMaterial({color: '#251f2b', depthTest: false, fog: false})); dia.rotation.z = Math.PI/4; dia.renderOrder = 5; var inner = new THREE.Mesh(new THREE.RingGeometry(.2,.28,4,1).rotateZ(Math.PI/4), new THREE.MeshBasicMaterial({color: '#fff', depthTest: false, fog: false})); inner.renderOrder = 6; inner.rotation.z = -Math.PI/4; dia.add(inner);
+  var pin = new THREE.Group(); pin.add(lab, dia); pin.position.copy(d.pos).add(new V3(0, d.id === 'mail' ? 3.5 : 8, 0)); scene.add(pin); d.pin = pin; d.lab = lab; d.labK = 0;
+});
+// trees, sparse, in orchards
+(function () { var seed = 3; function rnd() { seed = (seed*16807) % 2147483647; return seed/2147483647; } var pts = road.getSpacedPoints(200); for (var k = 0; k < 160; k++) { var p = new V3(rnd()*110-55, 0, rnd()*110-55); if (p.length() > 62) continue; var ok = pts.every(function (q) { return q.distanceTo(p) > 4; }) && D.every(function (d) { return d.pos.distanceTo(p) > 7; }); if (!ok) continue; var G = new THREE.Group(); G.position.copy(p); scene.add(G); var h = 1.4 + rnd()*1.2; add(G,CYL,6,0,0,0,.3,h*.5,.3); add(G,SPH,rnd()<.5?8:9,0,h*.4,0,h,h*1.1,h); statics.push({p: p, r: .5}); } })();
+// physics letters (the name as bricks), normal gravity
+var pw = new CANNON.World(); pw.gravity.set(0,-16,0); pw.allowSleep = true; pw.addBody(new CANNON.Body({mass: 0, shape: new CANNON.Plane(), quaternion: new CANNON.Quaternion().setFromAxisAngle(new CANNON.Vec3(1,0,0), -Math.PI/2)}));
+var carBody = new CANNON.Body({mass: 0, type: CANNON.Body.KINEMATIC, shape: new CANNON.Box(new CANNON.Vec3(.65,.5,1.15))}); pw.addBody(carBody);
+var GLYPH = {H:['1...1','1...1','11111','1...1','1...1'],U:['1...1','1...1','1...1','1...1','.111.'],S:['.1111','1....','.111.','....1','1111.'],A:['.111.','1...1','11111','1...1','1...1'],M:['1...1','11.11','1.1.1','1...1','1...1'],O:['.111.','1...1','1...1','1...1','.111.'],K:['1..1.','1.1..','11...','1.1..','1..1.'],R:['1111.','1...1','1111.','1.1..','1..11']};
+var dyn = [];
+'HUSAMSOKAR'.split('').forEach(function (ch, i) { var G = new THREE.Group(); GLYPH[ch].forEach(function (row, y) { for (var x = 0; x < 5; x++) if (row[x] === '1') add(G, BOX, 3, (x-2)*.36, (4-y)*.36-.9, 0, .36, .36, .5); }); scene.add(G); var row = i < 5 ? 0 : 1, col = row ? i-5 : i; var b = new CANNON.Body({mass: 1.2, shape: new CANNON.Box(new CANNON.Vec3(.9,.9,.25)), position: new CANNON.Vec3(-40 + col*2.1, 6 + i, 20 + row*3)}); b.sleepSpeedLimit = .3; pw.addBody(b); dyn.push({m: G, b: b}); });
+// reveal ring (Bruno 2025): a glowing ring sweeping out from the start
+var ring = new THREE.Mesh(new THREE.RingGeometry(.95, 1, 96).rotateX(-Math.PI/2), new THREE.MeshBasicMaterial({color: P.rev, transparent: true, fog: false})); ring.position.set(-34, .08, 26); ring.scale.setScalar(3.5); scene.add(ring);
+// car: kinematic arcade on the plane
+var car = {p: new V3(-34, 0, 26), h: Math.atan2(-16, 2), v: 0, st: 0, hop: 0, hv: 0}, carMesh = new THREE.Group(); add(carMesh,BOX,13,0,.35,0,1.3,.7,2.3); add(carMesh,BOX,13,0,1.05,.2,1.2,.55,1.2); add(carMesh,BOX,15,-.42,.6,-1.16,.25,.18,.05); add(carMesh,BOX,15,.42,.6,-1.16,.25,.18,.05); [[-.68,.8],[.68,.8],[-.68,-.75],[.68,-.75]].forEach(function (w) { var c = add(carMesh, CYL, 2, w[0], .0, w[1], .68, .3, .68); c.rotation.z = Math.PI/2; c.position.y = .34; c.position.x = w[0] + (w[0] > 0 ? -.15 : .15); }); scene.add(carMesh);
+// tyre tracks (2025 draws them into a render target; here: fading instanced quads)
+var TR = 300, trG = new THREE.PlaneGeometry(.25, .5).rotateX(-Math.PI/2), tracks = new THREE.InstancedMesh(trG, new THREE.MeshBasicMaterial({color: '#7a4a24', transparent: true, opacity: .35}), TR), trI = 0, trM = new THREE.Matrix4(), lastTr = car.p.clone(); tracks.count = TR; for (var q = 0; q < TR; q++) tracks.setMatrixAt(q, new THREE.Matrix4().makeScale(0,0,0)); scene.add(tracks);
+var keys = {}, joy = {x: 0, y: 0, on: false}, started = false, revealT = -1, zoom = .6, zoomT = .3, near = null, hud = document.getElementById('hud');
+function start() { if (started) return; started = true; html.classList.add('started'); revealT = 0; dyn.forEach(function (d) { d.b.wakeUp(); }); }
+addEventListener('keydown', function (e) { keys[e.code] = true; if (e.code === 'Enter') { if (!started) start(); else if (near && near.id !== 'mail') location.href = '../../' + near.id + '.html'; } if (e.code === 'Space' && car.hop === 0) car.hv = 6; });
+addEventListener('keyup', function (e) { keys[e.code] = false; });
+addEventListener('pointerdown', function () { if (!started) start(); });
+addEventListener('wheel', function (e) { zoomT = Math.max(0, Math.min(1, zoomT - e.deltaY*.001)); });
+var joyEl = document.getElementById('joy'), knob = document.getElementById('knob');
+joyEl.addEventListener('touchstart', jm, {passive: false}); joyEl.addEventListener('touchmove', jm, {passive: false}); joyEl.addEventListener('touchend', function () { joy.on = false; knob.style.transform = ''; });
+function jm(e) { e.preventDefault(); var r = joyEl.getBoundingClientRect(), t = e.touches[0], x = (t.clientX - r.left - 75)/55, y = (t.clientY - r.top - 75)/55, l = Math.hypot(x, y); if (l > 1) { x /= l; y /= l; } joy.x = x; joy.y = y; joy.on = true; knob.style.transform = 'translate(' + x*45 + 'px,' + y*45 + 'px)'; }
+var TH = Math.PI*.25, PH = Math.PI*.27;
+function drive(dt) {
+  var st = ((keys.KeyA||keys.ArrowLeft)?1:0) - ((keys.KeyD||keys.ArrowRight)?1:0), th = ((keys.KeyW||keys.ArrowUp)?1:0) - ((keys.KeyS||keys.ArrowDown)?1:0), boost = keys.ShiftLeft||keys.ShiftRight;
+  if (joy.on && Math.hypot(joy.x, joy.y) > .15) { var want = Math.atan2(joy.x, -joy.y) - TH + Math.PI; var a = ((want - car.h + Math.PI*3) % (Math.PI*2)) - Math.PI; st = Math.max(-1, Math.min(1, -a*2)); th = Math.min(1, Math.hypot(joy.x, joy.y)); }
+  var max = boost ? 17 : 10.5; car.v += th*(th*car.v < 0 ? 26 : 13)*dt; if (!th) car.v *= Math.pow(.25, dt); car.v = Math.max(-5, Math.min(max, car.v));
+  car.st += (st - car.st)*Math.min(1, dt*8); car.h += car.st*2.1*Math.min(1, Math.abs(car.v)/4)*Math.sign(car.v||1)*dt;
+  car.p.x -= Math.sin(car.h)*car.v*dt; car.p.z -= Math.cos(car.h)*car.v*dt; var l = car.p.length(); if (l > 64) car.p.multiplyScalar(64/l);
+  statics.forEach(function (s) { if (!s.r) return; var d = car.p.distanceTo(s.p), m = s.r + 1.1; if (d < m) { car.p.add(car.p.clone().sub(s.p).setY(0).normalize().multiplyScalar(m - d)); car.v *= .6; } });
+  car.hv -= 18*dt; car.hop = Math.max(0, car.hop + car.hv*dt); if (!car.hop) car.hv = Math.max(0, car.hv);
+  carMesh.position.set(car.p.x, car.hop, car.p.z); carMesh.rotation.set(0, car.h, 0); carMesh.rotateZ(-car.st*Math.min(1, Math.abs(car.v)/8)*.1);
+  carBody.velocity.set((car.p.x - carBody.position.x)/dt, (car.hop + .5 - carBody.position.y)/dt, (car.p.z - carBody.position.z)/dt); carBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0,1,0), car.h);
+  if (car.p.distanceTo(lastTr) > .45 && Math.abs(car.v) > 1) { lastTr.copy(car.p); [-.6,.6].forEach(function (o) { trM.makeRotationY(car.h).setPosition(car.p.x + Math.cos(car.h)*o, .03, car.p.z - Math.sin(car.h)*o); tracks.setMatrixAt(trI++ % TR, trM); }); tracks.instanceMatrix.needsUpdate = true; }
+}
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+var focus = car.p.clone(), last = performance.now();
+function frame(t) {
+  var dt = Math.min(.05, (t - last)/1000); last = t;
+  if (started) { drive(dt); pw.step(1/60, dt, 3); }
+  dyn.forEach(function (d) { d.m.position.copy(d.b.position); d.m.quaternion.copy(d.b.quaternion); });
+  if (revealT >= 0) { revealT += dt; var k = Math.min(1, revealT/2), e = k*k*((1.3+1)*k - 1.3); ring.scale.setScalar(3.5 + e*70); ring.material.opacity = 1 - k; }
+  // camera: FOV 25, phi .27pi, theta .25pi, radius 15..30 (+9 on portrait), speed zoom -0.4 (Bruno 2025)
+  var speedZ = -.4*THREE.MathUtils.smoothstep(Math.abs(car.v), 5, 17); zoom += (zoomT + speedZ - zoom)*Math.min(1, dt*10);
+  var over = Math.max(1, 1.78/camera.aspect) - 1, r = 15 + (30 + over*9*1.5 - 15)*(1 - Math.max(-.4, zoom)*.8);
+  focus.lerp(carMesh.position, Math.min(1, dt*10)); var off = new V3().setFromSphericalCoords(r*1.6, PH, TH); camera.position.copy(focus).add(off); camera.lookAt(focus); scene.fog.near = r*1.6*.9; scene.fog.far = r*1.6*2.2;
+  sun.position.copy(focus).add(new V3(-18, 30, 12)); sun.target.position.copy(focus);
+  var best = null, bd = 1e9; D.forEach(function (d) { var dd = car.p.distanceTo(d.pad); if (dd < bd) { bd = dd; best = d; } d.pin.quaternion.copy(camera.quaternion); var want = d.pos.distanceTo(car.p) < 14 ? 1 : 0; d.labK += (want - d.labK)*Math.min(1, dt*8); d.lab.scale.x = Math.max(.001, d.labK); });
+  var n2 = started && bd < 3.2 ? best : null; if (n2 !== near) { near = n2; if (near) { document.getElementById('hn').textContent = near.name; document.getElementById('ht').textContent = near.t; } hud.classList.toggle('show', !!near); }
+  renderer.render(scene, camera); requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

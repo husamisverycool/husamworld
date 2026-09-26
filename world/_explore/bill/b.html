@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Capitol · B: a bill on the steps</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shrikhand&family=Cabin:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--sky:#5cc4d8;--sky2:#9fe0e6;--ink:#1d1a17;--paper:#fbf6e6;--mustard:#f0b429;--orange:#e8672c;--red:#d63a2f;--blue:#2d4fa0;--grass:#7cb342;--stone:#d9d2c0}
+*{box-sizing:border-box}
+body{margin:0;background:#231f1c;color:#fbf6e6;font:17px/1.5 Cabin,Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 60px}
+h1{font-family:Shrikhand,serif;font-weight:400;color:var(--mustard);font-size:clamp(28px,4vw,48px);margin:0 0 12px;text-shadow:3px 3px 0 var(--red)}
+.screen{position:relative;border-radius:28px/22px;overflow:hidden;border:10px solid #111;background:var(--sky);aspect-ratio:16/9}
+svg{display:block;width:100%;height:100%}
+.cap{position:absolute;left:0;right:0;bottom:0;padding:14px 22px 18px;background:linear-gradient(transparent,#000c 40%);font-weight:600;font-size:clamp(14px,1.7vw,21px);line-height:1.35;text-shadow:0 2px 0 #000}
+.cap b{color:var(--mustard)}
+.scenes{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.scenes button{font:700 14px Cabin,sans-serif;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:999px;padding:6px 14px;cursor:pointer;box-shadow:3px 3px 0 var(--orange)}
+.scenes button[aria-pressed=true]{background:var(--mustard)}
+.boil{filter:url(#boil)}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-22deg)}}
+.bill{animation:bob 1.2s steps(3) infinite}
+.arm{transform-origin:0 0;animation:wave .7s steps(2) infinite}
+.scene{display:none}.scene.on{display:inline}
+.enter{animation:in .6s steps(4) both}
+@keyframes in{from{transform:translateX(-400px)}to{transform:none}}
+.sheet{margin-top:26px;background:var(--paper);color:var(--ink);border-radius:6px;padding:20px 24px}
+.sheet h2{font-family:Shrikhand,serif;font-weight:400;margin:0 0 8px;color:var(--red)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Sitting on the steps in Sacramento</h1>
+<div class="screen">
+<svg viewBox="0 0 1600 900" aria-hidden="true">
+  <defs>
+    <filter id="boil"><feTurbulence id="turb" type="fractalNoise" baseFrequency="0.02" numOctaves="2" seed="1"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+    <g id="billchar">
+      <!-- the rolled bill -->
+      <path d="M-60 -170 C-70 -120 -66 -20 -58 40 L58 44 C66 -20 70 -110 62 -160 C60 -200 20 -214 -10 -205 C-40 -198 -58 -190 -60 -170Z" fill="#fffdf4" stroke="#1d1a17" stroke-width="6" stroke-linejoin="round"/>
+      <path d="M62 -160 C80 -190 70 -226 34 -222 C6 -219 -4 -206 -10 -205" fill="#f4ecd4" stroke="#1d1a17" stroke-width="6"/>
+      <path d="M-44 -30 L-44 30 M-30 -60 L40 -60 M-30 -44 L36 -44" stroke="#bbb" stroke-width="3"/>
+      <ellipse cx="-18" cy="-130" rx="17" ry="22" fill="#fff" stroke="#1d1a17" stroke-width="5"/><ellipse cx="20" cy="-130" rx="17" ry="22" fill="#fff" stroke="#1d1a17" stroke-width="5"/>
+      <circle cx="-14" cy="-124" r="6" fill="#1d1a17"/><circle cx="22" cy="-124" r="6" fill="#1d1a17"/>
+      <path d="M-4 -104 q8 12 0 18" fill="none" stroke="#1d1a17" stroke-width="5"/>
+      <path d="M-20 -72 q18 12 36 0" fill="none" stroke="#1d1a17" stroke-width="5" stroke-linecap="round"/>
+      <path d="M-58 -40 L58 10" stroke="#d63a2f" stroke-width="18"/>
+      <circle cx="26" cy="-4" r="34" fill="#fff" stroke="#1d1a17" stroke-width="5"/>
+      <path d="M-6 -4 a32 32 0 0 1 64 0z" fill="#d63a2f"/><path d="M-6 -4 a32 32 0 0 0 64 0z" fill="#2d4fa0"/>
+      <rect x="-8" y="-16" width="68" height="24" fill="#fff" stroke="#1d1a17" stroke-width="3"/>
+      <text x="26" y="2" font-family="Cabin" font-weight="700" font-size="17" text-anchor="middle" fill="#1d1a17">AB 1766</text>
+      <path d="M-30 44 l-6 50 l-24 4 M30 44 l6 50 l24 4" fill="none" stroke="#1d1a17" stroke-width="6" stroke-linecap="round"/>
+      <path d="M-58 -10 q-40 10 -50 50" fill="none" stroke="#1d1a17" stroke-width="6" stroke-linecap="round"/>
+      <g class="arm" transform="translate(58 -20)"><path d="M0 0 q40 -20 50 -70" fill="none" stroke="#1d1a17" stroke-width="6" stroke-linecap="round"/><circle cx="50" cy="-76" r="10" fill="#fff" stroke="#1d1a17" stroke-width="5"/></g>
+    </g>
+  </defs>
+  <!-- sky and capitol, always present -->
+  <rect width="1600" height="900" fill="#5cc4d8"/>
+  <circle cx="1380" cy="140" r="70" fill="#f0b429"/>
+  <g class="boil">
+    <g id="capitol" fill="#fbf6e6" stroke="#1d1a17" stroke-width="6" stroke-linejoin="round">
+      <rect x="360" y="330" width="880" height="230"/>
+      <path d="M560 330 L800 250 L1040 330Z"/>
+      <rect x="690" y="170" width="220" height="90"/>
+      <path d="M700 170 C700 60 900 60 900 170Z"/>
+      <rect x="788" y="40" width="24" height="46"/>
+      <g stroke-width="5"><path d="M420 360 v170 M470 360 v170 M520 360 v170 M1080 360 v170 M1130 360 v170 M1180 360 v170 M620 360 v170 M680 360 v170 M740 360 v170 M860 360 v170 M920 360 v170 M980 360 v170"/></g>
+    </g>
+    <g fill="#d9d2c0" stroke="#1d1a17" stroke-width="5">
+      <rect x="300" y="560" width="1000" height="40"/><rect x="250" y="600" width="1100" height="40"/><rect x="200" y="640" width="1200" height="40"/><rect x="150" y="680" width="1300" height="40"/>
+    </g>
+    <rect y="720" width="1600" height="180" fill="#7cb342" stroke="#1d1a17" stroke-width="6"/>
+  </g>
+  <!-- scene 1 -->
+  <g class="scene on" data-s="0"><g class="boil"><g class="bill"><use href="#billchar" transform="translate(800 600)"/></g></g></g>
+  <!-- scene 2: two doors -->
+  <g class="scene" data-s="1"><g class="boil">
+    <rect x="0" y="0" width="1600" height="900" fill="#f3e3c3"/>
+    <rect x="160" y="160" width="520" height="620" fill="#b5652f" stroke="#1d1a17" stroke-width="8"/><rect x="200" y="200" width="440" height="110" fill="#fbf6e6" stroke="#1d1a17" stroke-width="5"/>
+    <text x="420" y="248" text-anchor="middle" font-family="Cabin" font-weight="700" font-size="30" fill="#1d1a17">ASSEMBLYMEMBER</text><text x="420" y="290" text-anchor="middle" font-family="Cabin" font-weight="700" font-size="34" fill="#1d1a17">JIM PATTERSON</text>
+    <rect x="920" y="160" width="520" height="620" fill="#2d4fa0" stroke="#1d1a17" stroke-width="8"/><rect x="960" y="200" width="440" height="110" fill="#fbf6e6" stroke="#1d1a17" stroke-width="5"/>
+    <text x="1180" y="248" text-anchor="middle" font-family="Cabin" font-weight="700" font-size="30" fill="#1d1a17">SENATOR</text><text x="1180" y="290" text-anchor="middle" font-family="Cabin" font-weight="700" font-size="34" fill="#1d1a17">SHANNON GROVE</text>
+    <g class="bill enter"><use href="#billchar" transform="translate(800 700) scale(.9)"/></g>
+  </g></g>
+  <!-- scene 3: five bills -->
+  <g class="scene" data-s="2"><g class="boil">
+    <g class="bill"><use href="#billchar" transform="translate(800 640)"/></g>
+    <g transform="translate(360 690) scale(.6)"><use href="#billchar"/></g><g transform="translate(560 700) scale(.6)"><use href="#billchar"/></g>
+    <g transform="translate(1040 700) scale(.6)"><use href="#billchar"/></g><g transform="translate(1240 690) scale(.6)"><use href="#billchar"/></g>
+  </g></g>
+</svg>
+<div class="cap" id="cap"></div>
+</div>
+<div class="scenes" role="group" aria-label="Scenes">
+  <button aria-pressed="true" data-s="0">1 · The steps</button><button aria-pressed="false" data-s="1">2 · Two offices</button><button aria-pressed="false" data-s="2">3 · Five bills</button>
+</div>
+<div class="sheet"><h2>The lyric sheet</h2><p>Every caption, in order, readable without pressing play.</p><ol id="lyrics"></ol></div>
+</div>
+<script>
+var CAPS=[
+ '<b>AB 1766, California IDs for All.</b> Sacramento, May 2021. A bill needs somebody to carry it up these steps. It got a lead community advocate from CAIR.',
+ 'Upstairs, two doors. The Assembly office of <b>Jim Patterson</b>, through Legislative Director Ian Coolbear, and the Senate office of <b>Shannon Grove</b>.',
+ 'Then four more: <b>AB 1947</b> (Freedom from Hate Crimes), <b>SB 1161</b> (Transit Safety), <b>AB 2549</b> (Ending Street Harassment), <b>SB 1038</b> (limits on biometric surveillance). Five California bills, worked end to end.'
+];
+var cap=document.getElementById('cap');
+function go(i){document.querySelectorAll('.scene').forEach(function(g){g.classList.toggle('on',+g.dataset.s===i)});
+  document.querySelectorAll('.scenes button').forEach(function(b){b.setAttribute('aria-pressed',+b.dataset.s===i)});cap.innerHTML=CAPS[i];}
+document.querySelectorAll('.scenes button').forEach(function(b){b.onclick=function(){go(+b.dataset.s)}});
+document.getElementById('lyrics').innerHTML=CAPS.map(function(c){return '<li>'+c+'</li>'}).join('');
+go(0);
+// line boil at 8 fps
+var t=document.getElementById('turb'),k=0;if(!matchMedia('(prefers-reduced-motion: reduce)').matches)setInterval(function(){t.setAttribute('seed',(k++%3)+1)},125);
+</script>
+</body>
+</html>

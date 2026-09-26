@@ -1,0 +1,1020 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Deep End</title>
+<meta name="description" content="Husam Sokar's honors, each at the depth of its odds: from the surface down to 1 in 1,628.">
+<meta name="theme-color" content="#9ee0fe">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Heebo:wght@400;700&family=Oswald:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<!--
+  The Pier: an homage to Neal Agarwal's "The Deep Sea" (neal.fun/deep-sea).
+  Depth = rarity. Every honor sits at "1 in N", where N = pool / number picked (from versions/CONTENT.md).
+  Scale is linear: one unit of N is 60px (desktop), 68px (tablet) or 96px (phone). Study notes: world/_study/depths.md
+-->
+<style>
+:root{
+  --navy:#2c2c54; --slate:#4d4d80; --cream:#f7f1e3; --lilac:#eabdff;
+  --sand-1:#ede5ce; --sand-2:#b5ad9a; --ink:#333;
+  --sky-1:#9ee0fe; --sky-2:#e2e9c5;
+  --vh:1vh;
+  --sans:Heebo,"Helvetica Neue",Arial,sans-serif;
+  --cond:Oswald,"Arial Narrow","Helvetica Neue",Arial,sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0}
+html{font-size:16px;-webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased;background:#000;color:#fff;font-family:var(--sans);overflow-x:hidden}
+body{background:#000;min-height:100%}
+img,svg{display:block}
+button{font:inherit;color:inherit}
+a{color:inherit}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+:focus-visible{outline:3px solid var(--lilac);outline-offset:3px;border-radius:4px}
+.skip-link{position:absolute;left:50%;top:10px;transform:translate(-50%,-160%);z-index:200;background:var(--navy);color:var(--cream);font:500 16px var(--cond);padding:8px 14px;border-radius:8px;text-decoration:none}
+.skip-link:focus{transform:translate(-50%,0)}
+
+/* ---------- the water: a fixed WebGL canvas behind everything (neal.fun/deep-sea) ---------- */
+.water{position:fixed;left:0;top:0;width:100%;height:100vh;height:calc(var(--vh)*100);z-index:0;background:linear-gradient(180deg,var(--sky-1),var(--sky-2));pointer-events:none}
+.water canvas{display:block;width:100%;height:100%}
+
+/* ---------- title slide ---------- */
+.title-slide{position:relative;height:100vh;height:calc(var(--vh)*100);display:flex;align-items:center;justify-content:center;z-index:3}
+.mark{position:absolute;left:18px;top:12px;z-index:5;display:flex;align-items:center;gap:1px;font:700 34px/1 "Amatic SC",var(--cond);color:var(--navy);text-decoration:none;letter-spacing:.01em}
+.mark svg{width:15px;height:10px;margin:14px 1px 0}
+@media (hover:hover){.mark:hover{transform:scale(1.033)}}
+.title-wrapper{position:relative;bottom:50px;text-align:center;padding:0 16px;z-index:4}
+.title{font:700 76px/1.08 var(--sans);color:var(--navy);letter-spacing:-.005em}
+.title-credit{font:400 26px/1.3 var(--cond);color:var(--slate);margin-top:15px}
+.title-actions{margin-top:26px;display:flex;gap:10px 22px;justify-content:center;align-items:center;flex-wrap:wrap}
+.dive-btn{display:inline-flex;align-items:center;gap:10px;font:500 21px/1 var(--cond);letter-spacing:.07em;text-transform:uppercase;color:var(--cream);background:var(--navy);border:0;border-radius:8px;padding:12px 22px 13px;cursor:pointer;transition:transform .15s ease,background .15s ease}
+.dive-btn svg{width:14px;height:16px}
+.dive-btn:hover{background:#3a3a6c}
+.dive-btn:active{transform:scale(.97)}
+.text-btn{font:400 18px/1.2 var(--cond);color:var(--slate);background:none;border:0;padding:6px 4px;cursor:pointer;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}
+.text-btn:hover{color:var(--navy)}
+.title-slide :focus-visible{outline-color:var(--navy)}
+
+html:not(.js) .scene,html:not(.js) .controls,html:not(.js) .gauge,html:not(.js) .skip-link{display:none}
+.scene{position:absolute;left:0;top:calc(var(--vh)*77.8 - 240px);width:100%;height:340px;overflow:visible;pointer-events:none;z-index:3}
+.scene #raft-bob{animation:raftBob 4.6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes raftBob{from{transform:translateY(-1px) rotate(-1.4deg)}to{transform:translateY(3px) rotate(1.4deg)}}
+.skip-intro{position:fixed;right:18px;bottom:18px;z-index:60;font:500 16px/1 var(--cond);letter-spacing:.05em;text-transform:uppercase;color:var(--navy);background:rgba(247,241,227,.92);border:0;border-radius:8px;padding:10px 14px;cursor:pointer;display:none}
+html.intro-on .skip-intro{display:block}
+
+/* ---------- controls (top right, like Neal's language picker) ---------- */
+.controls{position:fixed;top:12px;right:12px;z-index:70;display:flex;gap:2px;align-items:flex-start}
+.ctl{font:400 18px/1 var(--cond);color:var(--slate);background:transparent;border:0;border-radius:8px;padding:8px 10px;cursor:pointer;transition:background .15s ease,color .3s ease;white-space:nowrap}
+.ctl:hover,.ctl[aria-expanded="true"]{background:rgba(0,0,0,.06)}
+html.under .controls{background:rgba(10,14,36,.5);border-radius:11px}
+html.under .ctl{color:var(--cream)}
+html.sand .controls{background:transparent}
+html.sand .ctl{color:var(--slate)}
+html.sand .ctl:hover{background:rgba(0,0,0,.06)}
+html.under .ctl:hover,html.under .ctl[aria-expanded="true"]{background:rgba(255,255,255,.12)}
+.ctl .state{opacity:.7}
+.menu{position:absolute;right:0;top:calc(100% + 6px);background:#fff;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,.18);list-style:none;margin:0;padding:6px 0;min-width:250px;z-index:80}
+.menu[hidden]{display:none}
+.menu button{display:flex;justify-content:space-between;align-items:baseline;gap:18px;width:100%;padding:8px 16px;font:400 17px/1.25 var(--cond);color:var(--navy);background:none;border:0;text-align:left;cursor:pointer}
+.menu button:hover,.menu button:focus-visible{background:#f1f2f6;outline:none}
+.menu .r{font-size:14px;color:var(--slate)}
+.menu hr{border:0;border-top:1px solid #e6e7ee;margin:6px 0}
+
+/* depth gauge on the right edge (desktop) */
+.gauge{position:fixed;right:10px;top:84px;bottom:120px;width:14px;z-index:60;display:none;flex-direction:column}
+.gauge button{flex:1;display:block;width:100%;border:0;padding:0;background:transparent;cursor:pointer;position:relative}
+.gauge button::before{content:"";position:absolute;left:5px;width:4px;top:1px;bottom:1px;border-radius:2px;background:var(--c);opacity:.55;transition:opacity .2s}
+.gauge button:hover::before,.gauge button:focus-visible::before{opacity:1}
+.gauge button span{position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;font:400 14px/1 var(--cond);letter-spacing:.04em;text-transform:uppercase;color:var(--cream);background:var(--navy);padding:5px 8px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .15s}
+.gauge button:hover span,.gauge button:focus-visible span{opacity:1}
+.gauge .pip{position:absolute;left:1px;width:12px;height:12px;border-radius:50%;background:var(--cream);box-shadow:0 0 0 2px var(--navy);transform:translateY(-50%);pointer-events:none;top:0}
+@media (min-width:900px){.gauge{display:flex}}
+
+/* ---------- the ocean ---------- */
+.ocean{position:relative;z-index:2}
+html:not(.js) .ocean{background:linear-gradient(180deg,#0a8ea0 0,#05505e 4%,#01161d 12%,#000 20%)}
+.zone-title{font:700 48px/1.12 var(--cond);color:var(--lilac);text-transform:uppercase;text-align:center}
+.zone-range{display:block;font:400 21px/1.3 var(--cond);letter-spacing:.03em;text-transform:none;opacity:.85;margin-top:6px}
+.blurb{font:400 24px/1.6 var(--cond);color:#fff;text-align:center}
+.blurb small{display:block;font-size:.8em;opacity:.85}
+
+/* the surface: things with no published odds */
+.surface{max-width:1400px;margin:0 auto;padding:56px 15px 120px;text-align:center}
+.surface .blurb{max-width:760px;margin:26px auto 0}
+.floats{list-style:none;padding:0;margin:54px auto 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:44px 28px;max-width:1240px}
+.float{text-align:center}
+.float-art{width:112px;margin:0 auto 6px}
+.float-art svg{width:100%;height:auto;animation:bob 5.2s ease-in-out infinite alternate;animation-delay:var(--d,0s)}
+@keyframes bob{from{transform:translateY(-3px) rotate(-3deg)}to{transform:translateY(4px) rotate(3deg)}}
+.float-name{font:400 16px/1.3 var(--cond);letter-spacing:.03em;text-transform:uppercase;color:var(--cream);opacity:.95}
+.float-note{font:300 17px/1.4 var(--cond);color:#fff;opacity:.9;margin-top:4px}
+
+/* the scale */
+.scale{position:relative;max-width:1400px;margin:0 auto;padding:0 15px}
+html:not(.js) .scale{padding:40px 15px 80px;display:flex;flex-direction:column;gap:48px;align-items:center}
+html:not(.js) .scale section{display:flex;flex-direction:column;gap:48px;align-items:center}
+html.js .scale [data-n]{position:absolute;top:0;left:0}
+.scale .blurb,.scale .zone-title,.scale .zone-head{padding:0 8px;z-index:3}
+.zone-head{text-align:center}
+.zone-head .blurb{margin:18px auto 0;max-width:780px}
+.descender{z-index:1}
+.spec{text-align:center;color:#fff;padding:0 10px}
+html:not(.js) .spec{max-width:380px}
+.spec-art{margin:0 auto;width:calc(var(--w,1)*100%)}
+.spec-art svg{width:100%;height:auto;overflow:visible}
+.spec-name{font:300 17px/1.3 var(--cond);letter-spacing:.035em;text-transform:uppercase;color:var(--cream);opacity:.95;margin-top:8px}
+.spec-fact{font:400 19px/1.45 var(--cond);color:#fff;margin-top:5px}
+.spec-odds{position:relative;display:flex;align-items:center;gap:10px;margin-top:10px;font:700 14px/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;color:var(--cream);white-space:nowrap}
+.spec-odds::before,.spec-odds::after{content:"";flex:1;border-bottom:1px dashed rgba(255,255,255,.4)}
+.spec-odds .tether{display:none;position:absolute;left:-2px;bottom:50%;height:var(--shift,0);border-left:1px dotted rgba(255,255,255,.6)}
+.spec-odds .tether::before{content:"";position:absolute;left:-5px;top:-1px;width:9px;border-top:1px solid rgba(255,255,255,.75)}
+.spec.shifted .spec-odds .tether{display:block}
+.spec.shifted.up .spec-odds .tether{bottom:auto;top:50%}
+.spec.shifted.up .spec-odds .tether::before{top:auto;bottom:-1px}
+.spec .note{display:block;font:300 16px/1.4 var(--cond);opacity:.82;margin-top:3px}
+
+/* the deepest one rests on the sand */
+.spec-floor .spec-art.floor-angler{width:min(360px,70vw);margin:0 auto 14px}
+.spec-floor .spec-odds{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);margin:0}
+.spec-floor .spec-text{max-width:620px;margin:0 auto 26px}
+
+/* the diver who rides down with you (after the Trieste) */
+.descender{pointer-events:none}
+html:not(.js) .descender{display:none}
+.descender-sticky{position:sticky;top:40%;width:min(300px,52vw);margin-left:auto;margin-right:6%;transform:translateY(-50%);animation:subFloat 6s ease-in-out infinite alternate}
+@keyframes subFloat{0%{transform:translateY(-50%) rotate(0)}100%{transform:translateY(-53%) rotate(2deg)}}
+.hadal-diver{width:100%;height:auto}
+.hadal-diver .kick{animation:kick 1.6s ease-in-out infinite alternate;transform-origin:250px 110px}
+@keyframes kick{from{transform:rotate(-5deg)}to{transform:rotate(6deg)}}
+.hadal-diver .dbub circle{animation:dbub 2.4s linear infinite}
+.hadal-diver .dbub circle:nth-child(2){animation-delay:.8s}
+.hadal-diver .dbub circle:nth-child(3){animation-delay:1.6s}
+@keyframes dbub{0%{transform:translateY(22px);opacity:0}20%{opacity:1}100%{transform:translateY(-40px);opacity:0}}
+.hadal-diver .beam{animation:beam 3.2s ease-in-out infinite alternate}
+@keyframes beam{from{opacity:.75}to{opacity:1}}
+
+/* creature idle motion */
+.sway{animation:sway 3.4s ease-in-out infinite alternate}
+.sway2{animation:sway 4.1s ease-in-out infinite alternate-reverse}
+@keyframes sway{from{translate:0 -2px}to{translate:3px 2px}}
+.bell{animation:pulse 3s ease-in-out infinite;transform-origin:110px 100px}
+@keyframes pulse{0%,100%{transform:scale(1,1)}50%{transform:scale(1.05,.93)}}
+.lure,.lure-glow{animation:glow 2.6s ease-in-out infinite alternate}
+@keyframes glow{from{opacity:.65}to{opacity:1}}
+
+/* ---------- the counter (sticky, bottom 18%, dashed line; Neal's depth-line) ---------- */
+.depth-line{position:sticky;bottom:18%;height:56px;margin-top:-56px;z-index:6;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px;border-bottom:1px dashed rgba(255,255,255,.22);color:#fff;font:700 28px/1 var(--sans);letter-spacing:.01em;opacity:0;transition:opacity .3s ease-in-out}
+.depth-line.on{opacity:1}
+html:not(.js) .depth-line{display:none}
+
+/* ---------- the floor ---------- */
+.floor-edge{position:relative;z-index:3;margin-top:-4px;line-height:0}
+.floor-edge-svg{width:100%;height:40px}
+.floor{position:relative;z-index:3;min-height:100vh;min-height:calc(var(--vh)*100);background:linear-gradient(var(--sand-1),var(--sand-2));color:var(--navy);text-align:center;padding:72px 16px 190px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-top:-1px}
+.pebbles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.floor .big{font:700 76px/1.05 var(--sans);color:var(--navy);position:relative}
+.floor .who{font:400 26px/1.3 var(--cond);color:var(--slate);margin-top:14px;position:relative}
+.floor .why{font:400 20px/1.5 var(--cond);color:var(--slate);margin-top:26px;max-width:34em;position:relative}
+.x-copy{font:500 15px/1 var(--cond);letter-spacing:.06em;text-transform:uppercase;color:var(--cream);background:var(--navy);border:0;border-radius:6px;padding:7px 10px;cursor:pointer;min-width:70px}
+.x-copy.done{background:#3f7d5b}
+.back-top{position:absolute;left:0;right:0;bottom:92px;margin:0 auto;width:max-content;font:400 28px/1.2 var(--cond);color:#333;background:none;border:0;cursor:pointer;padding:6px 10px}
+.back-top:hover{text-decoration:underline;text-underline-offset:5px}
+.floor :focus-visible{outline-color:var(--navy)}
+
+/* ---------- list view ---------- */
+.list-view{position:fixed;inset:0;z-index:120;background:var(--navy);color:var(--cream);overflow-y:auto;overscroll-behavior:contain;padding:70px 16px 110px}
+.list-view[hidden]{display:none}
+.list-inner{max-width:920px;margin:0 auto}
+.list-close{position:fixed;top:12px;right:14px;z-index:2;font:400 18px/1 var(--cond);color:var(--cream);background:rgba(255,255,255,.1);border:0;border-radius:8px;padding:9px 12px;cursor:pointer}
+.list-close:hover{background:rgba(255,255,255,.18)}
+.list-view h2{font:700 50px/1.08 var(--sans);color:#fff}
+.list-sub{font:400 20px/1.45 var(--cond);color:var(--lilac);margin-top:12px;max-width:40em}
+.list-sort{display:flex;gap:6px;margin-top:22px;flex-wrap:wrap}
+.list-sort button{font:400 16px/1 var(--cond);letter-spacing:.04em;text-transform:uppercase;color:var(--cream);background:transparent;border:1px solid rgba(255,255,255,.3);border-radius:7px;padding:8px 12px;cursor:pointer}
+.list-sort button[aria-pressed="true"]{background:var(--cream);color:var(--navy);border-color:var(--cream)}
+.list-groups{display:flex;flex-direction:column}
+.list-zone{font:700 24px/1.2 var(--cond);color:var(--lilac);text-transform:uppercase;margin:40px 0 6px;letter-spacing:.03em}
+.list-zone span{font-weight:400;font-size:17px;text-transform:none;opacity:.8;margin-left:8px;letter-spacing:.02em}
+.list-rows{list-style:none;padding:0;margin:0;display:flex;flex-direction:column}
+.list-row{display:grid;grid-template-columns:8.2em minmax(0,1fr);gap:3px 22px;padding:13px 0;border-top:1px dashed rgba(255,255,255,.2)}
+.list-odds{font:700 18px/1.35 var(--sans);color:#fff;text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.list-name{font:400 18px/1.35 var(--cond);letter-spacing:.03em;text-transform:uppercase}
+.list-name button{all:unset;cursor:pointer;color:var(--cream);text-decoration:underline;text-decoration-color:rgba(247,241,227,.35);text-underline-offset:4px}
+.list-name button:hover{text-decoration-color:var(--cream)}
+.list-name button:focus-visible{outline:3px solid var(--lilac);outline-offset:2px}
+.list-fact{grid-column:2;font:300 17px/1.45 var(--cond);color:#fff;opacity:.9}
+.list-foot{margin-top:40px;font:400 17px/1.5 var(--cond);color:var(--lilac);opacity:.9}
+html.list-open{overflow:hidden}
+
+/* ---------- small screens ---------- */
+@media (max-width:1100px){.floats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:700px){
+  .floats{grid-template-columns:repeat(2,minmax(0,1fr));gap:36px 14px}
+  .float-art{width:92px}
+  .float-name{font-size:14px}
+  .float-note{font-size:15px}
+  .spec{padding:0 5px}
+  .spec-name{font-size:13.5px;margin-top:4px}
+  .spec-fact{font-size:15px;line-height:1.38;margin-top:3px}
+  .spec .note{font-size:14px}
+  .spec-odds{font-size:12px;gap:6px;margin-top:8px}
+  .blurb{font-size:20px;line-height:1.5}
+  .zone-title{font-size:32px}
+  .zone-range{font-size:17px}
+  .spec-art{max-width:140px}
+}
+@media (max-width:600px){.depth-line{font-size:21px}}
+@media (max-width:500px){
+  .title{font-size:48px;line-height:1.05}
+  .title-credit{font-size:18px;margin-top:10px}
+  .mark{left:14px;top:12px;font-size:22px}
+  .mark svg{width:12px;height:8px;margin-top:12px}
+  .controls{top:8px;right:6px}
+  .ctl{font-size:15.5px;padding:8px 7px}
+  .floor .big{font-size:46px}
+  .floor .who{font-size:22px}
+  .floor .why{font-size:18px}
+  .back-top{font-size:24px;bottom:120px}
+  .list-view h2{font-size:34px}
+  .list-row{grid-template-columns:1fr;gap:2px}
+  .list-odds{text-align:left}
+  .list-fact{grid-column:1}
+  .dive-btn{font-size:19px;padding:11px 18px 12px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+</style>
+</head>
+<body>
+<a class="skip-link" href="#listView" id="skipToList">Skip to the list of honors</a>
+<div class="water" id="water" aria-hidden="true"><canvas id="water-canvas"></canvas></div>
+
+<nav class="controls" aria-label="Page controls">
+  <div style="position:relative">
+    <button class="ctl" id="jumpBtn" type="button" aria-expanded="false" aria-controls="jumpMenu">Jump</button>
+    <ul class="menu" id="jumpMenu" hidden><li><button type="button" data-go="surface">The Surface<span class="r">no odds</span></button></li><li><button type="button" data-go="sunlight">Sunlight Zone<span class="r">1 in 1+</span></button></li><li><button type="button" data-go="twilight">Twilight Zone<span class="r">1 in 10+</span></button></li><li><button type="button" data-go="midnight">Midnight Zone<span class="r">1 in 100+</span></button></li><li><button type="button" data-go="abyssal">Abyssal Zone<span class="r">1 in 1,000+</span></button></li><li><hr></li><li><button type="button" data-go="bottom">Skip to the bottom<span class="r">1 in 1,628</span></button></li><li><button type="button" data-go="top">Back to the surface<span class="r">top</span></button></li></ul>
+  </div>
+  <button class="ctl" id="listBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="listView">List</button>
+</nav>
+<nav class="gauge" id="gauge" aria-label="Depth gauge"><button type="button" data-go="surface" style="--c:#8fe3f5" aria-label="Jump to The surface"><span aria-hidden="true">The surface</span></button><button type="button" data-go="sunlight" style="--c:#2cc3d6" aria-label="Jump to Sunlight: 1 in 1+"><span aria-hidden="true">Sunlight: 1 in 1+</span></button><button type="button" data-go="twilight" style="--c:#1a8aa0" aria-label="Jump to Twilight: 1 in 10+"><span aria-hidden="true">Twilight: 1 in 10+</span></button><button type="button" data-go="midnight" style="--c:#2d5a86" aria-label="Jump to Midnight: 1 in 100+"><span aria-hidden="true">Midnight: 1 in 100+</span></button><button type="button" data-go="abyssal" style="--c:#5a5a96" aria-label="Jump to Abyssal: 1 in 1,000+"><span aria-hidden="true">Abyssal: 1 in 1,000+</span></button><button type="button" data-go="bottom" style="--c:#ede5ce" aria-label="Jump to The bottom"><span aria-hidden="true">The bottom</span></button><button type="button" data-go="end" style="--c:#f7f1e3" aria-label="Jump to The end"><span aria-hidden="true">The end</span></button><span class="pip" id="gaugePip" aria-hidden="true"></span></nav>
+
+<main>
+<section class="title-slide" id="top" aria-labelledby="page-title">
+  <a class="mark" href="index.html#from-depths" aria-label="husam.world: back to the map">HUSAM<svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><path d="M2,10 C6,3 15,2 21,8 L28,3 L27,10 L28,17 L21,12 C15,18 6,17 2,10 Z" fill="#2c2c54"/><circle cx="8" cy="9" r="1.6" fill="#f7f1e3"/></svg>WORLD</a>
+  <svg class="scene" id="scene" viewBox="0 0 1440 340" aria-hidden="true" focusable="false"><defs><clipPath id="above-water"><rect id="above-rect" x="0" y="-3000" width="1440" height="3240"/></clipPath></defs><g id="under"></g><g id="pier" transform="translate(0,240)"><defs><linearGradient id="pier-post" x1="0" y1="-68" x2="0" y2="72" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#6e4426"/><stop offset=".485" stop-color="#6e4426"/><stop offset=".5" stop-color="#23606a" stop-opacity=".85"/><stop offset="1" stop-color="#0d6a78" stop-opacity="0"/></linearGradient><linearGradient id="ladder-g" x1="0" y1="-78" x2="0" y2="46" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#c9ccd6"/><stop offset=".62" stop-color="#c9ccd6"/><stop offset=".64" stop-color="#6fb7c2" stop-opacity=".8"/><stop offset="1" stop-color="#6fb7c2" stop-opacity="0"/></linearGradient></defs><rect x="12" y="-68" width="14" height="140" fill="url(#pier-post)"/><rect x="84" y="-68" width="14" height="140" fill="url(#pier-post)"/><rect x="156" y="-68" width="14" height="140" fill="url(#pier-post)"/><rect x="228" y="-68" width="14" height="140" fill="url(#pier-post)"/><rect x="292" y="-68" width="14" height="140" fill="url(#pier-post)"/><path d="M19,-58 L91,-10 M91,-58 L19,-10" stroke="#5a3620" stroke-width="5" opacity=".85"/><path d="M91,-58 L163,-10 M163,-58 L91,-10" stroke="#5a3620" stroke-width="5" opacity=".85"/><path d="M163,-58 L235,-10 M235,-58 L163,-10" stroke="#5a3620" stroke-width="5" opacity=".85"/><path d="M235,-58 L299,-10 M299,-58 L235,-10" stroke="#5a3620" stroke-width="5" opacity=".85"/><rect x="0" y="-80" width="312" height="14" fill="#a86d40"/><rect x="0" y="-80" width="312" height="3.5" fill="#c58a58"/><path d="M22,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M46,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M70,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M94,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M118,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M142,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M166,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M190,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M214,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M238,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M262,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M286,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><path d="M310,-78 V-66" stroke="#8a5731" stroke-width="1.2" opacity=".55"/><rect x="318" y="-78" width="3" height="124" fill="url(#ladder-g)"/><rect x="336" y="-78" width="3" height="124" fill="url(#ladder-g)"/><rect x="318" y="-60" width="21" height="2.6" fill="url(#ladder-g)"/><rect x="318" y="-40" width="21" height="2.6" fill="url(#ladder-g)"/><rect x="318" y="-20" width="21" height="2.6" fill="url(#ladder-g)"/><rect x="318" y="0" width="21" height="2.6" fill="url(#ladder-g)"/><rect x="318" y="20" width="21" height="2.6" fill="url(#ladder-g)"/><path d="M318,-78 C318,-92 339,-92 339,-78" stroke="#c9ccd6" stroke-width="3" fill="none"/><rect x="38" y="-152" width="4.5" height="72" fill="#3f3f55"/><path d="M30,-152 H50 L46,-166 H34 Z" fill="#2c2c54"/><circle cx="40" cy="-150" r="4" fill="#fff3b0"/><circle cx="40" cy="-110" r="10" fill="none" stroke="#f7f1e3" stroke-width="5.5"/><circle cx="40" cy="-110" r="10" fill="none" stroke="#e04b3f" stroke-width="5.5" stroke-dasharray="7.85 7.85"/><rect x="232" y="-96" width="14" height="16" rx="3" fill="#3f3f55"/><rect x="229" y="-99" width="20" height="5" rx="2" fill="#4d4d66"/><ellipse cx="266" cy="-84" rx="14" ry="4.5" fill="none" stroke="#d9c39a" stroke-width="3"/><ellipse cx="266" cy="-86" rx="9" ry="3" fill="none" stroke="#d9c39a" stroke-width="2.6"/><rect x="290" y="-98" width="22" height="18" rx="2" fill="#d4d7de"/><rect x="290" y="-98" width="22" height="4" fill="#e6e8ee"/><g id="board"><rect x="292" y="-104" width="156" height="7" rx="3" fill="#f4f1e8"/><rect x="292" y="-100.5" width="156" height="1.8" fill="#4d8fd1"/></g></g><g id="raft" transform="translate(1040,240)"><g id="raft-bob"><rect x="-4" y="-124" width="5" height="108" fill="#7a4f2c"/><path d="M1,-122 C30,-128 62,-112 104,-120 L104,-80 C62,-72 30,-88 1,-82 Z" fill="#f7f1e3"/><text x="52" y="-106" text-anchor="middle" font-family="Oswald, sans-serif" font-weight="700" font-size="11.5" fill="#2c2c54" letter-spacing=".4">NO PUBLISHED</text><text x="52" y="-91" text-anchor="middle" font-family="Oswald, sans-serif" font-weight="700" font-size="11.5" fill="#2c2c54" letter-spacing=".4">ODDS</text><rect x="-64" y="-36" width="18" height="18" rx="4" fill="#8d5a34"/><rect x="-64" y="-31" width="18" height="2.4" fill="#6b4225"/><rect x="-64" y="-24" width="18" height="2.4" fill="#6b4225"/><rect x="34" y="-38" width="22" height="20" fill="#c28f58"/><path d="M34,-38 L56,-18 M56,-38 L34,-18" stroke="#9c6f3e" stroke-width="2"/><rect x="-104" y="-20" width="208" height="7" rx="2" fill="#b07a47"/><rect x="-110" y="-14" width="220" height="22" rx="11" fill="#9a6a3e"/><rect x="-110" y="-14" width="220" height="5" rx="2.5" fill="#b3804f"/><rect x="-78" y="-14" width="6" height="22" fill="#d9c39a"/><rect x="-26" y="-14" width="6" height="22" fill="#d9c39a"/><rect x="26" y="-14" width="6" height="22" fill="#d9c39a"/><rect x="74" y="-14" width="6" height="22" fill="#d9c39a"/><circle cx="-104" cy="-3" r="10" fill="#c49a6c"/><circle cx="-104" cy="-3" r="6" fill="none" stroke="#9a6a3e" stroke-width="1.4"/><circle cx="-104" cy="-3" r="2.4" fill="#9a6a3e"/><rect x="-112" y="0" width="224" height="10" fill="#0b6f7d" opacity=".42"/></g></g><g clip-path="url(#above-water)"><g id="diver" transform="translate(440,136)"><path d="M-3.4,-43 L-4.6,-63 M3.4,-43 L4.6,-63" stroke="#a8683f" stroke-width="3.8" stroke-linecap="round"/><rect x="-5" y="-22" width="4.2" height="22" rx="2" fill="#a8683f"/><rect x="0.8" y="-22" width="4.2" height="22" rx="2" fill="#a8683f"/><rect x="-6.2" y="-45" width="12.4" height="19" rx="5" fill="#a8683f"/><rect x="-6.4" y="-29" width="12.8" height="9" rx="2.5" fill="#2c2c54"/><circle cx="0" cy="-51" r="6.4" fill="#a8683f"/><path d="M-6.6,-51.5 A6.6,6.6 0 0 1 6.6,-51.5 Z" fill="#e05a47"/><rect x="0.5" y="-51.5" width="6.5" height="2.8" rx="1.4" fill="#7fd0f0"/></g></g><g id="splash"></g></svg>
+  <div class="title-wrapper">
+    <h1 class="title" id="page-title">The Deep End</h1>
+    <p class="title-credit">Husam Sokar’s honors, at the depth of their odds</p>
+    <div class="title-actions">
+      <button class="dive-btn" id="diveBtn" type="button">Dive <svg viewBox="0 0 14 16" aria-hidden="true" focusable="false"><path d="M7,1 V14 M1.5,8.5 L7,14 L12.5,8.5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="text-btn" id="skipBottom" type="button">or skip to the bottom</button>
+    </div>
+  </div>
+</section>
+
+<div class="ocean" id="ocean">
+<section class="surface" id="surface" aria-labelledby="surface-title"><h2 class="zone-title" id="surface-title">The Surface<span class="zone-range">No published odds</span></h2><p class="blurb">These 5 honors never came with a pool size, so there’s nothing to weigh them down. They float.</p><ul class="floats"><li class="float"><div class="float-art" style="--d:0.00s"><svg viewBox="0 0 120 92" width="120" height="92" aria-hidden="true" focusable="false"><circle cx="60" cy="50" r="31" fill="#76c49a" opacity=".85"/><ellipse cx="50" cy="38" rx="11" ry="7" fill="#e6fff0" opacity=".7"/><clipPath id="raft0-c"><circle cx="60" cy="50" r="32"/></clipPath><g clip-path="url(#raft0-c)"><path d="M0,10 L50,90 M50,10 L0,90" stroke="#8a6a44" stroke-width="1.8"/><path d="M16,10 L66,90 M66,10 L16,90" stroke="#8a6a44" stroke-width="1.8"/><path d="M32,10 L82,90 M82,10 L32,90" stroke="#8a6a44" stroke-width="1.8"/><path d="M48,10 L98,90 M98,10 L48,90" stroke="#8a6a44" stroke-width="1.8"/><path d="M64,10 L114,90 M114,10 L64,90" stroke="#8a6a44" stroke-width="1.8"/><path d="M80,10 L130,90 M130,10 L80,90" stroke="#8a6a44" stroke-width="1.8"/><path d="M96,10 L146,90 M146,10 L96,90" stroke="#8a6a44" stroke-width="1.8"/><path d="M112,10 L162,90 M162,10 L112,90" stroke="#8a6a44" stroke-width="1.8"/></g><path d="M60,19 C56,10 64,4 60,-2" stroke="#8a6a44" stroke-width="2.4" fill="none"/></svg></div><h3 class="float-name">Benjamin A. Gilman Scholar</h3><p class="float-note">Scholarship.</p></li><li class="float"><div class="float-art" style="--d:4.27s"><svg viewBox="0 0 120 92" width="120" height="92" aria-hidden="true" focusable="false"><circle cx="60" cy="50" r="30" fill="#f08a3c"/><path d="M31,44 H89 V56 H31 Z" fill="#f7f1e3"/><ellipse cx="48" cy="34" rx="9" ry="5" fill="#fff" opacity=".45"/><path d="M54,20 C54,12 66,12 66,20" stroke="#8d8f9c" stroke-width="3" fill="none"/></svg></div><h3 class="float-name">National African American Recognition Program</h3><p class="float-note">National recognition.</p></li><li class="float"><div class="float-art" style="--d:3.54s"><svg viewBox="0 0 120 92" width="120" height="92" aria-hidden="true" focusable="false"><clipPath id="raft2-c"><circle cx="60" cy="48" r="32"/></clipPath><circle cx="60" cy="48" r="32" fill="#4f8fd8"/><g clip-path="url(#raft2-c)"><path d="M30,30 C40,22 54,26 56,36 C58,46 46,48 44,58 C42,66 32,64 28,56 Z" fill="#6fbf5a"/><path d="M66,22 C78,20 90,28 90,40 C84,44 74,40 70,46 C66,52 72,62 66,68 C60,62 62,50 58,42 C56,32 60,24 66,22 Z" fill="#6fbf5a"/><path d="M60,16 C44,30 44,66 60,80 M60,16 C76,30 76,66 60,80 M28,48 H92" stroke="#fff" stroke-width="1.4" fill="none" opacity=".55"/></g><ellipse cx="48" cy="32" rx="9" ry="5" fill="#fff" opacity=".35"/></svg></div><h3 class="float-name">International Geography Olympiad</h3><p class="float-note">Team USA qualifier: 7th nationally, with a perfect qualifying score.</p></li><li class="float"><div class="float-art" style="--d:2.81s"><svg viewBox="0 0 120 92" width="120" height="92" aria-hidden="true" focusable="false"><g transform="rotate(-24 60 48)"><rect x="30" y="34" width="56" height="28" rx="12" fill="#7cc2a0" opacity=".78"/><rect x="84" y="41" width="16" height="14" rx="3" fill="#7cc2a0" opacity=".78"/><rect x="98" y="42" width="9" height="12" rx="2" fill="#c9955b"/><rect x="40" y="40" width="34" height="16" rx="7" fill="#f3ead3"/><path d="M44,45 H70 M44,50 H66" stroke="#b9ab8a" stroke-width="1.4"/><rect x="36" y="37" width="30" height="4" rx="2" fill="#fff" opacity=".4"/></g></svg></div><h3 class="float-name">National History Day</h3><p class="float-note">2× Valley Champion.</p></li><li class="float"><div class="float-art" style="--d:2.08s"><svg viewBox="0 0 120 92" width="120" height="92" aria-hidden="true" focusable="false"><path d="M36,50 C36,64 84,64 84,50 L84,40 L36,40 Z" fill="#23234a"/><path d="M60,18 L108,36 L60,54 L12,36 Z" fill="#2c2c54"/><path d="M60,22 L100,36 L60,50 L20,36 Z" fill="#3a3a6a"/><path d="M60,36 L96,46 L96,64" stroke="#f2c14e" stroke-width="2.4" fill="none"/><path d="M92,62 L100,62 L98,74 L94,74 Z" fill="#f2c14e"/><circle cx="60" cy="36" r="3" fill="#f2c14e"/></svg></div><h3 class="float-name">Summa Cum Laude</h3><p class="float-note">The highest of the Latin honors.</p></li></ul></section>
+<div class="scale" id="scale">
+<section id="sunlight" aria-labelledby="z-sunlight"><header class="zone-head" data-kind="head" data-n="1"><h2 class="zone-title" id="z-sunlight">The Sunlight Zone<span class="zone-range">1 in 1 to 1 in 10</span></h2><p class="blurb">From here down, depth is odds: an honor that picked 1 person in 64 sits at 1 in 64. Up here, you swim in schools.</p></header><article class="spec" id="s-qb-finalist" data-n="3.499382" data-lane="0.3" aria-labelledby="s-qb-finalist-h"><div class="spec-art" style="--w:0.9"><svg viewBox="0 0 310 140" width="310" height="140" aria-hidden="true" focusable="false"><g transform="translate(14,22) scale(0.34,0.29)" class="sway2"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#81a1b8"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#81a1b8"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#81a1b8"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#a3c2d6"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#eef4f7"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#81a1b8" opacity=".9"/><circle cx="38" cy="44" r="7" fill="#fff"/><circle cx="36.5" cy="44" r="4.2" fill="#1c1c2e"/><circle cx="34.9" cy="41.8" r="1.5" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g><g transform="translate(104,6) scale(0.34,0.29)" class="sway"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#81a1b8"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#81a1b8"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#81a1b8"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#a3c2d6"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#eef4f7"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#81a1b8" opacity=".9"/><circle cx="38" cy="44" r="7" fill="#fff"/><circle cx="36.5" cy="44" r="4.2" fill="#1c1c2e"/><circle cx="34.9" cy="41.8" r="1.5" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g><g transform="translate(196,26) scale(0.34,0.29)" class="sway2"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#d99f2e"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#d99f2e"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#d99f2e"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#f2c14e"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#fde9a8"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#d99f2e" opacity=".9"/><circle cx="38" cy="44" r="7" fill="#fff"/><circle cx="36.5" cy="44" r="4.2" fill="#1c1c2e"/><circle cx="34.9" cy="41.8" r="1.5" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g><g transform="translate(58,66) scale(0.34,0.29)" class="sway"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#81a1b8"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#81a1b8"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#81a1b8"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#a3c2d6"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#eef4f7"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#81a1b8" opacity=".9"/><circle cx="38" cy="44" r="7" fill="#fff"/><circle cx="36.5" cy="44" r="4.2" fill="#1c1c2e"/><circle cx="34.9" cy="41.8" r="1.5" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g><g transform="translate(150,58) scale(0.34,0.29)" class="sway2"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#d99f2e"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#d99f2e"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#d99f2e"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#f2c14e"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#fde9a8"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#d99f2e" opacity=".9"/><circle cx="38" cy="44" r="7" fill="#fff"/><circle cx="36.5" cy="44" r="4.2" fill="#1c1c2e"/><circle cx="34.9" cy="41.8" r="1.5" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g><g transform="translate(234,80) scale(0.34,0.29)" class="sway"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#81a1b8"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#81a1b8"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#81a1b8"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#a3c2d6"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#eef4f7"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#81a1b8" opacity=".9"/><circle cx="38" cy="44" r="7" fill="#fff"/><circle cx="36.5" cy="44" r="4.2" fill="#1c1c2e"/><circle cx="34.9" cy="41.8" r="1.5" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g><g transform="translate(104,106) scale(0.34,0.29)" class="sway2"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#81a1b8"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#81a1b8"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#81a1b8"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#a3c2d6"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#eef4f7"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#81a1b8" opacity=".9"/><circle cx="38" cy="44" r="7" fill="#fff"/><circle cx="36.5" cy="44" r="4.2" fill="#1c1c2e"/><circle cx="34.9" cy="41.8" r="1.5" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg></div><h3 class="spec-name" id="s-qb-finalist-h">QuestBridge National College Match Finalist</h3><p class="spec-fact">7,287 finalists from 25,500.</p><p class="spec-odds"><span class="tether"></span>1 in 3.5</p></article><article class="spec" id="s-qb-cps" data-n="4.091025" data-lane="0.9" aria-labelledby="s-qb-cps-h"><div class="spec-art" style="--w:0.9"><svg viewBox="0 0 290 125" width="290" height="125" aria-hidden="true" focusable="false"><g transform="translate(8,14) scale(0.5,0.42)" class="sway"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#3b76b4"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#3b76b4"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#f0c93a"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#4d8fd1"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#e3eef8"/><path d="M34,40 C74,31 128,32 152,48 C128,42 76,41 34,45 Z" fill="#f5d547"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#3b76b4" opacity=".9"/><circle cx="38" cy="44" r="6" fill="#fff"/><circle cx="36.7" cy="44" r="3.6" fill="#1c1c2e"/><circle cx="35.3" cy="42.1" r="1.3" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g><g transform="translate(150,4) scale(0.5,0.42)" class="sway"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#d99f2e"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#d99f2e"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#d99f2e"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#f2c14e"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#fde9a8"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#d99f2e" opacity=".9"/><circle cx="38" cy="44" r="6" fill="#fff"/><circle cx="36.7" cy="44" r="3.6" fill="#1c1c2e"/><circle cx="35.3" cy="42.1" r="1.3" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g><g transform="translate(70,64) scale(0.5,0.42)" class="sway"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#3b76b4"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#3b76b4"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#f0c93a"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#4d8fd1"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#e3eef8"/><path d="M34,40 C74,31 128,32 152,48 C128,42 76,41 34,45 Z" fill="#f5d547"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#3b76b4" opacity=".9"/><circle cx="38" cy="44" r="6" fill="#fff"/><circle cx="36.7" cy="44" r="3.6" fill="#1c1c2e"/><circle cx="35.3" cy="42.1" r="1.3" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g><g transform="translate(178,78) scale(0.5,0.42)" class="sway2"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#3b76b4"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#3b76b4"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#f0c93a"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#4d8fd1"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#e3eef8"/><path d="M34,40 C74,31 128,32 152,48 C128,42 76,41 34,45 Z" fill="#f5d547"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#3b76b4" opacity=".9"/><circle cx="38" cy="44" r="6" fill="#fff"/><circle cx="36.7" cy="44" r="3.6" fill="#1c1c2e"/><circle cx="35.3" cy="42.1" r="1.3" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg></div><h3 class="spec-name" id="s-qb-cps-h">QuestBridge College Prep Scholar</h3><p class="spec-fact">3,911 scholars from 16,000.</p><p class="spec-odds"><span class="tether"></span>1 in 4.1</p></article><article class="spec" id="s-hsd" data-n="8.750000" data-lane="0.1" aria-labelledby="s-hsd-h"><div class="spec-art" style="--w:0.95"><svg viewBox="0 0 272 116" width="272" height="116" aria-hidden="true" focusable="false"><path d="M124,36 C132,20 144,12 158,10 C151,22 151,32 157,42 Z" fill="#6a88a1"/><path d="M246,74 C254,60 262,52 270,50 C265,63 263,71 259,76 C263,82 267,92 270,102 C261,97 252,88 246,80 Z" fill="#6a88a1"/><path d="M12,72 C18,68 26,67 34,64 C40,52 52,44 70,40 C104,32 160,34 200,52 C222,62 238,70 252,74 C236,80 222,84 200,84 C160,92 110,96 70,90 C52,88 40,84 32,80 C24,78 16,76 12,72 Z" fill="#7d9cb5"/><path d="M30,78 C50,86 90,94 130,92 C165,90 195,84 215,80 C190,80 150,83 120,83 C80,83 50,81 30,78 Z" fill="#dbe5ed"/><path d="M80,48 C110,38 160,40 196,56 C160,46 116,46 80,54 Z" fill="#8fadc4" opacity=".6"/><path d="M86,86 C90,100 98,108 112,112 C107,101 105,93 107,87 Z" fill="#6a88a1"/><circle cx="52" cy="61" r="3.6" fill="#1c2233"/><circle cx="51" cy="59.8" r="1.1" fill="#fff"/><path d="M18,74 C27,77 36,77 45,72" stroke="#4f6b82" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg></div><h3 class="spec-name" id="s-hsd-h">High School Diplomats Finalist</h3><p class="spec-fact">About 80 finalists from 700+.</p><p class="spec-odds"><span class="tether"></span><span aria-hidden="true">~</span><span class="sr-only">about </span>1 in 8.8</p></article><article class="spec" id="s-usc" data-n="9.000000" data-lane="0.7" aria-labelledby="s-usc-h"><div class="spec-art" style="--w:0.72"><svg viewBox="0 0 204 100" width="204" height="100" aria-hidden="true" focusable="false"><g transform="translate(2,0) scale(1,1)"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#6f93b5"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#6f93b5"/><path d="M148,50 C160,40 172,24 194,12 C186,34 186,66 194,88 C172,76 160,60 148,50 Z" fill="#2e4a68"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#8aaccb"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#e1ebf3"/><clipPath id="usc-c"><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z"/></clipPath><g clip-path="url(#usc-c)"><rect x="44" y="0" width="13" height="100" fill="#2e4a68"/><rect x="72" y="0" width="13" height="100" fill="#2e4a68"/><rect x="99" y="0" width="13" height="100" fill="#2e4a68"/><rect x="124" y="0" width="13" height="100" fill="#2e4a68"/><rect x="146" y="0" width="13" height="100" fill="#2e4a68"/></g><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#6f93b5" opacity=".9"/><circle cx="38" cy="44" r="6" fill="#fff"/><circle cx="36.7" cy="44" r="3.6" fill="#1c1c2e"/><circle cx="35.3" cy="42.1" r="1.3" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg></div><h3 class="spec-name" id="s-usc-h">USC Young Leaders Summit Scholar</h3><p class="spec-fact">About 200 from 1,800+.</p><p class="spec-odds"><span class="tether"></span><span aria-hidden="true">~</span><span class="sr-only">about </span>1 in 9</p></article></section>
+<section id="twilight" aria-labelledby="z-twilight"><h2 class="zone-title" id="z-twilight" data-kind="zone" data-n="10">The Twilight Zone<span class="zone-range">1 in 10 to 1 in 100</span></h2><article class="spec" id="s-notre-dame" data-n="16.666667" data-lane="1" aria-labelledby="s-notre-dame-h"><div class="spec-art" style="--w:0.78"><svg viewBox="0 0 226 176" width="226" height="176" aria-hidden="true" focusable="false"><path d="M66,64 L74,31 L88,26 L78,64 Z" fill="#f2cdbf" opacity=".55"/><path d="M78,64 L88,26 L103,21 L90,64 Z" fill="#f2cdbf" opacity=".55"/><path d="M90,64 L103,21 L118,16 L102,64 Z" fill="#f2cdbf" opacity=".55"/><path d="M102,60 L118,16 L132,21 L114,60 Z" fill="#f2cdbf" opacity=".55"/><path d="M114,60 L132,21 L146,26 L126,60 Z" fill="#f2cdbf" opacity=".55"/><path d="M126,60 L146,26 L161,31 L138,60 Z" fill="#f2cdbf" opacity=".55"/><path d="M138,60 L161,31 L176,36 L150,60 Z" fill="#f2cdbf" opacity=".55"/><path d="M150,64 L176,36 L190,41 L162,64 Z" fill="#f2cdbf" opacity=".55"/><path d="M66,60 L74,23" stroke="#a83a2a" stroke-width="2.6" stroke-linecap="round"/><path d="M78,60 L88,18" stroke="#a83a2a" stroke-width="2.6" stroke-linecap="round"/><path d="M90,60 L103,13" stroke="#a83a2a" stroke-width="2.6" stroke-linecap="round"/><path d="M102,56 L118,8" stroke="#a83a2a" stroke-width="2.6" stroke-linecap="round"/><path d="M114,56 L132,13" stroke="#a83a2a" stroke-width="2.6" stroke-linecap="round"/><path d="M126,56 L146,18" stroke="#a83a2a" stroke-width="2.6" stroke-linecap="round"/><path d="M138,56 L161,23" stroke="#a83a2a" stroke-width="2.6" stroke-linecap="round"/><path d="M150,60 L176,28" stroke="#a83a2a" stroke-width="2.6" stroke-linecap="round"/><path d="M162,60 L190,33" stroke="#a83a2a" stroke-width="2.6" stroke-linecap="round"/><path d="M92,104 C112,138 150,168 214,170 C190,146 160,126 124,100 Z" fill="#efc3b1" opacity=".85"/><path d="M96,110 L140,168" stroke="#b5402e" stroke-width="2" opacity=".7"/><path d="M96,110 L152,162" stroke="#b5402e" stroke-width="2" opacity=".7"/><path d="M96,110 L164,156" stroke="#b5402e" stroke-width="2" opacity=".7"/><path d="M96,110 L176,150" stroke="#b5402e" stroke-width="2" opacity=".7"/><path d="M96,110 L188,144" stroke="#b5402e" stroke-width="2" opacity=".7"/><path d="M96,110 L200,138" stroke="#b5402e" stroke-width="2" opacity=".7"/><g transform="translate(24,50) scale(0.92,0.74)"><path d="M104,76 C110,88 124,90 130,72 Z" fill="#c8553f"/><path d="M146,50 C156,32 184,28 194,50 C184,72 156,68 146,50 Z" fill="#c8553f"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#f5e6d6"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#fbf1e6"/><clipPath id="notre-dame-c"><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z"/></clipPath><g clip-path="url(#notre-dame-c)"><path d="M44,20 L30,100" stroke="#b5402e" stroke-width="7"/><path d="M61,20 L47,100" stroke="#b5402e" stroke-width="7"/><path d="M78,20 L64,100" stroke="#b5402e" stroke-width="7"/><path d="M95,20 L81,100" stroke="#b5402e" stroke-width="7"/><path d="M112,20 L98,100" stroke="#b5402e" stroke-width="7"/><path d="M129,20 L115,100" stroke="#b5402e" stroke-width="7"/><path d="M146,20 L132,100" stroke="#b5402e" stroke-width="7"/><path d="M163,20 L149,100" stroke="#b5402e" stroke-width="7"/><path d="M180,20 L166,100" stroke="#b5402e" stroke-width="7"/><path d="M197,20 L183,100" stroke="#b5402e" stroke-width="7"/></g><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#c8553f" opacity=".9"/><circle cx="38" cy="44" r="6.5" fill="#fff"/><circle cx="36.6" cy="44" r="3.9" fill="#1c1c2e"/><circle cx="35.1" cy="41.9" r="1.4" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g><path d="M40,98 C60,112 70,128 66,146 C58,132 50,118 36,106 Z" fill="#efc3b1" opacity=".8"/></svg></div><h3 class="spec-name" id="s-notre-dame-h">Notre Dame Leadership Seminars</h3><p class="spec-fact">About 90 from 1,500+.</p><p class="spec-odds"><span class="tether"></span><span aria-hidden="true">~</span><span class="sr-only">about </span>1 in 17</p></article><article class="spec" id="s-jfk" data-n="18.666667" data-lane="0.2" aria-labelledby="s-jfk-h"><div class="spec-art" style="--w:1"><svg viewBox="0 0 306 104" width="306" height="104" aria-hidden="true" focusable="false"><path d="M72,51 L4,56 L72,61 Z" fill="#1f3c63"/><g transform="translate(52,18) scale(1.25,.8)"><path d="M70,26 C72,-8 90,-16 102,-10 C96,4 104,18 120,26 Z" fill="#24466f"/></g><g transform="translate(52,16) scale(1.25,0.8)"><path d="M104,76 C110,88 124,90 130,72 Z" fill="#24466f"/><path d="M144,50 C154,42 166,18 198,6 C184,32 184,68 198,94 C166,82 154,58 144,50 Z" fill="#24466f"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#2f5585"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#c4d3e3"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#24466f" opacity=".9"/><circle cx="38" cy="44" r="5" fill="#fff"/><circle cx="36.9" cy="44" r="3.0" fill="#1c1c2e"/><circle cx="35.8" cy="42.4" r="1.1" fill="#fff"/><path d="M17,55 C21,57 25,57 29,55" stroke="#1c2233" stroke-opacity=".55" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></svg></div><h3 class="spec-name" id="s-jfk-h">JFK Profile in Courage Essay Contest</h3><p class="spec-fact">Top 5%: about 150 of 2,800+.</p><p class="spec-odds"><span class="tether"></span><span aria-hidden="true">~</span><span class="sr-only">about </span>1 in 19</p></article><article class="spec" id="s-climate" data-n="20.000000" data-lane="0.75" aria-labelledby="s-climate-h"><div class="spec-art" style="--w:0.72"><svg viewBox="0 0 216 140" width="216" height="140" aria-hidden="true" focusable="false"><ellipse cx="108" cy="130" rx="92" ry="9" fill="#5f5a6c"/><path d="M16,128 C12,72 58,26 108,26 C160,26 204,72 200,128 Z" fill="#d99a5b"/><path d="M20,128 C22,104 34,82 50,68 C40,92 38,110 40,128 Z" fill="#c08447" opacity=".6"/><ellipse cx="92" cy="48" rx="40" ry="13" fill="#eab983" opacity=".5"/><path d="M34,112 C38,98 50,100 52,88 C54,76 68,78 70,66 C72,56 86,54 90,46" stroke="#b27238" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M60,118 C60,104 74,106 76,94 C78,82 92,84 94,72 C96,60 110,60 112,50 C114,42 126,40 132,38" stroke="#b27238" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M94,120 C94,108 108,108 110,96 C112,84 126,86 128,74 C130,64 142,64 146,56 C150,50 160,50 166,52" stroke="#b27238" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M130,120 C130,110 144,108 148,98 C152,88 164,88 168,80 C172,72 180,74 186,78" stroke="#b27238" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M24,94 C32,88 34,78 44,72 C52,66 54,58 62,52" stroke="#b27238" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M164,122 C166,112 176,110 182,104 C186,98 192,98 196,100" stroke="#b27238" stroke-width="3.6" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="132" rx="16" ry="6" fill="#6d6878"/><ellipse cx="176" cy="133" rx="20" ry="6" fill="#6d6878"/></svg></div><h3 class="spec-name" id="s-climate-h">International Climate Science Olympiad Semifinalist</h3><p class="spec-fact">Top 5% of 55,000+.</p><p class="spec-odds"><span class="tether"></span><span aria-hidden="true">~</span><span class="sr-only">about </span>1 in 20</p></article><p class="blurb" data-kind="blurb" data-n="27.5" data-span="2" data-lane="1">9 of his 16 measured honors live in this zone.</p><article class="spec" id="s-tass" data-n="33.333333" data-lane="0.3" aria-labelledby="s-tass-h"><div class="spec-art" style="--w:0.82"><svg viewBox="0 0 220 150" width="220" height="150" aria-hidden="true" focusable="false"><path d="M170,100 C190,110 206,124 214,138 C196,134 180,122 166,110 Z" fill="#8ea55a"/><path d="M92,72 C80,42 96,14 120,4 C114,30 112,52 116,72 Z" fill="#7d944d"/><path d="M60,86 C60,50 100,30 146,32 C186,34 212,58 212,86 C212,104 190,114 146,116 C100,118 60,112 60,86 Z" fill="#6f8f45"/><path d="M60,90 C70,108 110,120 146,120 C186,120 208,108 212,90 C200,104 180,110 146,112 C110,114 76,106 60,90 Z" fill="#56722f"/><path d="M104,52 L128,44 L152,48 L156,72 L132,82 L106,76 Z M156,48 L180,50 L196,66 L182,86 L156,72 Z M74,70 L104,52 L106,76 L82,96 Z M106,76 L132,82 L130,106 L96,104 Z M132,82 L156,72 L182,86 L166,106 L130,106 Z" fill="#7fa152" stroke="#55722f" stroke-width="2.4" stroke-linejoin="round"/><path d="M62,78 C48,70 30,70 22,78 C16,84 20,94 32,96 C44,98 56,94 64,90 Z" fill="#a3b86c"/><circle cx="35" cy="82" r="3.6" fill="#1c2233"/><circle cx="34" cy="81" r="1.1" fill="#fff"/><path d="M22,90 C26,91 30,91 34,89" stroke="#56722f" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M86,96 C76,118 54,136 26,146 C40,126 56,108 72,94 Z" fill="#93aa5d"/></svg></div><h3 class="spec-name" id="s-tass-h">Telluride Association Summer Seminar</h3><p class="spec-fact">72 from 2,400+. Tuition-free, six to seven weeks in Critical Black Studies, summer 2024. Elected house chair.</p><p class="spec-odds"><span class="tether"></span>1 in 33</p></article><article class="spec" id="s-taco-bell" data-n="35.000000" data-lane="1" aria-labelledby="s-taco-bell-h"><div class="spec-art" style="--w:0.6"><svg viewBox="0 0 194 164" width="194" height="164" aria-hidden="true" focusable="false"><path d="M150,86 C164,74 180,72 188,80 C184,88 184,92 188,100 C180,108 164,104 150,94 Z" fill="#d8b04c"/><path d="M149.4,95.0 L165.7,92.4 L150.1,87.1 Z" fill="#c79a3a"/><path d="M145.6,108.5 L162.0,109.9 L148.2,101.0 Z" fill="#c79a3a"/><path d="M138.7,120.7 L154.3,126.0 L143.0,114.0 Z" fill="#c79a3a"/><path d="M129.0,130.8 L142.9,139.7 L134.8,125.3 Z" fill="#c79a3a"/><path d="M117.2,138.4 L128.6,150.3 L124.1,134.4 Z" fill="#c79a3a"/><path d="M103.9,142.9 L112.1,157.2 L111.6,140.7 Z" fill="#c79a3a"/><path d="M89.9,144.1 L94.5,160.0 L97.9,143.8 Z" fill="#c79a3a"/><path d="M76.1,141.9 L76.7,158.4 L83.9,143.6 Z" fill="#c79a3a"/><path d="M63.2,136.5 L59.8,152.6 L70.4,140.0 Z" fill="#c79a3a"/><path d="M51.9,128.1 L44.8,143.0 L58.1,133.2 Z" fill="#c79a3a"/><path d="M55.0,41.2 L41.1,32.3 L49.2,46.7 Z" fill="#c79a3a"/><path d="M66.8,33.6 L55.4,21.7 L59.9,37.6 Z" fill="#c79a3a"/><path d="M80.1,29.1 L71.9,14.8 L72.4,31.3 Z" fill="#c79a3a"/><path d="M94.1,27.9 L89.5,12.0 L86.1,28.2 Z" fill="#c79a3a"/><path d="M107.9,30.1 L107.3,13.6 L100.1,28.4 Z" fill="#c79a3a"/><path d="M120.8,35.5 L124.2,19.4 L113.6,32.0 Z" fill="#c79a3a"/><path d="M132.1,43.9 L139.2,29.0 L125.9,38.8 Z" fill="#c79a3a"/><path d="M141.0,54.7 L151.5,41.9 L136.2,48.3 Z" fill="#c79a3a"/><path d="M147.1,67.3 L160.3,57.5 L144.0,59.9 Z" fill="#c79a3a"/><path d="M149.9,81.0 L165.1,74.6 L148.7,73.1 Z" fill="#c79a3a"/><circle cx="92" cy="86" r="62" fill="#efcf6a"/><path d="M36,100 C44,136 76,150 100,148 C128,146 150,128 154,104 C120,118 70,118 36,100 Z" fill="#fbeec7"/><circle cx="90" cy="40" r="3" fill="#9c7a33" opacity=".75"/><circle cx="112" cy="46" r="3" fill="#9c7a33" opacity=".75"/><circle cx="130" cy="60" r="3" fill="#9c7a33" opacity=".75"/><circle cx="100" cy="60" r="3" fill="#9c7a33" opacity=".75"/><circle cx="120" cy="80" r="3" fill="#9c7a33" opacity=".75"/><circle cx="76" cy="50" r="3" fill="#9c7a33" opacity=".75"/><circle cx="140" cy="82" r="3" fill="#9c7a33" opacity=".75"/><circle cx="106" cy="34" r="3" fill="#9c7a33" opacity=".75"/><path d="M108,98 C120,90 132,92 136,102 C126,108 116,106 108,98 Z" fill="#d8b04c"/><circle cx="62" cy="70" r="13" fill="#fff"/><circle cx="59.1" cy="70" r="7.8" fill="#1c1c2e"/><circle cx="56.1" cy="65.8" r="2.9" fill="#fff"/><ellipse cx="33" cy="95" rx="5.5" ry="4.5" fill="#b5653a"/></svg></div><h3 class="spec-name" id="s-taco-bell-h">Taco Bell Live Más Scholar</h3><p class="spec-fact">$10K. About 400 from 14,000.</p><p class="spec-odds"><span class="tether"></span><span aria-hidden="true">~</span><span class="sr-only">about </span>1 in 35</p></article><article class="spec" id="s-quest-excellence" data-n="39.110000" data-lane="0.6" aria-labelledby="s-quest-excellence-h"><div class="spec-art" style="--w:0.62"><svg viewBox="0 0 196 164" width="196" height="164" aria-hidden="true" focusable="false"><path d="M58,80 C40,84 26,76 12,70" stroke="#d9b99a" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M58,86 C40,89 26,83 8,84" stroke="#d9b99a" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M58,92 C40,89 26,95 10,98" stroke="#d9b99a" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M58,98 C40,94 26,102 16,110" stroke="#d9b99a" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M58,84 C40,92 26,76 20,62" stroke="#d9b99a" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M58,96 C40,88 26,104 24,118" stroke="#d9b99a" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M58,90 C40,90 26,90 4,91" stroke="#d9b99a" stroke-width="2.6" fill="none" stroke-linecap="round"/><clipPath id="quest-excellence-c"><circle cx="120" cy="88" r="72"/></clipPath><circle cx="120" cy="88" r="72" fill="#f3e6d0"/><g clip-path="url(#quest-excellence-c)"><path d="M116.2,66.3 Q130.2,38.7 132.2,19.1 L149.3,24.4 Q140.5,41.2 119.6,66.0 Z" fill="#b5673d" opacity=".85"/><path d="M126.1,66.9 Q149.6,45.1 161.2,31.4 L174.2,43.7 Q157.8,51.9 129.3,68.1 Z" fill="#b5673d" opacity=".85"/><path d="M134.7,71.7 Q164.3,59.4 181.8,55.2 L188.1,72.0 Q168.6,69.1 137.1,74.2 Z" fill="#b5673d" opacity=".85"/><path d="M140.4,79.8 Q171.2,78.7 190.0,85.6 L188.3,103.5 Q170.9,89.3 141.4,83.1 Z" fill="#b5673d" opacity=".85"/><path d="M141.9,89.5 Q168.9,99.0 183.9,116.5 L174.6,131.8 Q164.0,108.4 141.4,92.9 Z" fill="#b5673d" opacity=".85"/><path d="M139.1,99.0 Q158.0,116.3 164.9,141.7 L149.8,151.3 Q149.5,122.6 137.1,101.8 Z" fill="#b5673d" opacity=".85"/><path d="M132.3,106.2 Q140.6,127.1 136.9,155.9 L119.0,158.0 Q130.2,129.0 129.3,107.9 Z" fill="#b5673d" opacity=".85"/><path d="M123.1,109.8 Q120.2,129.1 105.4,156.5 L88.5,150.5 Q110.0,126.2 119.6,110.0 Z" fill="#b5673d" opacity=".85"/><path d="M113.2,108.9 Q101.0,122.0 76.9,143.1 L64.3,130.3 Q93.1,115.0 110.0,107.6 Z" fill="#b5673d" opacity=".85"/></g><path d="M120,74 A14,14 0 1,1 108,96 A26,26 0 1,0 144,68" stroke="#d8c3a1" stroke-width="3" fill="none"/><circle cx="122" cy="90" r="9" fill="#e5d3b3"/><path d="M48,88 C48,58 66,40 86,44 C76,60 74,76 78,94 C72,112 62,120 50,114 C48,106 48,96 48,88 Z" fill="#7a4a36"/><circle cx="66" cy="72" r="5.4" fill="#1c1c2e"/><circle cx="64.6" cy="70.4" r="1.6" fill="#fff"/></svg></div><h3 class="spec-name" id="s-quest-excellence-h">QuestBridge Quest for Excellence Award, Humanities</h3><p class="spec-fact">About 100 from the 3,911 College Prep Scholars.<span class="note">The pool is scholars, not applicants.</span></p><p class="spec-odds"><span class="tether"></span><span aria-hidden="true">~</span><span class="sr-only">about </span>1 in 39</p></article><article class="spec" id="s-coolidge" data-n="41.000000" data-lane="0" aria-labelledby="s-coolidge-h"><div class="spec-art" style="--w:0.86"><svg viewBox="0 0 244 124" width="244" height="124" aria-hidden="true" focusable="false"><g transform="translate(2,0) scale(1.2,1.22)"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#5f513d"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#5f513d"/><path d="M146,50 C156,32 184,28 194,50 C184,72 156,68 146,50 Z" fill="#5f513d"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#7c6a50"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#b9a585"/><clipPath id="coolidge-c"><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z"/></clipPath><g clip-path="url(#coolidge-c)"><circle cx="70" cy="36" r="5" fill="#5a4a36" opacity=".55"/><circle cx="96" cy="30" r="4" fill="#5a4a36" opacity=".55"/><circle cx="120" cy="40" r="5" fill="#5a4a36" opacity=".55"/><circle cx="84" cy="54" r="4" fill="#5a4a36" opacity=".55"/><circle cx="110" cy="58" r="6" fill="#5a4a36" opacity=".55"/><circle cx="136" cy="50" r="4" fill="#5a4a36" opacity=".55"/><circle cx="60" cy="60" r="3.5" fill="#5a4a36" opacity=".55"/><circle cx="130" cy="66" r="4" fill="#5a4a36" opacity=".55"/><circle cx="100" cy="72" r="3.5" fill="#5a4a36" opacity=".55"/><circle cx="146" cy="42" r="3" fill="#5a4a36" opacity=".55"/></g><path d="M14,52 C18,64 30,68 44,62" stroke="#3d3226" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M54,35 C62,45 62,59 54,68" stroke="#1c2233" stroke-opacity=".22" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#5f513d" opacity=".9"/><circle cx="38" cy="44" r="5" fill="#fff"/><circle cx="36.9" cy="44" r="3.0" fill="#1c1c2e"/><circle cx="35.8" cy="42.4" r="1.1" fill="#fff"/></g></svg></div><h3 class="spec-name" id="s-coolidge-h">Coolidge Scholarship Senator</h3><p class="spec-fact">100 from 4,100+.</p><p class="spec-odds"><span class="tether"></span>1 in 41</p></article><article class="spec" id="s-elks" data-n="42.000000" data-lane="0.35" aria-labelledby="s-elks-h"><div class="spec-art" style="--w:0.6"><svg viewBox="0 0 212 180" width="212" height="180" aria-hidden="true" focusable="false"><ellipse cx="106" cy="168" rx="68" ry="11" fill="#6d6878"/><path d="M105,166 L100,120 L70,90 L52,50 L40,18" stroke="#d9a38e" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M70,90 L86,56 L92,26" stroke="#d9a38e" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M100,120 L128,92 L152,58 L166,24" stroke="#d9a38e" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M128,92 L118,60 L124,28" stroke="#d9a38e" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M100,120 L102,80 L108,42" stroke="#d9a38e" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M52,50 L28,38" stroke="#d9a38e" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M152,58 L180,48" stroke="#d9a38e" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M70,90 L40,82" stroke="#d9a38e" stroke-width="13" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="40" cy="18" r="6.5" fill="#f4d3c6"/><circle cx="92" cy="26" r="6.5" fill="#f4d3c6"/><circle cx="166" cy="24" r="6.5" fill="#f4d3c6"/><circle cx="124" cy="28" r="6.5" fill="#f4d3c6"/><circle cx="108" cy="42" r="6.5" fill="#f4d3c6"/><circle cx="28" cy="38" r="6.5" fill="#f4d3c6"/><circle cx="180" cy="48" r="6.5" fill="#f4d3c6"/><circle cx="40" cy="82" r="6.5" fill="#f4d3c6"/><circle cx="98" cy="140" r="1.8" fill="#b97d68"/><circle cx="84" cy="104" r="1.8" fill="#b97d68"/><circle cx="62" cy="72" r="1.8" fill="#b97d68"/><circle cx="48" cy="36" r="1.8" fill="#b97d68"/><circle cx="88" cy="44" r="1.8" fill="#b97d68"/><circle cx="140" cy="76" r="1.8" fill="#b97d68"/><circle cx="160" cy="42" r="1.8" fill="#b97d68"/><circle cx="120" cy="46" r="1.8" fill="#b97d68"/><circle cx="104" cy="60" r="1.8" fill="#b97d68"/><circle cx="102" cy="100" r="1.8" fill="#b97d68"/></svg></div><h3 class="spec-name" id="s-elks-h">Elks Most Valuable Student Semifinalist</h3><p class="spec-fact">500 from 21,000+.</p><p class="spec-odds"><span class="tether"></span>1 in 42</p></article><p class="blurb" data-kind="blurb" data-n="46.5" data-span="2" data-lane="0.5">Rush hour: 5 honors between 1 in 33 and 1 in 42.</p><p class="blurb" data-kind="blurb" data-n="53" data-span="2" data-lane="0">The light starts to go around here.</p><article class="spec" id="s-gates" data-n="64.000000" data-lane="0.4" aria-labelledby="s-gates-h"><div class="spec-art" style="--w:1"><svg viewBox="0 0 300 160" width="300" height="160" aria-hidden="true" focusable="false"><path d="M196,80 L298,80" stroke="#26324a" stroke-width="3" stroke-linecap="round"/><path d="M40,80 C60,70 92,40 152,6 C160,30 172,52 198,68 C222,74 246,77 262,80 C246,83 222,86 198,92 C172,108 160,130 152,154 C92,120 60,90 40,80 Z" fill="#2f3d52"/><path d="M92,64 C112,50 132,36 150,24 C142,44 134,58 122,70 Z" fill="#e3eaf0" opacity=".92"/><path d="M92,96 C112,110 132,124 150,136 C142,116 134,102 122,90 Z" fill="#e3eaf0" opacity=".92"/><ellipse cx="116" cy="80" rx="54" ry="15" fill="#3a4b63"/><path d="M44,72 C32,62 22,62 16,70 C24,72 32,75 40,78 Z M44,88 C32,98 22,98 16,90 C24,88 32,85 40,82 Z" fill="#26324a"/><circle cx="46" cy="71" r="2.8" fill="#0f1420"/><circle cx="46" cy="89" r="2.8" fill="#0f1420"/></svg></div><h3 class="spec-name" id="s-gates-h">Gates Scholar</h3><p class="spec-fact">750 from 48,000+.</p><p class="spec-odds"><span class="tether"></span>1 in 64</p></article><p class="blurb" data-kind="blurb" data-n="80" data-span="2" data-lane="1">It’s a long way to the next one.</p></section>
+<section id="midnight" aria-labelledby="z-midnight"><h2 class="zone-title" id="z-midnight" data-kind="zone" data-n="100">The Midnight Zone<span class="zone-range">1 in 100 to 1 in 1,000</span></h2><p class="blurb" data-kind="blurb" data-n="108" data-span="3" data-lane="0.5">The sun gives up around here.</p><p class="blurb" data-kind="blurb" data-n="150" data-span="2" data-lane="0.3">Only 3 of his honors are rarer than 1 in 100.</p><article class="spec" id="s-princeton-prize" data-n="200.000000" data-lane="0.75" aria-labelledby="s-princeton-prize-h"><div class="spec-art" style="--w:0.85"><svg viewBox="0 0 228 128" width="228" height="128" aria-hidden="true" focusable="false"><defs><radialGradient id="princeton-prize-g"><stop offset="0" stop-color="#8dffb9" stop-opacity=".55"/><stop offset="1" stop-color="#8dffb9" stop-opacity="0"/></radialGradient></defs><path d="M120,96 C140,118 170,126 200,122 C180,110 160,100 140,90 Z" fill="#9aa7c9" opacity=".35"/><g transform="translate(26,40) scale(0.98,0.78)"><path d="M84,24 C94,8 120,6 134,28 Z" fill="#373c50"/><path d="M104,76 C110,88 124,90 130,72 Z" fill="#373c50"/><path d="M146,50 C156,32 184,28 194,50 C184,72 156,68 146,50 Z" fill="#373c50"/><path d="M16,52 C16,33 54,21 96,21 C128,21 148,37 156,50 C148,63 128,79 96,79 C54,79 16,71 16,52 Z" fill="#454a5e"/><path d="M20,58 C42,73 82,79 110,76 C132,73 146,62 153,53 C127,65 76,70 20,58 Z" fill="#6c728a"/><circle cx="30" cy="56" r="3" fill="#1c1f2b"/><circle cx="40" cy="58" r="2.4" fill="#1c1f2b"/><path d="M60,56 C72,70 90,72 96,62 C88,55 72,53 60,56 Z" fill="#373c50" opacity=".9"/><circle cx="38" cy="44" r="0.01" fill="#fff"/><circle cx="38.0" cy="44" r="0.0" fill="#1c1c2e"/><circle cx="38.0" cy="44.0" r="0.0" fill="#fff"/></g><circle cx="80" cy="44" r="30" fill="url(#princeton-prize-g)"/><rect x="66" y="34" width="11" height="24" rx="5.5" fill="#62d98f"/><rect x="82" y="32" width="11" height="24" rx="5.5" fill="#62d98f"/><ellipse cx="71.5" cy="35" rx="4.4" ry="3.2" fill="#d9ffe6"/><ellipse cx="87.5" cy="33" rx="4.4" ry="3.2" fill="#d9ffe6"/><path d="M40,64 C38,40 56,18 84,16 C112,14 132,34 130,62" fill="#cdefff" fill-opacity=".13" stroke="#dff5ff" stroke-opacity=".6" stroke-width="1.8"/><path d="M56,30 C64,24 74,21 84,21" stroke="#fff" stroke-opacity=".5" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg></div><h3 class="spec-name" id="s-princeton-prize-h">Princeton Prize in Race Relations, San Francisco</h3><p class="spec-fact">3 from 600+.</p><p class="spec-odds"><span class="tether"></span>1 in 200</p></article><p class="blurb" data-kind="blurb" data-n="225" data-span="2" data-lane="0.2">Three were picked in San Francisco. He was one of them.</p><p class="blurb" data-kind="blurb" data-n="290" data-span="2" data-lane="0.8">Every unit of depth is one more person in the pool for each person picked.</p><p class="blurb" data-kind="blurb" data-n="370" data-span="2" data-lane="0.2">Nothing between here and 1 in 700.</p><p class="blurb" data-kind="blurb" data-n="450" data-span="2" data-lane="0.7">Still here? Good.</p><p class="blurb" data-kind="blurb" data-n="500" data-span="3" data-lane="0.5">Halfway to 1 in 1,000.</p><p class="blurb" data-kind="blurb" data-n="600" data-span="2" data-lane="0.3">Almost there. For this one, anyway.</p><article class="spec" id="s-coca-cola" data-n="700.000000" data-lane="0.25" aria-labelledby="s-coca-cola-h"><div class="spec-art" style="--w:0.62"><svg viewBox="0 0 220 240" width="220" height="240" aria-hidden="true" focusable="false"><defs><radialGradient id="coca-cola-g"><stop offset="0" stop-color="#ff5b6b" stop-opacity=".32"/><stop offset="1" stop-color="#ff5b6b" stop-opacity="0"/></radialGradient></defs><circle cx="110" cy="96" r="100" fill="url(#coca-cola-g)"/><path d="M78,98 C66,134 88,164 74,200 C68,218 76,232 86,236 C94,220 90,200 98,176 C106,150 94,124 98,100 Z" fill="#8f1a26" class="arm"/><path d="M104,102 C98,140 118,168 108,206 C104,222 110,234 120,236 C126,218 124,196 128,172 C132,146 118,126 120,102 Z" fill="#8f1a26" class="arm"/><path d="M128,100 C134,136 152,158 146,196 C144,212 150,226 160,228 C164,210 162,190 162,168 C162,142 146,124 142,98 Z" fill="#8f1a26" class="arm"/><path d="M58,96 C48,124 60,148 50,176 C46,190 52,200 60,202 C66,188 64,172 70,154 C76,134 70,116 74,98 Z" fill="#8f1a26" class="arm"/><g class="bell"><path d="M30,96 C30,40 70,14 110,14 C150,14 190,40 190,96 C176,104 160,100 150,108 C136,100 124,108 110,104 C96,108 84,100 70,108 C60,100 44,104 30,96 Z" fill="#b3222f"/><path d="M52,54 C62,32 88,22 110,22 C90,30 74,44 64,64 Z" fill="#dc4b56" opacity=".75"/><path d="M36,94 C60,86 90,84 110,84 C136,84 160,86 184,94" stroke="#7f1420" stroke-width="4" fill="none" opacity=".55" stroke-linecap="round"/></g></svg></div><h3 class="spec-name" id="s-coca-cola-h">Coca-Cola Scholar</h3><p class="spec-fact">150 from 105,000+.</p><p class="spec-odds"><span class="tether"></span>1 in 700</p></article><p class="blurb" data-kind="blurb" data-n="748" data-span="2" data-lane="0.75">For every Coca-Cola Scholar, about 699 others weren’t picked.</p><p class="blurb" data-kind="blurb" data-n="830" data-span="2" data-lane="0.2">One left. It’s 928 units further down.</p><p class="blurb" data-kind="blurb" data-n="930" data-span="3" data-lane="0.5">Below 1 in 1,000 it gets very quiet.</p></section>
+<section id="abyssal" aria-labelledby="z-abyssal"><h2 class="zone-title" id="z-abyssal" data-kind="zone" data-n="1000">The Abyssal Zone<span class="zone-range">1 in 1,000 and rarer</span></h2><p class="blurb" data-kind="blurb" data-n="1070" data-span="2" data-lane="0.6">You’ve scrolled about <span data-screens>seventy</span> screens to get here.</p><p class="blurb" data-kind="blurb" data-n="1160" data-span="2" data-lane="0.2">Nothing lives here.</p><p class="blurb" data-kind="blurb" data-n="1260" data-span="2" data-lane="0.7">Still nothing.</p><p class="blurb" data-kind="blurb" data-n="1360" data-span="2" data-lane="0.3">You can skip to the bottom any time. It’s under Jump, top right.</p><p class="blurb" data-kind="blurb" data-n="1450" data-span="2" data-lane="0.6">Something down here is glowing.</p><p class="blurb" data-kind="blurb" data-n="1530" data-span="3" data-lane="0.5">Getting closer.</p><h2 class="zone-title" id="z-deepest" data-kind="zone" data-n="1590">The Deepest Point<span class="zone-range">On this page, anyway</span></h2><article class="spec spec-floor" id="s-nsda-soty" data-kind="floor" data-n="1627.906977" aria-labelledby="s-nsda-soty-h"><div class="spec-art floor-angler"><svg viewBox="0 0 252 172" width="252" height="172" aria-hidden="true" focusable="false"><defs><radialGradient id="nsda-soty-g"><stop offset="0" stop-color="#fff7b8" stop-opacity=".9"/><stop offset=".35" stop-color="#ffe36b" stop-opacity=".35"/><stop offset="1" stop-color="#ffe36b" stop-opacity="0"/></radialGradient></defs><circle cx="60" cy="28" r="58" fill="url(#nsda-soty-g)" class="lure-glow"/><path d="M210,104 C226,86 240,82 248,88 C244,104 244,116 248,132 C240,136 226,130 210,116 Z" fill="#231d2c"/><path d="M150,52 C160,38 176,38 182,52 Z" fill="#231d2c"/><path d="M52,96 C60,64 96,46 138,48 C184,50 214,78 214,110 C214,142 184,164 140,166 C100,168 70,154 58,138 Z" fill="#2e2638"/><path d="M40,104 C56,96 76,100 96,112 C80,124 64,132 44,136 C38,126 36,114 40,104 Z" fill="#5a1f2e"/><path d="M44,103 l4,10 l4,-10 Z" fill="#f3efe6"/><path d="M54,101 l4,10 l4,-10 Z" fill="#f3efe6"/><path d="M64,102 l4,10 l4,-10 Z" fill="#f3efe6"/><path d="M74,105 l4,10 l4,-10 Z" fill="#f3efe6"/><path d="M84,109 l4,10 l4,-10 Z" fill="#f3efe6"/><path d="M42,136 l4,-11 l4,11 Z" fill="#f3efe6"/><path d="M52,133 l4,-11 l4,11 Z" fill="#f3efe6"/><path d="M62,130 l4,-11 l4,11 Z" fill="#f3efe6"/><path d="M72,127 l4,-11 l4,11 Z" fill="#f3efe6"/><path d="M82,123 l4,-11 l4,11 Z" fill="#f3efe6"/><path d="M36,136 C54,132 78,126 100,116 C98,130 84,148 60,154 C46,156 36,148 36,136 Z" fill="#3a3046"/><path d="M130,120 C144,110 160,114 164,128 C150,134 138,132 130,120 Z" fill="#231d2c"/><circle cx="150" cy="80" r="2.4" fill="#3d3349"/><circle cx="170" cy="96" r="2" fill="#3d3349"/><circle cx="160" cy="140" r="2.4" fill="#3d3349"/><circle cx="186" cy="120" r="2" fill="#3d3349"/><circle cx="106" cy="80" r="5.2" fill="#d6d1e6"/><circle cx="105" cy="80" r="2.6" fill="#1c1c2e"/><path d="M112,52 C104,18 80,8 62,22" stroke="#4a3f58" stroke-width="3.6" fill="none" stroke-linecap="round"/><circle cx="60" cy="28" r="10" fill="#fff3a0" class="lure"/><polygon points="60.0,21.8 61.5,25.9 65.9,26.1 62.5,28.8 63.6,33.0 60.0,30.6 56.4,33.0 57.5,28.8 54.1,26.1 58.5,25.9" fill="#f6b928"/></svg></div><div class="spec-text"><h3 class="spec-name" id="s-nsda-soty-h">NSDA Student of the Year</h3><p class="spec-fact">86 from 140,000+ members.<span class="note">That pool is every member, not applicants.</span></p></div><p class="spec-odds">1 in 1,628</p></article></section>
+<div class="descender" id="descender" aria-hidden="true" style="position:absolute"><div class="descender-sticky"><svg viewBox="0 0 320 190" width="320" height="190" class="hadal-diver" aria-hidden="true" focusable="false"><defs><linearGradient id="beam-g" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#fff6c8" stop-opacity=".55"/><stop offset="1" stop-color="#fff6c8" stop-opacity="0"/></linearGradient></defs><path d="M150,92 L0,40 L0,178 L150,104 Z" fill="url(#beam-g)" class="beam"/><g class="kick"><path d="M258,96 L304,74 L316,86 L262,108 Z" fill="#e0503f"/><path d="M252,112 L300,118 L302,134 L250,126 Z" fill="#d44637"/></g><path d="M200,96 C220,96 240,96 258,100 L256,110 C238,110 220,112 200,112 Z" fill="#2c3446"/><path d="M200,108 C220,112 236,118 252,120 L250,130 C232,128 216,124 198,118 Z" fill="#252c3c"/><rect x="170" y="70" width="78" height="20" rx="10" fill="#e2b13c"/><rect x="170" y="70" width="78" height="6" rx="3" fill="#f0c95a"/><rect x="242" y="74" width="10" height="12" rx="2" fill="#7c7f8f"/><path d="M150,94 C160,84 190,82 210,90 C214,100 210,112 200,118 C180,120 160,114 150,106 Z" fill="#2c3446"/><path d="M166,108 C150,118 136,126 122,128" stroke="#2c3446" stroke-width="9" stroke-linecap="round" fill="none"/><circle cx="120" cy="128" r="5" fill="#a8683f"/><circle cx="146" cy="98" r="13" fill="#a8683f"/><path d="M133,96 A13,13 0 0 1 158,90 L158,96 Z" fill="#2c3446"/><rect x="130" y="94" width="16" height="10" rx="3" fill="#7fd0f0" stroke="#1c2233" stroke-width="2"/><circle cx="146" cy="86" r="4.2" fill="#fff6c8"/><path d="M152,108 C160,112 168,110 176,104" stroke="#1c2233" stroke-width="3" fill="none"/><g class="dbub"><circle cx="160" cy="70" r="3.2" fill="none" stroke="#dff5ff" stroke-width="1.2"/><circle cx="166" cy="56" r="2.4" fill="none" stroke="#dff5ff" stroke-width="1.2"/><circle cx="158" cy="42" r="4" fill="none" stroke="#dff5ff" stroke-width="1.2"/></g></svg></div></div>
+</div>
+<div class="depth-line" id="depthLine" aria-hidden="true"><span id="depthText">1 IN 1</span></div>
+</div>
+
+<div class="floor-edge" aria-hidden="true"><svg class="floor-edge-svg" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path d="M0,22 C80,14 160,10 240,16 C330,23 400,28 480,22 C560,16 640,8 720,12 C820,17 900,28 990,26 C1080,24 1150,12 1240,12 C1320,12 1380,20 1440,18 L1440,40 L0,40 Z" fill="#ede5ce"/><path d="M0,22 C80,14 160,10 240,16 C330,23 400,28 480,22 C560,16 640,8 720,12 C820,17 900,28 990,26 C1080,24 1150,12 1240,12 C1320,12 1380,20 1440,18" fill="none" stroke="#f7f0dc" stroke-width="3"/></svg></div>
+<section class="floor" id="bottom" aria-labelledby="end-title">
+  <div class="pebbles" aria-hidden="true"><svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" width="100%" height="100%"><ellipse cx="466" cy="141" rx="8.2" ry="4.3" fill="#d8cfb4"/><ellipse cx="527" cy="60" rx="7.1" ry="3.6" fill="#e3dbc3"/><ellipse cx="602" cy="219" rx="7.4" ry="3.8" fill="#d8cfb4"/><ellipse cx="1364" cy="559" rx="7.7" ry="4.0" fill="#e3dbc3"/><ellipse cx="71" cy="202" rx="7.5" ry="4.0" fill="#e3dbc3"/><ellipse cx="208" cy="112" rx="5.5" ry="3.8" fill="#cfc5a8"/><ellipse cx="148" cy="507" rx="4.5" ry="2.4" fill="#d8cfb4"/><ellipse cx="813" cy="549" rx="7.0" ry="4.4" fill="#c5bb9e"/><ellipse cx="670" cy="813" rx="5.9" ry="3.3" fill="#cfc5a8"/><ellipse cx="1007" cy="222" rx="7.6" ry="4.8" fill="#c5bb9e"/><ellipse cx="1050" cy="261" rx="10.8" ry="5.7" fill="#e3dbc3"/><ellipse cx="238" cy="308" rx="10.5" ry="6.3" fill="#d8cfb4"/><ellipse cx="1101" cy="509" rx="10.0" ry="5.8" fill="#c5bb9e"/><ellipse cx="856" cy="515" rx="6.6" ry="4.7" fill="#c5bb9e"/><ellipse cx="683" cy="588" rx="3.5" ry="2.4" fill="#e3dbc3"/><ellipse cx="410" cy="346" rx="8.3" ry="4.2" fill="#e3dbc3"/><ellipse cx="512" cy="542" rx="6.9" ry="3.9" fill="#c5bb9e"/><ellipse cx="186" cy="225" rx="6.1" ry="4.4" fill="#d8cfb4"/><ellipse cx="240" cy="359" rx="5.2" ry="2.8" fill="#e3dbc3"/><ellipse cx="1244" cy="252" rx="6.3" ry="3.7" fill="#e3dbc3"/><ellipse cx="1379" cy="141" rx="4.4" ry="2.5" fill="#cfc5a8"/><ellipse cx="17" cy="733" rx="4.5" ry="2.5" fill="#cfc5a8"/><ellipse cx="603" cy="331" rx="7.5" ry="5.6" fill="#d8cfb4"/><ellipse cx="658" cy="768" rx="10.6" ry="7.1" fill="#e3dbc3"/><ellipse cx="573" cy="353" rx="6.9" ry="4.1" fill="#cfc5a8"/><ellipse cx="97" cy="192" rx="4.3" ry="2.5" fill="#d8cfb4"/><ellipse cx="147" cy="503" rx="7.3" ry="5.4" fill="#d8cfb4"/><ellipse cx="101" cy="191" rx="6.0" ry="4.0" fill="#c5bb9e"/><ellipse cx="867" cy="423" rx="3.9" ry="2.4" fill="#e3dbc3"/><ellipse cx="692" cy="281" rx="4.2" ry="2.9" fill="#c5bb9e"/><ellipse cx="689" cy="612" rx="7.1" ry="3.9" fill="#c5bb9e"/><ellipse cx="211" cy="483" rx="3.2" ry="2.0" fill="#d8cfb4"/><ellipse cx="1003" cy="237" rx="5.9" ry="3.2" fill="#cfc5a8"/><ellipse cx="767" cy="688" rx="5.6" ry="3.1" fill="#cfc5a8"/><ellipse cx="1161" cy="722" rx="8.9" ry="5.0" fill="#e3dbc3"/><ellipse cx="512" cy="35" rx="3.2" ry="1.8" fill="#c5bb9e"/><ellipse cx="279" cy="536" rx="5.8" ry="4.0" fill="#c5bb9e"/><ellipse cx="1375" cy="327" rx="4.8" ry="2.7" fill="#cfc5a8"/><ellipse cx="486" cy="430" rx="10.9" ry="7.1" fill="#d8cfb4"/><ellipse cx="690" cy="578" rx="9.4" ry="4.9" fill="#d8cfb4"/><ellipse cx="1310" cy="691" rx="9.0" ry="5.6" fill="#cfc5a8"/><ellipse cx="625" cy="563" rx="3.7" ry="2.7" fill="#e3dbc3"/><ellipse cx="667" cy="657" rx="3.7" ry="2.0" fill="#cfc5a8"/><ellipse cx="40" cy="524" rx="6.7" ry="4.5" fill="#e3dbc3"/><ellipse cx="946" cy="315" rx="7.4" ry="3.9" fill="#d8cfb4"/><ellipse cx="1151" cy="642" rx="3.8" ry="2.6" fill="#cfc5a8"/></svg></div>
+  <h2 class="big" id="end-title">The Deep End</h2>
+  <p class="who">16 honors with a pool. 5 without one.</p>
+  <p class="why">Add up every pool on this page and you get 438,400+ people. He was picked out of each.</p>
+  <button class="back-top" id="backTop" type="button">Back to the surface</button>
+</section>
+</main>
+
+<div class="list-view" id="listView" role="dialog" aria-modal="true" aria-labelledby="list-title" hidden><button class="list-close" id="listClose" type="button">Back to the dive</button><div class="list-inner"><h2 id="list-title">The Deep End, as a list</h2><p class="list-sub">All 21 honors. Odds are the size of the pool divided by the number picked. “~” means the source figure was approximate or a percentage.</p><div class="list-sort" role="group" aria-label="Order"><button type="button" data-sort="deep" aria-pressed="true">Rarest first</button><button type="button" data-sort="shallow" aria-pressed="false">Surface first</button></div><div class="list-groups" id="listGroups"><section class="list-group"><h3 class="list-zone">The Abyssal Zone<span>1 in 1,000 and rarer</span></h3><ul class="list-rows"><li class="list-row"><span class="list-odds">1 in 1,628</span><span class="list-name"><button type="button" data-go="s-nsda-soty">NSDA Student of the Year</button></span><span class="list-fact">86 from 140,000+ members. That pool is every member, not applicants.</span></li></ul></section><section class="list-group"><h3 class="list-zone">The Midnight Zone<span>1 in 100 to 1 in 1,000</span></h3><ul class="list-rows"><li class="list-row"><span class="list-odds">1 in 700</span><span class="list-name"><button type="button" data-go="s-coca-cola">Coca-Cola Scholar</button></span><span class="list-fact">150 from 105,000+.</span></li><li class="list-row"><span class="list-odds">1 in 200</span><span class="list-name"><button type="button" data-go="s-princeton-prize">Princeton Prize in Race Relations, San Francisco</button></span><span class="list-fact">3 from 600+.</span></li></ul></section><section class="list-group"><h3 class="list-zone">The Twilight Zone<span>1 in 10 to 1 in 100</span></h3><ul class="list-rows"><li class="list-row"><span class="list-odds">1 in 64</span><span class="list-name"><button type="button" data-go="s-gates">Gates Scholar</button></span><span class="list-fact">750 from 48,000+.</span></li><li class="list-row"><span class="list-odds">1 in 42</span><span class="list-name"><button type="button" data-go="s-elks">Elks Most Valuable Student Semifinalist</button></span><span class="list-fact">500 from 21,000+.</span></li><li class="list-row"><span class="list-odds">1 in 41</span><span class="list-name"><button type="button" data-go="s-coolidge">Coolidge Scholarship Senator</button></span><span class="list-fact">100 from 4,100+.</span></li><li class="list-row"><span class="list-odds">~1 in 39</span><span class="list-name"><button type="button" data-go="s-quest-excellence">QuestBridge Quest for Excellence Award, Humanities</button></span><span class="list-fact">About 100 from the 3,911 College Prep Scholars. The pool is scholars, not applicants.</span></li><li class="list-row"><span class="list-odds">~1 in 35</span><span class="list-name"><button type="button" data-go="s-taco-bell">Taco Bell Live Más Scholar</button></span><span class="list-fact">$10K. About 400 from 14,000.</span></li><li class="list-row"><span class="list-odds">1 in 33</span><span class="list-name"><button type="button" data-go="s-tass">Telluride Association Summer Seminar</button></span><span class="list-fact">72 from 2,400+. Tuition-free, six to seven weeks in Critical Black Studies, summer 2024. Elected house chair.</span></li><li class="list-row"><span class="list-odds">~1 in 20</span><span class="list-name"><button type="button" data-go="s-climate">International Climate Science Olympiad Semifinalist</button></span><span class="list-fact">Top 5% of 55,000+.</span></li><li class="list-row"><span class="list-odds">~1 in 19</span><span class="list-name"><button type="button" data-go="s-jfk">JFK Profile in Courage Essay Contest</button></span><span class="list-fact">Top 5%: about 150 of 2,800+.</span></li><li class="list-row"><span class="list-odds">~1 in 17</span><span class="list-name"><button type="button" data-go="s-notre-dame">Notre Dame Leadership Seminars</button></span><span class="list-fact">About 90 from 1,500+.</span></li></ul></section><section class="list-group"><h3 class="list-zone">The Sunlight Zone<span>1 in 1 to 1 in 10</span></h3><ul class="list-rows"><li class="list-row"><span class="list-odds">~1 in 9</span><span class="list-name"><button type="button" data-go="s-usc">USC Young Leaders Summit Scholar</button></span><span class="list-fact">About 200 from 1,800+.</span></li><li class="list-row"><span class="list-odds">~1 in 8.8</span><span class="list-name"><button type="button" data-go="s-hsd">High School Diplomats Finalist</button></span><span class="list-fact">About 80 finalists from 700+.</span></li><li class="list-row"><span class="list-odds">1 in 4.1</span><span class="list-name"><button type="button" data-go="s-qb-cps">QuestBridge College Prep Scholar</button></span><span class="list-fact">3,911 scholars from 16,000.</span></li><li class="list-row"><span class="list-odds">1 in 3.5</span><span class="list-name"><button type="button" data-go="s-qb-finalist">QuestBridge National College Match Finalist</button></span><span class="list-fact">7,287 finalists from 25,500.</span></li></ul></section><section class="list-group list-raft"><h3 class="list-zone">The Surface<span>No published odds</span></h3><ul class="list-rows"><li class="list-row"><span class="list-odds">no odds</span><span class="list-name">Benjamin A. Gilman Scholar</span><span class="list-fact">Scholarship.</span></li><li class="list-row"><span class="list-odds">no odds</span><span class="list-name">National African American Recognition Program</span><span class="list-fact">National recognition.</span></li><li class="list-row"><span class="list-odds">no odds</span><span class="list-name">International Geography Olympiad</span><span class="list-fact">Team USA qualifier: 7th nationally, with a perfect qualifying score.</span></li><li class="list-row"><span class="list-odds">no odds</span><span class="list-name">National History Day</span><span class="list-fact">2× Valley Champion.</span></li><li class="list-row"><span class="list-odds">no odds</span><span class="list-name">Summa Cum Laude</span><span class="list-fact">The highest of the Latin honors.</span></li></ul></section></div><p class="list-foot">Pick any honor to swim straight to it.</p></div></div>
+<button class="skip-intro" id="skipIntro" type="button">Skip intro</button>
+<p class="sr-only" id="live" aria-live="polite"></p>
+<script>
+(function () {
+  'use strict';
+  var D = document, H = D.documentElement, W = window;
+  var reduce = W.matchMedia && W.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hash = location.hash || '';
+  var fromReturn = hash.indexOf('#from-') === 0;
+  var NMAX = 1627.906977;
+  try { history.scrollRestoration = 'manual'; } catch (e) {}
+
+  function $(id) { return D.getElementById(id); }
+  var scale = $('scale'), depthLine = $('depthLine'), depthText = $('depthText');
+  var floorSec = $('bottom'), surfaceSec = $('surface'), live = $('live');
+
+  /* ------------------------------------------------ stable viewport height */
+  var vhW = -1, vhH = -1;
+  function setVH(force) {
+    var w = W.innerWidth, h = W.innerHeight;
+    if (force || w !== vhW || Math.abs(h - vhH) > 140) {
+      vhW = w; vhH = h;
+      H.style.setProperty('--vh', (h / 100) + 'px');
+      return true;
+    }
+    return false;
+  }
+  setVH(true);
+  function surfacePageY() { return vhH * 0.778; }
+
+  /* ------------------------------------------------ layout: depth = odds, linear */
+  var K = 60, LANES = 4, scaleTop = 0;
+  function lanePlan(w) { return w >= 1080 ? [4, 60] : w >= 660 ? [3, 68] : [2, 96]; }
+  function nToY(n) { return scaleTop + (n - 1) * K; }
+
+  /* Placement. Every item has an exact depth y = (n-1)*K. Zone titles and the floor are pinned
+     there. Specimens hang above their "1 in N" tag and take the lane that moves them least (up or
+     down, tags kept in depth order); any that must move get a tether back to their true depth.
+     Blurbs are commentary and fill the nearest free gap. */
+  function layout() {
+    var cs = getComputedStyle(scale), pad = parseFloat(cs.paddingLeft) || 0;
+    var inner = scale.clientWidth - pad * 2;
+    var p = lanePlan(inner); LANES = p[0]; K = p[1];
+    var laneW = inner / LANES, GAP = LANES === 2 ? 26 : 34;
+    scale.style.height = ((NMAX - 1) * K) + 'px';
+    var occ = [], i;
+    for (i = 0; i < LANES; i++) occ.push([]);
+    function hits(s, span, top, h) {
+      var lo = null, hi = null;
+      for (var q = s; q < s + span; q++) {
+        var L = occ[q];
+        for (var k = 0; k < L.length; k++) {
+          var iv = L[k];
+          if (iv[0] < top + h + GAP && iv[1] + GAP > top) {
+            if (lo === null || iv[0] < lo) lo = iv[0];
+            if (hi === null || iv[1] > hi) hi = iv[1];
+          }
+        }
+      }
+      return lo === null ? null : [lo, hi];
+    }
+    function nearest(s, span, want, h, allowUp, minTop) {
+      var down = want, g = 0, c;
+      while (g++ < 400 && (c = hits(s, span, down, h))) down = c[1] + GAP;
+      var up = null;
+      if (allowUp) {
+        up = want; g = 0;
+        while (g++ < 400 && (c = hits(s, span, up, h))) { up = c[0] - GAP - h; }
+        if (up < minTop || g >= 400) up = null;
+      }
+      if (!allowUp) return down;
+      return up === null ? down : up;
+    }
+    function put(el, s, span, top, h) {
+      el.style.left = (pad + s * laneW) + 'px';
+      el.style.top = top + 'px';
+      for (var q = s; q < s + span; q++) occ[q].push([top, top + h]);
+    }
+    var all = [].slice.call(scale.querySelectorAll('[data-n]'));
+    var zones = [], specs = [], blurbs = [];
+    all.forEach(function (el) {
+      var kind = el.getAttribute('data-kind') || 'spec';
+      el.classList.remove('shifted');
+      (kind === 'zone' || kind === 'floor' || kind === 'head') ? zones.push(el) : kind === 'spec' ? specs.push(el) : blurbs.push(el);
+    });
+    // 1. pinned: zone titles (centre lanes on wide screens), the header above 1 in 1, the floor
+    var headH = 0;
+    zones.forEach(function (el) {
+      var kind = el.getAttribute('data-kind'), n = parseFloat(el.getAttribute('data-n'));
+      var span = kind === 'zone' ? 2 : LANES;
+      var s = Math.floor((LANES - span) / 2);
+      el.style.width = (span * laneW) + 'px';
+      var h = el.offsetHeight, y = (n - 1) * K, top;
+      if (kind === 'head') { top = -h - 28; headH = h + 28; }
+      else if (kind === 'floor') top = y - h;
+      else top = Math.max(0, y - h / 2);
+      put(el, s, span, top, h);
+    });
+    scale.style.marginTop = headH + 'px';
+    // 2. specimens, zone by zone. A tag must stay between its own zone line and the next one.
+    var zl = zones.filter(function (el) { return el.getAttribute('data-kind') === 'zone'; })
+      .map(function (el) { return { n: parseFloat(el.getAttribute('data-n')), line: (parseFloat(el.getAttribute('data-n')) - 1) * K }; });
+    var bands = {};
+    specs.forEach(function (el) {
+      var n = parseFloat(el.getAttribute('data-n'));
+      el.style.width = laneW + 'px';
+      var h = el.offsetHeight, o = el.querySelector('.spec-odds'), a = o.offsetTop + o.offsetHeight / 2;
+      var zi = -1; for (var z = 0; z < zl.length; z++) if (zl[z].n <= n) zi = z;
+      var it = { el: el, h: h, a: a, want: (n - 1) * K - a,
+        pref: Math.round(parseFloat(el.getAttribute('data-lane') || '0') * (LANES - 1)),
+        tagMin: zi >= 0 ? zl[zi].line + 4 : 0, tagMax: zl[zi + 1] ? zl[zi + 1].line - 4 : 1e12 };
+      (bands[zi] = bands[zi] || []).push(it);
+    });
+    var TOL = 0.4 * K;
+    function packBand(list, reverse, prefs) {
+      var res = [], viol = 0, last = reverse ? 1e12 : -1e12;
+      var idx = list.map(function (_, i) { return i; });
+      if (reverse) idx.reverse();
+      idx.forEach(function (i) {
+        var it = list[i], pref = prefs[i], best = null, bestCost = 1e18;
+        for (var s = 0; s < LANES; s++) {
+          var cands = [nearest(s, 1, it.want, it.h, false, 0), nearest(s, 1, it.want, it.h, true, 0)];
+          for (var c = 0; c < 2; c++) {
+            var top = cands[c], shift = top - it.want, tag = top + it.a;
+            var cost = Math.abs(shift) * ((reverse ? shift > 0 : shift < 0) ? 1.1 : 1) + Math.abs(s - pref) * 6;
+            var v = (tag > it.tagMax || tag < it.tagMin) ? 1 : 0;
+            if (reverse ? tag > last + TOL : tag < last - TOL) cost += 1e6;
+            cost += v * 1e8;
+            if (cost < bestCost) { bestCost = cost; best = [s, top, shift, v]; }
+          }
+        }
+        occ[best[0]].push([best[1], best[1] + it.h]);
+        res[i] = [it, best]; viol += best[3]; last = best[1] + it.a;
+      });
+      return { res: res, viol: viol };
+    }
+    function snap() { return occ.map(function (L) { return L.slice(); }); }
+    function repair(r) {
+      r.res.forEach(function (pr) {
+        var it = pr[0], b = pr[1];
+        if (!b[3]) return;
+        var L = occ[b[0]];
+        for (var k = 0; k < L.length; k++) if (L[k][0] === b[1] && L[k][1] === b[1] + it.h) { L.splice(k, 1); break; }
+        var best = null, bestCost = 1e18;
+        for (var s = 0; s < LANES; s++) {
+          [nearest(s, 1, it.want, it.h, false, 0), nearest(s, 1, it.want, it.h, true, 0)].forEach(function (top) {
+            var tag = top + it.a, v = (tag > it.tagMax || tag < it.tagMin) ? 1 : 0;
+            var cost = Math.abs(top - it.want) + v * 1e8;
+            if (cost < bestCost) { bestCost = cost; best = [s, top, top - it.want, v]; }
+          });
+        }
+        occ[best[0]].push([best[1], best[1] + it.h]);
+        r.viol += best[3] - 1; pr[1] = best;
+      });
+      return r;
+    }
+    function score(r) {
+      var shift = 0, inv = 0, last = -1e12;
+      r.res.forEach(function (pr) {
+        shift += Math.abs(pr[1][2]);
+        var tag = pr[1][1] + pr[0].a;
+        if (tag < last - TOL) inv++;
+        last = Math.max(last, tag);
+      });
+      return r.viol * 1e9 + inv * 1e6 + shift;
+    }
+    // deterministic search over lane preferences (seeded), so the layout is stable between visits
+    var seed = 20260926;
+    function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+    Object.keys(bands).sort(function (x, y) { return x - y; }).forEach(function (k) {
+      var list = bands[k], base = snap(), best = null;
+      var tries = list.length > 2 ? 60 : 4;
+      for (var t = 0; t < tries; t++) {
+        occ = base.map(function (L) { return L.slice(); });
+        var prefs = list.map(function (it) { return t === 0 ? it.pref : Math.floor(rnd() * LANES); });
+        var rr = packBand(list, t % 6 === 5, prefs);
+        if (rr.viol) rr = repair(rr);
+        var sc = score(rr);
+        if (!best || sc < best.sc) best = { sc: sc, r: rr, occ: occ };
+      }
+      occ = best.occ;
+      var r = best.r;
+      r.res.forEach(function (pr) {
+        var it = pr[0], b = pr[1], el = it.el;
+        el.style.left = (pad + b[0] * laneW) + 'px';
+        el.style.top = b[1] + 'px';
+        el.classList.toggle('up', b[2] < 0);
+        if (Math.abs(b[2]) > 14) { el.classList.add('shifted'); el.style.setProperty('--shift', Math.abs(b[2]).toFixed(1) + 'px'); }
+      });
+    });
+    // 3. blurbs fill the gaps near where they belong
+    blurbs.forEach(function (el) {
+      var n = parseFloat(el.getAttribute('data-n'));
+      var span = LANES === 2 ? 2 : Math.min(LANES, parseInt(el.getAttribute('data-span') || '2', 10));
+      el.style.width = (span * laneW) + 'px';
+      var h = el.offsetHeight, want = Math.max(0, (n - 1) * K - h / 2);
+      var pref = Math.round(parseFloat(el.getAttribute('data-lane') || '.5') * (LANES - span));
+      var best = null, bestCost = 1e12;
+      for (var s = 0; s <= LANES - span; s++) {
+        var top = nearest(s, span, want, h, true, 0);
+        var cost = Math.abs(top - want) + Math.abs(s - pref) * 30;
+        if (cost < bestCost) { bestCost = cost; best = [s, top]; }
+      }
+      put(el, best[0], span, best[1], h);
+    });
+    var d = $('descender');
+    if (d) { d.style.top = ((1000 - 1) * K) + 'px'; d.style.height = ((NMAX - 1000) * K) + 'px'; d.style.left = '0'; d.style.width = '100%'; }
+    measure();
+    var sc = scale.querySelector('[data-screens]');
+    if (sc) {
+      var host = sc.closest('[data-n]');
+      var n2 = Math.round((scaleTop + parseFloat(host.style.top)) / (W.innerHeight || 800));
+      sc.textContent = n2.toLocaleString('en-US');
+    }
+  }
+  function measure() { scaleTop = scale.getBoundingClientRect().top + W.scrollY; }
+
+  /* ------------------------------------------------ the scene: pier, raft, diver */
+  var sceneSvg = $('scene'), gPier = $('pier'), gRaft = $('raft'), gDiver = $('diver'), gBoard = $('board');
+  var gSplash = $('splash'), gUnder = $('under'), aboveRect = $('above-rect');
+  var S = 1, WL = 240, tipX = 446, tipY = 136;
+  function placeScene() {
+    if (!sceneSvg) return;
+    var w = Math.max(320, W.innerWidth);
+    S = Math.max(0.42, Math.min(1, w / 1400));
+    sceneSvg.setAttribute('viewBox', '0 0 ' + w + ' 340');
+    gPier.setAttribute('transform', 'translate(0,' + WL + ') scale(' + S + ')');
+    tipX = 440 * S; tipY = WL - 104 * S;
+    var entryX = tipX + 170 * S;
+    var raftX = Math.max(w * 0.72, entryX + 160 * S);
+    if (raftX + 112 * S > w - 8) raftX = w - 8 - 112 * S;
+    gRaft.setAttribute('transform', 'translate(' + raftX.toFixed(1) + ',' + WL + ') scale(' + S + ')');
+    aboveRect.setAttribute('width', w);
+    if (!introRunning) setDiver(tipX, tipY, 0);
+  }
+  function setDiver(x, y, rot) {
+    gDiver.setAttribute('transform', 'translate(' + x.toFixed(1) + ',' + y.toFixed(1) + ') scale(' + S + ') rotate(' + rot.toFixed(1) + ' 0 -33)');
+  }
+  function setBoard(angle) { gBoard.setAttribute('transform', 'rotate(' + angle.toFixed(2) + ' 296 -100)'); }
+
+  var introRunning = false, introStart = 0, introLast = 0, splashed = false, parts = [], introRaf = 0;
+  function ns(tag, attrs, parent) {
+    var e = D.createElementNS('http://www.w3.org/2000/svg', tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    parent.appendChild(e); return e;
+  }
+  function splash(x) {
+    var i;
+    for (i = 0; i < 14; i++) {
+      var c = ns('circle', { r: (1.6 + Math.random() * 2.4) * Math.max(S, .6), fill: '#effcff' }, gSplash);
+      parts.push({ el: c, kind: 'drop', x: x + (Math.random() - .5) * 10 * S, y: WL - 2, vx: (Math.random() - .5) * 150 * S, vy: -(120 + Math.random() * 150) * Math.max(S, .7), t: 0 });
+    }
+    for (i = 0; i < 3; i++) {
+      var r = ns('ellipse', { cx: x, cy: WL + 2, rx: 1, ry: 1, fill: 'none', stroke: '#ffffff', 'stroke-width': 2 }, gSplash);
+      parts.push({ el: r, kind: 'ring', x: x, delay: i * .22, t: 0 });
+    }
+    for (i = 0; i < 10; i++) {
+      var b = ns('circle', { r: (2 + Math.random() * 3.5) * Math.max(S, .6), fill: 'none', stroke: '#e6fbff', 'stroke-width': 1.3 }, gUnder);
+      parts.push({ el: b, kind: 'bub', x: x + (Math.random() - .5) * 26 * S, y: WL + (30 + Math.random() * 50) * S, v: 34 + Math.random() * 40, delay: Math.random() * .5, t: 0 });
+    }
+  }
+  function stepParts(dt) {
+    for (var i = parts.length - 1; i >= 0; i--) {
+      var p = parts[i]; p.t += dt;
+      if (p.kind === 'drop') {
+        p.vy += 520 * dt; p.x += p.vx * dt; p.y += p.vy * dt;
+        p.el.setAttribute('cx', p.x.toFixed(1)); p.el.setAttribute('cy', p.y.toFixed(1));
+        if (p.y > WL + 2 && p.vy > 0) { p.el.remove(); parts.splice(i, 1); }
+      } else if (p.kind === 'ring') {
+        var u = (p.t - p.delay) / 1.1;
+        if (u < 0) { p.el.setAttribute('opacity', 0); continue; }
+        if (u >= 1) { p.el.remove(); parts.splice(i, 1); continue; }
+        var rx = (8 + 70 * u) * S;
+        p.el.setAttribute('rx', rx.toFixed(1)); p.el.setAttribute('ry', (rx * .16).toFixed(1));
+        p.el.setAttribute('opacity', (0.8 * (1 - u)).toFixed(2));
+      } else {
+        var t = p.t - p.delay;
+        if (t < 0) { p.el.setAttribute('opacity', 0); continue; }
+        var yy = p.y - p.v * t;
+        p.el.setAttribute('cx', (p.x + Math.sin(t * 7 + p.v) * 2.5).toFixed(1));
+        p.el.setAttribute('cy', yy.toFixed(1));
+        p.el.setAttribute('opacity', Math.max(0, Math.min(1, (yy - WL) / 20)).toFixed(2));
+        if (yy < WL + 1) { p.el.remove(); parts.splice(i, 1); }
+      }
+    }
+  }
+  function introFrame(now) {
+    var t = now - introStart, dt = Math.min(.05, Math.max(0, (now - (introLast || now)) / 1000)); introLast = now;
+    var x = tipX, y = tipY, rot = 0, board = 0;
+    if (t < 450) {
+      rot = Math.sin(t / 140) * 1.5;
+    } else if (t < 1550) {
+      var ph = ((t - 450) % 550) / 550;
+      var lift = Math.sin(Math.PI * ph);
+      board = (1 - lift) * 4.2;
+      y = tipY + Math.sin(board * Math.PI / 180) * 150 * S - lift * 22 * S;
+    } else if (t < 2500) {
+      var u = (t - 1550) / 950;
+      var X = 185 * u;
+      var a = 0.0142, c0 = a * 3600 - 55;
+      var Y = a * (X - 60) * (X - 60) - 55 - c0 * (1 - u);
+      x = tipX + X * S; y = tipY + Y * S;
+      rot = 18 * u + 190 * u * u;
+      board = Math.sin(u * 22) * 3.5 * (1 - u);
+      if (!splashed && y - 30 * S > WL) { splashed = true; splash(x); }
+    } else {
+      x = tipX + 185 * S; y = tipY + 300 * S; rot = 208;
+    }
+    setDiver(x, y, rot); setBoard(board);
+    stepParts(dt);
+    if (t < 4200 || parts.length) introRaf = requestAnimationFrame(introFrame);
+    else endIntro(true);
+  }
+  function startIntro() {
+    introRunning = true; splashed = false;
+    H.classList.add('intro-on');
+    introStart = performance.now();
+    introRaf = requestAnimationFrame(introFrame);
+  }
+  function endIntro(played) {
+    cancelAnimationFrame(introRaf);
+    introRunning = false;
+    H.classList.remove('intro-on');
+    parts.forEach(function (p) { p.el.remove(); }); parts = [];
+    setBoard(0);
+    if (played) gDiver.setAttribute('opacity', 0);
+    else setDiver(tipX, tipY, 0);
+  }
+  function skipIntro() { if (introRunning) endIntro(true); }
+
+  /* ------------------------------------------------ smooth jumps */
+  var jumpRaf = 0;
+  function cancelJump() { if (jumpRaf) { cancelAnimationFrame(jumpRaf); jumpRaf = 0; } }
+  function maxScroll() { return Math.max(0, H.scrollHeight - W.innerHeight); }
+  function jumpTo(y) {
+    y = Math.max(0, Math.min(Math.round(y), maxScroll()));
+    cancelJump();
+    var start = W.scrollY, dist = y - start;
+    if (reduce || Math.abs(dist) < 2) { W.scrollTo(0, y); return; }
+    var dur = Math.min(2600, 480 + Math.sqrt(Math.abs(dist)) * 6.5), t0 = performance.now();
+    function step(now) {
+      var p = Math.min(1, (now - t0) / dur);
+      var e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+      W.scrollTo(0, start + dist * e);
+      jumpRaf = p < 1 ? requestAnimationFrame(step) : 0;
+    }
+    jumpRaf = requestAnimationFrame(step);
+  }
+  ['wheel', 'touchstart'].forEach(function (ev) { W.addEventListener(ev, cancelJump, { passive: true }); });
+  W.addEventListener('keydown', function (e) {
+    if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].indexOf(e.key) > -1) cancelJump();
+    if (introRunning) skipIntro();
+  });
+  function floorY() { return floorSec.getBoundingClientRect().top + W.scrollY; }
+  function targetY(key) {
+    var vh = W.innerHeight;
+    if (key === 'top') return 0;
+    if (key === 'surface') return surfaceSec.getBoundingClientRect().top + W.scrollY - 10;
+    if (key === 'bottom') return floorY() - vh * 0.74;
+    if (key === 'end') return floorY();
+    var el = $(key);
+    if (!el) return null;
+    if (el.hasAttribute('data-n')) return scaleTop + parseFloat(el.style.top || 0) - vh * 0.28;
+    var h = el.querySelector('[data-n]');
+    if (h) return scaleTop + parseFloat(h.style.top || 0) - vh * 0.28;
+    return el.getBoundingClientRect().top + W.scrollY - vh * 0.2;
+  }
+  function go(key) { var y = targetY(key); if (y != null) jumpTo(y); }
+
+  /* ------------------------------------------------ counter + page state */
+  var lastTxt = '', gaugePip = $('gaugePip'), gauge = $('gauge'), gaugeOn = false;
+  function checkGauge() { gaugeOn = !!gauge && getComputedStyle(gauge).display !== 'none'; }
+  function fmtN(n) {
+    if (n < 1.05) return '1';
+    if (n < 9.95) return n.toFixed(1);
+    return Math.round(n).toLocaleString('en-US');
+  }
+  var state = { sy: 0, vh: 800, nTop: 0, dark: 0, surf: .222, depth: 0, frac: 0 };
+  function update() {
+    var sy = W.scrollY, vh = W.innerHeight;
+    state.sy = sy; state.vh = vh;
+    var r = depthLine.getBoundingClientRect();
+    var lineY = r.bottom + sy;
+    var n = 1 + (lineY - scaleTop) / K;
+    var on = n >= 1;
+    if (introRunning && sy > vhH * 0.6) endIntro(true);
+    var nc = Math.min(NMAX, Math.max(1, n));
+    var txt = '1 IN ' + fmtN(nc);
+    if (txt !== lastTxt) { depthText.textContent = txt; lastTxt = txt; }
+    depthLine.classList.toggle('on', on);
+    H.classList.toggle('under', sy > vhH * 0.62);
+    H.classList.toggle('sand', floorSec.getBoundingClientRect().top < 70);
+    var nTop = 1 + (sy - scaleTop) / K;
+    state.nTop = nTop;
+    state.dark = nTop <= 1 ? 0 : (nTop - 1) / 11;
+    state.surf = 1 - (surfacePageY() - sy) / vh;
+    state.depth = sy / vh;
+    state.frac = n < 1 ? 0 : Math.min(1, Math.log(nc) / Math.log(NMAX));
+    if (gauge && gaugePip && gaugeOn) {
+      var mid = sy + vh * 0.5, fy = floorY();
+      var bps = [0, surfaceSec.getBoundingClientRect().top + sy, nToY(1), nToY(10), nToY(100), nToY(1000), fy, H.scrollHeight];
+      var seg = 0;
+      for (var i = 0; i < bps.length - 1; i++) if (mid >= bps[i]) seg = i;
+      seg = Math.min(seg, 6);
+      var f = Math.max(0, Math.min(1, (mid - bps[seg]) / Math.max(1, bps[seg + 1] - bps[seg])));
+      gaugePip.style.top = (((seg + f) / 7) * 100).toFixed(2) + '%';
+    }
+  }
+
+  /* ------------------------------------------------ the water (WebGL port of Neal's shader) */
+  var canvas = $('water-canvas'), gl = null, progW, progP, bufQ, bufP, uW = {}, uP = {}, glOK = false;
+  var VS_W = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+  var NOISE = [
+    'float random(in vec2 st){return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*43758.5453123);}',
+    'float noise(in vec2 st){vec2 i=floor(st);vec2 f=fract(st);float a=random(i);float b=random(i+vec2(1.,0.));float c=random(i+vec2(0.,1.));float d=random(i+vec2(1.,1.));vec2 u=f*f*(3.-2.*f);return mix(a,b,u.x)+(c-a)*u.y*(1.-u.x)+(d-b)*u.x*u.y;}',
+    'float fbm(in vec2 st){float v=0.;float a=.5;for(int i=0;i<OCT;i++){v+=a*noise(st);st*=2.;a*=.7;}return v;}'
+  ].join('\n');
+  var FS_W = [
+    'precision highp float;',
+    'uniform vec2 resolution;uniform float time;uniform float depth;uniform float dark;uniform float surf;',
+    'vec3 hsb2rgb(in vec3 c){vec3 rgb=clamp(abs(mod(c.x*6.+vec3(0.,4.,2.),6.)-3.)-1.,0.,1.);rgb=rgb*rgb*(3.-2.*rgb);return c.z*mix(vec3(1.),rgb,c.y);}',
+    '#define OCT 7', NOISE,
+    'void main(){',
+    ' vec2 st=gl_FragCoord.xy/resolution.xy;',
+    ' if(dark>12.){gl_FragColor=vec4(0.,0.,0.,1.);return;}',
+    ' float diff=st.y-.025*fbm(st+time*.0005)-.016*sin(st.y+16.*st.x+time*.006);',
+    ' if(diff>surf){gl_FragColor=mix(vec4(1.,.929,.678,1.),vec4(.612,.878,1.,1.),st.y);return;}',
+    ' float foam=step(surf-.006,diff);',
+    ' float edgeShade=-.3*(smoothstep(0.,.5,st.x-.8)+smoothstep(0.,.5,.2-st.x));',
+    ' float lightBeams=.04*sin(time*.01+st.x*15.)+(.5*(st.y-.99));',
+    ' float waterEffect=.008*(fbm(vec2(st.x,st.y-.6*depth)+time*.0003)*2.-1.);',
+    ' float topWaterEffect=-.03*smoothstep(-.1,.25,st.y-depth);',
+    ' vec3 col=hsb2rgb(vec3(.55+waterEffect+topWaterEffect,1.,1.-dark*.1+edgeShade+lightBeams));',
+    ' float below=surf-st.y;',
+    ' float sh=.5+.5*sin((st.x*1.25+st.y*.52)*12.+sin(time*.0032+st.x*2.3)*1.4);',
+    ' sh=pow(sh,9.)*.17*exp(-below*1.5)*(1.-smoothstep(0.,2.4,dark));',
+    ' col+=vec3(.72,.95,1.)*sh;',
+    ' gl_FragColor=vec4(max(col,0.)+vec3(foam),1.);',
+    '}'
+  ].join('\n');
+  var VS_P = [
+    'attribute vec2 pos;attribute float size;attribute float alpha;attribute float kind;',
+    'uniform float pr;varying float va;varying float vk;',
+    'void main(){va=alpha;vk=kind;gl_PointSize=size*pr;gl_Position=vec4(pos,0.,1.);}'
+  ].join('\n');
+  var FS_P = [
+    'precision mediump float;',
+    'uniform vec2 resolution;uniform float time;uniform float surf;varying float va;varying float vk;',
+    '#define OCT 4', NOISE,
+    'void main(){',
+    ' vec2 st=gl_FragCoord.xy/resolution.xy;',
+    ' float diff=st.y-.025*fbm(st+time*.0005)-.016*sin(st.y+16.*st.x+time*.006);',
+    ' if(diff>surf-.004)discard;',
+    ' vec2 pc=gl_PointCoord-.5;float r=length(pc);',
+    ' if(vk<.5){float a=max(0.,.5-r)*va;gl_FragColor=vec4(vec3(.8)*a,a);}',
+    ' else if(vk<1.5){float ring=smoothstep(.5,.43,r)-smoothstep(.37,.3,r);float hi=smoothstep(.14,0.,length(pc-vec2(-.15,-.17)));float a=clamp(ring*.62+hi*.6,0.,1.)*va;gl_FragColor=vec4(vec3(.92,.98,1.)*a,a);}',
+    ' else{float a=pow(max(0.,1.-r*2.),2.)*va;gl_FragColor=vec4(vec3(.55,1.,.86)*a,a);}',
+    '}'
+  ].join('\n');
+
+  function compile(type, src) {
+    var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  function program(vs, fs) {
+    var p = gl.createProgram();
+    gl.attachShader(p, compile(gl.VERTEX_SHADER, vs)); gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p));
+    return p;
+  }
+  function initGL() {
+    if (!canvas) return false;
+    try {
+      gl = canvas.getContext('webgl', { antialias: false, alpha: false, premultipliedAlpha: true, preserveDrawingBuffer: false }) ||
+           canvas.getContext('experimental-webgl');
+      if (!gl) return false;
+      progW = program(VS_W, FS_W); progP = program(VS_P, FS_P);
+      bufQ = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bufQ);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, -1, 1, 1, 1, -1, -1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+      bufP = gl.createBuffer();
+      ['resolution', 'time', 'depth', 'dark', 'surf'].forEach(function (k) { uW[k] = gl.getUniformLocation(progW, k); });
+      ['resolution', 'time', 'surf', 'pr'].forEach(function (k) { uP[k] = gl.getUniformLocation(progP, k); });
+      uW.p = gl.getAttribLocation(progW, 'p');
+      ['pos', 'size', 'alpha', 'kind'].forEach(function (k) { uP['a_' + k] = gl.getAttribLocation(progP, k); });
+      canvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); glOK = false; paintFallback(); });
+      return true;
+    } catch (err) { gl = null; return false; }
+  }
+  var PR = 1;
+  function sizeCanvas() {
+    if (!canvas) return;
+    PR = Math.min(W.devicePixelRatio || 1, 1.5);
+    var w = Math.round(W.innerWidth * PR), h = Math.round(W.innerHeight * PR);
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+  }
+
+  // marine snow (as Neal's: 250 points, re-seeded 10 at a time), rising bubbles, deep sparks
+  var snow = { x: [], y: [], size: [], phase: [], scroll: [], par: [], t: [] };
+  var tick = 0, lastSeed = -1;
+  function reseed() {
+    var k;
+    while (snow.x.length > 240) for (k in snow) snow[k].shift();
+    while (snow.x.length < 250) {
+      snow.x.push(Math.random() * 2 - 1); snow.y.push(Math.random() * 2 - 1);
+      snow.size.push(Math.random() * 10); snow.phase.push(Math.random() * 100);
+      snow.scroll.push(W.scrollY); snow.par.push(Math.random() + .2); snow.t.push(tick);
+    }
+  }
+  var bubbles = [], spawnAcc = 0;
+  function stepBubbles(dt) {
+    var sy = state.sy, vh = state.vh, rate = state.dark < 1.5 ? 2.6 : state.dark < 6 ? 1.1 : 0.3;
+    spawnAcc += dt * rate;
+    while (spawnAcc >= 1 && bubbles.length < 60) {
+      spawnAcc -= 1;
+      bubbles.push({ x: Math.random(), y: sy + vh + 10 + Math.random() * 60, r: 2 + Math.random() * 5.5, v: 38 + Math.random() * 64, w: Math.random() * 6.28 });
+    }
+    if (spawnAcc > 1) spawnAcc = 0;
+    var sp = surfacePageY();
+    for (var i = bubbles.length - 1; i >= 0; i--) {
+      var b = bubbles[i];
+      b.y -= b.v * dt; b.w += dt * 2.2;
+      if (b.y < sp + 4 || b.y < sy - 80 || b.y > sy + vh + 260) bubbles.splice(i, 1);
+    }
+  }
+  function hash1(n) { var s = Math.sin(n * 127.1) * 43758.5453; return s - Math.floor(s); }
+  var pData = new Float32Array((250 + 60 + 40) * 5);
+  function drawGL() {
+    if (!glOK) return;
+    var w = canvas.width, h = canvas.height, t = tick;
+    gl.viewport(0, 0, w, h);
+    gl.disable(gl.BLEND);
+    gl.useProgram(progW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufQ);
+    gl.enableVertexAttribArray(uW.p);
+    gl.vertexAttribPointer(uW.p, 2, gl.FLOAT, false, 0, 0);
+    gl.uniform2f(uW.resolution, w, h); gl.uniform1f(uW.time, t);
+    gl.uniform1f(uW.depth, state.depth); gl.uniform1f(uW.dark, state.dark); gl.uniform1f(uW.surf, state.surf);
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    gl.disableVertexAttribArray(uW.p);
+    if (state.dark > 12.5 && state.nTop > NMAX + 40) return;
+    // points
+    var o = 0, i, vh = state.vh, sy = state.sy;
+    for (i = 0; i < snow.x.length; i++) {
+      var sz = Math.max(2, snow.size[i] * Math.sin((t - snow.t[i]) / 80));
+      pData[o++] = snow.x[i] + .01 * Math.sin(snow.phase[i] + t * .01);
+      pData[o++] = snow.y[i] + snow.par[i] * 2 * ((sy - snow.scroll[i]) / vh);
+      pData[o++] = sz; pData[o++] = 1; pData[o++] = 0;
+    }
+    for (i = 0; i < bubbles.length; i++) {
+      var b = bubbles[i];
+      pData[o++] = (b.x + .004 * Math.sin(b.w)) * 2 - 1;
+      pData[o++] = 1 - 2 * (b.y - sy) / vh;
+      pData[o++] = b.r * 2; pData[o++] = state.dark > 8 ? .45 : .8; pData[o++] = 1;
+    }
+    if (state.dark > 3) {
+      var fade = Math.min(1, (state.dark - 3) / 4), cell = 460, c0 = Math.floor(sy / cell), c1 = Math.floor((sy + vh) / cell);
+      for (var c = c0; c <= c1 && o < pData.length - 10; c++) {
+        for (var j = 0; j < 2; j++) {
+          var seed = c * 2 + j, py = c * cell + hash1(seed + .3) * cell;
+          var fl = Math.pow(Math.max(0, Math.sin(t * .018 + hash1(seed + .7) * 40)), 3);
+          pData[o++] = hash1(seed + .1) * 2 - 1;
+          pData[o++] = 1 - 2 * (py - sy) / vh;
+          pData[o++] = 5 + hash1(seed + .9) * 7; pData[o++] = fl * fade * .9; pData[o++] = 2;
+        }
+      }
+    }
+    var count = o / 5;
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+    gl.useProgram(progP);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufP);
+    gl.bufferData(gl.ARRAY_BUFFER, pData.subarray(0, o), gl.DYNAMIC_DRAW);
+    var st = 20;
+    gl.enableVertexAttribArray(uP.a_pos); gl.vertexAttribPointer(uP.a_pos, 2, gl.FLOAT, false, st, 0);
+    gl.enableVertexAttribArray(uP.a_size); gl.vertexAttribPointer(uP.a_size, 1, gl.FLOAT, false, st, 8);
+    gl.enableVertexAttribArray(uP.a_alpha); gl.vertexAttribPointer(uP.a_alpha, 1, gl.FLOAT, false, st, 12);
+    gl.enableVertexAttribArray(uP.a_kind); gl.vertexAttribPointer(uP.a_kind, 1, gl.FLOAT, false, st, 16);
+    gl.uniform2f(uP.resolution, w, h); gl.uniform1f(uP.time, t); gl.uniform1f(uP.surf, state.surf); gl.uniform1f(uP.pr, PR);
+    gl.drawArrays(gl.POINTS, 0, count);
+    gl.disableVertexAttribArray(uP.a_pos); gl.disableVertexAttribArray(uP.a_size);
+    gl.disableVertexAttribArray(uP.a_alpha); gl.disableVertexAttribArray(uP.a_kind);
+  }
+  // CSS fallback when WebGL is missing: same colour maths, as a gradient
+  function hsb(h, s, b) {
+    var r = [0, 4, 2].map(function (o) {
+      var x = Math.min(1, Math.max(0, Math.abs(((h * 6 + o) % 6) - 3) - 1));
+      x = x * x * (3 - 2 * x);
+      return Math.round(Math.max(0, b) * (1 + (x - 1) * s) * 255);
+    });
+    return 'rgb(' + r.join(',') + ')';
+  }
+  var waterEl = $('water');
+  function paintFallback() {
+    if (glOK) return;
+    var bTop = 1 - state.dark * .1, sp = (1 - state.surf) * 100;
+    if (state.dark > 12) { waterEl.style.background = '#000'; return; }
+    var top = hsb(.55, 1, bTop), bot = hsb(.55, 1, bTop - .5);
+    if (sp > 0) waterEl.style.background = 'linear-gradient(180deg,#9ee0fe 0%,#e2e9c5 ' + sp.toFixed(1) + '%,#fff ' + sp.toFixed(1) + '%,' + top + ' ' + (sp + .6).toFixed(1) + '%,' + bot + ' 100%)';
+    else waterEl.style.background = 'linear-gradient(180deg,' + top + ',' + bot + ')';
+  }
+
+  /* ------------------------------------------------ loop */
+  var running = false, lastNow = 0, rafId = 0;
+  function frame(now) {
+    rafId = requestAnimationFrame(frame);
+    var dt = Math.min(.05, (now - (lastNow || now)) / 1000); lastNow = now;
+    if (!reduce) tick += dt * 60;
+    var seedStep = Math.floor(tick / 10);
+    if (seedStep !== lastSeed) { lastSeed = seedStep; reseed(); }
+    update();
+    if (!reduce) stepBubbles(dt);
+    if (glOK) drawGL(); else paintFallback();
+  }
+  function start() { if (!running) { running = true; lastNow = 0; rafId = requestAnimationFrame(frame); } }
+  function stop() { running = false; cancelAnimationFrame(rafId); }
+  var pending = false;
+  function renderOnce() {
+    if (pending) return; pending = true;
+    requestAnimationFrame(function () { pending = false; update(); if (glOK) drawGL(); else paintFallback(); });
+  }
+
+  /* ------------------------------------------------ jump menu, gauge, buttons */
+  var jumpBtn = $('jumpBtn'), jumpMenu = $('jumpMenu');
+  function closeMenu(focusBtn) { jumpMenu.hidden = true; jumpBtn.setAttribute('aria-expanded', 'false'); if (focusBtn) jumpBtn.focus(); }
+  jumpBtn.addEventListener('click', function () {
+    var open = jumpMenu.hidden;
+    jumpMenu.hidden = !open; jumpBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) { var f = jumpMenu.querySelector('button'); if (f) f.focus(); }
+  });
+  jumpMenu.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-go]'); if (!b) return;
+    closeMenu(false); skipIntro(); go(b.getAttribute('data-go'));
+  });
+  jumpMenu.addEventListener('keydown', function (e) {
+    var items = [].slice.call(jumpMenu.querySelectorAll('button')), i = items.indexOf(D.activeElement);
+    if (e.key === 'Escape') { e.preventDefault(); closeMenu(true); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+  });
+  D.addEventListener('click', function (e) { if (!jumpMenu.hidden && !e.target.closest('.controls')) closeMenu(false); });
+  if (gauge) gauge.addEventListener('click', function (e) { var b = e.target.closest('[data-go]'); if (b) { skipIntro(); go(b.getAttribute('data-go')); } });
+  $('diveBtn').addEventListener('click', function () { skipIntro(); go('surface'); });
+  $('skipBottom').addEventListener('click', function () { skipIntro(); go('bottom'); });
+  $('backTop').addEventListener('click', function () { go('top'); });
+  $('skipIntro').addEventListener('click', function () { skipIntro(); });
+
+  /* ------------------------------------------------ list view */
+  var listView = $('listView'), listBtn = $('listBtn'), listClose = $('listClose'), lastFocus = null;
+  function openList() {
+    lastFocus = D.activeElement; skipIntro();
+    listView.hidden = false; H.classList.add('list-open'); listBtn.setAttribute('aria-expanded', 'true');
+    listView.scrollTop = 0; stop(); listClose.focus();
+  }
+  function closeList(restore) {
+    listView.hidden = true; H.classList.remove('list-open'); listBtn.setAttribute('aria-expanded', 'false');
+    if (!reduce) start(); else renderOnce();
+    if (restore && lastFocus) lastFocus.focus();
+  }
+  listBtn.addEventListener('click', openList);
+  $('skipToList').addEventListener('click', function (e) { e.preventDefault(); openList(); });
+  listClose.addEventListener('click', function () { closeList(true); });
+  listView.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { e.preventDefault(); closeList(true); return; }
+    if (e.key === 'Tab') {
+      var f = [].slice.call(listView.querySelectorAll('button,a[href]')).filter(function (x) { return x.offsetParent !== null; });
+      if (!f.length) return;
+      if (e.shiftKey && D.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && D.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+    }
+  });
+  listView.addEventListener('click', function (e) {
+    var g = e.target.closest('[data-go]');
+    if (g) { closeList(false); go(g.getAttribute('data-go')); return; }
+    var s = e.target.closest('[data-sort]');
+    if (s && s.getAttribute('aria-pressed') !== 'true') {
+      [].forEach.call(listView.querySelectorAll('[data-sort]'), function (b) { b.setAttribute('aria-pressed', b === s ? 'true' : 'false'); });
+      var groups = $('listGroups'), raft = groups.querySelector('.list-raft');
+      var gs = [].slice.call(groups.querySelectorAll('.list-group:not(.list-raft)')).reverse();
+      gs.forEach(function (gr) {
+        var ul = gr.querySelector('.list-rows');
+        [].slice.call(ul.children).reverse().forEach(function (li) { ul.appendChild(li); });
+        groups.insertBefore(gr, raft);
+      });
+    }
+  });
+
+  /* ------------------------------------------------ boot */
+  function relayout() { layout(); placeScene(); sizeCanvas(); checkGauge(); if (!running) renderOnce(); }
+  layout();
+  placeScene();
+  checkGauge();
+  glOK = initGL();
+  if (!glOK && canvas) canvas.style.display = 'none';
+  sizeCanvas();
+  var target = null;
+  if (hash.length > 1 && !fromReturn) {
+    var key = hash.slice(1);
+    if (key === 'bottom' || key === 'surface' || key === 'top' || $(key)) target = key;
+  }
+  var playIntro = !reduce && !fromReturn && !target;
+  function snapToTarget() { var y = targetY(target === 'bottom' ? 'end' : target); if (y != null) W.scrollTo(0, Math.max(0, y)); }
+  if (target) snapToTarget();
+  else W.scrollTo(0, 0);
+  if (playIntro) startIntro(); else setDiver(tipX, tipY, 0);
+  if (reduce) { update(); if (glOK) drawGL(); else paintFallback(); W.addEventListener('scroll', renderOnce, { passive: true }); }
+  else start();
+  D.addEventListener('visibilitychange', function () { if (reduce) return; if (D.hidden) stop(); else if (listView.hidden) start(); });
+  var rT = 0;
+  W.addEventListener('resize', function () {
+    clearTimeout(rT);
+    rT = setTimeout(function () { var big = setVH(false); sizeCanvas(); if (big) { relayout(); } else if (!running) renderOnce(); }, 120);
+  });
+  if (D.fonts && D.fonts.ready) D.fonts.ready.then(function () { layout(); if (target && !jumpRaf) snapToTarget(); });
+  W.addEventListener('load', function () { layout(); });
+})();
+
+</script>
+</body>
+</html>

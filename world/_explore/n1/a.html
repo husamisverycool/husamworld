@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prototype A: Answer sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#c8323f;--ink-l:#f3c9cc;--paper:#fbf8f0;--desk:#d9d4c7;--lead:#2f2f33;--black:#141414}
+*{box-sizing:border-box}body{margin:0;background:var(--desk);font:400 15px/1.4 Archivo,Arial Narrow,sans-serif;font-stretch:80%;color:var(--black)}
+.stage{padding:40px 16px 140px;display:flex;flex-direction:column;align-items:center}
+.slot{width:min(820px,100%);height:26px;background:#1d1d1f;border-radius:4px 4px 0 0;position:relative;box-shadow:inset 0 -6px 0 #000}
+.slot:after{content:"OPTICAL MARK READER · FEED FACE UP";position:absolute;inset:0;display:grid;place-items:center;color:#8a8a8a;font:600 10px Archivo;letter-spacing:.2em;font-stretch:100%}
+.sheet{width:min(760px,100%);background:var(--paper);position:relative;padding:22px 22px 26px 52px;box-shadow:0 20px 40px -20px rgba(0,0,0,.35);transition:transform 1.1s cubic-bezier(.6,0,.3,1)}
+.sheet.feed{transform:translateY(-110%)}
+.hdr{border:2px solid var(--ink);color:var(--ink);display:grid;grid-template-columns:1fr auto;}
+.hdr h1{margin:0;padding:8px 10px;font:800 26px/1 Archivo;font-stretch:70%;letter-spacing:.02em;text-transform:uppercase}
+.hdr .form{padding:8px 10px;border-left:2px solid var(--ink);font:600 11px/1.2 Archivo;text-align:right;text-transform:uppercase}
+.band{background:var(--ink);color:var(--paper);font:700 12px Archivo;letter-spacing:.18em;text-align:center;padding:4px;text-transform:uppercase;margin:8px 0}
+.ex{display:flex;gap:18px;color:var(--ink);font:600 11px Archivo;text-transform:uppercase;align-items:center;flex-wrap:wrap;border:1px solid var(--ink);padding:6px 10px}
+.row{display:grid;grid-template-columns:28px auto 1fr;gap:10px;align-items:start;padding:10px 0;border-bottom:1px dotted var(--ink-l);position:relative}
+.row:before{content:"";position:absolute;left:-44px;top:14px;width:22px;height:9px;background:var(--black)}
+.num{font:800 18px/1 Archivo;color:var(--ink);text-align:right;padding-top:4px}
+.bub{display:flex;gap:6px}
+.bub button{width:30px;height:20px;border-radius:50%;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font:700 10px Archivo;cursor:pointer;position:relative;padding:0}
+.bub button[aria-pressed=true]{color:transparent;background:radial-gradient(ellipse at 45% 55%,#2b2b30 55%,#3a3a40 70%,transparent 72%)}
+.bub button:focus-visible{outline:2px solid #1f5fbf;outline-offset:2px}
+.qt{font:500 15px/1.35 Archivo;font-stretch:88%}
+.qt small{display:block;color:var(--ink);font:600 11px Archivo;text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.key{display:none;font:400 14px/1.4 "Courier Prime",monospace;color:#b3121f;margin-top:6px}
+.graded .key{display:block}
+.mark{position:absolute;right:0;top:4px;font:700 26px "Courier Prime";color:#c0141f;transform:rotate(-8deg)}
+.feedbtn{margin-top:18px;font:800 15px Archivo;letter-spacing:.14em;text-transform:uppercase;background:var(--black);color:var(--paper);border:0;padding:14px 22px;cursor:pointer}
+.score{position:absolute;right:18px;top:64px;font:700 44px/1 "Courier Prime";color:#c0141f;transform:rotate(-6deg);border:3px solid #c0141f;border-radius:50%;padding:12px 14px;display:none}
+.graded .score{display:block}
+@media(max-width:600px){.sheet{padding:16px 12px 20px 34px}.row{grid-template-columns:22px 1fr}.row .qt{grid-column:1/-1}.row:before{left:-30px;width:16px}.bub button{width:34px;height:24px}.hdr h1{font-size:20px}}
+@media(prefers-reduced-motion:reduce){.sheet{transition:none}}
+</style></head><body><div class="stage">
+<div class="slot" aria-hidden="true"></div>
+<form class="sheet" id="sheet" onsubmit="return false">
+ <div class="hdr"><h1>The Polling Station · Answer Sheet</h1><div class="form">Form P-1<br>Research</div></div>
+ <div class="band">Use No. 2 pencil only · Fill each oval completely</div>
+ <div class="ex">Right ● &nbsp; Wrong ⊘ ✓ ✗ &nbsp;·&nbsp; Every wrong answer on this sheet is still on his record.</div>
+ <div class="score" id="score">6/6</div>
+ <div id="rows"></div>
+</form>
+<button class="feedbtn" id="feed">Feed sheet to scanner</button>
+</div>
+<script>
+const Q=[
+ ['America’s largest poll of 18–29-year-olds. Where did he work on it as an analyst?',['Institute of Politics','University of Houston','Chapman University','Ballotpedia'],0,'A. Harvard Youth Poll, Institute of Politics, Harvard Kennedy School. Sep 2025 – May 2026.'],
+ ['He was an associate to Ambassador Katherine Tai. Which U.S. Trade Representative was she?',['17th','18th','19th','20th'],2,'C. The 19th U.S. Trade Representative.'],
+ ['“Can Private Enterprise do for Health Care What it Has Done for Food?” Where did he write it?',['Chapman','Nevada, Reno','Houston','Harvard'],1,'B. University of Nevada, Reno, under Prof. Mark Pingle. Oct 2022 – Apr 2023.'],
+ ['Ballotpedia chose Research Fellows from 90+ applicants. How many?',['3','12','30','45'],1,'B. 12. He was one of them, Jan – Mar 2024.'],
+ ['Summer 2025, Policy Program in Economics: what did he research?',['Tuition','International students','Endowments','Housing'],1,'B. The impact of international students on Harvard and U.S. universities.'],
+ ['Which have his research and consulting teams worked for? Mark all that apply.',['Red Cross','United Nations','UNICEF','Urban Institute','WHO'],-1,'All five. Red Cross and UN (Institute of Politics); UNICEF, Urban Institute, WHO and the UN (Harvard Global Research and Consulting Group).'],
+];
+const rows=document.getElementById('rows');
+Q.forEach((q,i)=>{const r=document.createElement('div');r.className='row';
+ r.innerHTML=`<div class="num">${i+1}</div><div class="bub">${q[1].map((o,j)=>`<button type="button" aria-pressed="false" aria-label="${'ABCDE'[j]}: ${o}">${'ABCDE'[j]}</button>`).join('')}</div><div class="qt">${q[0]}<small>${q[1].map((o,j)=>'ABCDE'[j]+' '+o).join(' · ')}</small><div class="key">${q[3]}</div></div>`;
+ r.querySelectorAll('button').forEach((b,j)=>b.onclick=()=>{if(q[2]>=0)r.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')=='true'?'false':'true')});
+ rows.appendChild(r)});
+document.getElementById('feed').onclick=()=>{const s=document.getElementById('sheet');s.classList.add('feed');setTimeout(()=>{let n=0;
+ [...rows.children].forEach((r,i)=>{const q=Q[i],p=[...r.querySelectorAll('button')].map(b=>b.getAttribute('aria-pressed')=='true');
+ const ok=q[2]<0?p.every(Boolean):p[q[2]]&&p.filter(Boolean).length==1;n+=ok;const m=document.createElement('span');m.className='mark';m.textContent=ok?'✓':'✗';r.appendChild(m)});
+ document.getElementById('score').textContent=n+'/6';s.classList.add('graded');s.classList.remove('feed')},1200)};
+</script></body></html>

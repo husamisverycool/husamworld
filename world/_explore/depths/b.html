@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forms of Rarity (prototype B)</title>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script src="data.js"></script>
+<script src="forms.js"></script>
+<style>
+:root{--paper:#f3ead6;--paper2:#ebe0c7;--ink:#2a2521;--rule:#6d6150;--wood:#2e2a25}
+*{box-sizing:border-box;margin:0}
+html{background:var(--wood);color:var(--ink);font:400 17px/1.5 "Old Standard TT",Georgia,serif;overflow-x:hidden}
+body{background:var(--wood)}
+.book{max-width:1320px;margin:0 auto;padding:40px 16px 120px;display:flex;flex-direction:column;gap:48px}
+.spread{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);background:var(--paper);box-shadow:0 30px 60px -30px rgba(0,0,0,.7);border-radius:2px;position:relative}
+.spread::after{content:"";position:absolute;top:0;bottom:0;left:53.5%;width:40px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,rgba(0,0,0,.08) 45%,rgba(0,0,0,.12) 50%,rgba(0,0,0,.05) 55%,transparent);pointer-events:none}
+.plate{padding:26px 30px 22px;display:flex;flex-direction:column}
+.run{display:flex;justify-content:space-between;font:italic 15px/1 "IM Fell English",serif;color:#4a4238;padding:0 4px 10px}
+.frame{border:1px solid var(--rule);flex:1;position:relative;aspect-ratio:.78;overflow:hidden}
+.fig{position:absolute;transform:translate(-50%,-50%)}
+.fig svg{width:100%;height:auto;display:block;filter:drop-shadow(0 1px 0 rgba(60,40,20,.08))}
+.fig .num{position:absolute;right:4%;top:2%;font:400 13px "Old Standard TT",serif;color:#5b5145}
+.cap{text-align:center;font:400 22px/1 "Old Standard TT",serif;letter-spacing:.14em;padding-top:14px}
+.cap i{letter-spacing:.02em;font-family:"IM Fell English",serif}
+.legend{padding:40px 40px 30px 56px;border-left:1px solid rgba(0,0,0,.05)}
+.legend h2{font:700 15px/1.2 "Old Standard TT",serif;letter-spacing:.3em;text-transform:uppercase;text-align:center;margin-bottom:22px}
+.legend h2 small{display:block;font:italic 15px "IM Fell English",serif;letter-spacing:0;text-transform:none;margin-top:6px;color:#5b5145}
+.entry{padding:14px 0;border-top:1px solid rgba(0,0,0,.14)}
+.entry h3{font:400 18px/1.3 "Old Standard TT",serif}
+.entry h3 b{font-weight:700;margin-right:8px}
+.entry .lat{font:italic 16px "IM Fell English",serif;color:#5b5145}
+.entry p{font-size:16px;margin-top:3px}
+.entry .odds{display:inline-block;margin-top:6px;font:700 13px/1 "Old Standard TT",serif;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--ink);padding:4px 7px 3px}
+.title{background:var(--paper);text-align:center;padding:90px 20px 80px}
+.title h1{font:400 64px/1.05 "Old Standard TT",serif;letter-spacing:.06em}
+.title p{font:italic 22px/1.4 "IM Fell English",serif;margin-top:16px;color:#4a4238}
+.title .key{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;margin-top:40px}
+.title .key div{width:120px;font:italic 15px "IM Fell English",serif}
+@media (max-width:860px){
+  .spread{grid-template-columns:1fr}.spread::after{display:none}
+  .legend{padding:10px 20px 26px}
+  .plate{padding:16px 14px 10px}
+  .cap{font-size:17px}
+  .title h1{font-size:40px}
+}
+</style>
+</head>
+<body>
+<main class="book" id="book">
+  <header class="title">
+    <h1>Forms of Rarity</h1>
+    <p>His honors, classified, and drawn more intricately the rarer they are.</p>
+    <div class="key" id="key"></div>
+  </header>
+</main>
+<script>
+(function () {
+  var P = window.PIER.slice(), F = window.PIER_FLOAT, forms = window.PierForms;
+  var plates = [
+    { t: 'Tafel 1', gen: 'Communes', eng: 'The common ones', sub: '1 in 1 to 1 in 10', items: P.filter(function (x) { return x.n < 10; }) },
+    { t: 'Tafel 2', gen: 'Crepusculares', eng: 'Twilight forms', sub: '1 in 10 to 1 in 35', items: P.filter(function (x) { return x.n >= 10 && x.n < 36; }) },
+    { t: 'Tafel 3', gen: 'Profundae', eng: 'The deep ones', sub: '1 in 36 to 1 in 100', items: P.filter(function (x) { return x.n >= 36 && x.n < 100; }) },
+    { t: 'Tafel 4', gen: 'Nocturnae', eng: 'Midnight forms', sub: '1 in 100 to 1 in 1,000', items: P.filter(function (x) { return x.n >= 100 && x.n < 1000; }) },
+    { t: 'Tafel 5', gen: 'Rarissima', eng: 'The rarest', sub: '1 in 1,628', items: P.filter(function (x) { return x.n >= 1000; }) },
+    { t: 'Tafel 6', gen: 'Incertae sedis', eng: 'No pool published', sub: 'Unmeasured', items: F }
+  ];
+  var LAYOUT = {
+    1: [[50, 50, 78]], 2: [[34, 32, 56], [66, 70, 56]], 3: [[30, 28, 46], [70, 44, 46], [38, 76, 46]],
+    4: [[29, 25, 42], [71, 30, 42], [32, 72, 42], [70, 76, 42]], 5: [[27, 22, 38], [73, 22, 38], [50, 50, 40], [27, 78, 38], [73, 78, 38]]
+  };
+  function fmt(n) { return n < 10 ? n.toFixed(1).replace(/\.0$/, '') : Math.round(n).toLocaleString('en-US'); }
+  var book = document.getElementById('book'), fig = 0;
+  ['Scholarship', 'Leadership program', 'National recognition', 'Academic'].forEach(function (k) {
+    document.getElementById('key').insertAdjacentHTML('beforeend', '<div>' + forms.form({ id: k, kind: k, n: 40 }, 110) + forms.cls(k) + '<br>' + k + 's</div>');
+  });
+  plates.forEach(function (pl) {
+    var lay = LAYOUT[pl.items.length] || LAYOUT[5], figs = '', leg = '';
+    pl.items.forEach(function (it, i) {
+      fig++;
+      var L = lay[i];
+      figs += '<div class="fig" style="left:' + L[0] + '%;top:' + L[1] + '%;width:' + L[2] + '%">' + forms.form(it, 200) + '<span class="num">' + fig + '</span></div>';
+      leg += '<div class="entry"><h3><b>Fig. ' + fig + '.</b>' + it.name + '</h3><div class="lat">' + it.latin + ' · ' + forms.cls(it.kind) + '</div><p>' + it.fact + (it.note ? ' ' + it.note : '') + '</p>' + (it.n ? '<span class="odds">' + (it.approx ? '~' : '') + '1 in ' + fmt(it.n) + '</span>' : '') + '</div>';
+    });
+    book.insertAdjacentHTML('beforeend', '<section class="spread"><div class="plate"><div class="run"><span>The Pier, Forms of Rarity.</span><span>' + pl.t + ' — ' + pl.gen + '.</span></div><div class="frame">' + figs + '</div><div class="cap">' + pl.gen + '. — <i>' + pl.eng + '.</i></div></div>' +
+      '<div class="legend"><h2>Erklärung der ' + pl.t + '<small>' + pl.sub + '</small></h2>' + leg + '</div></section>');
+  });
+})();
+</script>
+</body>
+</html>

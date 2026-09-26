@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Chamber · A: Three Minutes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;800&display=swap" rel="stylesheet">
+<style>
+:root{--grey:#999D9E;--ink:#1C1D20;--blue:#455CE9;--white:#fff;--paper:#F4F4F2}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto}
+body{background:var(--grey);color:var(--white);font-family:"Hanken Grotesk",system-ui,sans-serif;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:4px}
+.nav{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:36px 44px;font-size:17px;z-index:5}
+.nav ul{display:flex;gap:40px;list-style:none}
+.hero{position:relative;height:100vh;min-height:620px;overflow:hidden}
+.hanger{position:absolute;left:0;top:48%;background:var(--ink);border-radius:0 60px 60px 0;padding:18px 18px 18px 44px;display:flex;align-items:center;gap:28px;font-size:16px;line-height:1.25}
+.hanger .clock{width:70px;height:70px;border-radius:50%;background:var(--grey);display:grid;place-items:center;font-weight:800;font-size:18px;color:var(--ink)}
+.kicker{position:absolute;right:9vw;top:40%;font-size:clamp(22px,2.3vw,34px);line-height:1.3;max-width:420px}
+.kicker .arr{display:block;font-size:24px;margin-bottom:40px}
+.roll{position:absolute;bottom:-2vw;left:0;white-space:nowrap;font-size:clamp(90px,15vw,216px);line-height:1;letter-spacing:-.02em;will-change:transform}
+.roll span{padding-right:.3em}
+.speech{background:var(--paper);color:var(--ink);padding:14vh 0 10vh;position:relative}
+.wrap{max-width:1060px;margin:0 auto;padding:0 44px}
+.label{font-size:14px;letter-spacing:.02em;color:#777;margin-bottom:28px}
+.para{display:grid;grid-template-columns:90px 1fr;gap:0 24px;margin-bottom:6vh}
+.para .t{font-size:14px;color:#888;padding-top:.8em;font-variant-numeric:tabular-nums}
+.para p{font-size:clamp(24px,2.6vw,38px);line-height:1.28;letter-spacing:-.01em}
+.para p b{font-weight:500;color:var(--blue)}
+.w{display:inline-block;overflow:hidden;vertical-align:top}
+.w>i{display:inline-block;font-style:normal;transform:translateY(0);transition:transform 1s cubic-bezier(.215,.61,.355,1)}
+.pre .w>i{transform:translateY(100%)}
+.stripe{height:1px;background:#d5d5d5;margin:0 0 6vh}
+.cards{position:fixed;right:28px;bottom:28px;width:150px;height:190px;perspective:900px;z-index:8}
+.card{position:absolute;inset:0;background:var(--ink);color:#fff;display:grid;place-items:center;font-weight:800;font-size:92px;border-radius:6px;transform-origin:50% 0;transition:transform .5s cubic-bezier(.6,0,.3,1),opacity .5s;backface-visibility:hidden}
+.card small{position:absolute;top:12px;left:0;right:0;text-align:center;font-size:12px;font-weight:500;letter-spacing:.12em}
+.card.gone{transform:rotateX(-100deg);opacity:0}
+.card.stop{background:#C8102E}
+.btn-round{position:relative;width:180px;height:180px;border-radius:50%;background:var(--ink);color:#fff;border:0;font:500 18px "Hanken Grotesk";cursor:pointer;overflow:hidden;display:grid;place-items:center}
+.btn-round .fill{position:absolute;left:-25%;width:150%;height:200%;border-radius:50%;background:var(--blue);transform:translateY(76%);transition:transform .6s cubic-bezier(.45,0,.55,1)}
+.btn-round:hover .fill{transform:translateY(0)}
+.btn-round .tx{position:relative}
+.record{background:var(--ink);padding:14vh 0}
+.record ul{list-style:none}
+.record li{display:grid;grid-template-columns:1fr auto;gap:16px;border-top:1px solid #3a3b3f;padding:34px 0;align-items:baseline}
+.record li:last-child{border-bottom:1px solid #3a3b3f}
+.record h3{font-weight:400;font-size:clamp(28px,4.4vw,64px);letter-spacing:-.02em;line-height:1.05}
+.record p{color:#9a9ca0;font-size:17px;text-align:right}
+.yield{background:var(--ink);padding:0 0 18vh;text-align:left}
+.yield h2{font-weight:400;font-size:clamp(60px,10vw,150px);letter-spacing:-.03em;margin-bottom:6vh}
+.snd{position:fixed;top:30px;right:44px;z-index:9;background:none;border:1px solid currentColor;color:inherit;border-radius:30px;padding:8px 16px;font:500 14px "Hanken Grotesk";cursor:pointer}
+@media (max-width:700px){
+ .nav{padding:22px 16px}.nav ul{gap:18px}.wrap{padding:0 16px}
+ .kicker{left:16px;right:16px;top:22%}
+ .hanger{top:auto;bottom:34vw;left:auto;right:0;border-radius:60px 0 0 60px;padding:12px 16px 12px 20px}
+ .para{grid-template-columns:1fr}.para .t{padding:0 0 6px}
+ .cards{width:96px;height:124px;right:16px;bottom:16px}.card{font-size:58px}
+ .record li{grid-template-columns:1fr}.record p{text-align:left}
+ .snd{top:18px;right:16px}
+}
+@media (prefers-reduced-motion:reduce){.w>i,.card{transition:none}.pre .w>i{transform:none}}
+</style>
+</head>
+<body>
+<button class="snd" id="snd" aria-pressed="false">Sound off</button>
+<header class="hero">
+  <nav class="nav"><span>© The Chamber</span><ul><li><a href="#speech">Floor</a></li><li><a href="#record">Record</a></li></ul></nav>
+  <div class="kicker"><span class="arr" aria-hidden="true">↘</span>Three minutes on the floor, then questions.</div>
+  <div class="hanger"><p>Congressional<br>Debate<br>NSDA Nationals</p><div class="clock" aria-hidden="true">3:00</div></div>
+  <div class="roll" id="roll" aria-hidden="true"><span>National Finalist —</span><span>National Finalist —</span><span>National Finalist —</span></div>
+  <h1 class="sr" style="position:absolute;left:-9999px">The Chamber: speech, debate and Mock Trial</h1>
+</header>
+
+<section class="speech" id="speech">
+ <div class="wrap">
+  <p class="label">Speech in affirmation · Time 3:00</p>
+  <div class="para"><span class="t">3:00</span><p>Thank you, Presiding Officer. I rise with a record, not a platform.</p></div>
+  <div class="para"><span class="t">2:45</span><p>Congressional Debate first. I qualified for the NSDA National Tournament <b>four times</b>. I made the national semifinal. Then I made the final: <b>one of 20, from a field of more than 50,000</b>.</p></div>
+  <div class="para"><span class="t">2:05</span><p>At home, I was a CHSSA semifinalist in Congress, <b>top 15 in California</b>, and I took <b>3rd</b> at the Berkeley National Congress Tournament.</p></div>
+  <div class="para"><span class="t">1:40</span><p>I wrote for the floor, too. NSDA named me a National Legislation Author: <b>one of 41, from more than 500</b>.</p></div>
+  <div class="stripe"></div>
+  <div class="para"><span class="t">1:20</span><p>Then every other room. CHSSA Public Forum, <b>octofinalist</b>. The UOP Invitational, <b>champion three times</b>: Parliamentary Debate, Oral Interpretation, Best Speaker. The Ethics Bowl, California <b>state quarterfinals, top 8</b>.</p></div>
+  <div class="para"><span class="t">0:45</span><p>And a courtroom. At the California Mock Trial Finals I was named <b>MVP: one of 128, from more than 5,000 competitors</b>.</p></div>
+  <div class="para"><span class="t">0:20</span><p>For a year I sat on NSDA's Student Leadership Council, <b>1 of 23</b> students speaking for <b>140,000+ members</b> to the national board. In 2023, TED Student Talks mentored me.</p></div>
+  <div class="para"><span class="t">0:00</span><p>I yield my time.</p></div>
+  <button class="btn-round magnetic" id="start" data-strength="100" data-strength-text="50"><span class="fill"></span><span class="tx">Start the clock</span></button>
+ </div>
+</section>
+
+<section class="record" id="record">
+ <div class="wrap">
+  <p class="label" style="color:#9a9ca0">The record</p>
+  <ul>
+   <li><h3>National Finalist</h3><p>NSDA Nationals · Congressional Debate · 1 of 20 from 50,000+</p></li>
+   <li><h3>National Semifinalist</h3><p>NSDA Nationals · Congressional Debate</p></li>
+   <li><h3>4× National Qualifier</h3><p>NSDA National Tournament</p></li>
+   <li><h3>Legislation Author</h3><p>NSDA Nationals · 1 of 41 from 500+</p></li>
+   <li><h3>MVP</h3><p>California Mock Trial Finals · 1 of 128 from 5,000+</p></li>
+   <li><h3>Semifinalist</h3><p>CHSSA · Congressional Debate · top 15 in CA</p></li>
+   <li><h3>Octofinalist</h3><p>CHSSA · Public Forum</p></li>
+   <li><h3>3× Champion</h3><p>UOP Invitational · Parli, Oral Interp, Best Speaker</p></li>
+   <li><h3>3rd place</h3><p>Berkeley National Congress Tournament</p></li>
+   <li><h3>Quarterfinalist</h3><p>Ethics Bowl · California · top 8</p></li>
+   <li><h3>1 of 23</h3><p>NSDA Student Leadership Council · 140,000+ members</p></li>
+   <li><h3>Mentee</h3><p>TED Student Talks · 2023</p></li>
+  </ul>
+ </div>
+</section>
+<section class="yield"><div class="wrap"><h2>I yield.</h2><button class="btn-round magnetic" id="gavel" data-strength="100" data-strength-text="50"><span class="fill"></span><span class="tx">Gavel</span></button></div></section>
+
+<div class="cards" aria-hidden="true" id="cards">
+ <div class="card stop"><small>TIME</small>STOP</div>
+ <div class="card"><small>SECONDS</small>30</div>
+ <div class="card"><small>MINUTES</small>1</div>
+ <div class="card"><small>MINUTES</small>2</div>
+ <div class="card"><small>MINUTES</small>3</div>
+</div>
+
+<script>
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+// word wrap for line reveals
+document.querySelectorAll('.para p').forEach(p=>{
+  const walk=n=>{[...n.childNodes].forEach(c=>{if(c.nodeType===3){const f=document.createDocumentFragment();c.textContent.split(/(\s+)/).forEach(t=>{if(!t)return;if(/^\s+$/.test(t)){f.appendChild(document.createTextNode(t));return}const w=document.createElement('span');w.className='w';w.innerHTML='<i></i>';w.firstChild.textContent=t;f.appendChild(w)});c.replaceWith(f)}else walk(c)})};
+  walk(p);
+});
+if(!RM){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.remove('pre');e.target.querySelectorAll('.w>i').forEach((w,i)=>w.style.transitionDelay=(i*.01)+'s');io.unobserve(e.target)}}),{rootMargin:'0px 0px -10% 0px'});
+ document.querySelectorAll('.para').forEach(p=>{const r=p.getBoundingClientRect();if(r.top>innerHeight){p.classList.add('pre');io.observe(p)}});}
+// rolling marquee with direction flip
+const roll=document.getElementById('roll');let x=0,dir=1,lastY=scrollY;
+function tick(){if(!RM){x-=0.35*dir;const w=roll.firstElementChild.offsetWidth;if(x<-w)x+=w;if(x>0)x-=w;roll.style.transform=`translateX(${x}px)`}requestAnimationFrame(tick)}
+tick();addEventListener('scroll',()=>{const y=scrollY;dir=y>=lastY?1:-1;lastY=y;updateCards()},{passive:true});
+// magnetic
+if(innerWidth>540)document.querySelectorAll('.magnetic').forEach(m=>{const tx=m.querySelector('.tx');
+ m.addEventListener('mousemove',e=>{const r=m.getBoundingClientRect(),s=+m.dataset.strength,st=+m.dataset.strengthText,dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;m.style.transition='transform 1.5s cubic-bezier(.165,.84,.44,1)';m.style.transform=`translate(${dx*s}px,${dy*s}px)`;tx.style.transition=m.style.transition;tx.style.transform=`translate(${dx*st}px,${dy*st}px)`});
+ m.addEventListener('mouseleave',()=>{m.style.transition='transform 1.5s cubic-bezier(.34,1.8,.64,1)';m.style.transform='';tx.style.transition=m.style.transition;tx.style.transform=''})});
+// time cards follow scroll through the speech
+const cards=[...document.querySelectorAll('.card')].reverse();// 3,2,1,30,STOP
+function updateCards(){const s=document.getElementById('speech').getBoundingClientRect();const p=Math.min(1,Math.max(0,(innerHeight*.5-s.top)/s.height));const n=Math.min(4,Math.floor(p*5));cards.forEach((c,i)=>c.classList.toggle('gone',i<n))}
+updateCards();
+// sound (opt-in, synthesized)
+let ac=null,on=false;const snd=document.getElementById('snd');
+snd.onclick=()=>{on=!on;snd.textContent=on?'Sound on':'Sound off';snd.setAttribute('aria-pressed',on);if(on){ac=ac||new (window.AudioContext||window.webkitAudioContext)();knock(.25)}};
+function knock(v=.5){if(!on||!ac)return;const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(180,t);o.frequency.exponentialRampToValueAtTime(60,t+.12);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+.3);
+ const b=ac.createBuffer(1,ac.sampleRate*.05,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length)**3;const n=ac.createBufferSource(),f=ac.createBiquadFilter(),g2=ac.createGain();f.type='bandpass';f.frequency.value=1800;g2.gain.value=v;n.buffer=b;n.connect(f).connect(g2).connect(ac.destination);n.start(t)}
+document.getElementById('gavel').onclick=()=>{knock();setTimeout(()=>knock(.4),180)};
+// start: real 3:00 countdown through the cards
+document.getElementById('start').onclick=function(){let t=180;const lab=this.querySelector('.tx');clearInterval(this._i);this._i=setInterval(()=>{t--;lab.textContent=Math.floor(t/60)+':'+String(t%60).padStart(2,'0');const n=t>120?0:t>60?1:t>30?2:t>0?3:4;cards.forEach((c,i)=>c.classList.toggle('gone',i<n));if(t<=0){clearInterval(this._i);knock()}},1000)};
+</script>
+</body>
+</html>

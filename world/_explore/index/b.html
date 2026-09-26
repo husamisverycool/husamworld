@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prototype B: a tiny planet</title>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Barlow:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--sea:#65c1bc;--ink:#23262e;--cream:#f2efe2;--yellow:#f0d055}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--sea);font-family:Barlow,Arial,sans-serif;color:var(--ink)}
+canvas{position:fixed;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.title{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;pointer-events:none;transition:opacity .6s,transform .8s cubic-bezier(.5,0,.2,1)}
+.title h1{margin:0;font:400 clamp(64px,13vw,170px)/.86 Bungee,Impact,sans-serif;color:var(--cream);text-align:center;letter-spacing:.02em;
+  text-shadow:0 1px 0 #cfc9b4,0 2px 0 #cfc9b4,0 3px 0 #cfc9b4,0 4px 0 #b9b39c,0 5px 0 #b9b39c,0 6px 0 #a39d86,0 7px 0 var(--ink),2px 0 0 var(--ink),-2px 0 0 var(--ink),0 -2px 0 var(--ink)}
+.title p{margin:0;font:700 18px Barlow;letter-spacing:.2em;text-transform:uppercase;color:#1d4f4c}
+.go{pointer-events:auto;font:400 22px Bungee,Impact,sans-serif;background:var(--yellow);color:#fff;text-shadow:0 2px 0 #b38f1c;border:0;padding:14px 30px 12px;box-shadow:0 6px 0 #c9a22a,0 6px 0 2px var(--ink),0 0 0 2px var(--ink);cursor:pointer;transform:rotate(-1deg)}
+.go:hover{transform:rotate(-1deg) translateY(-2px)}
+html.started .title{opacity:0;transform:scale(1.15)}
+.hud{position:fixed;left:50%;bottom:22px;transform:translate(-50%,150%);transition:transform .5s cubic-bezier(.4,1.6,.65,1);background:var(--cream);border:2px solid var(--ink);box-shadow:0 5px 0 var(--ink);padding:12px 16px;max-width:calc(100vw - 32px);width:440px}
+.hud.show{transform:translate(-50%,0)}
+.hud b{display:block;font:400 22px Bungee}
+.hud span{font:500 16px Barlow}
+.hud small{display:block;margin-top:6px;font:700 13px Barlow;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+.tag{position:fixed;left:16px;top:16px;font:400 18px Bungee;color:var(--cream);text-shadow:0 2px 0 var(--ink)}
+.joy{position:fixed;left:16px;bottom:16px;width:140px;height:140px;border:2px solid #fff;border-radius:50%;opacity:.5;display:none;touch-action:none}
+.joy i{position:absolute;left:45px;top:45px;width:50px;height:50px;border:2px solid #fff;border-radius:50%}
+html.coarse.started .joy{display:block}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div class="title"><h1>Husam<br>Sokar</h1><p>Fresno &rarr; Cambridge, all the way around</p><button class="go" id="go">Start the car</button></div>
+<div class="tag">Prototype B &middot; tiny planet</div>
+<div class="hud" id="hud"><b id="hn"></b><span id="ht"></span><small>Enter to go in</small></div>
+<div class="joy" id="joy"><i id="knob"></i></div>
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+<script>
+var D = [
+ {id:'bill', name:'The Capitol', t:'Ever watched an idea learn to walk?'},
+ {id:'speech', name:'The Chamber', t:'You have the floor. Better use it.'},
+ {id:'translation', name:'The Bridge', t:'Every word has another side.'},
+ {id:'n1', name:'The Polling Station', t:'Everyone has an opinion. Someone has to count.'},
+ {id:'triptik', name:'The Map Room', t:'Every road remembers where it started.'},
+ {id:'os', name:'The Garage', t:'Mind the cables. Something is booting.'},
+ {id:'depths', name:'The Pier', t:'How deep does it go? Hold your breath.'},
+ {id:'weeks', name:'The Plaza', t:'Where does the time go? Here, mostly.'},
+ {id:'everywhere', name:'The Airport', t:'Now boarding: somewhere far.'},
+ {id:'mail', name:'The Mailbox', t:'Say hello. It delivers.'}
+];
+var html = document.documentElement;
+if (matchMedia('(pointer: coarse)').matches) html.classList.add('coarse');
+var R = 26, V3 = THREE.Vector3;
+var renderer = new THREE.WebGLRenderer({canvas: document.getElementById('c'), antialias: !html.classList.contains('coarse')});
+renderer.setPixelRatio(Math.min(devicePixelRatio, html.classList.contains('coarse') ? 1.5 : 2));
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera(38, 1, 0.5, 400);
+
+// ---------- palette atlas (Messenger: one tiny texture for every colour) ----------
+var PAL_DAY = ['#9fcf7a','#7fb766','#4a4c57','#f4efe0','#f2ead3','#e2735a','#b98555','#a9b3b8','#5ea75b','#3f8750','#63c3cf','#f0c94c','#4f8fd0','#e35645','#2b3140','#fff3c2'];
+var PAL_NIGHT = ['#3f6a6a','#335a5c','#262a3b','#8d93a8','#8d8fa6','#8a4f5c','#6b5a5e','#5f6b80','#2f6258','#244d4b','#2b5f86','#c9a650','#3d5f99','#9a3f4a','#161a26','#ffd77a'];
+var palData = new Uint8Array(64), palTex = new THREE.DataTexture(palData, 16, 1, THREE.RGBAFormat);
+palTex.magFilter = palTex.minFilter = THREE.NearestFilter;
+function setPalette(k) { var a = new THREE.Color(), b = new THREE.Color(); for (var i = 0; i < 16; i++) { a.set(PAL_DAY[i]); b.set(PAL_NIGHT[i]); a.lerp(b, k); palData[i*4] = a.r*255; palData[i*4+1] = a.g*255; palData[i*4+2] = a.b*255; palData[i*4+3] = 255; } palTex.needsUpdate = true; }
+var hr = new Date().getHours() + new Date().getMinutes()/60;
+var night = hr < 6 || hr > 20 ? 1 : hr < 7.5 ? (7.5-hr)/1.5 : hr > 18.5 ? (hr-18.5)/1.5 : 0;
+setPalette(night);
+scene.background = new THREE.Color(night > .5 ? '#1f3550' : '#65c1bc');
+
+var U = { uPal: {value: palTex}, uLight: {value: new V3(-0.5, 0.8, 0.6).normalize()}, uShadow: {value: new THREE.Color(night > .5 ? '#2a2350' : '#5b6fb0')}, uNight: {value: night} };
+var toon = new THREE.ShaderMaterial({ uniforms: U,
+  vertexShader: 'attribute float pal; varying float vPal; varying vec3 vN; void main(){ vPal=pal; vN=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }',
+  fragmentShader: 'uniform sampler2D uPal; uniform vec3 uLight; uniform vec3 uShadow; uniform float uNight; varying float vPal; varying vec3 vN; void main(){ vec3 c=texture2D(uPal,vec2((vPal+.5)/16.,.5)).rgb; if(vPal>14.5){gl_FragColor=vec4(c*(1.+uNight*.6),1.);return;} float d=dot(normalize(vN),uLight); float b=smoothstep(-.02,.06,d); float b2=smoothstep(.55,.62,d); vec3 sh=mix(c,c*uShadow*1.4,.55); vec3 col=mix(sh,c,b)+c*b2*.08; gl_FragColor=vec4(col,1.); }' });
+var outlineMat = new THREE.ShaderMaterial({ side: THREE.BackSide,
+  vertexShader: 'attribute vec3 onormal; void main(){ vec4 mv=modelViewMatrix*vec4(position,1.); vec3 n=normalize(normalMatrix*onormal); float w=.035*(-mv.z)/18.; mv.xyz+=n*min(w,.12); gl_Position=projectionMatrix*mv; }',
+  fragmentShader: 'void main(){ gl_FragColor=vec4(.14,.15,.19,1.); }' });
+
+// ---------- geometry builder: parts in a local tangent frame, merged into one mesh ----------
+function withPal(g, p) { g = g.index ? g.toNonIndexed() : g; var n = g.attributes.position.count, a = new Float32Array(n).fill(p); g.setAttribute('pal', new THREE.BufferAttribute(a, 1)); if (g.attributes.uv) g.deleteAttribute('uv'); return g; }
+function smoothOutlineNormals(g) { var p = g.attributes.position, n = g.attributes.normal, map = {}, o = new Float32Array(p.count*3); for (var i = 0; i < p.count; i++) { var k = p.getX(i).toFixed(3)+','+p.getY(i).toFixed(3)+','+p.getZ(i).toFixed(3); (map[k] = map[k] || new V3()).add(new V3(n.getX(i), n.getY(i), n.getZ(i))); } for (i = 0; i < p.count; i++) { var k2 = p.getX(i).toFixed(3)+','+p.getY(i).toFixed(3)+','+p.getZ(i).toFixed(3), v = map[k2].clone().normalize(); o[i*3] = v.x; o[i*3+1] = v.y; o[i*3+2] = v.z; } g.setAttribute('onormal', new THREE.BufferAttribute(o, 3)); return g; }
+var parts = [];
+function frameAt(n, fwd) { n = n.clone().normalize(); var f = fwd ? fwd.clone().sub(n.clone().multiplyScalar(fwd.dot(n))).normalize() : null; if (!f || f.lengthSq() < .5) { var e = new V3(0,1,0).cross(n); if (e.lengthSq() < 1e-4) e.set(1,0,0); f = n.clone().cross(e.normalize()).normalize(); } var r = f.clone().cross(n).normalize(); return new THREE.Matrix4().makeBasis(r, n, f.clone().negate()).setPosition(n.clone().multiplyScalar(R)); }
+function add(frame, geo, p, x, y, z, sx, sy, sz, ry) { var g = withPal(geo.clone(), p); var m = new THREE.Matrix4().compose(new V3(x, y, z), new THREE.Quaternion().setFromAxisAngle(new V3(0,1,0), ry || 0), new V3(sx, sy, sz)); g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(frame, m)); smoothOutlineNormals(g); parts.push(g); return g; }
+var BOX = new THREE.BoxGeometry(1,1,1).translate(0,.5,0), CYL = new THREE.CylinderGeometry(.5,.5,1,12).translate(0,.5,0), CONE = new THREE.ConeGeometry(.5,1,8).translate(0,.5,0), SPH = new THREE.IcosahedronGeometry(.5,1).translate(0,.5,0), DOME = new THREE.SphereGeometry(.5,14,8,0,Math.PI*2,0,Math.PI/2);
+
+// ---------- the planet and the road (a spiral from the Fresno pole to the Cambridge pole) ----------
+var planetG = withPal(new THREE.IcosahedronGeometry(R, 5), 0); smoothOutlineNormals(planetG);
+(function () { var p = planetG.attributes.position, a = planetG.attributes.pal; for (var i = 0; i < p.count; i += 3) { var h = Math.sin(p.getX(i)*.31)*Math.cos(p.getZ(i)*.27)+Math.sin(p.getY(i)*.4); if (h > .9) for (var j = 0; j < 3; j++) a.setX(i+j, 1); } })();
+parts.push(planetG);
+function roadPoint(t) { var lat = (-72 + 144*t) * Math.PI/180, lon = t * 2.25 * Math.PI*2; return new V3(Math.cos(lat)*Math.cos(lon), Math.sin(lat), Math.cos(lat)*Math.sin(lon)); }
+var ROAD = []; for (var i = 0; i <= 900; i++) ROAD.push(roadPoint(i/900));
+function ribbon(w, lift, p, dash) { var pos = []; for (var i = 0; i < ROAD.length-1; i++) { if (dash && (i % 6) > 2) continue; var a = ROAD[i], b = ROAD[i+1], f = b.clone().sub(a).normalize(), s = f.clone().cross(a).normalize().multiplyScalar(w/2), s2 = f.clone().cross(b).normalize().multiplyScalar(w/2); var A = a.clone().multiplyScalar(R+lift), B = b.clone().multiplyScalar(R+lift); var q = [A.clone().add(s), A.clone().sub(s), B.clone().add(s2), B.clone().sub(s2)]; pos.push(q[0],q[1],q[2], q[1],q[3],q[2]); } var g = new THREE.BufferGeometry().setFromPoints(pos); g.computeVertexNormals(); var n = g.attributes.normal; for (var k = 0; k < n.count; k++) { var v = new V3(g.attributes.position.getX(k), g.attributes.position.getY(k), g.attributes.position.getZ(k)).normalize(); n.setXYZ(k, v.x, v.y, v.z); } g.setAttribute('pal', new THREE.BufferAttribute(new Float32Array(g.attributes.position.count).fill(p), 1)); return g; }
+var roadG = ribbon(3.4, .04, 2), dashG = ribbon(.22, .07, 3, true);
+
+// ---------- landmarks: each one its own silhouette, placed beside the road ----------
+var statics = [], areas = [];
+function roadTan(t) { return roadPoint(Math.min(1, t + .002)).sub(roadPoint(Math.max(0, t - .002))).normalize(); }
+function site(t, side, dist) { var n = roadPoint(t), f = roadTan(t), s = f.clone().cross(n).normalize().multiplyScalar(side*dist/R); return {n: n.clone().add(s).normalize(), f: f}; }
+var BUILD = {
+ bill: function (F) { add(F,BOX,4,0,0,0,7,1.2,5); for (var i=-2;i<=2;i++) add(F,CYL,3,i*1.3,1.2,1.8,.5,2.6,.5); add(F,BOX,4,0,3.8,0,6.4,.6,4.4); add(F,CYL,4,0,4.4,0,3.2,1.2,3.2); add(F,DOME,12,0,5.6,0,3.4,3.4,3.4); add(F,CYL,3,0,7.2,0,.3,1.4,.3); },
+ speech: function (F) { add(F,BOX,6,0,0,0,2.2,3.2,1.6,.2); add(F,BOX,6,0,3.1,-.2,2.8,.3,2.1,.2); add(F,CYL,6,2.6,0,1.2,.9,1.6,.9); add(F,BOX,6,1.6,2.2,1.8,1.8,.6,.6,.7); add(F,CYL,6,1.4,2.1,1.2,.25,1.6,.25); },
+ translation: function (F) { add(F,BOX,7,-5,0,0,1,4,3); add(F,BOX,7,5,0,0,1,4,3); add(F,BOX,7,0,4,0,11,.6,3); add(F,BOX,12,0,5.4,1.6,6,1.8,.3); for (var i=-4;i<=4;i+=2) add(F,CYL,3,i,4.6,1.4,.12,1.2,.12); },
+ n1: function (F) { add(F,BOX,4,0,0,0,5,3,4); add(F,BOX,5,0,3,0,5.6,.6,4.6); add(F,BOX,12,0,1.2,2.05,1.6,1.3,.1); for (var i=0;i<5;i++) add(F,BOX,i%2?11:13,-3.8,0,-1.5+i*.8,.6,1+i*.7,.6); },
+ triptik: function (F) { add(F,BOX,4,0,0,0,4,2.6,3); add(F,BOX,5,0,2.6,0,5,.4,3.8); add(F,BOX,13,3.4,0,0,.8,2.6,.8); add(F,SPH,11,3.4,2.6,0,1,1,1); add(F,BOX,3,-3.6,0,1,2.4,3.4,.2); add(F,BOX,12,-3.6,1.4,1.12,2,1.6,.05); },
+ os: function (F) { add(F,BOX,7,0,0,0,6,3.6,5); add(F,BOX,6,0,3.6,0,6.6,.5,5.6); add(F,BOX,14,0,.1,2.52,4,2.8,.1); add(F,BOX,15,0,1.4,2.2,1.2,.9,.4); add(F,CYL,7,3.6,0,-1.5,.8,1.4,.8); },
+ depths: function (F) { add(F,CYL,10,0,-.8,0,12,1,12); for (var i=0;i<4;i++) { add(F,CYL,6,-1.2,0,i*2-3,.4,1.2,.4); add(F,CYL,6,1.2,0,i*2-3,.4,1.2,.4); } add(F,BOX,6,0,1.2,0,3,.3,9); add(F,BOX,3,0,1.5,4.8,.8,.12,2.4); },
+ weeks: function (F) { for (var x=-3;x<=3;x++) for (var z=-3;z<=3;z++) add(F,BOX,(x*7+z*3+50)%4===0?15:(x+z)%2?4:3,x*1.1,0,z*1.1,1,.18,1); },
+ everywhere: function (F) { add(F,BOX,4,0,0,0,8,2.4,4); add(F,BOX,14,0,.6,2.02,7,1.2,.05); add(F,CYL,7,4.8,0,-1,1.2,6.5,1.2); add(F,CYL,14,4.8,6.5,-1,2.2,1.2,2.2); add(F,SPH,12,-3,2.4,-.5,3,3,3); },
+ mail: function (F) { add(F,CYL,6,0,0,0,.25,1.4,.25); add(F,BOX,12,0,1.4,0,.9,.8,1.4); add(F,CYL,12,0,2.2,0,.9,.15,1.4); add(F,BOX,13,.5,1.8,.4,.1,.6,.1); }
+};
+D.forEach(function (d, i) {
+  var t = .08 + i * .092, s = site(t, i % 2 ? 1 : -1, d.id === 'depths' ? 9.5 : 7.5);
+  d.site = s; var F = frameAt(s.n, s.f.clone().multiplyScalar(i % 2 ? -1 : 1).cross(s.n)); BUILD[d.id](F);
+  statics.push({n: s.n, r: d.id === 'weeks' || d.id === 'depths' ? 0 : d.id === 'mail' ? 1 : 3.4});
+  var pad = site(t, i % 2 ? 1 : -1, 3.2); d.pad = pad.n;
+});
+// trees and houses scattered away from the road
+(function () { var seed = 7; function rnd() { seed = (seed*16807) % 2147483647; return seed/2147483647; } for (var k = 0; k < 170; k++) { var n = new V3(rnd()*2-1, rnd()*2-1, rnd()*2-1).normalize(), ok = true; for (var j = 0; j < ROAD.length; j += 6) if (ROAD[j].angleTo(n)*R < 3.6) { ok = false; break; } D.forEach(function (d) { if (d.site.n.angleTo(n)*R < 7) ok = false; }); if (!ok) continue; var F = frameAt(n); var h = 1.6 + rnd()*1.6; if (rnd() < .8) { add(F,CYL,6,0,0,0,.35,h*.5,.35); add(F,SPH,rnd()<.5?8:9,0,h*.4,0,h*.9,h*1.1,h*.9); statics.push({n:n, r:.5}); } else { add(F,BOX,4,0,0,0,2,1.8,2,rnd()*3); add(F,CONE,5,0,1.8,0,2.9,1.2,2.9,rnd()*3+.785); statics.push({n:n, r:1.3}); } } })();
+parts.push(roadG, dashG); smoothOutlineNormals(roadG); smoothOutlineNormals(dashG);
+var world = new THREE.Mesh(THREE.BufferGeometryUtils ? THREE.BufferGeometryUtils.mergeBufferGeometries(parts) : merge(parts), toon);
+function merge(list) { var pos = [], nor = [], pal = [], on = []; list.forEach(function (g) { pos.push(g.attributes.position.array); nor.push(g.attributes.normal.array); pal.push(g.attributes.pal.array); on.push(g.attributes.onormal.array); }); function cat(a) { var n = 0; a.forEach(function (x) { n += x.length; }); var o = new Float32Array(n), k = 0; a.forEach(function (x) { o.set(x, k); k += x.length; }); return o; } var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(cat(pos), 3)); g.setAttribute('normal', new THREE.BufferAttribute(cat(nor), 3)); g.setAttribute('pal', new THREE.BufferAttribute(cat(pal), 1)); g.setAttribute('onormal', new THREE.BufferAttribute(cat(on), 3)); return g; }
+scene.add(world); var worldOutline = new THREE.Mesh(world.geometry, outlineMat); scene.add(worldOutline);
+
+// ---------- diamond tags (Bruno 2025) that stand upright on the curve (Messenger) ----------
+function tagTex(text) { var c = document.createElement('canvas'), x = c.getContext('2d'); x.font = '400 44px Bungee, Impact, sans-serif'; var w = Math.ceil(x.measureText(text).width) + 110; c.width = w; c.height = 72; x.fillStyle = '#23262e'; x.fillRect(58, 8, w - 58, 56); x.fillStyle = '#f2efe2'; x.font = '400 44px Bungee, Impact, sans-serif'; x.textBaseline = 'middle'; x.fillText(text, 78, 38); x.save(); x.translate(36, 36); x.rotate(Math.PI/4); x.fillStyle = '#23262e'; x.fillRect(-22,-22,44,44); x.strokeStyle = '#f2efe2'; x.lineWidth = 5; x.strokeRect(-14,-14,28,28); x.restore(); var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return {t: t, a: w/72}; }
+D.forEach(function (d) { var tt = tagTex(d.name.replace('The ','').toUpperCase()); var m = new THREE.Mesh(new THREE.PlaneGeometry(tt.a*1.1, 1.1).translate(tt.a*.55 - .55, 0, 0), new THREE.MeshBasicMaterial({map: tt.t, transparent: true, depthTest: false})); m.renderOrder = 5; m.position.copy(d.site.n.clone().multiplyScalar(R + (d.id === 'mail' ? 4 : 10))); scene.add(m); d.tag = m; });
+
+// ---------- physics: radial gravity; the name letters are bricks you knock over ----------
+var pw = new CANNON.World(); pw.gravity.set(0,0,0); pw.allowSleep = true; pw.defaultContactMaterial.friction = .3; pw.defaultContactMaterial.restitution = .2;
+var planetBody = new CANNON.Body({mass: 0, shape: new CANNON.Sphere(R)}); pw.addBody(planetBody);
+var carBody = new CANNON.Body({mass: 0, type: CANNON.Body.KINEMATIC, shape: new CANNON.Box(new CANNON.Vec3(1, .55, .6))}); pw.addBody(carBody);
+var GLYPH = {H:['1...1','1...1','11111','1...1','1...1'],U:['1...1','1...1','1...1','1...1','.111.'],S:['.1111','1....','.111.','....1','1111.'],A:['.111.','1...1','11111','1...1','1...1'],M:['1...1','11.11','1.1.1','1...1','1...1'],O:['.111.','1...1','1...1','1...1','.111.'],K:['1..1.','1.1..','11...','1.1..','1..1.'],R:['1111.','1...1','1111.','1.1..','1..11']};
+var dyn = [];
+function letter(ch, n, f, off) { var g = []; GLYPH[ch].forEach(function (row, y) { for (var x = 0; x < 5; x++) if (row[x] === '1') { var b = withPal(BOX.clone(), 3); b.applyMatrix4(new THREE.Matrix4().makeTranslation((x-2)*.36, (4-y)*.36-.2, 0).multiply(new THREE.Matrix4().makeScale(.36,.36,.5))); smoothOutlineNormals(b); g.push(b); } }); var geo = merge(g); geo.translate(0, -.72, 0); var mesh = new THREE.Mesh(geo, toon), ol = new THREE.Mesh(geo, outlineMat); mesh.add(ol); scene.add(mesh);
+  var F = frameAt(n, f), p = new V3(), q = new THREE.Quaternion(), s = new V3(); F.decompose(p, q, s); var up = n.clone(); p.add(up.multiplyScalar(1.2 + off));
+  var body = new CANNON.Body({mass: 1.2, shape: new CANNON.Box(new CANNON.Vec3(.9, .9, .25)), position: new CANNON.Vec3(p.x, p.y, p.z), quaternion: new CANNON.Quaternion(q.x, q.y, q.z, q.w)}); body.sleepSpeedLimit = .3; pw.addBody(body); dyn.push({m: mesh, b: body}); }
+(function () { var n0 = roadPoint(.012), f0 = roadTan(.012), side = f0.clone().cross(n0).normalize(); 'HUSAM SOKAR'.split('').forEach(function (ch, i) { if (ch === ' ') return; var row = i < 5 ? 0 : 1, col = row ? i - 6 : i; var n = n0.clone().add(side.clone().multiplyScalar((row ? -7.5 : 7.5)/R)).add(f0.clone().multiplyScalar((col - 2)*2.1/R)).normalize(); letter(ch, n, side.clone().multiplyScalar(row ? -1 : 1), 6 + i*.9); }); })();
+pw.addEventListener('preStep', function () { for (var i = 0; i < dyn.length; i++) { var b = dyn[i].b; if (b.sleepState === 2) continue; var p = b.position, l = Math.sqrt(p.x*p.x+p.y*p.y+p.z*p.z), g = 16*b.mass/l; b.force.x -= p.x*g; b.force.y -= p.y*g; b.force.z -= p.z*g; } });
+
+// ---------- the car: kinematic on the sphere (Messenger's maths), bumps things through cannon ----------
+var car = {n: roadPoint(.02), f: roadTan(.02), v: 0, steer: 0, hop: 0, hv: 0, tilt: 0, lean: 0};
+var carMesh = new THREE.Group(); (function () { var g = []; function b(geo, p, x, y, z, sx, sy, sz) { var q = withPal(geo.clone(), p); q.applyMatrix4(new THREE.Matrix4().compose(new V3(x,y,z), new THREE.Quaternion(), new V3(sx,sy,sz))); smoothOutlineNormals(q); g.push(q); } b(BOX,13,0,.35,0,1.3,.7,2.3); b(BOX,13,0,1.05,-.2,1.2,.55,1.2); b(BOX,14,0,1.1,.42,1.1,.4,.05); b(BOX,15,-.42,.6,1.16,.25,.18,.05); b(BOX,15,.42,.6,1.16,.25,.18,.05); [[-.68,.8],[.68,.8],[-.68,-.75],[.68,-.75]].forEach(function (w) { var c = withPal(new THREE.CylinderGeometry(.34,.34,.3,12).rotateZ(Math.PI/2), 2); c.translate(w[0], .34, w[1]); smoothOutlineNormals(c); g.push(c); }); var geo = merge(g); carMesh.add(new THREE.Mesh(geo, toon), new THREE.Mesh(geo, outlineMat)); })();
+scene.add(carMesh);
+(function(){ var p0 = car.n.clone().multiplyScalar(R + .6); carBody.position.set(p0.x, p0.y, p0.z); })();
+var keys = {}, joy = {x: 0, y: 0, on: false};
+addEventListener('keydown', function (e) { keys[e.code] = true; if (e.code === 'Enter' && started && near) go(near); if (e.code === 'Enter' && !started) start(); if (e.code === 'Space' && car.hop === 0) car.hv = 6; });
+addEventListener('keyup', function (e) { keys[e.code] = false; });
+var joyEl = document.getElementById('joy'), knob = document.getElementById('knob');
+joyEl.addEventListener('touchstart', jm, {passive: false}); joyEl.addEventListener('touchmove', jm, {passive: false});
+joyEl.addEventListener('touchend', function () { joy.on = false; knob.style.transform = ''; });
+function jm(e) { e.preventDefault(); var r = joyEl.getBoundingClientRect(), t = e.touches[0], x = (t.clientX - r.left - 70)/55, y = (t.clientY - r.top - 70)/55, l = Math.hypot(x, y); if (l > 1) { x /= l; y /= l; } joy.x = x; joy.y = y; joy.on = true; knob.style.transform = 'translate(' + x*45 + 'px,' + y*45 + 'px)'; }
+var _q = new THREE.Quaternion();
+function driveCar(dt) {
+  var up = keys.KeyW || keys.ArrowUp, dn = keys.KeyS || keys.ArrowDown, lt = keys.KeyA || keys.ArrowLeft, rt = keys.KeyD || keys.ArrowRight, boost = keys.ShiftLeft || keys.ShiftRight;
+  var steerIn = (lt ? 1 : 0) - (rt ? 1 : 0), thr = (up ? 1 : 0) - (dn ? 1 : 0);
+  if (joy.on) { // the joystick sets a heading on screen (Bruno 2019), converted to the tangent plane
+    var cr = new V3().setFromMatrixColumn(camera.matrixWorld, 0), cu = new V3().setFromMatrixColumn(camera.matrixWorld, 1); var want = cr.multiplyScalar(joy.x).add(cu.multiplyScalar(-joy.y)); want.sub(car.n.clone().multiplyScalar(want.dot(car.n))); var mag = Math.min(1, Math.hypot(joy.x, joy.y)); if (want.lengthSq() > 1e-4 && mag > .15) { want.normalize(); var ang = Math.atan2(car.f.clone().cross(want).dot(car.n), car.f.dot(want)); steerIn = Math.max(-1, Math.min(1, ang*2)); thr = mag; } }
+  var max = boost ? 17 : 10.5; car.v += thr * (thr * car.v < 0 ? 26 : 13) * dt; if (!thr) car.v *= Math.pow(.25, dt); car.v = Math.max(-5, Math.min(max, car.v));
+  car.steer += (steerIn - car.steer) * Math.min(1, dt*8); var turn = car.steer * 2.1 * Math.min(1, Math.abs(car.v)/4) * Math.sign(car.v || 1);
+  _q.setFromAxisAngle(car.n, turn*dt); car.f.applyQuaternion(_q);
+  var old = car.n.clone(), axis = car.n.clone().cross(car.f).normalize(); _q.setFromAxisAngle(axis, -car.v*dt/R); car.n.applyQuaternion(_q).normalize(); car.f.applyQuaternion(_q); car.f.sub(car.n.clone().multiplyScalar(car.f.dot(car.n))).normalize();
+  statics.forEach(function (s) { if (!s.r) return; var d = car.n.angleTo(s.n)*R, min = s.r + 1.1; if (d < min) { var away = car.n.clone().sub(s.n.clone().multiplyScalar(car.n.dot(s.n))).normalize(); car.n.add(away.multiplyScalar((min - d)/R)).normalize(); car.v *= .6; } });
+  car.hv -= 18*dt; car.hop = Math.max(0, car.hop + car.hv*dt); if (car.hop === 0) car.hv = Math.max(0, car.hv);
+  car.tilt += ((thr ? -thr*.05 : 0) - car.tilt) * Math.min(1, dt*6); car.lean += (-car.steer*Math.min(1, Math.abs(car.v)/8)*.12 - car.lean) * Math.min(1, dt*6);
+  var F = frameAt(car.n, car.f); var p = new V3(), q = new THREE.Quaternion(), s = new V3(); F.decompose(p, q, s); p.add(car.n.clone().multiplyScalar(car.hop)); carMesh.position.copy(p); carMesh.quaternion.copy(q); carMesh.rotateX(car.tilt); carMesh.rotateZ(car.lean); carMesh.rotateY(Math.PI);
+  var cp = p.clone().add(car.n.clone().multiplyScalar(.6)); carBody.velocity.set((cp.x - carBody.position.x)/dt, (cp.y - carBody.position.y)/dt, (cp.z - carBody.position.z)/dt); carBody.quaternion.set(q.x, q.y, q.z, q.w);
+}
+// ---------- camera: follows and keeps the surface under it (Messenger), long-lens distance by aspect (Bruno 2025) ----------
+var cam = {up: roadPoint(.02), f: roadTan(.02), zoom: 0};
+addEventListener('wheel', function (e) { cam.zoom = Math.max(0, Math.min(1, cam.zoom + e.deltaY*.001)); });
+function updateCamera(dt, t) {
+  if (!started) { var a = t*.00008; camera.position.set(Math.sin(a)*95, 22, Math.cos(a)*95); camera.up.set(0,1,0); camera.lookAt(0, 0, 0); return; }
+  var k = Math.min(1, dt*3); cam.up.lerp(car.n, k).normalize(); cam.f.lerp(car.f, Math.min(1, dt*1.6)); cam.f.sub(cam.up.clone().multiplyScalar(cam.f.dot(cam.up))).normalize();
+  var asp = Math.max(1, 1.2/camera.aspect), speed = Math.abs(car.v)/17, d = (15 + speed*5) * asp * (1 + cam.zoom*3.5), h = (12 + speed*3) * asp * (1 + cam.zoom*3.8);
+  var target = carMesh.position.clone(); var pos = target.clone().add(cam.up.clone().multiplyScalar(h)).sub(cam.f.clone().multiplyScalar(d));
+  var e = Math.min(1, dt*(intro < 1 ? 2 : 6)); camera.position.lerp(pos, e); camera.up.copy(cam.up); camera.lookAt(target.clone().add(cam.f.clone().multiplyScalar(4)));
+}
+// ---------- start: title planet, then the camera dives to the Fresno pole ----------
+var started = false, intro = 0, near = null, hud = document.getElementById('hud');
+function start() { if (started) return; started = true; html.classList.add('started'); dyn.forEach(function (d) { d.b.wakeUp(); }); }
+document.getElementById('go').addEventListener('click', start);
+function go(d) { if (d.id === 'mail') { hud.querySelector('small').textContent = 'The letter opens here in the build'; return; } location.href = '../../' + d.id + '.html'; }
+function resize() { renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+var last = performance.now();
+function frame(t) {
+  var dt = Math.min(.05, (t - last)/1000); last = t;
+  if (started) { intro = Math.min(1, intro + dt*.5); driveCar(dt); pw.step(1/60, dt, 3); }
+  dyn.forEach(function (d) { d.m.position.copy(d.b.position); d.m.quaternion.copy(d.b.quaternion); });
+  updateCamera(dt, t);
+  U.uLight.value.copy(new V3(-.45, .75, .55).normalize().applyQuaternion(camera.quaternion)).normalize();
+  var best = null, bd = 1e9; D.forEach(function (d) { var dd = car.n.angleTo(d.pad)*R; if (dd < bd) { bd = dd; best = d; } d.tag.quaternion.copy(camera.quaternion); var show = car.n.angleTo(d.site.n)*R < 22 || !started; d.tag.visible = show; });
+  var n2 = started && bd < 4 ? best : null; if (n2 !== near) { near = n2; if (near) { document.getElementById('hn').textContent = near.name; document.getElementById('ht').textContent = near.t; } hud.classList.toggle('show', !!near); }
+  renderer.render(scene, camera); requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

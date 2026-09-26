@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prototype B: Research article</title>
+<link href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400;0,500;1,400&family=Libre+Franklin:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--t:rgba(0,0,0,.8);--m:rgba(0,0,0,.55);--r:rgba(0,0,0,.1);--link:#004276;--acc:#e8590c}
+*{box-sizing:border-box}html{font:16px/1.6 "Libre Franklin",sans-serif}body{margin:0;background:#fff;color:var(--t)}
+.g{display:grid;grid-template-columns:[screen-start] 8px [page-start text-start] 1fr [text-end page-end gutter-start gutter-end] 8px [screen-end];column-gap:8px}
+@media(min-width:1000px){.g{grid-template-columns:[screen-start] 1fr [page-start] 50px 50px [text-start] repeat(8,50px) [text-end gutter-start] 50px 50px [page-end gutter-end] 1fr [screen-end];column-gap:16px}}
+.g>*{grid-column:text}.page{grid-column:page}.gut{grid-column:gutter}
+header.mast{border-bottom:1px solid var(--r);padding:14px 0;font:600 13px "Libre Franklin";letter-spacing:.02em}
+h1{font:400 50px/1.1 Gelasio,Georgia,serif;margin:64px 0 12px;color:rgba(0,0,0,.85)}
+.lede{font:400 20px/1.5 Gelasio,serif;color:var(--m);margin:0 0 28px}
+.byline{border-top:1px solid var(--r);border-bottom:1px solid var(--r);display:grid;grid-template-columns:repeat(3,1fr);font-size:13px;padding:14px 0;margin-bottom:40px}
+.byline h3{font:600 10px "Libre Franklin";letter-spacing:.1em;text-transform:uppercase;color:var(--m);margin:0 0 4px}
+p{font:400 19px/1.65 Gelasio,Georgia,serif;margin:0 0 1em}
+h2{font:500 26px/1.25 Gelasio,serif;margin:40px 0 12px;border-bottom:1px solid var(--r);padding-bottom:10px}
+figure{margin:24px 0 40px}figcaption{font-size:13px;line-height:1.5;color:var(--m);margin-top:10px}figcaption b{color:#000;font-weight:600}
+.cite{color:var(--link);font:500 15px "Libre Franklin"}
+svg{width:100%;height:auto;display:block}
+svg text{font:500 13px "Libre Franklin",sans-serif;fill:rgba(0,0,0,.75)}
+.edge{stroke:#c9ced6;stroke-width:2;fill:none;transition:stroke .2s,opacity .2s}
+.node rect{fill:#f3f5f8;stroke:#c9ced6}
+.hl .edge{opacity:.15}.hl .edge.on{opacity:1;stroke:var(--acc)}
+.slider{display:flex;gap:16px;align-items:center;font:600 12px "Libre Franklin"}
+input[type=range]{accent-color:var(--acc);width:200px}
+.waffle{display:grid;grid-template-columns:repeat(30,1fr);gap:3px}.waffle i{aspect-ratio:1;background:#e6e9ee;border-radius:2px}.waffle i.s{background:var(--acc)}
+.appx{background:#f7f7f7;border-top:1px solid var(--r);padding:30px 0 80px;margin-top:60px}
+.appx h3{font:600 15px "Libre Franklin";margin:0 0 6px}.appx p{font:400 14px/1.6 "Libre Franklin"}
+.note{font-size:12px;color:var(--m);line-height:1.5;padding-top:6px}
+</style></head><body>
+<header class="mast g"><div class="page">The Polling Station</div></header>
+<article class="g">
+<h1>Four Years Inside Other People’s Questions</h1>
+<p class="lede">A research record, 2022–2026, told with the only numbers it actually has.</p>
+<div class="byline"><div><h3>Author</h3>Husam Sokar</div><div><h3>Affiliation</h3>Institute of Politics</div><div><h3>Published</h3>Sept. 2026</div></div>
+<p>The work started with econometrics, far from home: Chapman University in the summer of 2022, then the University of Nevada, Reno, under Prof. Mark Pingle, then the University of Houston.</p>
+<figure class="page"><svg id="bip" viewBox="0 0 980 300"></svg>
+<figcaption><b>Figure 1.</b> Who the consulting work was for. Hover a team to trace its clients. The UN is the only client both teams share.</figcaption></figure>
+<h2>Selection</h2>
+<p>Ballotpedia took 12 Research Fellows from more than 90 applicants in early 2024.</p>
+<figure class="page"><div class="slider">Your guess: <input type="range" id="gs" min="1" max="90" value="30"><span id="gl">30</span> of 90</div><div class="waffle" id="wf" style="margin-top:12px"></div>
+<figcaption><b>Figure 2.</b> Ninety squares, one per applicant (the fact sheet says “90+”, so this is the smallest the pool could be). Move the slider, then <button id="rv">reveal</button>.</figcaption></figure>
+<p>At Harvard: an analyst on the Harvard Youth Poll, America’s largest poll of 18–29-year-olds; associate to Ambassador Katherine Tai, the 19th U.S. Trade Representative.</p>
+</article>
+<section class="appx g"><div><h3>Methods</h3><p>Every count on this page comes from his fact sheet. Nothing is estimated.</p></div></section>
+<script>
+const NS='http://www.w3.org/2000/svg',s=document.getElementById('bip');const el=(n,a,p=s)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e};
+const T=[['Institute of Politics',['Red Cross','United Nations']],['Harvard Global Research and Consulting Group',['UNICEF','Urban Institute','WHO','United Nations']]];
+const C=['Red Cross','United Nations','UNICEF','Urban Institute','WHO'];
+const ty=i=>90+i*120,cy=i=>30+i*60;const E=[];
+T.forEach(([t,cs],i)=>cs.forEach(c=>{const j=C.indexOf(c);E.push([i,el('path',{class:'edge',d:`M330,${ty(i)} C520,${ty(i)} 520,${cy(j)} 690,${cy(j)}`})])}));
+T.forEach(([t],i)=>{const g=el('g',{class:'node',tabindex:0});el('rect',{x:10,y:ty(i)-22,width:320,height:44,rx:3},g);el('text',{x:24,y:ty(i)+5},g).textContent=t;
+ const on=()=>{s.classList.add('hl');E.forEach(([k,p])=>p.classList.toggle('on',k==i))},off=()=>s.classList.remove('hl');g.onmouseenter=on;g.onfocus=on;g.onmouseleave=off;g.onblur=off});
+C.forEach((c,j)=>{const g=el('g',{class:'node'});el('rect',{x:690,y:cy(j)-18,width:260,height:36,rx:3},g);el('text',{x:704,y:cy(j)+5},g).textContent=c});
+const wf=document.getElementById('wf');for(let i=0;i<90;i++)wf.appendChild(document.createElement('i'));
+const gs=document.getElementById('gs');const paint=n=>[...wf.children].forEach((c,i)=>c.className=i<n?'s':'');gs.oninput=()=>{document.getElementById('gl').textContent=gs.value;paint(+gs.value)};paint(30);
+document.getElementById('rv').onclick=()=>{gs.value=12;gs.oninput()};
+</script></body></html>

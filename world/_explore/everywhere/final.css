@@ -1,0 +1,197 @@
+:root{
+  --bg:#000;
+  --fg:rgb(190,190,190);
+  --hi:rgb(250,250,250);
+  --mid:rgb(120,120,120);
+  --dim:rgb(90,90,90);
+  --rule:rgb(60,60,60);
+  /* Frankfurt Airport, 1972: blue for air traffic, green for services, white for the rest */
+  --fra-blue:#1b3f8f;
+  --fra-green:#136b45;
+  --fra-white:#ecece6;
+  --fs:16px;
+  --lh:19px;
+  --font:"Fira Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  color-scheme:dark;
+}
+@media (max-width:899px){:root{--fs:15px;--lh:18px}}
+@media (max-width:479px){:root{--fs:13.5px;--lh:17px}}
+*{box-sizing:border-box}
+html{background:#000}
+body{margin:0;background:#000;color:var(--fg);font:400 var(--fs)/var(--lh) var(--font);-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;font-variant-ligatures:none}
+p,ul,ol,h1,h2,h3,figure{margin:0;padding:0}
+ul,ol{list-style:none}
+h1,h2,h3{font:inherit}
+a{color:var(--hi);text-decoration:none}
+a:hover{background:var(--hi);color:#000}
+button{font:inherit;color:inherit}
+:focus-visible{outline:1px solid var(--hi);outline-offset:2px}
+::selection{background:var(--hi);color:#000}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.skiplink{position:absolute;left:-9999px;top:0;z-index:50;background:#000;color:var(--hi);padding:0 1ch;border:1px solid var(--hi)}
+.skiplink:focus{left:2ch;top:var(--lh)}
+.hi{color:var(--hi)}
+.mid{color:var(--mid)}
+.txtbtn{background:none;border:0;padding:0;margin:0;cursor:pointer;color:var(--hi)}
+.txtbtn:hover{background:var(--hi);color:#000}
+
+/* ---- the Gysin column grid ------------------------------------------ */
+.cols{display:grid;grid-template-columns:18ch 36ch 18ch 18ch 18ch 18ch;column-gap:2ch;padding:0 2ch}
+.cols>div{position:relative;min-width:0}
+.cols>div::before{content:"";position:absolute;left:calc(-1ch - .5px);top:0;bottom:0;border-left:1px solid var(--fg)}
+@media (max-width:1359px){.cols{grid-template-columns:18ch 36ch 18ch 18ch}}
+@media (max-width:1359px) and (min-width:900px){.hcols>.wide-only{display:none}}
+@media (max-width:899px){
+  .cols{grid-template-columns:1fr 1fr;column-gap:2ch;row-gap:var(--lh);padding:var(--lh) 2ch 0}
+  .cols>div::before{left:0;right:0;top:calc(var(--lh) * -.5);bottom:auto;border-left:0;border-top:1px solid var(--fg)}
+  .cols>.w2{grid-column:span 2}
+  .cols>.wide-only{display:none}
+  .hero .gap{margin-top:0}
+}
+
+/* ---- the hall: word field + globe --------------------------------------- */
+.hero{position:relative;min-height:100vh;min-height:100svh;isolation:isolate}
+#field{position:absolute;left:0;top:0;width:100%;height:100%;z-index:0;display:block}
+#globe{position:absolute;left:0;top:0;width:100%;height:100%;display:block;z-index:1;touch-action:pan-y;outline:none;-webkit-tap-highlight-color:transparent}
+#globe:focus-visible{outline:1px solid var(--hi);outline-offset:-4px}
+.hero .cols{position:relative;z-index:2;pointer-events:none}
+.hero .cols>div{pointer-events:auto}
+.hero h1{color:var(--hi)}
+.hero .gap{margin-top:var(--lh)}
+.codes li{white-space:nowrap}
+.codes button{background:none;border:0;padding:0;margin:0;cursor:pointer;color:var(--fg);text-align:left}
+.codes button b{font-weight:400;color:var(--hi)}
+.codes button:hover,.codes button[aria-pressed="true"]{background:var(--hi);color:#000}
+.codes button:hover b,.codes button[aria-pressed="true"] b{color:#000}
+.hint{position:absolute;z-index:2;right:2ch;bottom:calc(var(--lh) * 1.5);max-width:44ch;text-align:right;color:var(--mid);background:#000}
+.hint .touch{display:none}
+@media (hover:none){.hint .mouse{display:none}.hint .touch{display:inline}}
+@media (max-width:899px){
+  .hero{display:flex;flex-direction:column}
+  .hint{position:relative;right:auto;bottom:auto;text-align:left;max-width:none;margin:auto 2ch calc(var(--lh) * 1.5) 2ch;padding-left:76px;background:none}
+  .codes{display:grid;grid-template-columns:1fr;column-gap:2ch}
+}
+@media (max-width:899px) and (min-width:520px){.codes{grid-template-columns:1fr 1fr}}
+
+/* ---- sections below the hall ------------------------------------------ */
+.sect{position:relative;z-index:2;padding:calc(var(--lh) * 5) 0 calc(var(--lh) * 2);background:#000}
+.sect+.sect{padding-top:calc(var(--lh) * 3)}
+.sect>.cols{margin-bottom:calc(var(--lh) * 2)}
+.sect h2{color:var(--hi)}
+
+/* ---- the Solari board --------------------------------------------------- */
+.board,.info{--fw:15px;--fh:30px;--ffs:17px;--fgap:2px;--pitch:calc(var(--fw) + var(--fgap));--cg:10px;--ft:70ms;--fc:#ededed;--ft1:#202020;--fb1:#181818}
+@media (max-width:699px){.board,.info{--fw:12px;--fh:26px;--ffs:14px;--cg:6px}}
+.board{margin:0 2ch;background:#070707;border:1px solid #2c2c2c;padding:14px 16px 12px}
+.plate{display:flex;align-items:center;justify-content:space-between;gap:2ch;padding:0 4px 10px;margin:0 -4px 10px;border-bottom:1px solid #2c2c2c;font:700 13px/1 var(--font);letter-spacing:.12em;color:var(--hi);text-transform:uppercase}
+.plate .sub{font-weight:400;color:var(--mid);letter-spacing:.06em}
+.plate .right{display:flex;align-items:center;gap:1.5ch}
+/* column tracks: code | picto | destination | program | as | remarks */
+.bh,.row{display:grid;grid-template-columns:var(--cols);column-gap:var(--cg);align-items:center}
+.board[data-board="dep"]{--cols:calc(4 * var(--pitch)) var(--fh) minmax(0,1.05fr) minmax(0,1.5fr) minmax(0,1.05fr) minmax(0,1fr)}
+.board[data-board="gates"]{--cols:calc(4 * var(--pitch)) var(--fh) minmax(0,1.75fr) minmax(0,1.3fr) minmax(0,1fr)}
+.bh{padding:0 4px 6px;font:400 11px/1.2 var(--font);letter-spacing:.06em;color:var(--mid);text-transform:uppercase}
+.bh span{min-width:0;overflow:hidden;white-space:nowrap}
+.rows{margin:0;padding:0}
+.rows li+li{margin-top:3px}
+.row{width:100%;padding:3px 4px;margin:0;background:none;border:0;cursor:pointer;text-align:left;border-radius:2px;color:inherit}
+.row:hover{background:#101010}
+.row:focus-visible{outline:1px solid var(--hi);outline-offset:0}
+.row[aria-current="true"]{background:#141414;box-shadow:inset 3px 0 0 var(--hi)}
+.row[aria-current="true"] .fl,.row[aria-current="true"] .wf{--fc:#fff;--ft1:#2c2c2c;--fb1:#232323}
+/* letter flaps (codes, the information board) */
+.grp{display:flex;gap:var(--fgap);overflow:hidden;white-space:pre;font:700 var(--ffs)/var(--fh) var(--font);color:var(--fc);text-transform:uppercase}
+.fl{flex:none;display:block;position:relative;width:var(--fw);height:var(--fh);font:700 var(--ffs)/var(--fh) var(--font);text-align:center;color:var(--fc);border-radius:1.5px;
+  background:linear-gradient(to bottom,var(--ft1) 0,var(--ft1) calc(50% - .5px),#000 calc(50% - .5px),#000 calc(50% + .5px),var(--fb1) calc(50% + .5px),var(--fb1) 100%)}
+/* word flaps: one painted flap per destination or program (as on the Frankfurt Hbf board) */
+.wf{position:relative;display:block;min-width:0;height:var(--fh);padding:0 .6ch;font:700 var(--ffs)/var(--fh) var(--font);letter-spacing:.06em;color:var(--fc);text-transform:uppercase;white-space:pre;overflow:hidden;border-radius:1.5px;
+  background:linear-gradient(to bottom,var(--ft1) 0,var(--ft1) calc(50% - .5px),#000 calc(50% - .5px),#000 calc(50% + .5px),var(--fb1) calc(50% + .5px),var(--fb1) 100%)}
+.wf::after,.fl::after{content:none}
+/* the hinge pins at each end of the split */
+.wf>i{position:absolute;top:calc(50% - 1.5px);width:3px;height:3px;background:#3a3a3a;border-radius:50%}
+.wf>i:first-of-type{left:2px}.wf>i:last-of-type{right:2px}
+/* a flap: the old top half falls onto the split line, the new bottom half lands under it */
+.fl.s::before,.fl.s::after,.wf.s::before,.wf.s::after{position:absolute;left:0;width:100%;height:50%;overflow:hidden;display:flex;line-height:var(--fh);color:var(--fc);will-change:transform}
+.fl.s::before,.fl.s::after{justify-content:center}
+.wf.s::before,.wf.s::after{justify-content:flex-start;padding:0 .6ch;box-sizing:border-box}
+.fl.s::before,.wf.s::before{content:attr(data-o);content:attr(data-o) / "";top:0;align-items:flex-start;border-radius:1.5px 1.5px 0 0;background:linear-gradient(to bottom,var(--ft1),#111);transform-origin:50% 100%;animation:flapTop var(--ft) linear infinite}
+.fl.s::after,.wf.s::after{content:attr(data-c);content:attr(data-c) / "";top:50%;align-items:flex-end;border-radius:0 0 1.5px 1.5px;background:linear-gradient(to bottom,#0d0d0d,var(--fb1) 60%);transform-origin:50% 0;animation:flapBot var(--ft) linear infinite}
+html.flap-lite .fl.s::before,html.flap-lite .fl.s::after,html.flap-lite .wf.s::before,html.flap-lite .wf.s::after{display:none}
+@keyframes flapTop{0%{transform:scaleY(1)}50%,100%{transform:scaleY(0)}}
+@keyframes flapBot{0%,50%{transform:scaleY(0)}100%{transform:scaleY(1)}}
+/* pictogram flaps: Aicher's signs, enamelled in Frankfurt's colours, split like every other flap */
+.pf{position:relative;display:block;width:var(--fh);height:var(--fh);border-radius:1.5px;overflow:hidden;color:#fff;background:var(--fra-blue)}
+.pf[data-k="g"]{background:var(--fra-green)}
+.pf[data-k="w"]{background:var(--fra-white);color:#111}
+.pf svg{position:absolute;inset:12%;width:76%;height:76%;display:block}
+.pf::after{content:"";position:absolute;left:0;right:0;top:calc(50% - .5px);height:1px;background:rgba(0,0,0,.55)}
+.pf.s svg{animation:pfFlip calc(var(--ft) * 2) steps(2,end) 1}
+@keyframes pfFlip{0%{clip-path:inset(0 0 50% 0)}100%{clip-path:inset(0)}}
+.clock{--w:5}
+.info{display:block;margin:var(--lh) 2ch 0;background:#070707;border:1px solid #2c2c2c;padding:12px 14px}
+.info .ihead{font:400 11px/1.2 var(--font);letter-spacing:.06em;color:var(--mid);text-transform:uppercase;padding-bottom:6px}
+.info{--fh:24px;--ffs:15px;--fw:14px}
+@media (max-width:699px){.info{--fw:11px;--fh:20px;--ffs:12px}}
+.info .itext{font:700 var(--ffs)/calc(var(--fh) + 3px) var(--font);color:var(--fc);text-transform:uppercase;letter-spacing:.04em}
+.info .ln{display:flex;gap:var(--fgap)}
+.info .ln+.ln{margin-top:3px}
+.info[data-pages]{cursor:pointer}
+/* mid widths: the remarks column lives on the information board instead */
+@media (max-width:1199px){
+  .board[data-board="dep"]{--cols:calc(4 * var(--pitch)) var(--fh) minmax(0,1fr) minmax(0,1.45fr) minmax(0,1fr)}
+  .board[data-board="gates"]{--cols:calc(4 * var(--pitch)) var(--fh) minmax(0,1.6fr) minmax(0,1.2fr)}
+  .c-rm{display:none!important}
+}
+/* phones: each row is two lines, code and sign and place, then the program */
+@media (max-width:699px){
+  .board{margin:0 12px;padding:10px 8px 10px}
+  .plate{flex-wrap:wrap;row-gap:6px}
+  .bh{display:none}
+  .board[data-board="dep"],.board[data-board="gates"]{--cols:calc(4 * var(--pitch)) var(--fh) minmax(0,1fr)}
+  .row{row-gap:3px;padding:4px 4px}
+  .row .c-pg{grid-column:2 / 4}
+  .row .c-as{display:none}
+  .rows li+li{margin-top:6px}
+  .info{margin:var(--lh) 12px 0}
+}
+
+/* ---- manifests: everything on the boards, written out -------------------- */
+.manifest{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,36ch),1fr));gap:var(--lh) 2ch;padding:0 2ch;margin-top:calc(var(--lh) * 2)}
+.mi{border-left:1px solid var(--fg);padding-left:1ch}
+.mi .code{color:var(--mid)}
+.mi b{font-weight:400;color:var(--hi)}
+
+/* ---- the sign sheet (after Aicher's Munich pictogram poster) ------------ */
+.sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:2ch;padding:0 2ch}
+.sheet li{min-width:0}
+.sheet .sq{position:relative;display:block;aspect-ratio:1/1;border-radius:2px;color:#fff;background:var(--fra-blue)}
+.sheet .sq[data-k="g"]{background:var(--fra-green)}
+.sheet .sq[data-k="w"]{background:var(--fra-white);color:#111}
+.sheet .sq svg{position:absolute;inset:16%;width:68%;height:68%}
+.sheet .sq::before{content:"";position:absolute;inset:0;background:
+  linear-gradient(to right,rgba(127,127,127,.18) 1px,transparent 1px) 0 0/12.5% 12.5%,
+  linear-gradient(to bottom,rgba(127,127,127,.18) 1px,transparent 1px) 0 0/12.5% 12.5%;opacity:0;transition:opacity .25s}
+.sheet li:hover .sq::before{opacity:1}
+.sheet p{margin-top:calc(var(--lh) * .5)}
+.sheet p b{font-weight:400;color:var(--hi)}
+.keyrow{display:flex;flex-wrap:wrap;gap:var(--lh) 4ch;padding:0 2ch;margin-bottom:calc(var(--lh) * 2)}
+.keyrow li{display:flex;gap:1ch;align-items:flex-start;max-width:38ch}
+.keyrow i{flex:none;width:calc(var(--lh) * 2);height:calc(var(--lh) * 2);border-radius:2px;background:var(--fra-blue)}
+.keyrow i[data-k="g"]{background:var(--fra-green)}
+.keyrow i[data-k="w"]{background:var(--fra-white)}
+@media (max-width:699px){.sheet{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.sheet p{font-size:12px;line-height:15px}}
+
+.colophon{padding:calc(var(--lh) * 5) 2ch 120px;color:var(--mid);max-width:80ch}
+.colophon p+p{margin-top:var(--lh)}
+@media (max-width:899px){.colophon{padding-left:calc(2ch + 0px);padding-bottom:140px}}
+
+/* ---- intro -------------------------------------------------------------- */
+.skip{position:fixed;top:var(--lh);right:2ch;z-index:40;background:#000;color:var(--hi);border:1px solid var(--hi);padding:0 1ch;cursor:pointer;display:none}
+html.intro .skip{display:block}
+.skip:hover{background:var(--hi);color:#000}
+
+@media (prefers-reduced-motion:reduce){
+  .fl.s::before,.fl.s::after,.wf.s::before,.wf.s::after{animation:none;display:none}
+  .pf.s svg{animation:none}
+  .sheet .sq::before{transition:none}
+}

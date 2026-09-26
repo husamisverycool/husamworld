@@ -1,0 +1,172 @@
+<body>
+<a class="skiplink" href="#departures">Skip to the departures board</a>
+<button class="skip" type="button" id="skip">land now</button>
+
+<main>
+<header class="hero" id="top">
+  <canvas id="field" aria-hidden="true"></canvas>
+  <canvas id="globe" tabindex="0" role="img" aria-label="A globe drawn in text characters, lit by the real position of the sun. Lines run from Cambridge to South Korea, Lithuania, Poland, Hungary, Puerto Rico and Europe. It turns to whichever code is showing. Drag or use the arrow keys to turn it."></canvas>
+  <div class="cols hcols">
+    <div>
+      <h1>The Airport:</h1>
+      <p>Harvard and abroad.</p>
+    </div>
+    <div class="w2">
+      <p>Harvard College, sophomore.</p>
+      <p>Applied Math in Government and Economics.</p>
+      <p class="gap">Every flight here leaves from Cambridge. The big word is a code; the globe goes where it says.</p>
+    </div>
+    <div>
+      <p>Now showing:</p>
+      <p class="hi" id="now-c">BOS</p>
+      <p id="now-p">Boston &amp; Cambridge</p>
+      <p class="mid" id="now-r">Harvard College</p>
+      <p class="sr" id="now-live" aria-live="polite"></p>
+    </div>
+    <div>
+      <p>Codes:</p>
+      <ul class="codes">
+        <li><button type="button" data-i="0" aria-pressed="true"><b>BOS</b> Boston</button></li>
+        <li><button type="button" data-i="1" aria-pressed="false"><b>KOR</b> South Korea</button></li>
+        <li><button type="button" data-i="2" aria-pressed="false"><b>LTU</b> Lithuania</button></li>
+        <li><button type="button" data-i="3" aria-pressed="false"><b>POL</b> Poland</button></li>
+        <li><button type="button" data-i="4" aria-pressed="false"><b>HUN</b> Hungary</button></li>
+        <li><button type="button" data-i="5" aria-pressed="false"><b>PRI</b> Puerto Rico</button></li>
+        <li><button type="button" data-i="6" aria-pressed="false"><b>EUR</b> Europe</button></li>
+      </ul>
+    </div>
+    <div class="wide-only">
+      <p>Index:</p>
+      <ul>
+        <li><a href="#departures">Departures</a></li>
+        <li><a href="#gates">Gates</a></li>
+        <li><a href="#signs">Signs</a></li>
+      </ul>
+    </div>
+    <div class="wide-only">
+      <p id="hdate">Cambridge, MA:</p>
+      <p><span class="hi" id="hclock">--:--:--</span></p>
+      <p class="gap">Sun overhead:</p>
+      <p id="hsun">--</p>
+    </div>
+  </div>
+  <p class="hint"><span class="mouse">Pick a code, or a marker on the globe. Drag to turn it.</span><span class="touch">Tap a code or a marker. Swipe sideways to turn the globe.</span></p>
+</header>
+
+<section class="sect" id="departures" aria-labelledby="dep-h">
+  <div class="cols">
+    <div><h2 id="dep-h">Departures:</h2></div>
+    <div class="w2"><p>Four Harvard programs that came with a ticket. Choose a row and the information board flips to it.</p></div>
+    <div><p>Blue:</p><p>Frankfurt's colour for air traffic. The sign on each flap is the program's.</p></div>
+  </div>
+  <div class="board" data-board="dep">
+    <div class="plate"><span>Departures <span class="sub">· from Cambridge</span></span><span class="right"><span class="sub">Cambridge time</span><span class="grp clock" aria-hidden="true">00:00</span></span></div>
+    <div class="bh" aria-hidden="true"><span>Flight</span><span></span><span>Destination</span><span>Program</span><span>As</span><span class="c-rm">Remarks</span></div>
+    <ul class="rows">
+      <li><button class="row" type="button" data-code="THC · South Korea" data-say="The Harvard Crimson. South Korea. Workshop lead and mentor." data-info="The Harvard Crimson, Global Programs Associate from Oct 2025. Traveled to South Korea to mentor students and lead two weeks of workshops on writing, leadership and journalism. Moderated and judged international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.">
+        <span class="grp c-cd" data-w="4">THC</span><span class="pf" data-p="paper" data-k="b"></span><span class="wf c-ds">South Korea</span><span class="wf c-pg">The Harvard Crimson</span><span class="wf c-as" data-cycle="Workshop lead|Mentor">Workshop lead</span><span class="wf c-rm" data-cycle="Two weeks|Writing|Leadership|Journalism">Two weeks</span></button></li>
+      <li><button class="row" type="button" data-code="HIL · Lithuania, Poland, Hungary" data-say="Harvard Hillel Travel Program. Lithuania, Poland, Hungary. Fellow. Research tour." data-info="Harvard Hillel Travel Program Fellow: a research tour of Lithuania, Poland and Hungary. One of the Harvard Service, Ethics, and Leadership Fellowships.">
+        <span class="grp c-cd" data-w="4">HIL</span><span class="pf" data-p="tour" data-k="b"></span><span class="wf c-ds" data-cycle="Lithuania|Poland|Hungary">Lithuania</span><span class="wf c-pg">Hillel Travel Program</span><span class="wf c-as">Fellow</span><span class="wf c-rm">Research tour</span></button></li>
+      <li><button class="row" type="button" data-code="CAT · Puerto Rico" data-say="Catalyst Sustainability. Puerto Rico. Scholar. Service-learning." data-info="Catalyst Sustainability Scholar: a service-learning trip to Puerto Rico. Also one of the Harvard Service, Ethics, and Leadership Fellowships.">
+        <span class="grp c-cd" data-w="4">CAT</span><span class="pf" data-p="sun" data-k="b"></span><span class="wf c-ds">Puerto Rico</span><span class="wf c-pg">Catalyst Sustainability</span><span class="wf c-as">Scholar</span><span class="wf c-rm">Service-learning</span></button></li>
+      <li><button class="row" type="button" data-code="HMCE · Europe" data-say="Harvard Model Congress Europe. Europe. Staff. 500+ delegates from 20+ countries." data-info="On staff for Harvard Model Congress Europe: 500+ delegates from 20+ countries. The globe shades the whole continent rather than pinning a city.">
+        <span class="grp c-cd" data-w="4">HMCE</span><span class="pf" data-p="ring" data-k="b"></span><span class="wf c-ds">Europe</span><span class="wf c-pg">HMC Europe</span><span class="wf c-as">Staff</span><span class="wf c-rm" data-cycle="500+ delegates|20+ countries">500+ delegates</span></button></li>
+    </ul>
+  </div>
+  <div class="info" data-for="dep" role="region" aria-label="Information board for the selected departure">
+    <p class="ihead">Information · <span class="icode">THC · South Korea</span></p>
+    <p class="itext">The Harvard Crimson, Global Programs Associate from Oct 2025. Traveled to South Korea to mentor students and lead two weeks of workshops on writing, leadership and journalism. Moderated and judged international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.</p>
+    <p class="sr ilive" aria-live="polite"></p>
+  </div>
+  <h3 class="sr">Departures, written out</h3>
+  <div class="manifest">
+    <div class="mi"><p class="code">THC · KOR</p><p><b>The Harvard Crimson, to South Korea.</b> As a Global Programs Associate (from October 2025) he mentored students and led two weeks of workshops on writing, leadership and journalism. He also moderated and judged the international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.</p></div>
+    <div class="mi"><p class="code">HIL · LTU · POL · HUN</p><p><b>Harvard Hillel Travel Program Fellow.</b> A research tour of Lithuania, Poland and Hungary.</p></div>
+    <div class="mi"><p class="code">CAT · PRI</p><p><b>Catalyst Sustainability Scholar.</b> A service-learning trip to Puerto Rico.</p></div>
+    <div class="mi"><p class="code">HMCE · EUR</p><p><b>Harvard Model Congress Europe.</b> On staff: 500+ delegates from 20+ countries.</p></div>
+  </div>
+</section>
+
+<section class="sect" id="gates" aria-labelledby="gates-h">
+  <div class="cols">
+    <div><h2 id="gates-h">Gates:</h2></div>
+    <div class="w2"><p>The Harvard roles that stay in Cambridge. No passport needed.</p></div>
+    <div><p>White and green:</p><p>white for institutions, green for the service fellowships.</p></div>
+  </div>
+  <div class="board" data-board="gates">
+    <div class="plate"><span>Gates <span class="sub">· Cambridge, MA</span></span><span class="right"><span class="sub">10 open</span></span></div>
+    <div class="bh" aria-hidden="true"><span>Gate</span><span></span><span>Institution</span><span>Role</span><span class="c-rm">Remarks</span></div>
+    <ul class="rows">
+      <li><button class="row" type="button" data-code="HMC · Harvard Model Congress" data-say="Harvard Model Congress, Boston. Chair, senior staff. 1,500+ delegates from 100+ schools." data-info="Chair (Senior Staff) since Jan 2026, on staff since Sep 2025. Directing the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools.">
+        <span class="grp c-cd" data-w="4">HMC</span><span class="pf" data-p="chamber" data-k="w"></span><span class="wf c-ds">Harvard Model Congress</span><span class="wf c-pg">Chair (Senior Staff)</span><span class="wf c-rm" data-cycle="1,500+ delegates|100+ schools|Since Jan 2026">1,500+ delegates</span></button></li>
+      <li><button class="row" type="button" data-code="THCB · Crimson Business Board" data-say="The Harvard Crimson Business Board. Project Team Lead, TPR/AlgoEd, since December 2025." data-info="Project Team Lead, TPR/AlgoEd, on The Harvard Crimson Business Board since Dec 2025. Leads international writing and leadership camps with The Princeton Review and AlgoEd for the nation's oldest daily college newspaper, est. 1873, a $1M+ media enterprise.">
+        <span class="grp c-cd" data-w="4">THCB</span><span class="pf" data-p="paper" data-k="w"></span><span class="wf c-ds">Crimson Business Board</span><span class="wf c-pg">Project Team Lead</span><span class="wf c-rm" data-cycle="TPR / AlgoEd|Since Dec 2025">TPR / AlgoEd</span></button></li>
+      <li><button class="row" type="button" data-code="RAD · Radcliffe Emerging Leaders" data-say="Emerging Leaders Program, Harvard Radcliffe Institute. Mentor, October 2025 to April 2026." data-info="Mentor, Emerging Leaders Program, Harvard Radcliffe Institute, Oct 2025 to Apr 2026: Boston high-school sophomores, on leadership and social activism.">
+        <span class="grp c-cd" data-w="4">RAD</span><span class="pf" data-p="mentor" data-k="w"></span><span class="wf c-ds">Radcliffe Emerging Leaders</span><span class="wf c-pg">Mentor</span><span class="wf c-rm" data-cycle="Oct 2025 - Apr 2026|Boston sophomores">Oct 2025 - Apr 2026</span></button></li>
+      <li><button class="row" type="button" data-code="HCCF · China Forum" data-say="Harvard College China Forum. Operations." data-info="Operations for the Harvard College China Forum, America's largest conference on US-China relations.">
+        <span class="grp c-cd" data-w="4">HCCF</span><span class="pf" data-p="table" data-k="w"></span><span class="wf c-ds">Harvard College China Forum</span><span class="wf c-pg">Operations</span><span class="wf c-rm">US-China relations</span></button></li>
+      <li><button class="row" type="button" data-code="HIRC · International Relations Council" data-say="Harvard International Relations Council. Assistant Director of Operations. Harvard Model UN and Harvard National Model UN." data-info="Assistant Director of Operations, Harvard International Relations Council: Harvard Model UN and Harvard National Model UN.">
+        <span class="grp c-cd" data-w="4">HIRC</span><span class="pf" data-p="flags" data-k="w"></span><span class="wf c-ds">Intl Relations Council</span><span class="wf c-pg">Asst Dir of Operations</span><span class="wf c-rm">HMUN · HNMUN</span></button></li>
+      <li><button class="row" type="button" data-code="LIHC · Leadership Institute" data-say="Leadership Institute at Harvard College. Associate. Youth Lead the Change." data-info="Associate, Leadership Institute at Harvard College, for the Youth Lead the Change conferences.">
+        <span class="grp c-cd" data-w="4">LIHC</span><span class="pf" data-p="stage" data-k="w"></span><span class="wf c-ds">Leadership Institute</span><span class="wf c-pg">Associate</span><span class="wf c-rm">Youth Lead the Change</span></button></li>
+      <li><button class="row" type="button" data-code="FOP · First-Year Outdoor Program" data-say="First-Year Outdoor Program. Leader." data-info="Leader, First-Year Outdoor Program. One of the Harvard Service, Ethics, and Leadership Fellowships.">
+        <span class="grp c-cd" data-w="4">FOP</span><span class="pf" data-p="tent" data-k="g"></span><span class="wf c-ds">First-Year Outdoor Program</span><span class="wf c-pg">Leader</span><span class="wf c-rm">Fellowship</span></button></li>
+      <li><button class="row" type="button" data-code="HON · Honor Council" data-say="Honor Council. Member." data-info="Member, Honor Council. One of the Harvard Service, Ethics, and Leadership Fellowships.">
+        <span class="grp c-cd" data-w="4">HON</span><span class="pf" data-p="oath" data-k="g"></span><span class="wf c-ds">Honor Council</span><span class="wf c-pg">Member</span><span class="wf c-rm">Fellowship</span></button></li>
+      <li><button class="row" type="button" data-code="SPRK · SPARK Fellowship" data-say="SPARK Fellowship. Fellow, summer 2025. 2,000 dollar stipend, 7 weeks of public service." data-info="SPARK Fellow, summer 2025: seven weeks of public service on a $2,000 stipend.">
+        <span class="grp c-cd" data-w="4">SPRK</span><span class="pf" data-p="spark" data-k="g"></span><span class="wf c-ds">SPARK Fellowship</span><span class="wf c-pg">Fellow</span><span class="wf c-rm" data-cycle="Summer 2025|$2,000 · 7 weeks">Summer 2025</span></button></li>
+      <li><button class="row" type="button" data-code="FONG · Fong Family Fellowship" data-say="Fong Family Public Service Fellowship. Fellow, winter. 1,000 dollars, one month." data-info="Fong Family Public Service Fellow: a month-long winter fellowship, $1,000.">
+        <span class="grp c-cd" data-w="4">FONG</span><span class="pf" data-p="carry" data-k="g"></span><span class="wf c-ds">Fong Family Fellowship</span><span class="wf c-pg">Fellow</span><span class="wf c-rm" data-cycle="Winter|$1,000 · 1 month">Winter</span></button></li>
+    </ul>
+  </div>
+  <div class="info" data-for="gates" role="region" aria-label="Information board for the selected gate">
+    <p class="ihead">Information · <span class="icode">HMC · Harvard Model Congress</span></p>
+    <p class="itext">Chair (Senior Staff) since Jan 2026, on staff since Sep 2025. Directing the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools.</p>
+    <p class="sr ilive" aria-live="polite"></p>
+  </div>
+  <h3 class="sr">Gates, written out</h3>
+  <div class="manifest">
+    <div class="mi"><p class="code">HMC</p><p><b>Harvard Model Congress.</b> Chair (Senior Staff) since January 2026, on staff since September 2025. He is directing the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools.</p></div>
+    <div class="mi"><p class="code">THCB</p><p><b>The Harvard Crimson Business Board.</b> Project Team Lead, TPR/AlgoEd, since December 2025: international writing and leadership camps with The Princeton Review and AlgoEd, for the nation's oldest daily college newspaper (est. 1873, a $1M+ media enterprise).</p></div>
+    <div class="mi"><p class="code">RAD</p><p><b>Emerging Leaders Program, Harvard Radcliffe Institute.</b> Mentor, October 2025 to April 2026, working with Boston high-school sophomores on leadership and social activism.</p></div>
+    <div class="mi"><p class="code">HCCF</p><p><b>Harvard College China Forum.</b> Operations for America's largest conference on US-China relations.</p></div>
+    <div class="mi"><p class="code">HIRC</p><p><b>Harvard International Relations Council.</b> Assistant Director of Operations for Harvard Model UN and Harvard National Model UN.</p></div>
+    <div class="mi"><p class="code">LIHC</p><p><b>Leadership Institute at Harvard College.</b> Associate for the Youth Lead the Change conferences.</p></div>
+    <div class="mi"><p class="code">FOP · HON · SPRK · FONG</p><p><b>Harvard Service, Ethics, and Leadership Fellowships</b>, since August 2025. First-Year Outdoor Program leader. Honor Council member. SPARK Fellow, summer 2025: seven weeks of public service on a $2,000 stipend. Fong Family Public Service Fellow: a month-long winter fellowship, $1,000. The Hillel tour and the Catalyst trip on the departures board are part of the same program.</p></div>
+  </div>
+</section>
+
+<section class="sect" id="signs" aria-labelledby="signs-h">
+  <div class="cols">
+    <div><h2 id="signs-h">Signs:</h2></div>
+    <div class="w2"><p>Every program has a sign, drawn on a square grid with lines at 0°, 45° and 90°, the way Otl Aicher drew the Munich and Frankfurt pictograms in 1972. The colour says what kind of thing it is.</p></div>
+  </div>
+  <ul class="keyrow">
+    <li><i></i><p><span class="hi">Blue:</span> air traffic. The programs that flew somewhere.</p></li>
+    <li><i data-k="g"></i><p><span class="hi">Green:</span> services. The public-service and campus fellowships.</p></li>
+    <li><i data-k="w"></i><p><span class="hi">White:</span> everything else. The institutions he works inside.</p></li>
+  </ul>
+  <ul class="sheet">
+    <li><span class="sq" data-p="book" data-k="w"></span><p><b>Harvard College</b><br>Applied Math in Government and Economics</p></li>
+    <li><span class="sq" data-p="paper"></span><p><b>THC</b><br>South Korea</p></li>
+    <li><span class="sq" data-p="tour"></span><p><b>HIL</b><br>Lithuania, Poland, Hungary</p></li>
+    <li><span class="sq" data-p="sun"></span><p><b>CAT</b><br>Puerto Rico</p></li>
+    <li><span class="sq" data-p="ring"></span><p><b>HMCE</b><br>Europe</p></li>
+    <li><span class="sq" data-p="chamber" data-k="w"></span><p><b>HMC</b><br>Boston</p></li>
+    <li><span class="sq" data-p="paper" data-k="w"></span><p><b>THCB</b><br>Business Board</p></li>
+    <li><span class="sq" data-p="mentor" data-k="w"></span><p><b>RAD</b><br>Emerging Leaders</p></li>
+    <li><span class="sq" data-p="table" data-k="w"></span><p><b>HCCF</b><br>China Forum</p></li>
+    <li><span class="sq" data-p="flags" data-k="w"></span><p><b>HIRC</b><br>HMUN · HNMUN</p></li>
+    <li><span class="sq" data-p="stage" data-k="w"></span><p><b>LIHC</b><br>Youth Lead the Change</p></li>
+    <li><span class="sq" data-p="tent" data-k="g"></span><p><b>FOP</b><br>Outdoor Program</p></li>
+    <li><span class="sq" data-p="oath" data-k="g"></span><p><b>HON</b><br>Honor Council</p></li>
+    <li><span class="sq" data-p="spark" data-k="g"></span><p><b>SPRK</b><br>SPARK</p></li>
+    <li><span class="sq" data-p="carry" data-k="g"></span><p><b>FONG</b><br>Fong Family</p></li>
+  </ul>
+</section>
+</main>
+
+<footer class="colophon">
+  <p>Set in Fira Mono. The globe and the code are computed one character cell at a time, after Andreas Gysin's ASCII playground (<a href="https://play.ertdfgcvb.xyz/" target="_blank" rel="noopener">play.ertdfgcvb.xyz</a>); the code changes letter by letter, the way his home page changes its words. The boards turn whole-word flaps, as the Solari boards did. The signs follow Otl Aicher's grid and his Frankfurt Airport colours. The land comes from Natural Earth; the shading follows the sun right now. The three-letter codes are country codes, not airports.</p>
+  <p>Press f for fullscreen, i for the info box.</p>
+</footer>

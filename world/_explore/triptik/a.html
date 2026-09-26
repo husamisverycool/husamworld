@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map Room: prototype A (TripTik city strips)</title>
+<link href="https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;800;900&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+<style>
+:root{--desk:#c5cdc6;--paper:#f7f4e8;--edge:#d8d1b8;--ink:#1c2420;--muted:#4d564f;--sign:#0b6b3e;--road:#dc3b2c;--casing:#7a160f;--hi:rgba(214,255,20,.62);--pen:#1f3a9e;--land:#efe9d2;--vine:#9fb07a;
+--road-font:"Overpass","Arial Narrow",Arial,sans-serif;--hand:"Nanum Pen Script","Segoe Print",cursive}
+*{box-sizing:border-box}
+body{margin:0;background:var(--desk);color:var(--ink);font:17px/1.5 var(--road-font)}
+.book{max-width:1360px;margin:0 auto;padding:24px 20px 90px}
+.coil{height:28px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='28'%3E%3Ccircle cx='13' cy='18' r='3.6' fill='%23353a37'/%3E%3Cpath d='M13,18 C3,16 4,0 13,-2' fill='none' stroke='%23767d80' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E") repeat-x}
+.cover{background:var(--paper);border:1px solid var(--edge);border-top:10px solid #b0221a;padding:0 0 18px}
+.cover .in{padding:4px 28px 0;display:flex;flex-wrap:wrap;gap:12px 40px;align-items:flex-end;justify-content:space-between}
+.brand{margin:0;font-weight:900;font-style:italic;color:#b0221a;font-size:clamp(40px,6vw,76px);line-height:.9;letter-spacing:-.02em}
+.brand small{display:block;font-style:normal;font-size:14px;letter-spacing:.2em;color:var(--ink);text-transform:uppercase;margin-top:8px}
+.form{min-width:280px;flex:1;max-width:520px}
+.f{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid #9d977f;padding:4px 0}
+.f b{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:6px}
+.f span{font-family:var(--hand);color:var(--pen);font-size:28px;line-height:1.1}
+.strips{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:18px}
+@media (max-width:1180px){.strips{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:640px){.strips{grid-template-columns:1fr}.book{padding:16px 16px 90px}.cover .in{padding:4px 16px 0}}
+.strip{background:var(--paper);border:1px solid var(--edge);display:flex;flex-direction:column;box-shadow:0 10px 22px -16px rgba(20,30,25,.55)}
+.strip .coil{height:22px}
+.shead{padding:6px 12px 10px;border-bottom:3px solid #111}
+.sno{font-size:11px;font-weight:900;letter-spacing:.14em;color:#b0221a}
+.guide{display:block;background:var(--sign);color:#fff;font-weight:800;font-size:19px;line-height:1.1;padding:9px 12px 7px;margin-top:6px;box-shadow:inset 0 0 0 2px var(--sign),inset 0 0 0 3.5px #fff;border-radius:6px}
+.tab{display:inline-block;background:var(--sign);color:#fff;font-size:11px;font-weight:900;letter-spacing:.1em;padding:3px 8px 1px;border-radius:4px 4px 0 0;margin-left:10px;box-shadow:inset 0 0 0 2px var(--sign),inset 0 0 0 3px #fff}
+svg.map{display:block;width:100%;height:auto;background:var(--land);border-bottom:1.5px solid #111;cursor:pointer}
+.hl{fill:none;stroke:var(--hi);stroke-width:22;stroke-linecap:round;mix-blend-mode:multiply;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.4s cubic-bezier(.6,.05,.3,1)}
+.strip.on .hl{stroke-dashoffset:0}
+.hand{font-family:var(--hand);fill:var(--pen);font-size:22px}
+.lab{font:900 11px var(--road-font);letter-spacing:.08em;fill:#111;paint-order:stroke;stroke:var(--land);stroke-width:4px}
+.log{padding:10px 12px 14px;font-size:15px}
+.log dl{margin:0}
+.log div{display:grid;grid-template-columns:78px 1fr;gap:8px;border-bottom:1px dotted #bdb59b;padding:4px 0}
+.log dt{font-size:11px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.log dd{margin:0;font-weight:700}
+.note{font-family:var(--hand);color:var(--pen);font-size:25px;line-height:1.05;margin:8px 0 0}
+.hint{font-size:13px;color:var(--muted);margin:10px 0 0}
+@media (prefers-reduced-motion:reduce){.hl{transition:none}}
+</style>
+</head>
+<body>
+<main class="book">
+  <div class="cover"><div class="coil"></div>
+    <div class="in">
+      <h1 class="brand">Home Routes<small>A strip-map plan for Fresno &amp; Clovis</small></h1>
+      <div class="form">
+        <div class="f"><b>Home</b><span>Fresno &amp; Clovis, California</span></div>
+        <div class="f"><b>Region</b><span>the Central Valley</span></div>
+        <div class="f"><b>Years</b><span>2015 – 2025</span></div>
+      </div>
+    </div>
+    <p class="hint" style="padding:0 28px">Five local routes, one strip each. Tap a strip to mark it with the highlighter. Maps are schematic: no streets drawn.</p>
+  </div>
+  <div class="strips" id="strips"></div>
+</main>
+<script>
+const S=[
+ {n:1,tab:'SUNDAYS',dest:'Central California Food Bank',rows:[['Role','Volunteer'],['When','Most Sundays'],['Years','2015–2021']],note:'most Sundays, 2015 → 2021',curve:'M100,520 C60,440 150,380 110,300 C70,220 140,160 100,70'},
+ {n:2,tab:'SATURDAYS',dest:'Masjid Fresno Saturday School',rows:[['Role','Volunteer'],['When','Most Saturdays'],['Years','2018–2021']],note:'most Saturdays, 2018 → 2021',curve:'M100,520 C150,450 50,390 100,310 C150,230 60,150 100,70'},
+ {n:3,tab:'THE MCA',dest:'Muslim Community Association of Fresno',rows:[['Now','VP &amp; Executive Director, May 2022–Dec 2025'],['Before','Board member from Sep 2021; Director of Outreach, of Relations, of External Relations'],['Events','150+'],['Raised','$240K+ for Syrian and Afghan refugees and Pakistan flood victims'],['Pledge','$500K for Fresno’s first Muslim women’s transitional home']],note:'youth-driven. clothing &amp; food drives, mentoring groups',curve:'M100,520 L100,420 C100,360 40,340 60,270 C80,200 150,190 100,70'},
+ {n:4,tab:'CAMPUS',dest:'MSA, Clovis Community College',rows:[['Role','Director of Community Relations'],['Year','2022']],note:'the Clovis end of home',curve:'M100,520 C130,420 170,380 150,300 C130,220 90,170 120,70'},
+ {n:5,tab:'TUTORING',dest:'Instilt Educate',rows:[['Role','Tutor'],['Year','2023']],note:'one more stop',curve:'M100,520 C70,470 60,380 90,310 C120,240 60,160 90,70'}
+];
+const vines=()=>{let s='';for(let y=40;y<540;y+=14){s+=`<path d="M8,${y} h40 M152,${y} h40" stroke="#9fb07a" stroke-width="3" stroke-dasharray="2 4"/>`}return s};
+document.getElementById('strips').innerHTML=S.map(s=>`
+<section class="strip" aria-labelledby="h${s.n}"><div class="coil"></div>
+<div class="shead"><span class="sno">STRIP ${s.n} OF 5</span><br><span class="tab">${s.tab}</span><h2 id="h${s.n}" class="guide">${s.dest}</h2></div>
+<svg class="map" viewBox="0 0 200 560" role="img" aria-label="Schematic strip from home to ${s.dest}">
+ ${vines()}
+ <path d="${s.curve}" fill="none" stroke="#7a160f" stroke-width="9" stroke-linecap="round"/>
+ <path d="${s.curve}" fill="none" stroke="#dc3b2c" stroke-width="5" stroke-linecap="round"/>
+ <path class="hl" pathLength="1" d="${s.curve}"/>
+ <circle cx="100" cy="520" r="8" fill="#fff" stroke="#111" stroke-width="2"/>
+ <text x="100" y="548" text-anchor="middle" class="lab">HOME · FRESNO / CLOVIS</text>
+ <rect x="${s.curve.split(' ').pop().split(',')[0]-40}" y="30" width="80" height="26" rx="4" fill="#0b6b3e" stroke="#fff" stroke-width="1.5"/>
+ <text x="${s.curve.split(' ').pop().split(',')[0]}" y="48" text-anchor="middle" style="font:900 11px Overpass,Arial;fill:#fff;letter-spacing:.06em">${s.tab}</text>
+ <text x="16" y="250" class="hand" transform="rotate(-8 16 250)">${s.note.split(',')[0]}</text>
+ <text x="190" y="545" text-anchor="end" style="font:700 7px Overpass,Arial;fill:#666;letter-spacing:.1em">SCHEMATIC · NOT TO SCALE</text>
+</svg>
+<div class="log"><dl>${s.rows.map(r=>`<div><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join('')}</dl><p class="note">${s.note}</p></div>
+</section>`).join('');
+document.querySelectorAll('.strip').forEach(el=>{el.querySelector('svg').addEventListener('click',()=>el.classList.toggle('on'))});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')}),{threshold:.5});
+document.querySelectorAll('.strip').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

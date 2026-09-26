@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Map Room: prototype B (Vignelli lines)</title>
+<style>
+:root{--land:#efe6d3;--water:#d9c5a0;--ink:#111;--paper:#fbf8f1;
+--F:#ff6319;--S:#00933c;--M:#0039a6;--C:#b933ad;--T:#fccc0a}
+*{box-sizing:border-box}
+body{margin:0;background:#e9e4d8;color:var(--ink);font:16px/1.45 "Helvetica Neue",Helvetica,Arial,sans-serif}
+.wrap{max-width:1280px;margin:0 auto;padding:24px 20px 90px}
+.keystrip{display:grid;grid-template-columns:1.2fr 1fr 2fr;gap:0;background:var(--paper);border:1px solid #111;border-bottom:0}
+.keystrip>div{padding:12px 14px;border-right:1px solid #111;font-size:13px}
+.keystrip>div:last-child{border-right:0}
+.keystrip h1{font-size:28px;line-height:1;margin:0 0 6px;font-weight:700;letter-spacing:-.01em}
+.keystrip h2{font-size:12px;margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-bottom:3px solid #111;padding-bottom:3px}
+.bul{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;color:#fff;font-weight:700;font-size:15px;flex:none}
+.bul.T{color:#111}
+.routes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px}
+.routes button{all:unset;display:flex;gap:8px;align-items:center;cursor:pointer;font-size:13px;line-height:1.2;padding:2px 0}
+.routes button:focus-visible{outline:3px solid #111;outline-offset:2px}
+.mapbox{border:1px solid #111;background:var(--land);position:relative}
+svg{display:block;width:100%;height:auto}
+.st{font:500 13px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#111}
+.boro{font:700 30px "Helvetica Neue",Helvetica,Arial,sans-serif;fill:#8a7d62;letter-spacing:.02em}
+.grid{font:500 11px Helvetica,Arial;fill:#555}
+.ln{fill:none;stroke-width:9;stroke-linecap:butt;stroke-linejoin:miter;transition:opacity .25s}
+.dim .ln:not(.hot),.dim .dotg:not(.hot){opacity:.18}
+.verso{margin-top:24px;background:var(--paper);border:1px solid #111;display:grid;grid-template-columns:repeat(5,1fr)}
+.verso section{padding:12px 14px;border-right:1px solid #111}
+.verso section:last-child{border-right:0}
+.verso h3{display:flex;gap:8px;align-items:center;font-size:15px;margin:0 0 8px;line-height:1.15}
+.verso ul{margin:0;padding-left:16px;font-size:14px}
+@media (max-width:900px){.keystrip{grid-template-columns:1fr}.keystrip>div{border-right:0;border-bottom:1px solid #111}.verso{grid-template-columns:1fr}.verso section{border-right:0;border-bottom:1px solid #111}.wrap{padding:16px 16px 90px}.routes{grid-template-columns:1fr}}
+@media (max-width:640px){.mapbox{overflow-x:auto}.mapbox svg{width:900px;max-width:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+ <div class="keystrip">
+  <div><h1>Fresno &amp; Clovis<br>Service Map</h1><p style="margin:0">Each line is one commitment at home. Stations are years. No dot, no stop.</p></div>
+  <div><h2>How to use this map</h2><p style="margin:0">Pick a route bullet to light its line. The service guide below lists every stop.</p></div>
+  <div><h2>Routes</h2><ul class="routes">
+   <li><button data-r="F"><span class="bul" style="background:var(--F)">F</span>Food Bank · Sundays</button></li>
+   <li><button data-r="S"><span class="bul" style="background:var(--S)">S</span>Saturday School · Saturdays</button></li>
+   <li><button data-r="M"><span class="bul" style="background:var(--M)">M</span>Muslim Community Association</button></li>
+   <li><button data-r="C"><span class="bul" style="background:var(--C)">C</span>MSA · Clovis Community College</button></li>
+   <li><button data-r="T"><span class="bul T" style="background:var(--T)">T</span>Tutoring · Instilt Educate</button></li>
+  </ul></div>
+ </div>
+ <div class="mapbox"><svg id="map" viewBox="0 0 1200 640" role="img" aria-label="Diagram: five lines across the years 2015 to 2025">
+  <rect width="1200" height="640" fill="#efe6d3"/>
+  <path d="M0,60 L420,60 L480,0 L0,0Z M620,0 L700,80 L1200,80 L1200,0Z" fill="#d9c5a0"/>
+  <text x="120" y="42" class="grid" style="font-style:italic;fill:#7a6a48">San Joaquin River</text>
+  <text x="170" y="560" class="boro">FRESNO</text>
+  <text x="930" y="150" class="boro">CLOVIS</text>
+  <g id="years"></g>
+  <g id="lines"></g>
+ </svg></div>
+ <div class="verso" id="verso"></div>
+</main>
+<script>
+const X=y=>100+(y-2015)*100;
+const L={
+ F:{c:'var(--F)',d:`M${X(2015)},300 H${X(2021)}`,st:[[X(2015),300,'2015','Food Bank begins','b'],[X(2021),300,'2021','','b']]},
+ S:{c:'var(--S)',d:`M${X(2018)},380 L${X(2018)+60},320 H${X(2021)}`,st:[[X(2018),380,'2018','Saturday School begins','b'],[X(2021),320,'','','']]},
+ M:{c:'var(--M)',d:`M${X(2021)-25},340 H${X(2025)} L${X(2025)+60},280 V160`,st:[[X(2021)-25,340,'Sep 2021','Board','b'],[X(2022)-35,340,'May 2022','VP & Exec. Director','b'],[X(2025)+60,160,'150+ events · $240K+ · $500K pledge','','t'],[X(2025),340,'Dec 2025','','b']]},
+ C:{c:'var(--C)',d:`M${X(2022)},340 L${X(2022)+180},160 H${X(2022)+300}`,st:[[X(2022)+300,160,'Clovis Community College','','t']]},
+ T:{c:'var(--T)',d:`M${X(2023)},340 V480 H${X(2023)+200}`,st:[[X(2023)+200,480,'Instilt Educate','','b']]}
+};
+let yrs='';for(let y=2015;y<=2025;y++){yrs+=`<text x="${X(y)}" y="620" text-anchor="middle" class="grid">${y}</text><line x1="${X(y)}" x2="${X(y)}" y1="600" y2="606" stroke="#555"/>`}
+document.getElementById('years').innerHTML=yrs;
+let g='';for(const k in L){const l=L[k];g+=`<path class="ln" data-r="${k}" d="${l.d}" stroke="${l.c}"/>`;
+ g+=`<g class="dotg" data-r="${k}">`+l.st.map(s=>`<circle cx="${s[0]}" cy="${s[1]}" r="7" fill="#111"/><circle cx="${s[0]}" cy="${s[1]}" r="3" fill="#fff"/>${s[2]?`<text x="${s[0]+10}" y="${s[1]+(s[4]==='t'?-12:26)}" class="st">${s[2]}${s[3]?` <tspan style="fill:#555">${s[3]}</tspan>`:''}</text>`:''}`).join('')+`</g>`;}
+g+=`<rect x="${X(2021)-30}" y="292" width="${60}" height="56" rx="8" fill="none" stroke="#111" stroke-width="3"/>`;
+document.getElementById('lines').innerHTML=g;
+const V=[['F','Central California Food Bank',['Volunteer','Most Sundays','2015–2021']],['S','Masjid Fresno Saturday School',['Volunteer','Most Saturdays','2018–2021']],['M','Muslim Community Association of Fresno',['Board member from Sep 2021; Director of Outreach, of Relations, of External Relations','VP & Executive Director, May 2022–Dec 2025','150+ community events','$240K+ raised for Syrian and Afghan refugees and Pakistan flood victims','$500K pledge for Fresno’s first Muslim women’s transitional home','Clothing and food drives; mentoring groups at local mosques and Islamic schools']],['C','MSA, Clovis Community College',['Director of Community Relations','2022']],['T','Instilt Educate',['Tutor','2023']]];
+document.getElementById('verso').innerHTML=V.map(v=>`<section><h3><span class="bul ${v[0]==='T'?'T':''}" style="background:var(--${v[0]})">${v[0]}</span>${v[1]}</h3><ul>${v[2].map(x=>`<li>${x}</li>`).join('')}</ul></section>`).join('');
+const map=document.getElementById('map');
+document.querySelectorAll('.routes button').forEach(b=>b.addEventListener('click',()=>{const r=b.dataset.r;const on=map.dataset.r!==r;map.dataset.r=on?r:'';map.classList.toggle('dim',on);map.querySelectorAll('[data-r]').forEach(e=>e.classList.toggle('hot',on&&e.dataset.r===r))}));
+</script>
+</body>
+</html>

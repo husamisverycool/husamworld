@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Airport</title>
+<meta name="description" content="Prototype B: Harvard and abroad as airport wayfinding, after Otl Aicher's Frankfurt signage and Vignelli's NYCTA manual.">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --floor:#d6d8d5;      /* terminal concrete */
+  --ink:#141414;
+  --blue:#173a8c;       /* Frankfurt: air traffic */
+  --green:#0f6b45;      /* Frankfurt: services */
+  --white:#f4f4f0;      /* Frankfurt: everything else */
+  --black:#111;         /* Vignelli's overhead panels */
+  --m:clamp(84px, 9vw, 132px); /* one sign module */
+  --font:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--floor)}
+body{margin:0;background:var(--floor);color:var(--ink);font:500 17px/1.35 var(--font);-webkit-font-smoothing:antialiased;overflow-x:clip}
+h1,h2,h3,p,ul{margin:0;padding:0}ul{list-style:none}
+a{color:inherit}
+:focus-visible{outline:3px solid #f2b705;outline-offset:3px}
+.pic{display:block;width:100%;height:100%;color:#fff}
+
+/* ---- the overhead sign (Vignelli: black panel, white band on top) ---- */
+.overhead{position:relative;background:var(--black);color:#fff;margin:0 0 0;padding:14px 0 0}
+.overhead::before{content:"";position:absolute;left:0;right:0;top:6px;height:3px;background:#fff}
+.rail{display:flex;align-items:stretch;min-height:var(--m);overflow-x:auto;scrollbar-width:none}
+.rail>*{flex:none}
+.mod{width:var(--m);height:var(--m);padding:calc(var(--m) * .14)}
+.mod.sq{background:var(--blue)}
+.word{display:flex;flex-direction:column;justify-content:center;padding:0 calc(var(--m) * .18);min-width:calc(var(--m) * 2)}
+.word b{font-weight:600;font-size:calc(var(--m) * .34);line-height:1;letter-spacing:-.01em}
+.word span{font-size:calc(var(--m) * .15);opacity:.8;margin-top:.35em}
+.gap{width:18px}
+.hero{padding:clamp(40px,8vw,110px) 24px 30px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:40px;align-items:end;max-width:1400px;margin:0 auto}
+.hero h1{font-weight:600;font-size:clamp(56px,10vw,150px);line-height:.9;letter-spacing:-.035em}
+.hero p{font-size:clamp(18px,1.6vw,22px);max-width:34ch;margin-top:18px}
+.key{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.key li{display:flex;gap:10px;align-items:center;font-size:14px;line-height:1.2}
+.key i{flex:none;width:34px;height:34px;display:block}
+.key .kb{background:var(--blue)}.key .kg{background:var(--green)}.key .kw{background:var(--white);box-shadow:inset 0 0 0 1px #0002}
+
+section{max-width:1400px;margin:0 auto;padding:40px 24px 60px}
+.band{background:var(--black);color:#fff;position:relative;display:flex;align-items:center;gap:16px;padding:18px 18px 14px;margin-bottom:28px}
+.band::before{content:"";position:absolute;left:0;right:0;top:5px;height:3px;background:#fff}
+.band h2{font-weight:600;font-size:clamp(28px,3.4vw,44px);letter-spacing:-.02em}
+.band .mod{width:56px;height:56px;padding:6px}
+.band .note{margin-left:auto;font-size:14px;opacity:.75;max-width:40ch;text-align:right}
+
+/* ---- enamel signs, 54 × 54 cm squares ---- */
+.signs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:22px}
+.sign{position:relative;aspect-ratio:1/1;padding:22px;display:flex;flex-direction:column;color:#fff;background:var(--blue);border-radius:3px;
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.08),0 1px 0 rgba(0,0,0,.25);transform-origin:50% -30px;transition:transform .6s cubic-bezier(.3,1.6,.5,1)}
+.sign.g{background:var(--green)}
+.sign.w{background:var(--white);color:var(--ink)}
+.sign.w .pic{color:var(--ink)}
+.sign::after{content:"";position:absolute;inset:0;border-radius:3px;background:linear-gradient(135deg,rgba(255,255,255,.14),rgba(255,255,255,0) 38%);pointer-events:none}
+.sign .top{display:flex;justify-content:space-between;gap:12px}
+.sign .top .p{width:34%;aspect-ratio:1/1}
+.sign .top .a{width:22%;aspect-ratio:1/1}
+.sign h3{font-weight:600;font-size:clamp(26px,2.3vw,34px);line-height:1;letter-spacing:-.015em;margin-top:auto}
+.sign .role{font-size:15px;margin-top:8px;font-weight:600}
+.sign .desc{font-size:14px;line-height:1.3;margin-top:6px;opacity:.9}
+.sign .code{position:absolute;right:22px;bottom:18px;font-weight:700;font-size:13px;letter-spacing:.08em;opacity:.7}
+@media (hover:hover){.sign:hover{transform:rotate(-1.6deg)}}
+@media (prefers-reduced-motion:reduce){.sign{transition:none}.sign:hover{transform:none}}
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr}
+  .key{grid-template-columns:1fr}
+  .band .note{display:none}
+  .signs{grid-template-columns:1fr 1fr;gap:12px}
+  .sign{padding:14px}
+  .sign h3{font-size:21px}
+  .sign .desc{display:none}
+  .sign .role{font-size:13px}
+}
+footer{max-width:1400px;margin:0 auto;padding:10px 24px 120px;font-size:14px;color:#444}
+</style>
+</head>
+<body>
+<header class="overhead" aria-label="Overhead sign">
+  <div class="rail">
+    <div class="mod sq" data-p="depart"></div>
+    <div class="word"><b>Departures</b><span>South Korea · Europe · Puerto Rico</span></div>
+    <div class="mod" data-p="arrow" data-deg="0"></div>
+    <div class="gap"></div>
+    <div class="mod sq" style="background:var(--green)" data-p="book"></div>
+    <div class="word"><b>Gates</b><span>Cambridge</span></div>
+    <div class="mod" data-p="arrow" data-deg="90"></div>
+  </div>
+</header>
+
+<div class="hero">
+  <div>
+    <h1>The Airport</h1>
+    <p>Harvard College, sophomore, Applied Math in Government and Economics. Every trip leaves from Cambridge.</p>
+  </div>
+  <ul class="key" aria-label="Colour key">
+    <li><i class="kb"></i>Blue: programs that fly</li>
+    <li><i class="kg"></i>Green: service fellowships</li>
+    <li><i class="kw"></i>White: campus institutions</li>
+  </ul>
+</div>
+
+<section aria-labelledby="dep">
+  <div class="band"><div class="mod" data-p="depart"></div><h2 id="dep">Departures</h2><p class="note">Four programs with a ticket. Blue, as at Frankfurt, is for air traffic.</p></div>
+  <ul class="signs">
+    <li class="sign" data-p="paper"><h3>South Korea</h3><p class="role">The Harvard Crimson</p><p class="desc">Mentored students and led two weeks of workshops on writing, leadership and journalism.</p><span class="code">KOR</span></li>
+    <li class="sign" data-p="tour"><h3>Lithuania, Poland, Hungary</h3><p class="role">Hillel Travel Program Fellow</p><p class="desc">A research tour.</p><span class="code">LTU POL HUN</span></li>
+    <li class="sign" data-p="sun"><h3>Puerto Rico</h3><p class="role">Catalyst Sustainability Scholar</p><p class="desc">A service-learning trip.</p><span class="code">PRI</span></li>
+    <li class="sign" data-p="ring"><h3>Europe</h3><p class="role">HMC Europe, staff</p><p class="desc">500+ delegates from 20+ countries.</p><span class="code">EUR</span></li>
+  </ul>
+</section>
+
+<section aria-labelledby="gt">
+  <div class="band"><div class="mod" data-p="book"></div><h2 id="gt">Gates: Cambridge</h2><p class="note">No passport needed.</p></div>
+  <ul class="signs">
+    <li class="sign w" data-p="chamber"><h3>Harvard Model Congress</h3><p class="role">Chair (Senior Staff)</p><p class="desc">Directing the Boston conference: 1,500+ delegates, 100+ schools. North America's largest congressional simulation.</p><span class="code">HMC</span></li>
+    <li class="sign w" data-p="paper"><h3>Crimson Business Board</h3><p class="role">Project Team Lead, TPR/AlgoEd</p><p class="desc">International writing and leadership camps with The Princeton Review and AlgoEd.</p><span class="code">THCB</span></li>
+    <li class="sign w" data-p="mentor"><h3>Radcliffe Emerging Leaders</h3><p class="role">Mentor</p><p class="desc">Boston high-school sophomores, leadership and social activism.</p><span class="code">RAD</span></li>
+    <li class="sign w" data-p="table"><h3>China Forum</h3><p class="role">Operations</p><p class="desc">America's largest conference on US-China relations.</p><span class="code">HCCF</span></li>
+    <li class="sign w" data-p="flags"><h3>International Relations Council</h3><p class="role">Asst. Director of Operations</p><p class="desc">HMUN and HNMUN.</p><span class="code">HIRC</span></li>
+    <li class="sign w" data-p="stage"><h3>Leadership Institute</h3><p class="role">Associate</p><p class="desc">Youth Lead the Change conferences.</p><span class="code">LIHC</span></li>
+    <li class="sign g" data-p="tent"><h3>First-Year Outdoor Program</h3><p class="role">Leader</p><span class="code">FOP</span></li>
+    <li class="sign g" data-p="oath"><h3>Honor Council</h3><p class="role">Member</p><span class="code">HON</span></li>
+    <li class="sign g" data-p="spark"><h3>SPARK Fellow</h3><p class="role">Summer 2025</p><p class="desc">7 weeks of public service, $2,000 stipend.</p><span class="code">SPRK</span></li>
+    <li class="sign g" data-p="carry"><h3>Fong Family Fellow</h3><p class="role">Winter</p><p class="desc">A month of public service, $1,000.</p><span class="code">FONG</span></li>
+  </ul>
+</section>
+<footer>Prototype B. Colour code and 45°/90° pictogram grid after Otl Aicher's Frankfurt Airport signage (1972); black overhead panels with the white band after Vignelli and Noorda's NYCTA manual (1970).</footer>
+<script src="picto.js"></script>
+<script>
+document.querySelectorAll('[data-p]').forEach(function (el) {
+  var p = el.getAttribute('data-p');
+  if (el.classList.contains('sign')) {
+    var top = document.createElement('div'); top.className = 'top';
+    top.innerHTML = '<div class="p">' + pictoSVG(p) + '</div><div class="a">' + pictoSVG('arrow', 'pic', '', el.closest('section').querySelector('#dep') ? -45 : 0) + '</div>';
+    el.insertBefore(top, el.firstChild);
+  } else el.innerHTML = pictoSVG(p, 'pic', '', +el.getAttribute('data-deg') || 0);
+});
+</script>
+</body>
+</html>

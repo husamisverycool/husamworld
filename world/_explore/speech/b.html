@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Chamber · B: Tournament Night</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,700;0,800;1,800&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0B1B3F;--navy2:#132A5E;--red:#D7263D;--gold:#FFC629;--ice:#EAF0F8;--white:#fff;--grey:#8A96AD}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--navy);color:var(--white);font-family:Barlow,system-ui,sans-serif;overflow-x:hidden}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.cond{font-family:"Barlow Condensed",sans-serif}
+.ticker{display:flex;background:#fff;color:#111;overflow:hidden;border-bottom:1px solid #ddd;position:sticky;top:0;z-index:20}
+.ticker div{flex:0 0 150px;padding:8px 12px;border-right:1px solid #e3e3e3;font-size:12px;line-height:1.35}
+.ticker b{display:block;font:600 10px Barlow;color:#999;letter-spacing:.06em}
+.ticker .w{font-weight:600}
+.open{min-height:92vh;position:relative;display:grid;place-items:center;overflow:hidden;
+ background:repeating-linear-gradient(115deg,#0E2150 0 60px,#0B1B3F 60px 120px)}
+.open h1{font:800 italic clamp(64px,13vw,210px)/.86 "Barlow Condensed";text-transform:uppercase;letter-spacing:-.01em;text-align:center}
+.open h1 span{display:block;color:var(--gold)}
+.open p{position:absolute;bottom:8vh;left:0;right:0;text-align:center;font:600 16px Barlow;letter-spacing:.2em;text-transform:uppercase;color:var(--grey)}
+.shot{position:relative;min-height:88vh;display:flex;align-items:flex-end;padding:0 5vw 16vh;overflow:hidden;border-top:1px solid #1d3570}
+.shot .bg{position:absolute;inset:0;display:grid;place-items:center;font:800 clamp(120px,24vw,380px)/1 "Barlow Condensed";text-transform:uppercase;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.08);white-space:nowrap}
+.l3{position:relative;display:flex;flex-direction:column;max-width:900px;width:100%}
+.l3 .bar{display:flex;align-items:stretch}
+.l3 .chip{background:var(--c,var(--red));padding:10px 18px;font:800 22px "Barlow Condensed";text-transform:uppercase;letter-spacing:.02em;clip-path:inset(0 100% 0 0);transition:clip-path .35s cubic-bezier(.16,1,.3,1)}
+.l3 .name{background:#fff;color:var(--navy);padding:10px 18px;font:700 22px "Barlow Condensed";text-transform:uppercase;clip-path:inset(0 100% 0 0);transition:clip-path .35s .12s cubic-bezier(.16,1,.3,1)}
+.l3 .big{background:var(--navy2);padding:14px 18px 10px;overflow:hidden}
+.l3 .big h2{font:800 clamp(44px,7vw,104px)/.9 "Barlow Condensed";text-transform:uppercase;transform:translateY(105%);transition:transform .45s .25s cubic-bezier(.16,1,.3,1)}
+.l3 .assist{background:var(--gold);color:var(--navy);font:700 20px "Barlow Condensed";padding:8px 18px;text-transform:uppercase;transform:scaleY(0);transform-origin:top;transition:transform .3s .55s cubic-bezier(.16,1,.3,1)}
+.shot.on .chip,.shot.on .name{clip-path:inset(0 0 0 0)}
+.shot.on .big h2{transform:none}.shot.on .assist{transform:none}
+.replay{position:absolute;right:5vw;bottom:16vh;background:none;border:1px solid var(--grey);color:#fff;border-radius:40px;padding:8px 16px;font:600 14px Barlow;cursor:pointer}
+.bug{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);display:flex;height:48px;box-shadow:0 6px 24px rgba(0,0,0,.35);z-index:30;font-family:"Barlow Condensed";text-transform:uppercase}
+.bug>*{display:flex;align-items:center;padding:0 14px}
+.bug .net{background:#fff;color:var(--navy);font-weight:800;font-size:18px}
+.bug .ev{background:var(--c,var(--red));font-weight:800;font-size:20px;min-width:120px;transition:background .3s}
+.bug .rd{background:var(--navy2);font-weight:700;font-size:18px;min-width:130px}
+.bug .clk{background:#000;font-weight:800;font-size:28px;font-variant-numeric:tabular-nums;min-width:86px;justify-content:center}
+.bug .n{background:var(--gold);color:var(--navy);font-weight:800;font-size:18px}
+.bracket{padding:14vh 5vw;background:var(--ice);color:#111}
+.bracket h2{font:800 clamp(40px,6vw,80px)/1 "Barlow Condensed";text-transform:uppercase;color:var(--navy);margin-bottom:30px}
+.road{display:grid;grid-template-columns:220px repeat(5,1fr);gap:0;font-size:13px}
+.road .hd{font:600 11px Barlow;letter-spacing:.08em;text-transform:uppercase;color:#555;padding:8px 6px;border-top:6px solid #d9dee8}
+.road .ev{padding:14px 8px;font:700 17px "Barlow Condensed";text-transform:uppercase;border-bottom:1px solid #dde}
+.road .cell{border-bottom:1px solid #dde;position:relative}
+.road .cell.hit::after{content:"";position:absolute;left:0;right:0;top:50%;height:4px;background:var(--c);transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.road.on .cell.hit::after{transform:scaleX(1)}
+.road .cell.end span{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:var(--c);color:#fff;font:800 13px "Barlow Condensed";padding:3px 8px;text-transform:uppercase;z-index:1}
+.snd{position:fixed;top:56px;right:16px;z-index:25;background:var(--navy2);color:#fff;border:1px solid var(--grey);padding:6px 12px;font:600 13px Barlow;cursor:pointer}
+@media (max-width:700px){
+ .bug{left:88px;right:16px;transform:none;height:42px}.bug .net{display:none}.bug .ev{min-width:0;font-size:16px}.bug .rd{min-width:0;font-size:14px}.bug .clk{font-size:22px;min-width:64px}
+ .road{grid-template-columns:110px repeat(5,1fr)}.road .ev{font-size:13px}.road .hd{font-size:9px;padding:6px 2px}
+ .shot{padding:0 16px 18vh}.replay{right:16px;bottom:10vh}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<button class="snd" id="snd" aria-pressed="false">Sound: off</button>
+<div class="ticker" aria-label="Results ticker">
+ <div><b>FINAL</b><span class="w">NSDA · CONGRESS</span><br>Finalist</div>
+ <div><b>FINAL</b><span class="w">CA MOCK TRIAL</span><br>MVP</div>
+ <div><b>FINAL</b><span class="w">UOP INVITE</span><br>3× Champ</div>
+ <div><b>FINAL</b><span class="w">BERKELEY CONG.</span><br>3rd</div>
+ <div><b>SEMIS</b><span class="w">CHSSA · CONGRESS</span><br>Top 15</div>
+ <div><b>OCTOS</b><span class="w">CHSSA · PF</span><br>Octofinalist</div>
+ <div><b>QUARTERS</b><span class="w">ETHICS BOWL</span><br>Top 8</div>
+</div>
+<header class="open"><h1>Tournament<span>Night</span></h1><p>Live from the Chamber · speech, debate, Mock Trial</p></header>
+
+<main id="shots"></main>
+
+<section class="bracket"><h2>How far he went</h2><div class="road" id="road"></div></section>
+
+<div class="bug" id="bug" aria-live="polite"><span class="net">Chamber</span><span class="ev" id="bEv">Congress</span><span class="rd" id="bRd">Final</span><span class="clk" id="bClk">3:00</span><span class="n" id="bN">1/10</span></div>
+
+<script>
+const R=[
+ {ev:'Congressional Debate',ab:'Congress',t:'NSDA National Tournament',res:'National Finalist',as:'1 of 20 from 50,000+',rd:'Final',c:'#D7263D'},
+ {ev:'Congressional Debate',ab:'Congress',t:'NSDA National Tournament',res:'National Semifinalist',as:'NSDA Nationals',rd:'Semifinal',c:'#D7263D'},
+ {ev:'NSDA Nationals',ab:'Nationals',t:'NSDA National Tournament',res:'4× Qualifier',as:'Four national tournaments',rd:'Qualified',c:'#D7263D'},
+ {ev:'Legislation',ab:'Docket',t:'NSDA National Tournament',res:'Legislation Author',as:'1 of 41 from 500+',rd:'Docket',c:'#3A6FF7'},
+ {ev:'Mock Trial',ab:'Mock Trial',t:'California Mock Trial Finals',res:'MVP',as:'1 of 128 from 5,000+ competitors',rd:'Finals',c:'#7A1FA2'},
+ {ev:'Congressional Debate',ab:'Congress',t:'CHSSA',res:'Semifinalist',as:'Top 15 in California',rd:'Semifinal',c:'#0E9F6E'},
+ {ev:'Public Forum',ab:'PF',t:'CHSSA',res:'Octofinalist',as:'CHSSA · Public Forum',rd:'Octofinal',c:'#0E9F6E'},
+ {ev:'Parli · Oral Interp · Speaker',ab:'UOP',t:'UOP Invitational',res:'3× Champion',as:'Parliamentary Debate · Oral Interpretation · Best Speaker',rd:'Champion',c:'#E07A10'},
+ {ev:'Congress',ab:'Berkeley',t:'Berkeley National Congress Tournament',res:'3rd Place',as:'Berkeley National Congress',rd:'Final',c:'#E07A10'},
+ {ev:'Ethics Bowl',ab:'Ethics',t:'Ethics Bowl, California',res:'Quarterfinalist',as:'Top 8 in the state',rd:'Quarterfinal',c:'#0891B2'},
+];
+const main=document.getElementById('shots');
+R.forEach((r,i)=>{const s=document.createElement('section');s.className='shot';s.dataset.i=i;s.innerHTML=`<div class="bg" aria-hidden="true">${r.ab}</div><div class="l3" style="--c:${r.c}"><div class="bar"><span class="chip">${r.t}</span><span class="name">Sokar · ${r.ev}</span></div><div class="big"><h2>${r.res}</h2></div><div class="assist">${r.as}</div></div><button class="replay">Replay ↻</button>`;main.appendChild(s)});
+let ac=null,on=false;const sb=document.getElementById('snd');sb.onclick=()=>{on=!on;sb.textContent='Sound: '+(on?'on':'off');sb.setAttribute('aria-pressed',on);if(on){ac=ac||new AudioContext();sting(0)}};
+function sting(i){if(!on)return;const t=ac.currentTime;[0,.09].forEach((d,k)=>{const o=ac.createOscillator(),g=ac.createGain();o.type='triangle';o.frequency.value=(523+i*30)*(k?1.5:1);g.gain.setValueAtTime(.0001,t+d);g.gain.exponentialRampToValueAtTime(.18,t+d+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d+.35);o.connect(g).connect(ac.destination);o.start(t+d);o.stop(t+d+.4)})}
+const bug={ev:bEv,rd:bRd,n:bN,clk:bClk};
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){const i=+e.target.dataset.i,r=R[i];e.target.classList.add('on');bug.ev.textContent=r.ab;bug.ev.style.background=r.c;bug.rd.textContent=r.rd;bug.n.textContent=(i+1)+'/'+R.length;sting(i)}}),{threshold:.55});
+document.querySelectorAll('.shot').forEach(s=>{io.observe(s);s.querySelector('.replay').onclick=()=>{s.classList.remove('on');void s.offsetWidth;requestAnimationFrame(()=>{s.classList.add('on');sting(+s.dataset.i)})}});
+addEventListener('scroll',()=>{const p=Math.min(1,scrollY/(document.body.scrollHeight-innerHeight));const t=Math.round(180*(1-p));bug.clk.textContent=Math.floor(t/60)+':'+String(t%60).padStart(2,'0')},{passive:true});
+// road
+const cols=['Qualified','Octofinal','Quarterfinal','Semifinal','Final'];const lvl={Qualified:0,Docket:0,Octofinal:1,Quarterfinal:2,Semifinal:3,Final:4,Finals:4,Champion:4};
+const road=document.getElementById('road');road.innerHTML='<div class="hd"></div>'+cols.map(c=>`<div class="hd">${c}</div>`).join('');
+[['NSDA · Congress',4,'Finalist','#D7263D'],['CHSSA · Congress',3,'Semis','#0E9F6E'],['CHSSA · PF',1,'Octos','#0E9F6E'],['Ethics Bowl',2,'Top 8','#0891B2'],['Mock Trial',4,'MVP','#7A1FA2'],['UOP ×3',4,'Champ','#E07A10'],['Berkeley',4,'3rd','#E07A10']].forEach(([n,l,lab,c])=>{road.innerHTML+=`<div class="ev">${n}</div>`+cols.map((_,k)=>`<div class="cell ${k<=l?'hit':''} ${k===l?'end':''}" style="--c:${c};">${k===l?`<span>${lab}</span>`:''}</div>`).join('')});
+new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){[...road.querySelectorAll('.cell.hit')].forEach((c,i)=>c.style.transitionDelay=(i*.05)+'s');road.classList.add('on')}}),{threshold:.3}).observe(road);
+if(matchMedia('(prefers-reduced-motion: reduce)').matches){document.querySelectorAll('.shot').forEach(s=>s.classList.add('on'));road.classList.add('on')}
+</script>
+</body>
+</html>
