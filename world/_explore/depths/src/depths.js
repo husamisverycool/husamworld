@@ -358,12 +358,14 @@
     if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].indexOf(e.key) > -1) cancelJump();
     if (introRunning) skipIntro();
   });
+  // where 'the bottom' lands: the sand edge at 74% (phones 55%, so the end title stays clear of the bottom-left corner)
+  function landFrac() { return W.innerWidth < 700 ? 0.55 : 0.74; }
   function floorY() { return floorSec.getBoundingClientRect().top + W.scrollY; }
   function targetY(key) {
     var vh = W.innerHeight;
     if (key === 'top') return 0;
     if (key === 'surface') return surfaceSec.getBoundingClientRect().top + W.scrollY - 10;
-    if (key === 'bottom') return floorY() - vh * 0.74;
+    if (key === 'bottom') return floorY() - vh * landFrac();
     if (key === 'end') return floorY();
     if (key === 'collection') return $('collection').getBoundingClientRect().top + W.scrollY - 70;
     var el = $(key);
@@ -383,6 +385,26 @@
     return String(Math.round(n));
   }
   var state = { sy: 0, vh: 800, nTop: 0, dark: 0, surf: .222, depth: 0, frac: 0 };
+  /* The controls are pinned, but Neal's page has nothing pinned at the top; so when a line of text
+     scrolls under them they step aside (fade out) and come back once it has passed. */
+  var ctlBox = D.querySelector('.controls'), ctlSy = -1, TEXTY = /^(P|H1|H2|H3|LI|FIGCAPTION|A)$/;
+  function duck(sy) {
+    if (!ctlBox || sy === ctlSy) return; ctlSy = sy;
+    if (ctlBox.contains(D.activeElement) || !jumpMenu.hidden || sinking) { ctlBox.classList.remove('ducked'); return; }
+    var r = ctlBox.getBoundingClientRect(), hit = false;
+    for (var i = 0; i < 5 && !hit; i++) {
+      var x = r.left + 4 + (r.width - 8) * i / 4;
+      for (var j = 0; j < 2 && !hit; j++) {
+        var stack = D.elementsFromPoint(x, r.top + 6 + (r.height - 12) * j);
+        for (var k = 0; k < stack.length; k++) {
+          var e = stack[k];
+          if (ctlBox.contains(e)) continue;
+          if (TEXTY.test(e.tagName) || (e.tagName === 'SPAN' && e.closest('.plate,.spec,.zone-title'))) { hit = true; break; }
+        }
+      }
+    }
+    ctlBox.classList.toggle('ducked', hit);
+  }
   function update() {
     var sy = W.scrollY, vh = W.innerHeight;
     state.sy = sy; state.vh = vh;
@@ -403,6 +425,7 @@
     state.surf = 1 - (surfacePageY() - sy) / vh;
     state.depth = sy / vh;
     state.frac = n < 1 ? 0 : Math.min(1, Math.log(nc) / Math.log(NMAX));
+    duck(sy);
   }
 
   /* ------------------------------------------------ the water (WebGL port of Neal's shader) */
@@ -656,7 +679,7 @@
     var dt = Math.min(.05, (now - (sinkLast || now)) / 1000); sinkLast = now;
     sinkAcc += sinkSpeed() * dt;
     var whole = Math.floor(sinkAcc); sinkAcc -= whole;
-    var stopAt = floorY() - W.innerHeight * 0.74;
+    var stopAt = floorY() - W.innerHeight * landFrac();
     if (W.scrollY + whole >= stopAt) { W.scrollTo(0, stopAt); stopSink(); return; }
     if (whole) W.scrollBy(0, whole);
     sinkRaf = requestAnimationFrame(sinkStep);
