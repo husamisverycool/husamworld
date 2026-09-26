@@ -976,7 +976,9 @@ del.am{display:none}
 
   /* ---------- bill <-> slip law re-typesetting ---------- */
   var mq=window.matchMedia?matchMedia('(max-width:699px)'):null, rt=0, lastSlip=mq?mq.matches:false;
-  function onMode(){
+  var modeT=0;
+  function onMode(){ clearTimeout(modeT); modeT=setTimeout(applyMode,220); }
+  function applyMode(){
     var slip=mq.matches; if(slip===lastSlip) return; lastSlip=slip;
     if(!reduce){ root.classList.remove('retype'); void root.offsetWidth; root.classList.add('retype'); clearTimeout(rt); rt=setTimeout(function(){root.classList.remove('retype');},900); }
     toast('Re-typeset', slip?'as a slip law: new masthead, no line numbers.':'as a bill in the House, with line numbers.');
