@@ -132,7 +132,7 @@ strong,b{color:#222}
 /* ---------- after the story ---------- */
 .post{max-width:780px;margin:0 auto;padding:0 24px}
 .post h2{font:700 24px/1.3 var(--sans);color:#222;margin:48px 0 14px}
-.bold-break{font-weight:700;color:#222;margin-top:34px}
+.post h2.bold-break,.bold-break{font:700 17px/1.5 var(--sans);color:#222;margin:40px 0 12px}
 .method{border:2px solid #111;border-radius:255px 14px 225px 14px/14px 225px 14px 255px;padding:22px 26px 12px;margin:10px 0 30px;background:#fff}
 .method h2{margin:0 0 10px;font-size:19px}
 .method ul{margin:0 0 12px;padding-left:1.1em}
@@ -167,10 +167,16 @@ footer.end{font:12px var(--chart);color:#888;padding:10px 0 110px}
 /* ---------- narrower screens: Pudding mobile pattern ---------- */
 @media (max-width:980px){
   .scrolly{grid-template-columns:minmax(0,1fr);padding:0 16px}
-  .viz{top:0;padding:8px 0 6px;border-bottom:1px solid #eee}
+  .viz{top:0;padding:8px 0 6px;border-bottom:1px solid #eee;z-index:5;box-shadow:0 8px 12px -10px rgba(0,0,0,.25)}
+  .steps{position:relative;z-index:1}
   .steps{margin-top:0}
-  .step{min-height:92vh;justify-content:flex-end;padding:0 0 12vh}
-  .step:first-child{min-height:60vh;padding-top:0;justify-content:flex-end}
+  .steps{pointer-events:none}
+  .step-in{pointer-events:auto}
+  .step{min-height:100vh;justify-content:flex-end;padding:0 0 4vh}
+  .step:first-child{min-height:62vh;padding-top:0;justify-content:flex-end}
+  .viz-plot svg{max-height:47vh;width:auto;max-width:100%;margin:0 auto}
+  .viz-legend{font-size:11px;gap:3px 12px;margin-top:4px}
+  .viz-credit{display:none}
   .step-in{background:#fff;border:1.5px solid #111;padding:14px 16px 4px;box-shadow:4px 4px 0 rgba(17,17,17,.12);max-width:560px;margin:0 auto;width:100%}
 }
 @media (max-width:640px){
@@ -178,10 +184,11 @@ footer.end{font:12px var(--chart);color:#888;padding:10px 0 110px}
   .col,.post{padding:0 16px}
   .post-title{font-size:31px;margin-top:22px}
   .headline{font-size:18px}
-  .viz-title{font-size:21px}
+  .viz-title{font-size:19px}
+  .viz-head{margin-bottom:2px}
   .viz-controls{font-size:12px;gap:6px 10px}
   .seg button{padding:6px 10px;font-size:12px}
-  .step-in{font-size:15.5px}
+  .step-in{font-size:15px;line-height:1.55;padding:12px 14px 2px}
   .author{grid-template-columns:84px 1fr;gap:14px}
   .author img{width:84px;height:84px}
   table.roles thead{display:none}
@@ -256,9 +263,9 @@ footer.end{font:12px var(--chart);color:#888;padding:10px 0 110px}
     </div></div>
 
     <div class="step" data-state="cair"><div class="step-in">
-      <p><span class="yr">2021&ndash;2023.</span> In May 2021 I became Lead Advocate at CAIR in Sacramento. It lasted <span data-calc="wk:cair">105</span> weeks, until May 2023.</p>
+      <p><span class="yr">2021&ndash;2023.</span> In May 2021 I became Lead Advocate at CAIR in Sacramento. It lasted <span data-calc="wk:cair">109</span> weeks, until May 2023.</p>
       <p>I was the lead community advocate for AB 1766 (California IDs for All), working with Asm. Jim Patterson&rsquo;s office (Legislative Director Ian Coolbear) and Sen. Shannon Grove&rsquo;s office. I also advocated for AB 1947 (Freedom from Hate Crimes), SB 1161 (Transit Safety), AB 2549 (Ending Street Harassment) and SB 1038 (limits on biometric surveillance by law enforcement).</p>
-      <p>Five California bills, worked end to end. Meanwhile, in September 2021, I joined the board of the Muslim Community Association of Fresno. That one stays on the chart for <span data-calc="wk:mca">226</span> weeks.</p>
+      <p>Five California bills, worked end to end. Meanwhile, in September 2021, I joined the board of the Muslim Community Association of Fresno. That one stays on the chart for <span data-calc="wk:mca">225</span> weeks.</p>
     </div></div>
 
     <div class="step" data-state="y2022"><div class="step-in">
@@ -291,13 +298,13 @@ footer.end{font:12px var(--chart);color:#888;padding:10px 0 110px}
       <p><span class="yr">2025.</span> On April 16 the Wall Street Journal ran &ldquo;Harvard-Bound Students Stand Firm While Some Columbia Prospects Think Twice,&rdquo; with me as a contributor. That fall I started at Harvard, concentrating in Applied Math in Government and Economics. Then this happened.</p>
       <p>From <span data-calc="peakFrom">October 1</span> to <span data-calc="peakTo">December 31, 2025</span>, every week had <span data-calc="peak">7</span> things in it:</p>
       <ul data-calc="peakList">
-        <li>The Harvard Crimson Business Board</li>
-        <li>Harvard Model Congress, Boston &amp; Europe</li>
+        <li>Muslim Community Association of Fresno</li>
         <li>Harvard service, ethics and leadership fellowships</li>
         <li>Institute of Politics, Harvard Kennedy School</li>
         <li>Harvard Global Research and Consulting Group</li>
+        <li>Harvard Model Congress, Boston &amp; Europe</li>
+        <li>The Harvard Crimson Business Board</li>
         <li>Emerging Leaders Program, Harvard Radcliffe Institute</li>
-        <li>Muslim Community Association of Fresno</li>
       </ul>
       <p><span data-calc="peakWeeks">13</span> weeks in a row, the longest run at the chart&rsquo;s peak.</p>
       <svg class="fig" viewBox="0 0 340 214" role="img" aria-label="A stick figure juggling seven balls, saying: Seven at once."><g class="ink"><path d="M74.8,82.4 C73.8,81.8 70.1,80.7 68.7,79 C67.4,77.3 66.4,74.3 66.7,72.2 C67,70.1 68.9,67.6 70.6,66.4 C72.4,65.1 75.2,64.2 77.2,64.5 C79.3,64.8 81.8,66.3 83.1,68 C84.4,69.7 85.2,72.5 85,74.6 C84.8,76.8 83.7,79.5 81.7,80.8 C79.7,82.1 74.5,82.1 73.1,82.4" style="fill:#a6d3ff"/><path d="M88.3,50.4 C88.8,49.3 89.5,45.5 91.1,44.1 C92.6,42.7 95.4,41.8 97.6,41.8 C99.7,41.9 102.7,42.8 104.1,44.4 C105.5,45.9 106.1,48.9 106,51 C105.8,53.2 104.9,55.8 103.4,57.3 C101.9,58.7 99.1,60 96.9,59.9 C94.8,59.9 92.1,58.8 90.6,56.9 C89.1,55 88.5,50.1 88.1,48.7" style="fill:#94caaf"/><path d="M135.9,42.5 C134.8,42.8 131.4,44.6 129.3,44.3 C127.1,44.1 124.3,42.9 123,41.2 C121.6,39.5 120.9,36.4 121.2,34.3 C121.5,32.1 123,29.4 124.7,28.1 C126.4,26.8 129.4,26 131.5,26.3 C133.6,26.6 135.9,28.3 137.2,30.1 C138.6,31.8 140.1,34.3 139.7,36.6 C139.2,38.8 135.4,42.2 134.5,43.3" style="fill:#9dd894"/><path d="M160.7,30.2 C161.2,29.2 162.2,25.6 163.7,24.1 C165.3,22.5 167.7,21.2 169.8,21.1 C171.8,21.1 174.4,22.3 175.9,23.8 C177.5,25.2 179.1,27.7 179.1,29.8 C179.2,31.8 177.8,34.5 176.3,36 C174.8,37.5 172.3,38.7 170.2,38.8 C168.1,38.9 165.1,38.4 163.6,36.7 C162.2,35 161.9,30 161.5,28.7" style="fill:#ffff94"/><path d="M208.5,26.1 C209.6,26.5 213.3,27.3 214.9,28.7 C216.5,30 217.8,32.3 218.1,34.4 C218.5,36.5 218.3,39.6 217,41.2 C215.8,42.9 212.8,44 210.7,44.2 C208.5,44.3 205.9,43.5 204.2,42.3 C202.5,41 201,38.5 200.7,36.5 C200.4,34.4 200.9,31.5 202.5,29.8 C204.1,28.1 208.9,26.8 210.2,26.2" style="fill:#ffc58b"/><path d="M245.6,59.4 C244.5,59.2 240.8,59.4 238.8,58.4 C236.9,57.5 234.5,55.6 233.8,53.6 C233.2,51.7 233.9,48.7 235,46.8 C236,44.9 237.9,42.9 239.9,42.2 C241.9,41.5 245,41.5 246.9,42.5 C248.9,43.4 251,45.7 251.6,47.8 C252.3,49.8 252.1,52.8 250.8,54.8 C249.6,56.8 245.1,59 244,59.8" style="fill:#ff9c9c"/><path d="M266.2,65.1 C267.1,65.7 271,67 272,68.7 C273.1,70.5 273.1,73.7 272.5,75.7 C271.9,77.7 270.1,79.8 268.3,80.8 C266.5,81.8 263.8,82.2 261.8,81.8 C259.8,81.3 257.3,79.7 256.2,78 C255.1,76.2 254.6,73.2 255.2,71.1 C255.7,69 257.2,66.4 259.3,65.4 C261.4,64.4 266.5,65.1 267.9,65" style="fill:#c8b5da"/><path d="M174.4,132.7 C172.4,132.6 165.6,134 162.3,132.3 C159,130.6 155.6,126.3 154.5,122.6 C153.4,119 153.9,113.6 155.7,110.3 C157.5,107 161.8,104 165.5,102.9 C169.1,101.8 174.1,102.3 177.5,104 C181,105.7 184.8,109.6 185.9,113.2 C187.1,116.9 186.9,122.4 184.5,125.8 C182.2,129.2 173.9,132.2 171.7,133.5"/><circle cx="165" cy="116" r="1.9" class="fill"/><circle cx="175" cy="116" r="1.9" class="fill"/><circle cx="170" cy="125" r="2.6" fill="none"/><path d="M170,134 C170.1,136.3 170.6,143.2 170.7,147.9 C170.8,152.5 170.7,157 170.6,161.7 C170.4,166.4 170.1,173.6 170,176"/><path d="M170,146 C168.3,143.9 163.3,137.4 159.6,133.3 C156,129.2 151.8,125.7 148.2,121.5 C144.6,117.3 139.7,110.3 138,108"/><path d="M170,146 C171.6,143.8 176.2,136.9 179.8,132.8 C183.3,128.6 187.7,125.3 191.4,121.1 C195.1,117 200.2,110.2 202,108"/><path d="M170,176 C169.2,177.7 166.4,182.8 165,186.4 C163.5,189.9 162.6,193.7 161.1,197.3 C159.6,200.9 156.9,206.2 156,208"/><path d="M170,176 C170.8,177.8 173.1,183 174.6,186.5 C176.1,190.1 177.5,193.6 179,197.2 C180.6,200.8 183.2,206.2 184,208"/><path d="M99.7,150.2 C108.4,151.3 109.7,152.3 112.9,155.6 C116.1,158.8 117.8,166.1 119,169.5 C120.1,172.9 119.7,174 119.7,175.9 C119.6,177.8 119.7,178.2 118.6,181 C117.4,183.8 115.9,189.5 113,192.6 C110,195.7 109.4,198.3 101.1,199.6 C92.8,200.9 76,200.6 63.2,200.4 C50.4,200.3 33.1,199.5 24.2,198.4 C15.3,197.3 12.8,196.9 9.9,193.9 C6.9,190.9 7,183.9 6.5,180.4 C5.9,176.9 6.9,175 6.6,173 C6.4,170.9 4.1,171.4 4.9,168.3 C5.8,165.1 8.5,157.1 11.6,154.2 C14.7,151.3 15.4,151.6 23.7,150.8 C32,149.9 48.6,149.1 61.3,149 C74,148.9 91.1,149.1 99.7,150.2 Z" class="bub"/><path d="M118,166 C119.7,163.7 124.1,156.4 128.1,152.4 C132,148.4 137.6,146 141.6,142 C145.6,137.9 150.3,130.3 152,128"/><text class="hand" x="62" y="170.2" text-anchor="middle" font-size="15"><tspan x="62" dy="0">Seven</tspan><tspan x="62" dy="18">at once.</tspan></text></g></svg>
@@ -318,9 +325,8 @@ footer.end{font:12px var(--chart);color:#888;padding:10px 0 110px}
 </section>
 
 <div class="post">
-  <p class="bold-break">How I counted</p>
-  <div class="method" id="how">
-    <h2 class="sr">How I counted</h2>
+  <h2 class="bold-break" id="how">How I counted</h2>
+  <div class="method">
     <ul>
       <li><b>Weeks.</b> Each year is 52 weeks starting January 1. Week 52 runs to December 31, so it&rsquo;s 8 days long (9 in leap years). A role counts in a week if the week&rsquo;s middle day falls inside the role&rsquo;s dates.</li>
       <li><b>Months.</b> Most dates in my record are months. &ldquo;Jul&ndash;Oct 2022&rdquo; counts from July 1 to October 31. Two roles that hand off in the same month both count for that month.</li>
@@ -332,7 +338,7 @@ footer.end{font:12px var(--chart);color:#888;padding:10px 0 110px}
     </ul>
   </div>
 
-  <p class="bold-break" id="table">Every role, with dates</p>
+  <h2 class="bold-break" id="table">Every role, with dates</h2>
   <div class="tbl-wrap">
     <table class="roles" id="roleTable">
       <caption>Sorted by start. &ldquo;Weeks counted&rdquo; is how many boxes on the chart include the role.</caption>
@@ -390,7 +396,7 @@ footer.end{font:12px var(--chart);color:#888;padding:10px 0 110px}
   </div>
 
   <div class="notes">
-    <p class="bold-break">Notes</p>
+    <h2 class="bold-break">Notes</h2>
     <ol>
       <li id="fn1"><span data-calc="fn1">Counted from the month-level dates in my record: a role listed as &ldquo;Sep 2025&ndash;Feb 2026&rdquo; counts in every week from September 1, 2025 to February 28, 2026. On the chart the run of 7 continues to January 28, 2026, because a month-long winter fellowship is placed (approximately) in January. The count also hit 7 once before, October 1&ndash;28, 2022. Ten roles dated only to a year aren&rsquo;t counted; spread across their whole years they&rsquo;d push early 2023 to 13.</span></li>
     </ol>
@@ -671,7 +677,7 @@ var GREY=['#f2f2f0','#e6e6e3','#dadad6','#cdcdc8','#c0c0bb','#b3b3ad','#a6a6a0']
 var DOT_FB='#eb6834', DOT_SS='#4a3aa7', DOT_OFF='#c9c9c9';
 var ANNO=['#000080','#b3060b','#16701c','#6a2c91','#a54d00','#0e6b6b','#8a1538'];
 
-var S={view:'grid',incY:false,state:'all',intro:NW,hover:-1,pinned:false,sel:-1};
+var S={view:'grid',incY:false,state:'all',intro:NW,introOn:false,hover:-1,pinned:false,sel:-1};
 var L=null, R={rects:[],fb:[],ss:[]};
 var measureCtx=document.createElement('canvas').getContext('2d');
 function tw(t,font){measureCtx.font=font;return measureCtx.measureText(t).width;}
@@ -710,7 +716,7 @@ function STATES(){
       {at:firstWeek('don'),text:'Jun: Diversify Our Narrative, 1 of 5'},
       {at:firstWeek('tass'),text:'Summer: TASS, 1 of 72 (dates approx.)'},
       {at:EVENTS[0].i,text:'Oct 11: in The Nation'}]},
-    y2025:{hl:rolesHL(HARVARD.concat(['mca'])),lanes:HARVARD.concat(['mca']),annos:[
+    y2025:{hl:rolesHL(HARVARD),lanes:HARVARD.concat(['mca']),annos:[
       {at:EVENTS[1].i,text:'Apr 16: in the Wall Street Journal'},
       {at:firstWeek('iop'),text:'Fall 2025: Harvard'}],
       frames:[{a:run25[0],b:run25[1],text:PK_M.max+' at once, '+rangeText(W[run25[0]].s,W[run25[1]].e).replace(/, \d{4}$/,'')}]},
@@ -729,9 +735,9 @@ function layoutGrid(){
   var left=narrow?38:64, right=narrow?4:6;
   var pitch=(Wd-left-right)/cols;
   var box=Math.max(5,Math.round(pitch*0.72*2)/2);
-  var yearGap=narrow?Math.round(pitch*0.55):0;
+  var yearGap=narrow?Math.round(pitch*0.4):0;
   var fs=narrow?10.5:12.5;
-  var above=narrow?58:70, head=narrow?30:40, below=narrow?80:98;
+  var above=narrow?46:70, head=narrow?28:40, below=narrow?68:98;
   var gridTop=above+head;
   var gridH=rows*pitch+11*yearGap;
   return {Wd:Wd,narrow:narrow,cols:cols,rpy:rpy,rows:rows,left:left,right:right,pitch:pitch,box:box,yearGap:yearGap,fs:fs,above:above,head:head,below:below,gridTop:gridTop,gridH:gridH,H:gridTop+gridH+below};
@@ -770,12 +776,12 @@ function drawGrid(){
   E('path',{d:'M'+ax0+','+(hy-5)+' H'+ax1,stroke:'#000080','stroke-width':'1.2',fill:'none','marker-end':'url(#ah)'},gAx);
   var nums=L.narrow?[1,5,10,15,20,25]:[1,5,10,15,20,25,30,35,40,45,50];
   nums.forEach(function(n){var x=L.left+(n-1)*L.pitch+L.box/2;var tt=E('text',{x:x,y:L.gridTop-6,'class':'ax','text-anchor':'middle'},gAx);tt.textContent=n;});
-  if(L.narrow){var nt=E('text',{x:L.Wd-L.right,y:hy,'class':'ax-note','text-anchor':'end'},gAx);nt.textContent='weeks 27–52 wrap to a 2nd row';}
   // "Year" and down arrow (WBW's "Age")
   if(!L.narrow){
     var yx=16, yy0=L.gridTop+4;
+    var ywd=tw('Year','15px Arimo, Arial');
     var yt=E('text',{x:yx,y:yy0,'class':'ax-t',transform:'rotate(-90 '+yx+' '+yy0+')','text-anchor':'end'},gAx);yt.textContent='Year';
-    E('path',{d:'M'+(yx-5)+','+(yy0+8)+' V'+(yy0+Math.min(120,L.gridH*0.6)),stroke:'#000080','stroke-width':'1.2',fill:'none','marker-end':'url(#ah)'},gAx);
+    E('path',{d:'M'+(yx-5)+','+(yy0+ywd+6)+' V'+(yy0+ywd+6+Math.min(90,L.gridH*0.45)),stroke:'#000080','stroke-width':'1.2',fill:'none','marker-end':'url(#ah)'},gAx);
   }
   for(var yi=0;yi<12;yi++){
     var p=boxXY(yi*52);
@@ -785,7 +791,7 @@ function drawGrid(){
   var gB=E('g',{'class':'boxes'},svg);
   var gD=E('g',{'class':'dots','aria-hidden':'true'},svg);
   R.rects=[];R.fb=[];R.ss=[];
-  var dr=Math.max(1.05,L.box*0.14);
+  var dr=Math.max(1.2,L.box*0.16);
   for(var i=0;i<NW;i++){
     var q=boxXY(i);
     var rc=E('rect',{x:q.x+0.5,y:q.y+0.5,width:L.box,height:L.box,'class':'wk'+(i>CUR?' fut':''),fill:'#fff'},gB);
@@ -820,7 +826,7 @@ function paintGrid(all,from,to){
 function drawAnnos(animate){
   var g=R.gAnno; while(g.firstChild) g.removeChild(g.firstChild);
   var m=R.gMark; while(m.firstChild) m.removeChild(m.firstChild);
-  if(S.intro<CUR) return;
+  if(S.introOn) return;
   var st=ST[S.state]||{};
   var items=[];
   (st.annos||[]).forEach(function(a,k){if(a.at>=0&&a.at<NW) items.push({kind:'c',at:a.at,text:a.text,col:ANNO[k%ANNO.length]});});
@@ -908,8 +914,8 @@ function placeBand(items,side,fontL){
   var last=items[n-1];
   if(last.lx+last.w/2>x1){last.lx=x1-last.w/2;for(k=n-2;k>=0;k--){var c2=items[k],nx=items[k+1],mx=nx.lx-nx.w/2-gap-c2.w/2;if(c2.lx>mx)c2.lx=mx;}}
   items.forEach(function(it){
-    if(side==='below') it.ly=L.gridTop+L.gridH+(L.narrow?30:36)+L.fs;
-    else it.ly=L.above-(L.narrow?8:10);
+    if(side==='below') it.ly=L.gridTop+L.gridH+(L.narrow?24:36)+L.fs;
+    else it.ly=L.above-(L.narrow?6:10);
   });
   // stagger when labels are tall and neighbours are close to their target lines
 }
@@ -921,7 +927,7 @@ function drawLanes(){
   var Wd=Math.max(280,Math.round(plot.clientWidth)), narrow=Wd<600;
   var left=4,right=narrow?6:10,pw=Wd-left-right;
   var X=function(d){return left+(d-D0)/(D1-D0)*pw;};
-  var stripTop=narrow?30:34, stripH=narrow?46:58, axisY=stripTop+stripH+(narrow?20:22), lanesTop=axisY+10;
+  var stripTop=narrow?34:38, stripH=narrow?46:58, axisY=stripTop+stripH+(narrow?20:22), lanesTop=axisY+10;
   var vh=window.innerHeight||800;
   var fixed=(narrow?230:260);
   var pitch=Math.max(narrow?9:10,Math.min(narrow?11.5:14,(vh-fixed-lanesTop-30)/LANES.length));
@@ -952,8 +958,7 @@ function drawLanes(){
   E('line',{x1:left,x2:left+pw,y1:sy(mx),y2:sy(mx),stroke:'#e6e6e6','stroke-width':'1'},gS);
   E('path',{d:da,fill:'#2a78d6','fill-opacity':'0.12',stroke:'none'},gS);
   E('path',{d:d,fill:'none',stroke:'#2a78d6','stroke-width':'2','stroke-linejoin':'round'},gS);
-  var st=E('text',{x:left,y:stripTop-8,'class':'strip-t'},svg);st.textContent='Things at once, per week';
-  var mxl=E('text',{x:left+2,y:sy(mx)-3,'class':'ax'},svg);mxl.textContent=String(mx);
+  var st=E('text',{x:left,y:12,'class':'strip-t'},svg);st.textContent='Things at once, per week (peak: '+mx+')';
   var pk=peakRuns(arr);
   pk.runs.forEach(function(r){var xm=(X(W[r[0]].s)+X(W[r[1]].e+1))/2;var tt=E('text',{x:xm,y:sy(mx)-3,'class':'ax','text-anchor':'middle','font-weight':'700'},svg);tt.textContent=String(mx);});
   // lanes
@@ -991,14 +996,14 @@ function drawLanes(){
   // this week
   if(!ENDED&&CUR>=0){
     var cx=X(W[CUR].mid);
-    E('line',{x1:cx,x2:cx,y1:stripTop-2,y2:H-20,stroke:'#cb060c','stroke-width':'1.5'},svg);
-    var tw2=E('text',{x:cx-4,y:stripTop-8,'class':'an-h','text-anchor':'end',fill:'#cb060c','font-size':narrow?12:14},svg);tw2.textContent='this week';
+    E('line',{x1:cx,x2:cx,y1:4,y2:H-20,stroke:'#cb060c','stroke-width':'1.5'},svg);
+    var tw2=E('text',{x:cx-4,y:13,'class':'an-h','text-anchor':'end',fill:'#cb060c','font-size':narrow?12:14},svg);tw2.textContent='this week';
   }
   R.cross=E('line',{x1:0,x2:0,y1:stripTop,y2:H-20,'class':'cross',visibility:'hidden'},svg);
   if(S.laneReveal&&!RM){
     R.clipRect.setAttribute('width','0');
     var t0=performance.now();
-    (function fr(now){var p=Math.min(1,(now-t0)/750);var e=1-Math.pow(1-p,3);R.clipRect.setAttribute('width',String(Wd*e));if(p<1)requestAnimationFrame(fr);})(t0);
+    (function fr(now){var p=Math.max(0,Math.min(1,(now-t0)/750));var e=1-Math.pow(1-p,3);R.clipRect.setAttribute('width',String(Wd*e));if(p<1)requestAnimationFrame(fr);})(t0);
     S.laneReveal=false;
   }
 }
@@ -1022,6 +1027,7 @@ function drawLegend(){
     var a=span('lg');var d1=span('dot');d1.style.background=DOT_FB;a.appendChild(d1);a.appendChild(document.createTextNode('most Sundays: food bank'));legend.appendChild(a);
     var b=span('lg');var d2=span('dot');d2.style.background=DOT_SS;b.appendChild(d2);b.appendChild(document.createTextNode('most Saturdays: Saturday school'));legend.appendChild(b);
     var c=span('lg');var d3=span('sw');d3.style.border='2px solid #cb060c';c.appendChild(d3);c.appendChild(document.createTextNode(' this week'));legend.appendChild(c);
+    if(L&&L.narrow){legend.appendChild(span('lg','Each year wraps: weeks 1–26, then 27–52.'));}
   } else {
     [['#000080','dated to the month'],['#7f8fd0','season, placed approximately'],['hatch','year only (not counted)'],['dots','weekly volunteering']].forEach(function(p){
       var l=span('lg'),b=span('bar');
@@ -1074,9 +1080,10 @@ function showCard(i,px,py){
   if(!L.lanes){
     var q=boxXY(i);
     R.hov.setAttribute('x',q.x-1);R.hov.setAttribute('y',q.y-1);R.hov.setAttribute('visibility','visible');
-    var bx=q.x+L.box/2, by=q.y+L.box/2;
-    if(Wd<600){x=4;y=(by>L.H*0.5)?Math.max(0,by-ch-16):by+16;}
-    else{x=bx+18;if(x+cw>Wd)x=bx-18-cw;y=Math.min(Math.max(0,by-40),Math.max(0,L.H-ch));}
+    var sr=svg.getBoundingClientRect(),pr=plot.getBoundingClientRect(),sc=sr.width/L.Wd;
+    var bx=sr.left-pr.left+(q.x+L.box/2)*sc, by=sr.top-pr.top+(q.y+L.box/2)*sc, Hs=sr.height;
+    if(Wd<600){x=4;y=(by>Hs*0.5)?Math.max(0,by-ch-14):by+14;}
+    else{x=bx+18;if(x+cw>Wd)x=bx-18-cw;y=Math.min(Math.max(0,by-40),Math.max(0,Hs-ch));}
   } else {
     var cx=L.X(W[i].mid);
     R.cross.setAttribute('x1',cx);R.cross.setAttribute('x2',cx);R.cross.setAttribute('visibility','visible');
@@ -1095,14 +1102,14 @@ card.querySelector('.x').addEventListener('click',function(){hideCard();svg.focu
 function localXY(ev){var b=svg.getBoundingClientRect();return [(ev.clientX-b.left)*(L.Wd/b.width),(ev.clientY-b.top)*(L.H/b.height)];}
 function hit(ev){var p=localXY(ev);return L.lanes?(p[1]>=L.stripTop-10?hitLanes(p[0]):-1):hitGrid(p[0],p[1]);}
 svg.addEventListener('pointermove',function(ev){
-  if(S.pinned||ev.pointerType==='touch'||S.intro<CUR) return;
+  if(S.pinned||ev.pointerType==='touch'||S.introOn) return;
   var i=hit(ev);var p=localXY(ev);
   if(i<0){hideCard();return;}
   if(i!==S.hover||L.lanes) showCard(i,p[0],p[1]);
 });
 svg.addEventListener('pointerleave',function(){if(!S.pinned) hideCard();});
 svg.addEventListener('click',function(ev){
-  if(S.intro<CUR){finishIntro();return;}
+  if(S.introOn){finishIntro();return;}
   var i=hit(ev);var p=localXY(ev);
   if(i<0){hideCard();return;}
   if(S.pinned&&S.hover===i){hideCard();return;}
@@ -1159,12 +1166,12 @@ var stepIdx=-1, ticking=false;
 function onScroll(){
   ticking=false;
   var mobile=window.innerWidth<=980;
-  var trig=window.innerHeight*(mobile?0.72:0.56);
+  var trig=window.innerHeight*(mobile?0.84:0.56);
   var k=0;
   steps.forEach(function(s,idx){var r=s.querySelector('.step-in').getBoundingClientRect();if(r.top<trig) k=idx;});
   if(k!==stepIdx){
     stepIdx=k;steps.forEach(function(s,idx){s.classList.toggle('active',idx===k);});
-    if(S.intro>=CUR) setState(steps[k].getAttribute('data-state'),true);
+    if(!S.introOn) setState(steps[k].getAttribute('data-state'),true);
     else S.state=steps[k].getAttribute('data-state');
   }
 }
@@ -1173,7 +1180,8 @@ window.addEventListener('scroll',function(){if(!ticking){ticking=true;requestAni
 /* ---- opening: the grid fills in, week by week ---- */
 var introRAF=0;
 function finishIntro(){
-  if(S.intro>=CUR) return;
+  if(!S.introOn) return;
+  S.introOn=false;
   cancelAnimationFrame(introRAF);
   S.intro=NW;skipBtn.hidden=true;
   plot.classList.add('no-tr');paintGrid();
@@ -1183,12 +1191,12 @@ function finishIntro(){
 }
 function playIntro(){
   if(RM||FROM||CUR<0){S.intro=NW;return;}
-  S.intro=-1;plot.classList.add('no-tr');paintGrid();drawAnnos();
+  S.intro=-1;S.introOn=true;plot.classList.add('no-tr');paintGrid();drawAnnos();
   skipBtn.hidden=false;
   var T=2800,t0=performance.now(),last=-1;
   function fr(now){
-    var p=Math.min(1,(now-t0)/T), e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
-    var upto=Math.floor(e*(CUR+1))-1;
+    var p=Math.max(0,Math.min(1,(now-t0)/T)), e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+    var upto=Math.min(CUR-1,Math.floor(e*(CUR+1))-1);
     if(upto>last){S.intro=upto;paintGrid(false,last+1,upto);last=upto;}
     if(p<1) introRAF=requestAnimationFrame(fr); else finishIntro();
   }
@@ -1202,8 +1210,8 @@ render();
 playIntro();
 onScroll();
 var rt=0,lastW=plot.clientWidth;
-window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){if(Math.abs(plot.clientWidth-lastW)<2)return;lastW=plot.clientWidth;render();if(S.view==='grid'&&S.intro>=CUR)drawAnnos();},150);});
-if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){if(S.intro>=CUR){render();}else{drawAnnos();}});}
+window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){if(Math.abs(plot.clientWidth-lastW)<2)return;lastW=plot.clientWidth;render();},150);});
+if(document.fonts&&document.fonts.ready){document.fonts.ready.then(function(){if(!S.introOn){render();}});}
 if(HASH&&!FROM){var tgt=document.getElementById(HASH.slice(1));if(tgt)setTimeout(function(){tgt.scrollIntoView();},60);}
 
 /* ---- copy email ---- */
