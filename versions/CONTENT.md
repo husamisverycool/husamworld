@@ -5,11 +5,11 @@ Never invent a fact, number, quote, link, or email. Where something is missing,
 use a clearly marked placeholder (e.g. "[email]") and the builder will list it.
 
 ## Identity
-- **Name:** Husam Sokar. (Older LinkedIn URLs say "husam-ramadan"; we use Sokar, as on his current profile and deck.)
+- **Name:** Husam Sokar (confirmed by Husam).
 - **School:** Harvard College, started fall 2025 (now a sophomore). Concentration: Applied Math in Government and Economics.
 - **From:** Fresno / Clovis, California (Central Valley).
 - **Languages:** English and Arabic (California State Seal of Biliteracy in Arabic; professional Arabic↔English translation).
-- **Photo:** `versions/assets/husam.jpg` (448×448 black-and-white headshot; base64 in `husam.jpg.b64`). Placeholder until he sends a better one.
+- **Photo:** `versions/assets/husam-new.jpg` (500×500 color headshot, his real one; base64 in `husam-new.jpg.b64`). Embed as a data URI.
 - **Email / socials:** not provided. Use placeholders. Only LinkedIn exists: https://www.linkedin.com/in/husam-sokar-089648227/
 - **Background detail:** grew up working billing and back-office operations as an admin assistant at his father's law firm.
 
