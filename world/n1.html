@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Husam Sokar</title>
+<script>/* world contract: start at the top unless the URL has a hash (#from-… included) */try{history.scrollRestoration="manual";}catch(e){}if(!location.hash){window.scrollTo(0,0);}</script>
 <meta name="description" content="n = 1. A survey report with one respondent: Husam Sokar, Harvard College, from Fresno, California.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -160,8 +161,9 @@ figure.fig{margin:0 0 40px;background:var(--surface);border-top:2px solid var(--
   .sel-axis .scale{height:22px}
   .sel-axis.bottom .scale{height:22px}
   #xtab{min-width:0}
-  #xtab tr{display:grid;grid-template-columns:minmax(0,1fr) 52px 60px 76px}
-  #xtab caption{display:block}
+  #xtab tr{display:grid;grid-template-columns:minmax(0,1fr) 50px 58px 72px}
+  #xtab th,#xtab td{padding-left:6px;padding-right:6px}
+  #xtab thead th{white-space:normal;font-size:10px;letter-spacing:.03em;line-height:1.2}
   #xtab td.items{grid-column:1/-1;min-width:0;padding-top:0}
   #xtab thead th:last-child{display:none}
   #xtab th,#xtab td{border-bottom:0}
@@ -359,7 +361,7 @@ html.motion .story{display:block}
       <p class="kicker">Husam Sokar</p>
       <h1 aria-label="n equals 1">n<span class="eq">=</span>1</h1>
       <p class="subtitle">Findings from a decade-long study of one Harvard sophomore from Fresno, California.</p>
-      <p class="byline">Prepared by the respondent. He is an analyst on the Harvard Youth Poll, America's largest poll of 18&ndash;29-year-olds, and has spent a lot of time thinking about sample sizes.<sup><a href="#n1" id="r1">1</a></sup></p>
+      <p class="byline">Prepared by the respondent. He was an analyst on the Harvard Youth Poll, America's largest poll of 18&ndash;29-year-olds, and has spent a lot of time thinking about sample sizes.<sup><a href="#n1" id="r1">1</a></sup></p>
     </div>
     <aside class="respondent" aria-label="Respondent profile">
       <figure>
@@ -424,7 +426,7 @@ html.motion .story{display:block}
   <p class="lede">What the respondent reported doing at time of fieldwork.</p>
   <div class="now">
     <article>
-      <p class="when">Jun 2026 &ndash; present</p>
+      <p class="when">Summer 2026 &ndash; present</p>
       <h3>Co-founder &amp; CEO, stealth startup</h3>
       <p>Backed by DoorDash's early team. Spent summer 2026 building it full-time in San Francisco. Further details withheld by the respondent, as is his right.</p>
     </article>
@@ -772,6 +774,7 @@ function placeTip(ev, anchor){
   var w=tip.offsetWidth,h=tip.offsetHeight, vw=document.documentElement.clientWidth;
   var L=x+14; if(L+w>vw-8) L=x-w-14; if(L<8) L=8;
   var T=y-h-12; if(T<8) T=y+18;
+  if(L<88&&T+h>window.innerHeight-88){ L=Math.max(L,88); } /* keep the bottom-left corner free */
   tip.style.left=L+"px"; tip.style.top=T+"px";
 }
 function hideTip(){ tip.classList.remove("on"); }
@@ -923,7 +926,7 @@ var R=[
  {l:"hvd",t:"Mentor, Radcliffe Emerging Leaders Program",s:ym(2025,10),e:ye(2026,4),d:"Oct 2025 – Apr 2026"},
  {l:"ent",t:"Founder, Electric Deals (age 14–15)",s:ym(2020,3),e:ye(2020,10),d:"Mar – Oct 2020"},
  {l:"ent",t:"Paid Intern, Jetson",s:ym(2023,6),e:ye(2023,8),d:"Summer 2023. 1 of 40 from 1,000+",a:1,sid:"jetson"},
- {l:"ent",t:"Co-founder & CEO, stealth startup",s:ym(2026,6),e:NOW,d:"Jun 2026 – present. Backed by DoorDash's early team",p:1}
+ {l:"ent",t:"Co-founder & CEO, stealth startup",s:ym(2026,6),e:NOW,d:"Summer 2026 – present. Backed by DoorDash's early team",a:1,p:1}
 ];
 var key=$("#tlKey");
 LANES.forEach(function(L){ var li=document.createElement("li"); var sw=document.createElement("span"); sw.className="sw"; sw.style.background=L.c; li.appendChild(sw); li.appendChild(document.createTextNode(L.name)); key.appendChild(li); });
@@ -1060,9 +1063,11 @@ if(MOTION){
       D[0].push({x:x,y:y,w:dot,h:dot,rx:dot/2,fill:e.k==="role"?LCOL[e.lane]:"#1f1f1d",fop:1,stroke:"none",op:1});
     });
     var gA=layers[0];
-    T("text",{x:0,y:12,"font-size":fs,fill:"#44433f"},"n = 1 · "+ENT.length+" observations",gA);
+    var capA=T("text",{x:0,y:12,"font-size":fs,fill:"#44433f"},"n = 1 · "+ENT.length+" observations",gA);
     var lx=0, ly=H-4, items=[["Roles",null]].concat(LANES.map(function(L){return [L.name,LCOL[L.id]]})).concat([["Honors","#1f1f1d"]]);
-    if(!phoneS){ var kx=W; items.slice().reverse().forEach(function(it){ if(!it[1]) return; var t=T("text",{x:0,y:12,"font-size":fs,fill:"#44433f","text-anchor":"end"},it[0],gA); var tw=t.getComputedTextLength(); t.setAttribute("x",kx); el("circle",{cx:kx-tw-8,cy:8,r:4,fill:it[1]},gA); kx-=tw+26; }); }
+    if(!phoneS){ var kx=W, ky=12, keyEls=[]; items.slice().reverse().forEach(function(it){ if(!it[1]) return; var t=T("text",{x:0,y:ky,"font-size":fs,fill:"#44433f","text-anchor":"end"},it[0],gA); var tw=t.getComputedTextLength(); t.setAttribute("x",kx); var c=el("circle",{cx:kx-tw-8,cy:ky-4,r:4,fill:it[1]},gA); keyEls.push(t,c); kx-=tw+26; });
+      /* not enough room beside the caption: drop the key to its own line and push the dots down */
+      if(kx+14<capA.getComputedTextLength()+16){ keyEls.forEach(function(e){ if(e.tagName==="text") e.setAttribute("y",30); else e.setAttribute("cy",26); }); var span=H-40-dot; D[0].forEach(function(p){ p.y=46+(p.y-28)*(span-18)/span; }); } }
     /* B: timeline */
     var lw=phoneS?0:150, top=phoneS?30:26, bottom=phoneS?34:40;
     var x0=lw, x1=W-6, tx=function(t){return x0+(t-T0)/(T1-T0)*(x1-x0)};

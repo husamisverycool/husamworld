@@ -96,13 +96,15 @@ a:hover{color:var(--line)}
 .name .en{font-family:var(--latin);font-weight:500;font-size:clamp(54px,17vw,268px);white-space:nowrap;letter-spacing:-.02em;margin-right:-.28em;position:relative;z-index:2}
 .name .ar{font-family:var(--ruqaa);font-weight:700;font-size:clamp(58px,18vw,288px);white-space:nowrap;margin-left:-.3em;line-height:1.1;position:relative;z-index:1}
 [data-lead="ar"] .name .en{margin-right:0;margin-left:-.28em}
-[data-lead="ar"] .name .ar{margin-left:0;margin-right:-.3em}
+[data-lead="ar"] .name .ar{margin-left:0;margin-right:-.1em}
 .name .ar{padding-top:.3em}
 [data-lead="ar"] .name .ar{padding-top:0}
 [data-lead="ar"] .name .en{padding-top:.42em}
 .name small{display:block;font-size:.24em;letter-spacing:.32em;text-transform:uppercase;margin-top:.5em;color:var(--ink-2);font-weight:400}
 .name .ar small{font-family:var(--arab);letter-spacing:0;text-transform:none;font-size:.22em;margin-top:.15em;font-weight:400}
 .name .en small{margin-right:1.3em}
+.name .ar small{margin-left:2.2em}
+[data-lead="ar"] .name .ar small{margin-left:0;margin-right:2.2em}
 [data-lead="ar"] .name .en small{margin-right:0;margin-left:1.3em}
 .name .en span,.name .ar span{display:block}
 
@@ -199,6 +201,7 @@ footer .ar{font-size:1rem}
 .copy span{font-family:var(--arab)}
 .copy:hover{border-color:var(--line);color:var(--line)}
 .copy.done{border-color:var(--line);color:var(--line)}
+.nw{white-space:nowrap}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* ---------- greeting ---------- */
@@ -238,8 +241,9 @@ footer .ar{font-size:1rem}
   .runhead .col{text-align:start !important}
   .runhead .ar{margin-top:4px}
   .name{margin-top:36px}
-  .name .en small{margin-right:.4em}
-  [data-lead="ar"] .name .en small{margin-left:.4em;margin-right:0}
+  .name .en small{margin-right:1.1em}
+  [data-lead="ar"] .name .en small{margin-left:1.1em;margin-right:0}
+  [data-lead="ar"] .name .ar{margin-right:-.02em}
   .control legend{float:none;display:block;text-align:center;margin:0 0 4px}
   .control fieldset{flex-wrap:wrap;justify-content:center}
   .fig .lab{font-size:.84rem}
@@ -256,9 +260,11 @@ footer .ar{font-size:1rem}
 <script>
 /* greeting: Hello / مرحبا, resolving into the name. Under 1.4s, skippable, never shown with reduced motion. */
 (function(){
+  /* world contract: start at the top unless the URL has a hash; the greeting is skipped for #from-… (returning from the world) and other deep links */
+  try{ history.scrollRestoration='manual'; }catch(e){}
+  if(!location.hash){ window.scrollTo(0,0); }
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   if(location.hash) return;
-  try{ history.scrollRestoration='manual'; }catch(e){} window.scrollTo(0,0);
   var d=document.createElement('div'); d.className='intro'; d.setAttribute('aria-hidden','true');
   d.innerHTML='<div class="intro-en" lang="en"></div><div class="intro-ar" lang="ar" dir="rtl"></div>';
   document.body.appendChild(d);
@@ -347,7 +353,7 @@ footer .ar{font-size:1rem}
   <h2 class="row head" id="translation"><span class="col en" lang="en">Translation</span><span class="mark" aria-hidden="true">§</span><span class="col ar" lang="ar" dir="rtl">الترجمة</span></h2>
   <div class="row text ">
     <p class="col en" lang="en"><span class="s" data-k="t22" style="--i:0" tabindex="0">From 2022 to 2024 I was Senior English Writer at White House in Arabic.</span> <span class="s" data-k="t23" style="--i:1" tabindex="0">I edited and translated press briefings, op-eds, and documentary scripts between Arabic and English.</span> <span class="s" data-k="t24" style="--i:2" tabindex="0">I worked under Marah Bukai, Washington Bureau Chief of Al-Arab Media Organization.</span> <span class="s" data-k="t25" style="--i:3" tabindex="0">The work reached more than 350,000 readers and viewers combined.</span></p>
-    <p class="col ar" lang="ar" dir="rtl"><span class="s" data-k="t22" style="--i:0">من ٢٠٢٢ إلى ٢٠٢٤ كنتُ كاتبًا أول باللغة الإنجليزية في «البيت الأبيض بالعربية» (White House in Arabic).</span> <span class="s" data-k="t23" style="--i:1">حرّرتُ وترجمتُ إحاطات صحفية ومقالات رأي ونصوص أفلام وثائقية بين العربية والإنجليزية.</span> <span class="s" data-k="t24" style="--i:2">عملتُ تحت إشراف مرح البقاعي، مديرة مكتب واشنطن في مؤسسة العرب الإعلامية.</span> <span class="s" data-k="t25" style="--i:3">ووصل هذا العمل إلى أكثر من ٣٥٠٬٠٠٠ قارئ ومشاهد مجتمعين.</span></p>
+    <p class="col ar" lang="ar" dir="rtl"><span class="s" data-k="t22" style="--i:0">من ٢٠٢٢ إلى ٢٠٢٤ كنتُ كاتبًا أول باللغة الإنجليزية في «البيت الأبيض بالعربية» <bdi class="nw">(White House in Arabic)</bdi>.</span> <span class="s" data-k="t23" style="--i:1">حرّرتُ وترجمتُ إحاطات صحفية ومقالات رأي ونصوص أفلام وثائقية بين العربية والإنجليزية.</span> <span class="s" data-k="t24" style="--i:2">عملتُ تحت إشراف مرح البقاعي، مديرة مكتب واشنطن في مؤسسة العرب الإعلامية.</span> <span class="s" data-k="t25" style="--i:3">ووصل هذا العمل إلى أكثر من ٣٥٠٬٠٠٠ قارئ ومشاهد مجتمعين.</span></p>
   </div>
   <div class="row text lead-in">
     <p class="col en" lang="en"><span class="s" data-k="t26" style="--i:0" tabindex="0">Six pieces I edited or translated:</span></p>
@@ -369,7 +375,7 @@ footer .ar{font-size:1rem}
   </div>
   <div class="row text note">
     <p class="col en" lang="en"><span class="s" data-k="t33" style="--i:0" tabindex="0">The Arabic titles opposite are rendered for this page; the links open the English editions.</span> <span class="s" data-k="t34" style="--i:1" tabindex="0">I also hold the California State Seal of Biliteracy in Arabic.</span></p>
-    <p class="col ar" lang="ar" dir="rtl"><span class="s" data-k="t33" style="--i:0">العناوين العربية هنا مترجمة لهذه الصفحة، والروابط تفتح النسخ الإنجليزية.</span> <span class="s" data-k="t34" style="--i:1">وأحمل أيضًا ختم ولاية كاليفورنيا لإتقان لغتين (Seal of Biliteracy) في اللغة العربية.</span></p>
+    <p class="col ar" lang="ar" dir="rtl"><span class="s" data-k="t33" style="--i:0">العناوين العربية هنا مترجمة لهذه الصفحة، والروابط تفتح النسخ الإنجليزية.</span> <span class="s" data-k="t34" style="--i:1">وأحمل أيضًا ختم ولاية كاليفورنيا لإتقان لغتين <bdi class="nw">(Seal of Biliteracy)</bdi> في اللغة العربية.</span></p>
   </div>
 </section>
 <section aria-labelledby="fresno">
@@ -443,7 +449,7 @@ footer .ar{font-size:1rem}
       <li class="s" data-k="h65" style="--i:4" tabindex="0">JFK Profile in Courage Essay Contest <i>top 5% of 2,800+</i></li>
       <li class="s" data-k="h66" style="--i:5" tabindex="0">Telluride Association Summer Seminar <i>1 of 72 from 2,400+</i></li>
       <li class="s" data-k="h67" style="--i:6" tabindex="0">Coolidge Scholarship Senator <i>1 of 100 from 4,100+</i></li>
-      <li class="s" data-k="h68" style="--i:7" tabindex="0">LeapYear grant for the startup <i>$30,000</i></li>
+      <li class="s" data-k="h68" style="--i:7" tabindex="0">LeapYear grant <i>$30,000</i></li>
       <li class="s" data-k="h69" style="--i:8" tabindex="0">President’s Volunteer Service Award, Lifetime <i>4,000+ service hours</i></li>
       <li class="s" data-k="h70" style="--i:9" tabindex="0">Summa Cum Laude, Clovis Community College</li></ul>
     <ul class="col ar" lang="ar" dir="rtl"><li class="s" data-k="h61" style="--i:0">منحة Coca-Cola Scholars <i>واحد من ١٥٠ من بين أكثر من ١٠٥٬٠٠٠</i></li>
@@ -453,7 +459,7 @@ footer .ar{font-size:1rem}
       <li class="s" data-k="h65" style="--i:4">مسابقة JFK Profile in Courage للمقال <i>ضمن أفضل ٥٪ من أكثر من ٢٬٨٠٠</i></li>
       <li class="s" data-k="h66" style="--i:5">ندوة Telluride Association الصيفية <i>واحد من ٧٢ من بين أكثر من ٢٬٤٠٠</i></li>
       <li class="s" data-k="h67" style="--i:6">Coolidge Scholarship Senator <i>واحد من ١٠٠ من بين أكثر من ٤٬١٠٠</i></li>
-      <li class="s" data-k="h68" style="--i:7">منحة LeapYear للشركة الناشئة <i>٣٠٬٠٠٠ دولار</i></li>
+      <li class="s" data-k="h68" style="--i:7">منحة LeapYear <i>٣٠٬٠٠٠ دولار</i></li>
       <li class="s" data-k="h69" style="--i:8">جائزة الرئيس للخدمة التطوعية مدى الحياة <i>أكثر من ٤٬٠٠٠ ساعة خدمة</i></li>
       <li class="s" data-k="h70" style="--i:9">مرتبة الشرف العليا (Summa Cum Laude)، كلية كلوفيس المجتمعية</li></ul>
   </div>

@@ -338,6 +338,7 @@ a.term:hover,a.term[aria-expanded="true"]{background:rgba(29,59,166,.08)}
   .btable tr:last-child{border-bottom:1px solid #8c8c86}
   .btable th,.btable td{display:block;border:0;padding:1px 0;width:auto!important}
   .btable td.fld::before{content:"Field: "}
+  .btable td.fld:empty{display:none}
 }
 .sig{display:flex;flex-wrap:wrap;gap:12px 40px;font-family:var(--sans);font-size:12px;color:var(--pencil);border-top:2px solid var(--ink);padding-top:10px}
 .sig span{letter-spacing:.14em;text-transform:uppercase}
@@ -454,7 +455,7 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
       <li id="n-tai"><b>Ambassador Katherine Tai.</b> 19th U.S. Trade Representative. I was her associate at the IOP.</li>
       <li id="n-crimson"><b>The Harvard Crimson Business Board.</b> The nation&rsquo;s oldest daily college newspaper (est. 1873). Project Team Lead, TPR/AlgoEd, since Dec 2025: international camps with The Princeton Review and AlgoEd. Earlier, Global Programs Associate: moderated and judged international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.</li>
       <li id="n-ed"><b>Electric Deals.</b> Mar&ndash;Oct 2020, at 14&ndash;15. Facebook retail arbitrage: 131+ positive reviews, 400+ products shipped, ~$20,000 revenue, ~43% margin. eBay drop-shipping: 150+ positive reviews, ~$8,000 revenue, ~39% margin.</li>
-      <li id="n-startup"><b>Stealth startup.</b> Co-founder &amp; CEO since June 2026, full-time. Backed by DoorDash&rsquo;s early team. Summer 2026 in San Francisco. It&rsquo;s in stealth; that&rsquo;s all for now.</li>
+      <li id="n-startup"><b>Stealth startup.</b> Co-founder &amp; CEO, backed by DoorDash&rsquo;s early team. Spent summer 2026 building it full-time in San Francisco. It&rsquo;s in stealth; that&rsquo;s all for now.</li>
     </ol>
   </article>
 
@@ -484,7 +485,7 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
         <details open id="q-startup">
           <summary><span class="who">Questioner 2</span>What&rsquo;s the startup?</summary>
           <div class="ans">
-            <p><span class="a" aria-hidden="true">A.</span>I&rsquo;m Co-founder &amp; CEO of a stealth startup, backed by DoorDash&rsquo;s early team. I&rsquo;ve been on it full-time since June 2026 and spent the summer building it in San Francisco. It&rsquo;s in stealth, so that&rsquo;s the full answer for now.</p>
+            <p><span class="a" aria-hidden="true">A.</span>I&rsquo;m Co-founder &amp; CEO of a stealth startup, backed by DoorDash&rsquo;s early team. I spent summer 2026 building it full-time in San Francisco. It&rsquo;s in stealth, so that&rsquo;s the full answer for now.</p>
           </div>
         </details>
         <details open id="q-arabic">
@@ -551,14 +552,14 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
         <thead><tr><th scope="col">Tournament / event</th><th scope="col">Result</th><th scope="col">Field</th></tr></thead>
         <tbody>
           <tr><th scope="row">NSDA National Tournament, Congressional Debate</th><td class="res"><b class="circ">Finalist</b></td><td class="fld">1 of 20 from 50,000+</td></tr>
-          <tr><th scope="row">NSDA National Tournament, Congressional Debate</th><td class="res">Semifinalist</td><td class="fld">&nbsp;</td></tr>
-          <tr><th scope="row">NSDA National Tournament</th><td class="res">4&times; Qualifier</td><td class="fld">&nbsp;</td></tr>
+          <tr><th scope="row">NSDA National Tournament, Congressional Debate</th><td class="res">Semifinalist</td><td class="fld"></td></tr>
+          <tr><th scope="row">NSDA National Tournament</th><td class="res">4&times; Qualifier</td><td class="fld"></td></tr>
           <tr><th scope="row">NSDA National Legislation</th><td class="res">Author</td><td class="fld">1 of 41 from 500+</td></tr>
           <tr><th scope="row">California Mock Trial Finals</th><td class="res"><b class="circ">MVP</b></td><td class="fld">1 of 128 from 5,000+ competitors</td></tr>
           <tr><th scope="row">CHSSA State, Congressional Debate</th><td class="res">Semifinalist</td><td class="fld">Top 15 in California</td></tr>
-          <tr><th scope="row">CHSSA State, Public Forum</th><td class="res">Octofinalist</td><td class="fld">&nbsp;</td></tr>
-          <tr><th scope="row">UOP Invitational</th><td class="res">3&times; Champion: Parliamentary Debate, Oral Interpretation, Best Speaker</td><td class="fld">&nbsp;</td></tr>
-          <tr><th scope="row">Berkeley National Congress Tournament</th><td class="res">3rd place</td><td class="fld">&nbsp;</td></tr>
+          <tr><th scope="row">CHSSA State, Public Forum</th><td class="res">Octofinalist</td><td class="fld"></td></tr>
+          <tr><th scope="row">UOP Invitational</th><td class="res">3&times; Champion: Parliamentary Debate, Oral Interpretation, Best Speaker</td><td class="fld"></td></tr>
+          <tr><th scope="row">Berkeley National Congress Tournament</th><td class="res">3rd place</td><td class="fld"></td></tr>
         </tbody>
       </table>
 
@@ -569,10 +570,10 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
           <tr><th scope="row">NSDA Student of the Year</th><td class="res"><b class="circ">Named</b></td><td class="fld">1 of 86 from 140,000+</td></tr>
           <tr><th scope="row">Princeton Prize in Race Relations, San Francisco</th><td class="res">Recipient</td><td class="fld">1 of 3 from 600+</td></tr>
           <tr><th scope="row">JFK Profile in Courage Essay Contest</th><td class="res">Top 5%</td><td class="fld">~150 of 2,800+</td></tr>
-          <tr><th scope="row">International Geography Olympiad</th><td class="res">Team USA qualifier, 7th nationally, perfect qualifying score</td><td class="fld">&nbsp;</td></tr>
+          <tr><th scope="row">International Geography Olympiad</th><td class="res">Team USA qualifier, 7th nationally, perfect qualifying score</td><td class="fld"></td></tr>
           <tr><th scope="row">International Climate Science Olympiad</th><td class="res">Semifinalist</td><td class="fld">Top 5% of 55,000+</td></tr>
           <tr><th scope="row">Ethics Bowl, California</th><td class="res">State quarterfinalist</td><td class="fld">Top 8</td></tr>
-          <tr><th scope="row">National History Day</th><td class="res">2&times; Valley Champion</td><td class="fld">&nbsp;</td></tr>
+          <tr><th scope="row">National History Day</th><td class="res">2&times; Valley Champion</td><td class="fld"></td></tr>
           <tr><th scope="row">President&rsquo;s Volunteer Service Award</th><td class="res">Lifetime</td><td class="fld">4,000+ service hours</td></tr>
         </tbody>
       </table>
@@ -586,8 +587,8 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
           <tr><th scope="row">QuestBridge National College Match</th><td class="res">Finalist</td><td class="fld">1 of 7,287 from 25,500</td></tr>
           <tr><th scope="row">Taco Bell Live M&aacute;s Scholarship</th><td class="res">Scholar, $10K</td><td class="fld">1 of ~400 from 14,000</td></tr>
           <tr><th scope="row">Coolidge Scholarship</th><td class="res">Senator</td><td class="fld">1 of 100 from 4,100+</td></tr>
-          <tr><th scope="row">Benjamin A. Gilman Scholarship</th><td class="res">Scholar</td><td class="fld">&nbsp;</td></tr>
-          <tr><th scope="row">American Legion California Boys State</th><td class="res">Delegate</td><td class="fld">&nbsp;</td></tr>
+          <tr><th scope="row">Benjamin A. Gilman Scholarship</th><td class="res">Scholar</td><td class="fld"></td></tr>
+          <tr><th scope="row">American Legion California Boys State</th><td class="res">Delegate</td><td class="fld"></td></tr>
         </tbody>
       </table>
 
@@ -665,6 +666,7 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
   var cards=[].slice.call(document.querySelectorAll('.tcard'));
   var speech=document.getElementById('speech'),chair=document.getElementById('chair');
   var cur=-1,ticking=false,hot=-1,struck=false,prog=document.getElementById('tk-prog');
+  var headBits=[].slice.call(document.querySelectorAll('.docket,.placard,.bill,.rise'));
 
   function remaining(){
     var line=window.innerHeight*0.55,words=0;
@@ -698,6 +700,11 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
     }
     var sr=speech.getBoundingClientRect(),vh=window.innerHeight;
     var show=sr.top<vh*0.7&&sr.bottom>vh*0.25;
+    if(show){ /* where the timekeeper sits when shown: a bar across the top on narrow screens, a card stand bottom-right on wide ones */
+      var wideTk=window.matchMedia('(min-width:1100px)').matches,vw=document.documentElement.clientWidth;
+      var zone=wideTk?{l:vw-36-216-12,t:vh-tk.offsetHeight-44,r:vw,b:vh}:{l:0,t:0,r:vw,b:56};
+      headBits.forEach(function(el){ var r=el.getBoundingClientRect(); if(r.width&&r.right>zone.l&&r.left<zone.r&&r.bottom>zone.t&&r.top<zone.b) show=false; });
+    }
     tk.classList.toggle('away',!show);
     if(done&&!struck){
       var cr=chair.getBoundingClientRect();
@@ -759,7 +766,9 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
     if(e.key==='Enter'&&!(e.target&&e.target.closest&&e.target.closest('a,.rise-skip,.snd'))){e.preventDefault();rise(true);}
     else if(e.key==='Escape'){rise(false);}
   }
-  if(!location.hash){try{history.scrollRestoration='manual';}catch(e){} window.scrollTo(0,0);}
+  /* world contract: start at the top unless the URL has a hash; the RISE intro is skipped for #from-… (returning from the world) and other deep links */
+  try{history.scrollRestoration='manual';}catch(e){}
+  if(!location.hash){window.scrollTo(0,0);}
   if(!reduce&&window.scrollY<40&&!location.hash){
     dark=true;chamber.classList.add('dark');
     gTimer=setInterval(function(){
@@ -844,6 +853,7 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
     var rects=a.getClientRects(),r=rects[0]||a.getBoundingClientRect(),pw=pop.offsetWidth,ph=pop.offsetHeight,vw=document.documentElement.clientWidth;
     var left=Math.min(Math.max(12,r.left-8),vw-pw-12),top=r.bottom+10;
     if(top+ph>window.innerHeight-12)top=Math.max(12,r.top-ph-10);
+    if(left<88&&top+ph>window.innerHeight-88){var up=r.top-ph-10; if(up>=12) top=up; else left=Math.min(88,vw-pw-12);} /* keep the bottom-left corner free */
     pop.style.left=left+'px';pop.style.top=top+'px';pop.style.setProperty('--ox',Math.max(10,r.left-left)+'px');
   }
   function hidePop(){if(!popFor)return;pop.hidden=true;popFor.setAttribute('aria-expanded','false');popFor.removeAttribute('aria-describedby');popFor=null;}
