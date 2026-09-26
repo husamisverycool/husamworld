@@ -261,7 +261,7 @@ del.am{display:none}
 .pop{position:fixed;z-index:40;width:min(330px,calc(100vw - 32px));background:var(--paper);border:1px solid var(--ink);border-top:4px solid var(--red);padding:12px 14px 13px;font-size:14.5px;line-height:21px;box-shadow:0 18px 40px -22px rgba(0,0,0,.55),4px 4px 0 var(--desk);opacity:0;transform:translateY(4px);transition:opacity .14s ease,transform .14s ease;pointer-events:none}
 .pop.show{opacity:1;transform:none;pointer-events:auto}
 .pop[hidden]{display:block;visibility:hidden}
-.pop-l{display:flex;justify-content:space-between;gap:10px;color:var(--red);font-variant-caps:all-small-caps;letter-spacing:.08em;font-size:14px;line-height:18px;margin-bottom:6px}
+.pop-l{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 10px;color:var(--red);font-variant-caps:all-small-caps;letter-spacing:.08em;font-size:14px;line-height:18px;margin-bottom:6px}
 .pop-t{font-weight:700;font-size:16px;line-height:21px;margin:0 0 4px}
 .pop-b{margin:0}
 .pop-m{margin:8px 0 0;padding-top:7px;border-top:1px solid var(--hair);font-style:italic;color:var(--ink-2);font-size:13.5px;line-height:19px}
@@ -295,7 +295,7 @@ del.am{display:none}
 .btn:hover{background:var(--red);border-color:var(--red)}
 .btn.ghost{background:var(--paper);color:var(--ink)}
 .btn.ghost:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-.stamp{position:absolute;right:6%;top:18px;padding:10px 18px 8px;border:4px double var(--red);color:var(--red);text-align:center;transform:rotate(-8deg);opacity:0;pointer-events:none;mix-blend-mode:multiply;background:rgba(255,255,255,.0)}
+.stamp{position:absolute;right:6%;top:18px;padding:10px 18px 8px;border:4px double var(--red);color:var(--red);text-align:center;transform:rotate(-8deg);opacity:0;pointer-events:none;background:rgba(255,255,255,.0)}
 .stamp b{display:block;font-size:clamp(26px,4.4vw,40px);line-height:1;letter-spacing:.12em;font-weight:700}
 .stamp-d{display:block;margin-top:6px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;border-top:1.5px solid var(--red);padding-top:4px}
 .stamp.down{opacity:.92;animation:slam .42s cubic-bezier(.2,1.5,.35,1) both}
@@ -337,8 +337,7 @@ del.am{display:none}
   .enact{margin-top:6px}
 }
 /* re-typeset flourish when crossing between bill and slip law */
-.retype .mast>*,.retype .folio,.retype .txt,.retype .attest{animation:ink .62s cubic-bezier(.2,.75,.2,1) both}
-.retype .txt{animation-delay:.12s}
+.retype .mast>*,.retype .folio{animation:ink .62s cubic-bezier(.2,.75,.2,1) both}
 .retype .desk .sheet{animation:settle .7s cubic-bezier(.2,.75,.2,1) both}
 @keyframes settle{0%{transform:scale(.985);filter:grayscale(1) contrast(.9)}100%{transform:none}}
 
@@ -375,7 +374,7 @@ del.am{display:none}
     <span class="cv fit cv1">H.&#8202;R.&#8202;2026</span>
     <span class="cv cv-rule" aria-hidden="true"></span>
     <span class="cv fit cv2">HUSAM</span>
-    <span class="cv fit cv3">SOKAR&#8202;ACT</span>
+    <span class="cv fit cv3">SOKAR ACT</span>
   </h1>
   <p class="cv cv4 cover-sub"><span class="cs-k">A BILL</span> To recognize Husam Sokar of Fresno, California, who learns how institutions actually run and then does the work inside them, and for other purposes.</p>
   <div class="roller" aria-hidden="true"></div>
@@ -901,8 +900,8 @@ del.am{display:none}
     var w=cover.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
     var caps={cv1:0.16,cv2:0.21,cv3:0.2};
     cover.querySelectorAll('.fit').forEach(function(el){
-      el.style.fontSize='100px';
-      var nat=el.scrollWidth||1;
+      el.style.fontSize='100px'; el.style.width='max-content';
+      var nat=el.getBoundingClientRect().width||1; el.style.width='';
       var cap=0.2*window.innerWidth; for(var k in caps){ if(el.classList.contains(k)) cap=caps[k]*window.innerWidth; }
       var size=Math.min(100*w/nat*0.995, cap, 300);
       el.style.fontSize=Math.max(36,size)+'px';
@@ -976,9 +975,9 @@ del.am{display:none}
   buttons.forEach(function(b){ b.addEventListener('click',function(){ setVersion(b.getAttribute('data-v')); }); });
 
   /* ---------- bill <-> slip law re-typesetting ---------- */
-  var mq=window.matchMedia?matchMedia('(max-width:699px)'):null, rt=0;
+  var mq=window.matchMedia?matchMedia('(max-width:699px)'):null, rt=0, lastSlip=mq?mq.matches:false;
   function onMode(){
-    var slip=mq.matches;
+    var slip=mq.matches; if(slip===lastSlip) return; lastSlip=slip;
     if(!reduce){ root.classList.remove('retype'); void root.offsetWidth; root.classList.add('retype'); clearTimeout(rt); rt=setTimeout(function(){root.classList.remove('retype');},900); }
     toast('Re-typeset', slip?'as a slip law: new masthead, no line numbers.':'as a bill in the House, with line numbers.');
     schedule();
