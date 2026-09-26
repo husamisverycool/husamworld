@@ -316,7 +316,7 @@ html.intro .skip{display:block}
     <ul class="rows">
       <li><button class="row" type="button" data-code="HMC · Harvard Model Congress" data-say="Harvard Model Congress, Boston. Chair, senior staff. 1,500+ delegates from 100+ schools." data-info="Chair (Senior Staff) since Jan 2026, on staff since Sep 2025. Directing the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools.">
         <span class="grp c-cd" data-w="4">HMC</span><span class="pf" data-p="chamber" data-k="w"></span><span class="wf c-ds">Harvard Model Congress</span><span class="wf c-pg">Chair (Senior Staff)</span><span class="wf c-rm" data-cycle="1,500+ delegates|100+ schools|Since Jan 2026">1,500+ delegates</span></button></li>
-      <li><button class="row" type="button" data-code="THCB · Crimson Business Board" data-say="The Harvard Crimson Business Board. Project Team Lead, TPR/AlgoEd, since December 2025." data-info="Project Team Lead, TPR/AlgoEd, on The Harvard Crimson Business Board since Dec 2025. Leads international writing and leadership camps with The Princeton Review and AlgoEd for the nation's oldest daily college newspaper, est. 1873, a $1M+ media enterprise.">
+      <li><button class="row" type="button" data-code="THCB · Crimson Business Board" data-say="The Harvard Crimson Business Board. Project Team Lead, TPR/AlgoEd, since December 2025." data-info="Project Team Lead, TPR/AlgoEd, on The Harvard Crimson Business Board since Dec 2025. Leads international writing and leadership camps with The Princeton Review and AlgoEd for the oldest daily college newspaper in the country, est. 1873, a $1M+ media enterprise.">
         <span class="grp c-cd" data-w="4">THCB</span><span class="pf" data-p="paper" data-k="w"></span><span class="wf c-ds">Crimson Business Board</span><span class="wf c-pg">Project Team Lead</span><span class="wf c-rm" data-cycle="TPR / AlgoEd|Since Dec 2025">TPR / AlgoEd</span></button></li>
       <li><button class="row" type="button" data-code="RAD · Radcliffe Emerging Leaders" data-say="Emerging Leaders Program, Harvard Radcliffe Institute. Mentor, October 2025 to April 2026." data-info="Mentor, Emerging Leaders Program, Harvard Radcliffe Institute, Oct 2025 to Apr 2026: Boston high-school sophomores, on leadership and social activism.">
         <span class="grp c-cd" data-w="4">RAD</span><span class="pf" data-p="mentor" data-k="w"></span><span class="wf c-ds">Radcliffe Emerging Leaders</span><span class="wf c-pg">Mentor</span><span class="wf c-rm" data-cycle="Oct 2025 - Apr 2026|Boston sophomores">Oct 2025 - Apr 2026</span></button></li>
@@ -344,7 +344,7 @@ html.intro .skip{display:block}
   <h3 class="sr">Gates, written out</h3>
   <div class="manifest">
     <div class="mi"><p class="code">HMC</p><p><b>Harvard Model Congress.</b> Chair (Senior Staff) since January 2026, on staff since September 2025. He is directing the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools.</p></div>
-    <div class="mi"><p class="code">THCB</p><p><b>The Harvard Crimson Business Board.</b> Project Team Lead, TPR/AlgoEd, since December 2025: international writing and leadership camps with The Princeton Review and AlgoEd, for the nation's oldest daily college newspaper (est. 1873, a $1M+ media enterprise).</p></div>
+    <div class="mi"><p class="code">THCB</p><p><b>The Harvard Crimson Business Board.</b> Project Team Lead, TPR/AlgoEd, since December 2025: international writing and leadership camps with The Princeton Review and AlgoEd, for the oldest daily college newspaper in the country (est. 1873, a $1M+ media enterprise).</p></div>
     <div class="mi"><p class="code">RAD</p><p><b>Emerging Leaders Program, Harvard Radcliffe Institute.</b> Mentor, October 2025 to April 2026, working with Boston high-school sophomores on leadership and social activism.</p></div>
     <div class="mi"><p class="code">HCCF</p><p><b>Harvard College China Forum.</b> Operations for America's largest conference on US-China relations.</p></div>
     <div class="mi"><p class="code">HIRC</p><p><b>Harvard International Relations Council.</b> Assistant Director of Operations for Harvard Model UN and Harvard National Model UN.</p></div>
@@ -1661,6 +1661,7 @@ function afterFonts() {
   LAND = sortRamp(LAND, true); PORT = ' ' + sortRamp(PORT.trim(), true);
   layoutAll();
   INTRO.waiting = false; INTRO.t0 = performance.now();
+  if (!INTRO.active && !G.arcT0) G.arcT0 = performance.now() + 150;
 }
 if (doc.fonts && doc.fonts.load) {
   Promise.race([
