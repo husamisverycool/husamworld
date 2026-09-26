@@ -1081,27 +1081,28 @@ $('exitGo').addEventListener('click', function () { if (near) goIn(near); });
 
 // ---------------------------------------------------------------- driving
 function driveInput() {
-  var thr = (ctl.up ? 1 : 0) - (ctl.down ? 1 : 0), steer = (ctl.left ? 1 : 0) - (ctl.right ? 1 : 0);
+  var thr = (ctl.up ? 1 : 0) - (ctl.down ? 1 : 0), steer = (ctl.left ? 1 : 0) - (ctl.right ? 1 : 0), touch = COARSE;
   if (joy.on) {
-    var mag = Math.min(1, Math.hypot(joy.x, joy.y));
+    var mag = Math.min(1, Math.hypot(joy.x, joy.y)), push = Math.pow(clamp((mag - .18) / .82, 0, 1), 1.4); // a light push creeps, a full push drives
     if (mag > .18) { // the stick points where you want to go, on screen
       var cr = new V3().setFromMatrixColumn(camera.matrixWorld, 0), cu = new V3().setFromMatrixColumn(camera.matrixWorld, 1);
       var want = cr.multiplyScalar(joy.x).add(cu.multiplyScalar(-joy.y)); want.sub(car.n.clone().multiplyScalar(want.dot(car.n)));
-      if (want.lengthSq() > 1e-5) { want.normalize(); var ang = Math.atan2(car.f.clone().cross(want).dot(car.n), car.f.dot(want)); if (Math.abs(ang) > 2.3 && car.v < 2) { thr = -mag * .8; steer = -clamp(ang, -1, 1) * .8; } else { thr = mag; steer = clamp(ang * 2.2, -1, 1); } }
+      if (want.lengthSq() > 1e-5) { want.normalize(); var ang = Math.atan2(car.f.clone().cross(want).dot(car.n), car.f.dot(want)); if (Math.abs(ang) > 2.3 && car.v < 2) { thr = -push * .8; steer = -clamp(ang, -1, 1) * .8; } else { thr = push; steer = clamp(ang * 1.4, -1, 1); } }
     }
   }
-  return { thr: thr, steer: steer };
+  return { thr: thr, steer: steer, touch: touch };
 }
 var _ax = new V3(), _qq = new Q(), lastHit = 0;
 function updateCar(dt) {
   var inp = playing() ? driveInput() : { thr: 0, steer: 0 }, brake = playing() && ctl.brake;
-  var boost = playing() && ctl.boost, max = boost ? 19 : 12.5;
-  if (inp.thr) car.v += inp.thr * (inp.thr * car.v < 0 ? 30 : boost ? 22 : 15) * dt;
+  // on phones the car is calmer: lower top speed, softer acceleration and steering, so a thumb can place it where it means to
+  var boost = playing() && ctl.boost, soft = inp.touch, max = soft ? (boost ? 11 : 7.5) : (boost ? 19 : 12.5);
+  if (inp.thr) car.v += inp.thr * (inp.thr * car.v < 0 ? 30 : soft ? (boost ? 13 : 8.5) : boost ? 22 : 15) * dt;
   else car.v *= Math.pow(.3, dt);
   if (brake) car.v *= Math.pow(.02, dt);
   car.v = clamp(car.v, -6, max);
-  car.steer += (inp.steer - car.steer) * Math.min(1, dt * 9);
-  var turn = car.steer * 2.2 * Math.min(1, Math.abs(car.v) / 3.5) * (car.v < 0 ? -1 : 1);
+  car.steer += (inp.steer - car.steer) * Math.min(1, dt * (soft ? 5 : 9));
+  var turn = car.steer * (soft ? 1.7 : 2.2) * Math.min(1, Math.abs(car.v) / 3.5) * (car.v < 0 ? -1 : 1);
   _qq.setFromAxisAngle(car.n, turn * dt); car.f.applyQuaternion(_qq);
   var prevN = car.n.clone();
   _ax.copy(car.n).cross(car.f).normalize(); _qq.setFromAxisAngle(_ax, car.v * dt / R); car.n.applyQuaternion(_qq).normalize(); car.f.applyQuaternion(_qq);
