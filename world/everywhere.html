@@ -983,7 +983,7 @@ var LDRUM = ' ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var WF = { cur: ['B', 'O', 'S'], tgt: ['B', 'O', 'S'], t0: 0, next: 0 };
 F.word = 'BOS';
 function flapWord(w) {
-  WF.tgt = w.split(''); WF.t0 = performance.now();
+  WF.tgt = w.split(''); WF.t0 = WF.next = performance.now();
   if (REDUCED) { WF.cur = WF.tgt.slice(); F.word = w; buildLetters(); F.dirty = true; }
 }
 function wordTick(now) {

@@ -432,6 +432,10 @@ DOC = f'''<!doctype html>
 </html>
 '''
 
+# keep the shared world-nav block (same form as world/_shared/inject.py writes it)
+NAV = open(os.path.join(ROOT, 'world', '_shared', 'worldnav.js')).read()
+DOC = DOC.replace('</body>', '<!-- world-nav:start -->\n<husam-world-nav current="depths"></husam-world-nav>\n<script>\n' + NAV + '</script>\n<!-- world-nav:end -->\n</body>', 1)
+
 with open(OUT, 'w') as f:
     f.write(DOC)
 print('wrote', OUT, len(DOC), 'bytes')
