@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- husam.world: the tiny planet from the hub, its road, and the red car parked on top -->
+  <defs>
+    <clipPath id="p"><circle cx="32" cy="35" r="25"/></clipPath>
+  </defs>
+  <ellipse cx="32" cy="61" rx="17" ry="2.2" fill="#23262e" opacity=".22"/>
+  <g clip-path="url(#p)">
+    <rect x="0" y="0" width="64" height="64" fill="#f2c94c"/>
+    <path d="M0 0H64V22C54 19 47 25 38 22C29 19 22 25 13 22C8 20.5 4 22 0 23Z" fill="#6fb35d"/>
+    <path d="M40 60C52 55 58 45 58 34L64 34V64H40Z" fill="#e0a93a" opacity=".55"/>
+    <path d="M3 44C17 34 45 30 62 36" fill="none" stroke="#2b2f3b" stroke-width="9" stroke-linecap="round"/>
+    <path d="M3 44C17 34 45 30 62 36" fill="none" stroke="#f2c23a" stroke-width="1.6" stroke-dasharray="4 4"/>
+    <circle cx="16" cy="53" r="3.4" fill="#3f8a55" stroke="#23262e" stroke-width="1.4"/>
+    <circle cx="47" cy="17" r="3.6" fill="#3f8a55" stroke="#23262e" stroke-width="1.4"/>
+  </g>
+  <circle cx="32" cy="35" r="25" fill="none" stroke="#23262e" stroke-width="3.2"/>
+  <g transform="rotate(-8 32 11)">
+    <rect x="21" y="4" width="22" height="13" rx="2" fill="#e0533d" stroke="#23262e" stroke-width="2.6"/>
+    <rect x="26" y="6.5" width="12" height="5" rx="1" fill="#23262e"/>
+    <rect x="30" y="5" width="4" height="3" fill="#f2c23a"/>
+  </g>
+</svg>

@@ -42,7 +42,7 @@ OWNED = {
     r'Radcliffe': 'everywhere', r'China Forum': 'everywhere', r'International Relations Council|HMUN|HNMUN': 'everywhere',
     r'Applied Math': 'everywhere', r'Honor Council': 'everywhere', r'Outdoor Program': 'everywhere', r'SPARK': 'everywhere', r'Fong': 'everywhere',
     # World
-    r'linkedin\.com': 'index', r'\[email\]': 'index', r'data:image/jpeg;base64': 'index',
+    r'linkedin\.com': 'index', r'hramadan@college': 'index', r'data:image/jpeg;base64': 'index',
 }
 
 def visible_text(raw):

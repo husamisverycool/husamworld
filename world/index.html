@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><link rel="icon" href="favicon.ico" sizes="48x48"><link rel="icon" href="icons/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Husam Sokar</title>
 <meta name="description" content="Husam Sokar's world: a tiny planet with one road wrapped around it, from Fresno to Cambridge. Drive it; every landmark is a door.">
@@ -138,8 +138,8 @@ html.coarse .toast.show{transform:translate(-50%,0);opacity:1}
 .contact{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .btn{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:12px 16px 10px;background:var(--ink);color:var(--cream);font:400 15px/1 var(--display);text-decoration:none;box-shadow:0 4px 0 0 #000}
 .btn:hover{background:#383c48}
-.email{display:inline-flex;align-items:stretch;min-height:46px;background:#fff;box-shadow:0 0 0 2px var(--ink)}
-.email-addr{display:flex;align-items:center;padding:0 12px 0 14px;font:600 16px/1 var(--text)}
+.email{display:inline-flex;align-items:stretch;min-height:46px;max-width:100%;background:#fff;box-shadow:0 0 0 2px var(--ink)}
+.email-addr{display:flex;align-items:center;min-width:0;padding:0 12px 0 14px;font:600 clamp(13px,3.9vw,16px)/1.2 var(--text);overflow-wrap:anywhere}
 .copy{min-width:78px;padding:0 13px;border-left:2px solid var(--ink);font:400 13px/1 var(--display);background:var(--yellow)}
 .copy.done{background:#9fe0b7}
 
@@ -273,8 +273,7 @@ html.has-world .stop-drive{display:inline-block}
     <p>You bumped the mailbox. LinkedIn is the quickest way to reach him; email works too.</p>
     <div class="contact">
       <a class="btn" href="https://www.linkedin.com/in/husam-sokar-089648227/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">&nearr;</span></a>
-      <!-- PLACEHOLDER: Husam's email address (visible text and the copy button's data-copy) -->
-      <span class="email"><span class="email-addr">[email]</span><button class="copy" type="button" data-copy="[email]">Copy</button></span>
+      <span class="email"><span class="email-addr">hramadan@college.harvard.edu</span><button class="copy" type="button" data-copy="hramadan@college.harvard.edu">Copy</button></span>
     </div>
   </div>
 </div>
@@ -293,8 +292,7 @@ html.has-world .stop-drive{display:inline-block}
       </div>
       <div class="contact">
         <a class="btn" href="https://www.linkedin.com/in/husam-sokar-089648227/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">&nearr;</span></a>
-        <!-- PLACEHOLDER: Husam's email address (visible text and the copy button's data-copy) -->
-        <span class="email"><span class="email-addr">[email]</span><button class="copy" type="button" data-copy="[email]">Copy</button></span>
+        <span class="email"><span class="email-addr">hramadan@college.harvard.edu</span><button class="copy" type="button" data-copy="hramadan@college.harvard.edu">Copy</button></span>
       </div>
       <p class="card-note" id="worldNote" hidden></p>
     </section>
@@ -345,7 +343,7 @@ var byId = {}; STOPS.forEach(function (d, i) { d.index = i; byId[d.id] = d; });
     if (d.id === 'contact') {
       h += '<li class="stop stop-mail slab" data-id="contact"><div class="stop-top"><span class="stop-name no-arrow">' + d.name + '</span><span class="stop-no">Last stop</span></div><span class="stop-line">' + d.teaser + '</span>' +
         '<div class="contact"><a class="btn" href="https://www.linkedin.com/in/husam-sokar-089648227/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">&nearr;</span></a>' +
-        '<!-- PLACEHOLDER: Husam\'s email address --><span class="email"><span class="email-addr">[email]</span><button class="copy" type="button" data-copy="[email]">Copy</button></span></div>' +
+        '<span class="email"><span class="email-addr">hramadan@college.harvard.edu</span><button class="copy" type="button" data-copy="hramadan@college.harvard.edu">Copy</button></span></div>' +
         '<button class="stop-drive" type="button" data-drive="contact">Drive there</button></li>';
     } else {
       h += '<li class="stop slab" data-id="' + d.id + '"><div class="stop-top"><a class="stop-name" href="' + d.file + '">' + d.name + '</a><span class="stop-no">Exit ' + (i + 1) + '</span></div><span class="stop-line">' + d.teaser + '</span><button class="stop-drive" type="button" data-drive="' + d.id + '">Drive there</button></li>';
@@ -637,7 +635,8 @@ function disc(n, r, lift, pal, seg) {
   g.setAttribute('normal', new THREE.BufferAttribute(N, 3)); g.setAttribute('onormal', new THREE.BufferAttribute(N.slice(), 3)); g.setAttribute('pal', new THREE.BufferAttribute(new Float32Array(cnt).fill(pal), 1));
   flats.push(g);
 }
-ribbon(-ROAD_W / 2, ROAD_W / 2, .045, 2, 0, ROAD_LEN, .5);
+// the asphalt is laid in six strips so it follows the planet's curve across its width (one flat quad sagged below the ground at the centre line)
+for (var rs = 0; rs < 6; rs++) ribbon(-ROAD_W / 2 + ROAD_W * rs / 6, -ROAD_W / 2 + ROAD_W * (rs + 1) / 6, .045, 2, 0, ROAD_LEN, .5);
 ribbon(-ROAD_W / 2 + .12, -ROAD_W / 2 + .26, .06, 3, 0, ROAD_LEN, .5);
 ribbon(ROAD_W / 2 - .26, ROAD_W / 2 - .12, .06, 3, 0, ROAD_LEN, .5);
 ribbon(-.09, .09, .065, 11, 1.5, ROAD_LEN - 1.5, .5, 1.6, 1.4);
@@ -836,7 +835,9 @@ function waterPatch(n, f, w, l, round) {
   var m = new THREE.Mesh(g, waterMat); scene.add(m); return m;
 }
 (function () {
-  var b = byId.translation; waterPatch(b.site, roadSide(b.s), 4.2, 44, false);
+  // the stream runs up to the bridge from both sides and stops at its abutments, so it never flows over the road
+  var b = byId.translation, bf = roadSide(b.s), BF = frameAt(b.site, bf), gap = ROAD_W + .3, sl = (44 - gap) / 2;
+  for (var sd = -1; sd <= 1; sd += 2) waterPatch(new V3(0, 0, sd * (gap + sl) / 2).applyMatrix4(BF).normalize(), bf, 4.2, sl, false);
   var p = byId.depths, F = frameAt(p.site, p.face); waterPatch(new V3(0, 0, -3.5).applyMatrix4(F).normalize(), p.face, 13, 13, true);
 })();
 
@@ -1372,6 +1373,8 @@ function showTitle() {
   U.uRevDir.value.copy(startN); U.uRev.value = -.2; paintMesh.material.opacity = 0;
   var b = $('goBtn'); b.disabled = false; b.textContent = 'Start the car';
   b.addEventListener('click', startWorld);
+  // warm every shader once while the title is up, so the car and signs appearing mid-flight can't stall a frame (Bruno warms his scene the same way)
+  carG.visible = true; signMeshes.forEach(function (m) { m.visible = true; }); try { renderer.compile(scene, camera); } catch (e) {}
   carG.visible = false; car.drop = 0; placeCar(0); signMeshes.forEach(function (m) { m.visible = false; });
 }
 function startWorld() {
@@ -1379,7 +1382,7 @@ function startWorld() {
   html.classList.add('started'); $('goBtn').blur();
   if (RM()) { finishIntro(); return; }
   state = 'intro';
-  var from = { pos: camera.position.clone(), q: camera.quaternion.clone() };
+  var from = { pos: camera.position.clone(), q: camera.quaternion.clone(), up: new V3(0, 1, 0).applyQuaternion(camera.quaternion) };
   car.drop = 0; placeCar(0);
   playPose(1, pose); cam.up.copy(car.n); cam.h.copy(car.f);
   var to = { pos: pose.pos.clone(), tgt: pose.tgt.clone(), up: pose.up.clone() };
@@ -1393,7 +1396,11 @@ function updateIntro(dt) {
   // camera: an arc from orbit down to the Fresno pole
   var k = eio(T / 2.4), p = I.from.pos.clone().lerp(I.to.pos, k), minR = lerp(I.from.pos.length(), I.to.pos.length(), k) * (1 + Math.sin(k * PI) * .25);
   if (p.length() < minR) p.setLength(minR);
-  var tgt = new V3().lerp(I.to.tgt, eio(T / 1.5)), up = new V3(0, 1, 0).lerp(I.to.up, eio(T / 2.4)).normalize();
+  // the camera's up turns on a great circle (never through zero, so the horizon can't flip), kept square to the view
+  var tgt = new V3().lerp(I.to.tgt, eio(T / 1.5));
+  if (!I.qUp) I.qUp = new Q().setFromUnitVectors(I.from.up, I.to.up.clone().normalize());
+  var up = I.from.up.clone().applyQuaternion(new Q().slerp(I.qUp, eio(T / 2.4))), vd = tgt.clone().sub(p).normalize();
+  up.addScaledVector(vd, -up.dot(vd)); if (up.lengthSq() < 1e-4) up.copy(I.lastUp || I.to.up); up.normalize(); I.lastUp = up.clone();
   cam.pos.copy(p); cam.tgt.copy(tgt); camUp.copy(up); applyCam(p, tgt, up);
   // letters fly down and become bricks
   letters.forEach(function (o, i) {
