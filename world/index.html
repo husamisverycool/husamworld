@@ -51,7 +51,7 @@ html.started .title{opacity:0;visibility:hidden;transition:opacity .45s,visibili
 .t-name{position:absolute;left:16px;right:16px;top:50%;transform:translateY(-58%);margin:0;font:400 clamp(58px,14vw,178px)/.84 var(--display);letter-spacing:.01em;color:var(--cream);text-transform:uppercase;
   text-shadow:0 2px 0 #d9d1b8,0 4px 0 #cbc2a6,0 6px 0 #b9af92,0 8px 0 var(--ink),3px 0 0 var(--ink),-3px 0 0 var(--ink),0 -3px 0 var(--ink);transition:opacity .5s}
 .t-name span{display:block}
-html.gl-title .t-name{opacity:0}
+html.gl-title .t-name{opacity:0;transition:none} /* swap to the 3D letters in one frame, so the two names never overlap */
 .t-go{pointer-events:auto;min-width:230px;min-height:58px;padding:14px 26px 12px;font:400 22px/1 var(--display);color:var(--ink);background:var(--yellow);box-shadow:0 0 0 2.5px var(--ink),0 6px 0 2.5px var(--ink);transform:rotate(-1.2deg);transition:transform .15s var(--spring),box-shadow .15s,background .3s}
 .t-go:hover{transform:rotate(-1.2deg) translateY(-2px)}
 .t-go:active{transform:rotate(-1.2deg) translateY(4px);box-shadow:0 0 0 2.5px var(--ink),0 2px 0 2.5px var(--ink)}
