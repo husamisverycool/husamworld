@@ -3045,7 +3045,7 @@ function Term(root, w) {
   const term = $('.term', root), out = $('.t-out', root), inp = $('.t-in', root), ps = $('.t-ps', root);
   let cwd = 'C:\\GARAGE', hist = [], hi = 0, pwMode = false, denyN = 0; const t0 = Date.now();
   // DOS text mode keeps no scrollback: when the screen is full, the top line scrolls away for good
-  const fit = () => { let n = 0; while (term.scrollHeight > term.clientHeight + 1 && out.firstChild && n++ < 400) { const f = out.firstChild; if (f.nodeType === 1 && f.textContent.split('\n').length > 2) { const t = f.textContent; const k = t.indexOf('\n'); if (f.children.length) f.remove(); else f.textContent = t.slice(k + 1); } else f.remove(); } term.scrollTop = 0; };
+  const fit = () => { if (term.clientHeight < 60) return; let n = 0; while (term.scrollHeight > term.clientHeight + 1 && out.firstChild && n++ < 400) { const f = out.firstChild; if (f.nodeType === 1 && f.textContent.split('\n').length > 2) { const t = f.textContent; const k = t.indexOf('\n'); if (f.children.length) f.remove(); else f.textContent = t.slice(k + 1); } else f.remove(); } term.scrollTop = 0; };
   const print = (s, cls) => { s.split('\n').forEach(line => { const sp = document.createElement('span'); if (cls) sp.style.color = cls; sp.textContent = line + '\n'; out.append(sp); }); fit(); };
   const html = s => { const sp = document.createElement('span'); sp.innerHTML = s + '\n'; out.append(sp); fit(); };
   const setPs = () => { ps.textContent = pwMode ? 'Password: ' : cwd + '>'; inp.type = pwMode ? 'password' : 'text'; WM.status('prompt', cwd); };
