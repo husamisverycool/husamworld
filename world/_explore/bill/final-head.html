@@ -234,6 +234,11 @@ mark.cur{background:#ffb13b}
 .play .chalk{animation:chalk 1.4s steps(10) var(--del,0s) both}
 .play .sighs{transform-box:fill-box;transform-origin:50% 100%;animation:sigh 2s steps(2) infinite}
 .play .crowd{animation:bob .8s steps(2) infinite}
+@keyframes stepup{0%,52%{transform:translateY(50px)}56%,100%{transform:translateY(0)}}
+.play .up{animation:stepup var(--dur,2.4s) steps(1) var(--del,0s) both}
+@keyframes strike{from{stroke-dashoffset:260}to{stroke-dashoffset:0}}
+.play .strike{stroke-dasharray:260;animation:strike .3s steps(3) var(--del,1s) both}
+.play .pin{transform-box:fill-box;transform-origin:center;animation:popin .3s steps(3) var(--del,0s) both}
 .signed-toon .jumper{animation:jump .8s steps(4) infinite}
 .stars{display:none}.signed-toon .stars{display:inline}
 .signed-toon .waiting{display:none}.jubil{display:none}.signed-toon .jubil{display:inline}
