@@ -207,7 +207,11 @@
       put(el, best[0], span, best[1], h);
     });
     var d = $('descender');
-    if (d) { d.style.top = ((1000 - 1) * K) + 'px'; d.style.height = ((NMAX - 1000) * K) + 'px'; d.style.left = '0'; d.style.width = '100%'; }
+    if (d) {
+      var fl = scale.querySelector('[data-kind="floor"]'), dTop = (1000 - 1) * K;
+      var dEnd = fl ? parseFloat(fl.style.top) - 24 : (NMAX - 1) * K;
+      d.style.top = dTop + 'px'; d.style.height = Math.max(0, dEnd - dTop) + 'px'; d.style.left = '0'; d.style.width = '100%';
+    }
     measure();
     var sc = scale.querySelector('[data-screens]');
     if (sc) {
