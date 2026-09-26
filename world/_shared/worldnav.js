@@ -32,14 +32,14 @@
         '.orb svg{width:26px;height:26px}.orb .spin{transform-origin:12px 12px;animation:spin 14s linear infinite}' +
         '@keyframes spin{to{transform:rotate(360deg)}}' +
         '.tip{position:absolute;left:58px;bottom:12px;white-space:nowrap;background:#15161a;color:#f4f3ef;padding:5px 10px;border-radius:999px;font-size:12px;letter-spacing:.02em;opacity:0;transform:translateX(-6px);pointer-events:none;transition:opacity .2s,transform .25s}' +
-        '.orb:hover+.tip,.orb:focus-visible+.tip{opacity:1;transform:none}' +
+        '.orb:hover+.tip,.orb:focus-visible+.tip{opacity:1;transform:none}.orb[aria-expanded=true]+.tip{opacity:0!important}' +
         '.panel{position:absolute;left:0;bottom:60px;width:min(300px,calc(100vw - 24px));max-height:min(72vh,560px);overflow:auto;background:#15161a;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:8px;box-shadow:0 30px 60px -20px rgba(0,0,0,.6);transform-origin:bottom left;animation:pop .28s cubic-bezier(.34,1.4,.64,1)}' +
         '.panel[hidden]{display:none}@keyframes pop{from{opacity:0;transform:scale(.9) translateY(8px)}}' +
-        '.back{display:flex;align-items:center;gap:10px;width:100%;padding:12px;border:0;border-radius:10px;background:#f4f3ef;color:#15161a;font:600 14px/1 inherit;cursor:pointer;text-decoration:none;box-sizing:border-box}' +
+        '.back{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:10px;width:100%;padding:12px;border:0;border-radius:10px;background:#f4f3ef;color:#15161a;font:600 14px/1 inherit;cursor:pointer;text-decoration:none;box-sizing:border-box}' +
         '.back:hover{background:#fff}' +
         '.lbl{margin:12px 10px 6px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(244,243,239,.5)}' +
         'ul{list-style:none;margin:0;padding:0}' +
-        'a{display:flex;flex-direction:column;gap:2px;padding:9px 10px;border-radius:9px;color:#f4f3ef;text-decoration:none}' +
+        'a{display:flex;flex-direction:column;gap:1px;padding:7px 10px;border-radius:9px;color:#f4f3ef;text-decoration:none}' +
         'a:hover{background:rgba(255,255,255,.08)}a b{font-weight:600}a span{font-size:12px;color:rgba(244,243,239,.6)}' +
         'a[aria-current]{background:rgba(255,255,255,.1)}a[aria-current] b::after{content:"  • you are here";font-weight:400;font-size:11px;color:#8fb4ff}' +
         '.wipe{position:fixed;inset:0;background:#15161a;clip-path:circle(0 at 36px calc(100% - 36px));pointer-events:none;transition:clip-path .55s cubic-bezier(.7,0,.3,1)}' +
