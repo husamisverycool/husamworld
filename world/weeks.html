@@ -100,7 +100,7 @@ p{margin:0}
 .years-list button[aria-pressed="true"]{background:var(--slate);color:#fff}
 .life-wrap{margin-top:14px}
 .life-cap{font-size:11.5px;color:var(--taupe-ink);margin:0 0 4px}
-.steps{padding:30vh 0 40vh}
+.steps{padding:30vh 0 22vh}
 .step{min-height:78vh;display:flex;align-items:center}
 .step-in{border-top:1px solid var(--coral);padding-top:10px}
 .step h3{font:400 30px/1 var(--serif);color:var(--taupe);margin:0 0 8px}
@@ -589,7 +589,7 @@ function wire(svg,hit,ringAt){
 (function(){
   var svg=document.getElementById('bub'),Wd=1040,Hh=460,colW=Wd/NY,bottom=Hh-26;
   var circles=[];
-  function rOf(w){return w.n?3.4+w.n*2.15:(w.sun&&w.sat?2.9:2.3);}
+  function rOf(w){return w.n?3.2+w.n*1.75:(w.sun&&w.sat?2.9:2.3);}
   for(var c=0;c<NY;c++){
     var ws=byYear[c].slice().sort(function(a,b){return rOf(b)-rOf(a)||a.i-b.i;});
     var placed=[],x0=c*colW+6,x1=(c+1)*colW-6;
@@ -676,7 +676,7 @@ function bars(vals,max,color,hi,h){
     num:String(emptyWeeks),numcap:'Since January 2015, out of '+fmt(PAST.length)+' weeks',
     a:[fmt(PAST.length),'weeks counted'],b:['“Most”','weekends: a habit, not a register']});
   var svc=mod(T,{h:'Service',cap:'President’s Volunteer Service Award, Lifetime',
-    spark:null,num:'4,000',unit:'+ hours',numcap:'Lifetime service hours',
+    spark:null,num:'4,000+',numcap:'Service hours, lifetime',
     a:['Lifetime','award level'],b:[fmt(Math.round(4000/24))+'+','days’ worth, around the clock']});
   /* a small clock-free pictogram: 4,000 hours as 40 bars of 100 */
   var pic=E('svg',{'class':'spark',viewBox:'0 0 200 56','aria-hidden':'true'});

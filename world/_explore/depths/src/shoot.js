@@ -21,11 +21,12 @@ fs.mkdirSync(path.dirname(out), { recursive: true });
   page.on('console', m => { if (m.type() === 'error' || m.type() === 'warning') errs.push(m.type() + ': ' + m.text()); });
   page.on('pageerror', e => errs.push('pageerror: ' + e.message));
   await page.goto('http://127.0.0.1:8871/' + file, { waitUntil: 'load' });
-  for (const [label, expr, wait, act] of steps) {
+  for (const [label, expr, wait, act, sel] of steps) {
     if (act) await page.evaluate(act);
     if (expr !== null) await page.evaluate(`window.scrollTo(0, ${expr})`);
     await page.waitForTimeout(wait || 500);
-    await page.screenshot({ path: `${out}-${label}.png` });
+    if (sel) await (await page.$(sel)).screenshot({ path: `${out}-${label}.png` });
+    else await page.screenshot({ path: `${out}-${label}.png` });
   }
   const info = await page.evaluate(() => ({ h: document.documentElement.scrollHeight, sw: document.documentElement.scrollWidth, cw: document.documentElement.clientWidth }));
   console.log(mode, JSON.stringify(info), 'errors:', errs.length ? '\n' + errs.join('\n') : 'none');
