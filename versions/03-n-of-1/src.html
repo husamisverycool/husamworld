@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Husam Sokar</title>
+<meta name="description" content="n = 1. A survey report with one respondent: Husam Sokar, Harvard College, from Fresno, California.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Archivo+Narrow:wght@400;500;600&family=Red+Hat+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: light;
+  --paper:#fcfcfa;
+  --surface:#ffffff;
+  --ink:#111111;
+  --ink-2:#44433f;
+  --muted:#76746e;
+  --rule:#cfcdc6;
+  --hair:#e6e5df;
+  --wash:#f3f2ee;
+  /* categorical, validated (light, adjacent): service, policy, research, harvard, enterprise */
+  --s-svc:#1baf7a;
+  --s-pol:#2a78d6;
+  --s-res:#eb6834;
+  --s-hvd:#a51c30;
+  --s-ent:#4a3aa7;
+  --dot:#1f1f1d;
+  --pool:#c4c2ba;
+  --hi:#a51c30;
+  --sans:"Public Sans", "Helvetica Neue", Arial, sans-serif;
+  --serif:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --narrow:"Archivo Narrow", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --mono:"Red Hat Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+*{box-sizing:border-box}
+html{background:var(--paper);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.55;font-optical-sizing:auto}
+a{color:var(--ink);text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:var(--muted)}
+a:hover{text-decoration-color:var(--hi);color:var(--hi)}
+:focus-visible{outline:2px solid var(--s-pol);outline-offset:2px}
+.num,table{font-variant-numeric:tabular-nums lining-nums}
+.page{max-width:1120px;margin:0 auto;padding:0 32px 80px}
+@media (max-width:640px){.page{padding:0 16px 56px}body{font-size:17px}}
+
+/* ---------- cover ---------- */
+.runhead{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding:18px 0 8px;font:500 12px/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.cover{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:48px;padding:56px 0 40px;border-bottom:1px solid var(--rule)}
+@media (max-width:860px){.cover{grid-template-columns:1fr;gap:28px;padding:36px 0 28px}}
+.kicker{font:600 13px/1.3 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--hi);margin:0 0 18px}
+h1{font:800 clamp(64px,13vw,168px)/.86 var(--sans);letter-spacing:-.045em;margin:0 0 20px}
+h1 i{font-style:italic;font-weight:400;font-family:var(--serif);letter-spacing:-.02em}
+.subtitle{font:400 clamp(22px,2.6vw,30px)/1.25 var(--serif);margin:0 0 22px;max-width:30ch}
+.byline{font:400 15px/1.5 var(--sans);color:var(--ink-2);margin:0}
+.respondent{border:1px solid var(--ink);background:var(--surface);align-self:start}
+.respondent figure{margin:0}
+.respondent img{display:block;width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;filter:grayscale(1) contrast(1.02);border-bottom:1px solid var(--ink)}
+.respondent figcaption{font:400 12px/1.4 var(--sans);color:var(--ink-2);padding:8px 12px}
+.respondent dl{margin:0;padding:4px 12px 12px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font:400 13px/1.4 var(--sans)}
+.respondent dt{color:var(--muted)}
+.respondent dd{margin:0;font-variant-numeric:tabular-nums}
+@media (max-width:860px){.respondent{display:grid;grid-template-columns:132px 1fr}.respondent img{border-bottom:0;border-right:1px solid var(--ink)}.respondent figure{grid-row:span 2}}
+
+.method{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--ink);margin:0}
+.method div{padding:14px 16px 16px 0}
+.method div+div{padding-left:16px;border-left:1px solid var(--hair)}
+.method dt{font:600 11px/1.3 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.method dd{margin:0;font:500 15px/1.4 var(--sans)}
+@media (max-width:860px){.method{grid-template-columns:1fr 1fr}.method div:nth-child(3){padding-left:0;border-left:0}.method div{border-top:1px solid var(--hair)}}
+@media (max-width:420px){.method{grid-template-columns:1fr}.method div,.method div+div{padding-left:0;border-left:0}}
+
+/* ---------- sections ---------- */
+section{padding:56px 0 8px}
+.sec-no{font:600 12px/1 var(--mono);color:var(--muted);letter-spacing:.04em;margin:0 0 10px}
+h2{font:700 clamp(28px,3.4vw,40px)/1.1 var(--sans);letter-spacing:-.02em;margin:0 0 18px}
+h3{font:700 19px/1.25 var(--sans);margin:0 0 6px}
+.lede{max-width:64ch;margin:0 0 24px;color:var(--ink-2)}
+.prose{max-width:64ch}
+.prose p{margin:0 0 14px}
+sup a{font:600 11px/1 var(--mono);text-decoration:none;color:var(--hi);padding:0 1px}
+
+.findings{list-style:none;margin:0;padding:0;counter-reset:f;max-width:74ch}
+.findings li{counter-increment:f;display:grid;grid-template-columns:96px 1fr;gap:16px;padding:14px 0;border-top:1px solid var(--hair)}
+.findings li::before{content:"Finding " counter(f);font:600 12px/1.9 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+@media (max-width:520px){.findings li{grid-template-columns:1fr;gap:2px}}
+
+/* ---------- now ---------- */
+.now{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 48px}
+@media (max-width:760px){.now{grid-template-columns:1fr}}
+.now article{border-top:1px solid var(--ink);padding:14px 0 22px}
+.now .when{font:500 13px/1.3 var(--mono);color:var(--muted);margin:0 0 8px}
+.now p{margin:0 0 8px;font-size:17px}
+.now .where{font:400 13px/1.4 var(--sans);color:var(--ink-2)}
+
+/* ---------- figures ---------- */
+figure.fig{margin:0 0 40px;background:var(--surface);border-top:2px solid var(--ink);border-bottom:1px solid var(--rule);padding:18px 20px 16px}
+@media (max-width:640px){figure.fig{padding:14px 12px 12px;margin-left:-4px;margin-right:-4px}}
+.fig-title{font:700 17px/1.3 var(--sans);margin:0 0 4px}
+.fig-title b{font-weight:800;margin-right:6px}
+.fig-sub{font:400 14px/1.45 var(--sans);color:var(--ink-2);margin:0 0 16px;max-width:80ch}
+.fig-note{font:400 12.5px/1.5 var(--sans);color:var(--muted);margin:14px 0 0;border-top:1px solid var(--hair);padding-top:10px}
+.fig-note b{color:var(--ink-2);font-weight:600}
+.key{display:flex;flex-wrap:wrap;gap:6px 18px;font:400 13px/1.3 var(--narrow);color:var(--ink-2);margin:0 0 12px;padding:0;list-style:none}
+.key li{display:flex;align-items:center;gap:6px}
+.sw{display:inline-block;width:14px;height:10px;border-radius:2px}
+.sw-dot{width:10px;height:10px;border-radius:50%;background:var(--dot)}
+.sw-hollow{width:10px;height:10px;border-radius:50%;border:2px solid var(--dot);background:var(--surface)}
+.sw-hi{width:10px;height:10px;border-radius:50%;background:var(--hi)}
+
+/* Figure 1: selectivity dot plot */
+.sel{--lab:330px;--val:150px;position:relative}
+.sel-axis{display:grid;grid-template-columns:var(--lab) 1fr var(--val);font:400 12px/1.2 var(--narrow);color:var(--muted)}
+.sel-axis .scale{position:relative;height:34px}
+.sel-axis .tick{position:absolute;transform:translateX(-50%);text-align:center;white-space:nowrap;bottom:4px}
+.sel-axis .tick b{display:block;font:600 12px/1.2 var(--mono);color:var(--ink-2)}
+.sel-axis .tick:first-child{transform:none}
+.sel-axis .tick:last-child{transform:translateX(-100%);text-align:right}
+.sel-axis.bottom .scale{height:30px}
+.sel-axis.bottom .tick{bottom:auto;top:6px}
+.sel-axis .hdr{align-self:end;font:600 11px/1.2 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-bottom:6px}
+.sel-axis .hdr.r{text-align:right}
+.sel-rows{list-style:none;margin:0;padding:0;position:relative}
+.sel-row{margin:0}
+.sel-row button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:var(--lab) 1fr var(--val);align-items:center;width:100%;min-height:30px;cursor:pointer;border-top:1px solid var(--hair)}
+.sel-row button:focus-visible{outline:2px solid var(--s-pol);outline-offset:-2px}
+.sel-row button:hover{background:var(--wash)}
+.sel-row[aria-current="true"] button{background:#f7eef0}
+.sel-name{font:500 14px/1.25 var(--narrow);padding:5px 12px 5px 0;display:flex;gap:8px;align-items:baseline;min-width:0}
+.sel-name .cat{font:500 10.5px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap;flex:none;width:72px}
+.sel-name .nm{min-width:0}
+.sel-track{position:relative;height:30px}
+.sel-track .grid{position:absolute;top:0;bottom:0;width:1px;background:var(--hair)}
+.sel-track .grid.major{background:#d9d8d2}
+.sel-track .stem{position:absolute;top:50%;height:1px;background:#bdbbb3;left:0}
+.sel-track .mk{position:absolute;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:var(--dot);box-shadow:0 0 0 2px var(--surface)}
+.sel-track .mk.approx{background:var(--surface);border:2px solid var(--dot)}
+.sel-row[aria-current="true"] .mk{background:var(--hi);border-color:var(--hi);box-shadow:0 0 0 2px #f7eef0}
+.sel-row[aria-current="true"] .mk.approx{background:#f7eef0}
+.sel-val{font:500 13px/1.2 var(--mono);text-align:right;padding-left:10px;white-space:nowrap}
+.sel-val small{display:block;font:400 11.5px/1.2 var(--narrow);color:var(--muted)}
+@media (max-width:860px){.sel{--lab:230px;--val:118px}.sel-name .cat{display:none}}
+@media (max-width:640px){
+  .sel{--val:0px}
+  .sel-axis{grid-template-columns:1fr}
+  .sel-axis .hdr{display:none}
+  .sel-row button{grid-template-columns:1fr auto;grid-template-areas:"n v" "t t";padding-top:6px}
+  .sel-name{grid-area:n;padding:0 8px 0 0}
+  .sel-val{grid-area:v}
+  .sel-val small{display:inline;margin-left:4px}
+  .sel-track{grid-area:t;height:22px}
+  .sel-axis .scale{margin:0}
+}
+
+/* Figure 2: pool */
+.pool-head{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:end;margin:0 0 12px}
+.pool-head label{font:600 11px/1.2 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
+.pool-head select{font:500 15px/1.2 var(--sans);color:var(--ink);background:var(--surface);border:1px solid var(--ink);border-radius:0;padding:7px 30px 7px 10px;max-width:100%;appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink) 50%),linear-gradient(135deg,var(--ink) 50%,transparent 50%);background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px;background-repeat:no-repeat}
+.pool-read{font:400 15px/1.45 var(--sans);margin:0;flex:1 1 320px}
+.pool-read strong{font:600 15px/1 var(--mono)}
+.pool-wrap{position:relative;border:1px solid var(--hair)}
+#pool{display:block;width:100%}
+.pool-legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:10px 0 0;padding:0;list-style:none;font:400 13px/1.3 var(--narrow);color:var(--ink-2)}
+.pool-legend li{display:flex;gap:6px;align-items:center}
+.pool-legend .g{width:9px;height:9px;background:var(--pool);border-radius:50%}
+
+/* Figure 3: timeline */
+#tl{position:relative}
+#tl svg{display:block;width:100%;height:auto;overflow:visible}
+#tl text{font-family:var(--narrow)}
+#tl .bar{cursor:default}
+#tl .bar:focus{outline:none}
+#tl .bar:focus-visible rect.hit{stroke:var(--s-pol);stroke-width:2}
+#tl .bar:hover rect.mark,#tl .bar:focus rect.mark{filter:brightness(1.12)}
+
+/* tooltip */
+.tip{position:fixed;z-index:10;pointer-events:none;background:var(--surface);border:1px solid var(--ink);padding:8px 10px;max-width:300px;font:400 13px/1.35 var(--sans);color:var(--ink);box-shadow:3px 3px 0 rgba(17,17,17,.08);opacity:0;transition:opacity .08s}
+.tip.on{opacity:1}
+.tip .v{font:600 14px/1.3 var(--mono);display:block;margin-bottom:2px}
+.tip .k{display:inline-block;width:14px;height:2px;vertical-align:middle;margin-right:6px}
+.tip .m{color:var(--ink-2)}
+
+/* ---------- toplines ---------- */
+.toplines{border-top:2px solid var(--ink)}
+.q{display:grid;grid-template-columns:62px minmax(0,1fr) minmax(170px,300px);gap:6px 20px;padding:16px 0;border-bottom:1px solid var(--hair);align-items:start}
+.q .qn{font:600 14px/1.5 var(--mono);color:var(--muted)}
+.q .qt{font:500 17px/1.45 var(--serif)}
+.q .qt .base{display:block;font:400 12.5px/1.4 var(--sans);color:var(--muted);margin-top:4px}
+.q .ans{font:400 14px/1.4 var(--sans)}
+.q .ans table{width:100%;border-collapse:collapse}
+.q .ans td{padding:2px 0;border-bottom:1px dotted var(--rule);vertical-align:baseline}
+.q .ans td.p{text-align:right;font:600 15px/1.4 var(--mono);white-space:nowrap;padding-left:12px}
+.q .ans .big{font:700 34px/1 var(--sans);letter-spacing:-.02em;display:block}
+.q .ans .unit{font:400 13px/1.4 var(--sans);color:var(--ink-2)}
+.q ol.art{margin:6px 0 0;padding:0 0 0 20px;font:400 14px/1.45 var(--sans)}
+.q ol.art li{margin:0 0 3px}
+.q ol.art li::marker{font:500 12px var(--mono);color:var(--muted)}
+.split{display:flex;height:12px;gap:2px;margin:8px 0 4px}
+.split span{display:block;height:100%}
+.split span:first-child{border-radius:4px 0 0 4px}
+.split span:last-child{border-radius:0 4px 4px 0}
+.split-lab{display:flex;justify-content:space-between;font:400 12.5px/1.3 var(--narrow);color:var(--ink-2)}
+@media (max-width:760px){.q{grid-template-columns:44px minmax(0,1fr)}.q .ans{grid-column:2}}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink)}
+table.report{width:100%;border-collapse:collapse;font:400 14px/1.35 var(--sans);min-width:560px}
+table.report caption{text-align:left;font:700 17px/1.3 var(--sans);padding:0 0 10px;caption-side:top}
+table.report th,table.report td{padding:8px 10px;border-bottom:1px solid var(--hair);text-align:left;vertical-align:top}
+table.report thead th{font:600 11.5px/1.25 var(--sans);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);border-bottom:1px solid var(--ink);vertical-align:bottom}
+table.report td.n,table.report th.n{text-align:right;font-family:var(--mono);font-weight:500;white-space:nowrap}
+table.report tbody th{font-weight:600}
+table.report tfoot td,table.report tfoot th{border-top:1px solid var(--ink);border-bottom:0;font-weight:700}
+table.report td.items{font:400 13px/1.45 var(--narrow);color:var(--ink-2);min-width:260px}
+.cap-out{font:700 17px/1.3 var(--sans);margin:0 0 10px}
+
+/* ---------- press / contact ---------- */
+.press{list-style:none;margin:0;padding:0;border-top:2px solid var(--ink)}
+.press li{display:grid;grid-template-columns:170px 1fr;gap:6px 24px;padding:16px 0;border-bottom:1px solid var(--hair)}
+.press .outlet{font:800 15px/1.3 var(--sans);letter-spacing:.01em}
+.press .outlet span{display:block;font:400 13px/1.4 var(--mono);color:var(--muted);letter-spacing:0;margin-top:2px}
+.press a{font:500 19px/1.35 var(--serif)}
+.press p{margin:4px 0 0;font:400 14px/1.4 var(--sans);color:var(--ink-2)}
+@media (max-width:600px){.press li{grid-template-columns:1fr}}
+.contact{border:1px solid var(--ink);background:var(--surface);max-width:720px}
+.contact .form-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--ink);padding:8px 14px;font:600 11.5px/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase}
+.contact dl{margin:0}
+.contact .row{display:grid;grid-template-columns:200px 1fr;border-bottom:1px solid var(--hair)}
+.contact .row:last-child{border-bottom:0}
+.contact dt{padding:12px 14px;font:500 13px/1.4 var(--sans);color:var(--ink-2);border-right:1px solid var(--hair)}
+.contact dd{margin:0;padding:12px 14px;font:500 16px/1.4 var(--sans);word-break:break-word}
+.contact .blank{font-family:var(--mono);border-bottom:1px solid var(--ink);padding:0 4px}
+@media (max-width:560px){.contact .row{grid-template-columns:1fr}.contact dt{border-right:0;padding-bottom:0}}
+
+/* ---------- appendix ---------- */
+.appendix{border-top:4px double var(--ink);margin-top:64px}
+.appendix h2{font-size:clamp(24px,2.8vw,32px)}
+.notes{font:400 14px/1.55 var(--sans);color:var(--ink-2);padding-left:22px;max-width:80ch}
+.notes li{margin:0 0 8px}
+.notes li::marker{font:600 12px var(--mono);color:var(--hi)}
+.notes li:target{background:#f7eef0}
+.method-list{display:grid;grid-template-columns:220px 1fr;gap:0;border-top:1px solid var(--ink);max-width:880px;margin:0}
+.method-list dt,.method-list dd{padding:10px 0;border-bottom:1px solid var(--hair);margin:0}
+.method-list dt{font:600 13px/1.45 var(--sans);padding-right:16px}
+.method-list dd{font:400 15px/1.5 var(--serif)}
+@media (max-width:600px){.method-list{grid-template-columns:1fr}.method-list dt{border-bottom:0;padding-bottom:0}}
+footer.colophon{margin-top:56px;border-top:1px solid var(--ink);padding-top:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:400 12px/1.4 var(--sans);color:var(--muted)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="runhead"><span>Survey of One Respondent &middot; Topline Report</span><span class="num">Released September 2026</span></div>
+  <div class="cover">
+    <div>
+      <p class="kicker">Husam Sokar</p>
+      <h1>n&thinsp;=&thinsp;<i>1</i></h1>
+      <p class="subtitle">Findings from a decade-long study of one Harvard sophomore from Fresno, California.</p>
+      <p class="byline">Prepared by the respondent. He is an analyst on the Harvard Youth Poll, America's largest poll of 18&ndash;29-year-olds, and has spent a lot of time thinking about sample sizes.<sup><a href="#n1" id="r1">1</a></sup></p>
+    </div>
+    <aside class="respondent" aria-label="Respondent profile">
+      <figure>
+        <!-- PLACEHOLDER: headshot; swap for a newer photo when Husam sends one -->
+        <img src="data:image/jpeg;base64,__PHOTO__" alt="Black-and-white headshot of Husam Sokar" width="448" height="448">
+        <figcaption>Respondent #1 of 1</figcaption>
+      </figure>
+      <dl>
+        <dt>School</dt><dd>Harvard College, sophomore</dd>
+        <dt>Field</dt><dd>Applied Math in Government and Economics</dd>
+        <dt>From</dt><dd>Fresno / Clovis, CA</dd>
+        <dt>Languages</dt><dd>English, Arabic</dd>
+      </dl>
+    </aside>
+  </div>
+  <dl class="method" aria-label="Methodology summary">
+    <div><dt>Sample</dt><dd class="num">1 respondent</dd></div>
+    <div><dt>Margin of error</dt><dd class="num">&plusmn;0 points</dd></div>
+    <div><dt>Fieldwork</dt><dd>Fresno, CA, 2015 &ndash; Cambridge, MA, 2026</dd></div>
+    <div><dt>Response rate</dt><dd class="num">100%</dd></div>
+  </dl>
+</header>
+
+<main>
+
+<section id="findings" aria-labelledby="h-findings">
+  <p class="sec-no">&sect; 1</p>
+  <h2 id="h-findings">Key findings</h2>
+  <ol class="findings">
+    <li><span>The respondent's pattern holds across every wave: he learns how an institution actually runs, then does the work inside it. Observed in a Sacramento bill campaign, a congressional office, a translation desk, a debate league, a youth poll, and now a company.</span></li>
+    <li><span>He is currently Co-founder &amp; CEO of a stealth startup, backed by DoorDash's early team, which he spent summer 2026 building full-time in San Francisco.</span></li>
+    <li><span>Between 2021 and 2025, a youth-run Fresno nonprofit under his leadership held 150+ community events, raised $240K+ for refugees and flood victims, and secured a $500K pledge for Fresno's first Muslim women's transitional home.</span></li>
+    <li><span>Where selection rates were published, the median honor or program in this report took about 1 in 38 applicants.<sup><a href="#n2" id="r2">2</a></sup> The most selective took fewer than 1 in 2,500 (Figure 1).</span></li>
+  </ol>
+</section>
+
+<section id="now" aria-labelledby="h-now">
+  <p class="sec-no">&sect; 2</p>
+  <h2 id="h-now">Current wave (2026)</h2>
+  <p class="lede">What the respondent reported doing at time of fieldwork.</p>
+  <div class="now">
+    <article>
+      <p class="when">Jun 2026 &ndash; present</p>
+      <h3>Co-founder &amp; CEO, stealth startup</h3>
+      <p>Backed by DoorDash's early team. Spent summer 2026 building it full-time in San Francisco. Further details withheld by the respondent, as is his right.</p>
+    </article>
+    <article>
+      <p class="when">Dec 2025 &ndash; present</p>
+      <h3>Project Team Lead, TPR/AlgoEd &middot; The Harvard Crimson Business Board</h3>
+      <p>Leads international writing and leadership camps with The Princeton Review and AlgoEd for the nation's oldest daily college newspaper (est. 1873). Traveled to South Korea to mentor students and lead two weeks of workshops on writing, leadership, and journalism; moderated and judged the international rounds of the Harvard Crimson Global Quiz Bowl.</p>
+    </article>
+    <article>
+      <p class="when">Jan 2026 &ndash; present</p>
+      <h3>Chair, Harvard Model Congress</h3>
+      <p>Senior staff directing the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools. Also staffing HMC Europe (500+ delegates, 20+ countries).</p>
+    </article>
+    <article>
+      <p class="when">Sep 2025 &ndash; May 2026</p>
+      <h3>Institute of Politics, Harvard Kennedy School</h3>
+      <p>Analyst on the Harvard Youth Poll. Associate to Ambassador Katherine Tai, the 19th U.S. Trade Representative. Consulting for the Red Cross and the United Nations.</p>
+    </article>
+  </div>
+  <p class="where">Also at Harvard: Senior Associate, Harvard Global Research and Consulting Group (UNICEF, Urban Institute); mentor, Radcliffe Institute Emerging Leaders Program; First-Year Outdoor Program leader; Honor Council; Hillel Travel Program Fellow (Lithuania, Poland, Hungary); Catalyst Sustainability Scholar (Puerto Rico).</p>
+</section>
+
+<section id="toplines" aria-labelledby="h-top">
+  <p class="sec-no">&sect; 3</p>
+  <h2 id="h-top">Toplines</h2>
+  <p class="lede">Questions put to the respondent, with his answers. Where a number is reported, it is a count, not an estimate. No opinions were polled.<sup><a href="#n3" id="r3">3</a></sup></p>
+  <div class="toplines">
+    <div class="q"><span class="qn">Q1.</span>
+      <div class="qt">Which languages do you speak professionally?<span class="base">Multiple responses allowed. Base: all respondents (n = 1).</span></div>
+      <div class="ans"><table><tr><td>English</td><td class="p">100%</td></tr><tr><td>Arabic (State Seal of Biliteracy)</td><td class="p">100%</td></tr><tr><td>Totals exceed 100% due to multiple responses</td><td class="p"></td></tr></table></div>
+    </div>
+    <div class="q"><span class="qn">Q2.</span>
+      <div class="qt">In which direction do you translate?<span class="base">Base: White House in Arabic, Jul 2022 &ndash; Apr 2024.</span></div>
+      <div class="ans"><table><tr><td>Arabic &rarr; English</td><td class="p">Yes</td></tr><tr><td>English &rarr; Arabic</td><td class="p">Yes</td></tr><tr><td>Neither</td><td class="p">0%</td></tr></table></div>
+    </div>
+    <div class="q"><span class="qn">Q3.</span>
+      <div class="qt">How many community events did your nonprofit hold?<span class="base">Muslim Community Association of Fresno, VP &amp; Executive Director, May 2022 &ndash; Dec 2025.</span></div>
+      <div class="ans"><span class="big">150+</span><span class="unit">events: clothing and food drives, mentoring groups at local mosques and Islamic schools</span></div>
+    </div>
+    <div class="q"><span class="qn">Q4.</span>
+      <div class="qt">How much did you raise for Syrian and Afghan refugees and Pakistan flood victims?<span class="base">Same organization and period as Q3.</span></div>
+      <div class="ans"><span class="big">$240K+</span><span class="unit">raised</span></div>
+    </div>
+    <div class="q"><span class="qn">Q5.</span>
+      <div class="qt">What did you secure for Fresno's first Muslim women's transitional home?<span class="base">A shelter addressing homelessness and domestic abuse.</span></div>
+      <div class="ans"><span class="big">$500K</span><span class="unit">pledge</span></div>
+    </div>
+    <div class="q"><span class="qn">Q6.</span>
+      <div class="qt">How many California bills did you work on end to end?<span class="base">Lead Advocate, CAIR, Sacramento, May 2021 &ndash; May 2023.</span></div>
+      <div class="ans"><span class="big">5</span>
+        <table><tr><td>AB 1766, California IDs for All (lead community advocate)</td></tr><tr><td>AB 1947, Freedom from Hate Crimes</td></tr><tr><td>SB 1161, Transit Safety</td></tr><tr><td>AB 2549, Ending Street Harassment</td></tr><tr><td>SB 1038, limits on biometric surveillance by law enforcement</td></tr></table></div>
+    </div>
+    <div class="q"><span class="qn">Q7.</span>
+      <div class="qt">How many articles, of those listed, did you edit or translate for White House in Arabic?<span class="base">Under Marah Bukai, Washington Bureau Chief of Al-Arab Media Organization.</span></div>
+      <div class="ans"><span class="big">6</span>
+        <ol class="art">
+          <li><a href="https://whia.us/en/5461/" target="_blank" rel="noopener">Mustafa Al-Kazemi's Crucial Role in the MENA Region</a></li>
+          <li><a href="https://whia.us/en/6115/" target="_blank" rel="noopener">The Sadrist Movement's Sit-In Sends Iraq into Political Turmoil</a></li>
+          <li><a href="https://whia.us/en/5276/" target="_blank" rel="noopener">MalikiLeaks: When Sectarianism Rules Iraq</a></li>
+          <li><a href="https://whia.us/en/5028/" target="_blank" rel="noopener">Iraq to Play a Major Role at Jeddah Summit</a></li>
+          <li><a href="https://whia.us/en/6215/" target="_blank" rel="noopener">The Possible Outcomes of the Iraqi Political Crisis</a></li>
+          <li><a href="https://whia.us/en/5047/" target="_blank" rel="noopener">Biden in Palestine: Is Health a Path to Statehood?</a></li>
+        </ol></div>
+    </div>
+    <div class="q"><span class="qn">Q8.</span>
+      <div class="qt">Roughly how many people read or watched that work?<span class="base">Combined audience, White House in Arabic.</span></div>
+      <div class="ans"><span class="big">350K+</span>
+        <div class="split" role="img" aria-label="150K+ readers and 200K+ viewers"><span style="flex:150;background:var(--s-res)"></span><span style="flex:200;background:var(--s-pol)"></span></div>
+        <div class="split-lab num"><span>150K+ readers</span><span>200K+ viewers</span></div></div>
+    </div>
+    <div class="q"><span class="qn">Q9.</span>
+      <div class="qt">How many service hours have you logged?<span class="base">President's Volunteer Service Award, Lifetime. Includes most Sundays at the Central California Food Bank, 2015&ndash;2021.</span></div>
+      <div class="ans"><span class="big">4,000+</span><span class="unit">hours</span></div>
+    </div>
+    <div class="q"><span class="qn">Q10.</span>
+      <div class="qt">How many students did you represent to the National Speech &amp; Debate Association's board?<span class="base">Student Leadership Council, 1 of 23 students nationwide, May 2024 &ndash; May 2025.</span></div>
+      <div class="ans"><span class="big">140,000+</span><span class="unit">members</span></div>
+    </div>
+    <div class="q"><span class="qn">Q11.</span>
+      <div class="qt">How many delegates attend the conference you're directing?<span class="base">Harvard Model Congress Boston, 2026.</span></div>
+      <div class="ans"><span class="big">1,500+</span><span class="unit">delegates from 100+ schools</span></div>
+    </div>
+    <div class="q"><span class="qn">Q12.</span>
+      <div class="qt">At what age did you start your first business?<span class="base">&ldquo;Electric Deals,&rdquo; retail arbitrage and eBay drop-shipping, Mar &ndash; Oct 2020.</span></div>
+      <div class="ans"><table><tr><td>Age</td><td class="p">14&ndash;15</td></tr><tr><td>Revenue, retail arbitrage</td><td class="p">~$20,000</td></tr><tr><td>Revenue, eBay</td><td class="p">~$8,000</td></tr><tr><td>Positive reviews</td><td class="p">281+</td></tr></table></div>
+    </div>
+  </div>
+</section>
+
+<section id="selectivity" aria-labelledby="h-sel">
+  <p class="sec-no">&sect; 4</p>
+  <h2 id="h-sel">Selectivity</h2>
+  <p class="lede">Every honor and program in the respondent's record that published how many people it took and from how large a pool, plotted on a logarithmic scale. Each gridline is ten times rarer than the one to its right. Select any row to redraw its pool in Figure 2.</p>
+
+  <figure class="fig" aria-labelledby="f1t">
+    <p class="fig-title" id="f1t"><b>Figure 1.</b>Acceptance rate, by honor or program</p>
+    <p class="fig-sub">Selected &divide; pool, log scale. Sorted from most to least selective. Where a pool is reported as &ldquo;X+&rdquo;, the true rate is at or below the value shown (&le;).<sup><a href="#n4" id="r4">4</a></sup></p>
+    <ul class="key">
+      <li><span class="sw sw-dot"></span>Exact counts</li>
+      <li><span class="sw sw-hollow"></span>Approximate (&ldquo;~&rdquo; or &ldquo;top X%&rdquo;)</li>
+      <li><span class="sw sw-hi"></span>Shown in Figure 2</li>
+    </ul>
+    <div class="sel" id="sel">
+      <div class="sel-axis" aria-hidden="true"><span class="hdr">Honor or program</span><div class="scale" id="axTop"></div><span class="hdr r">Rate &middot; 1 in N</span></div>
+      <ol class="sel-rows" id="selRows"></ol>
+      <div class="sel-axis bottom" aria-hidden="true"><span></span><div class="scale" id="axBot"></div><span></span></div>
+    </div>
+    <p class="fig-note"><b>Source:</b> program-reported figures as listed by the respondent. &ldquo;Members&rdquo; rows (NSDA) divide seats or awards by the total membership, not by an applicant pool. Mock Trial MVP: 1 of 128 MVPs across 5,000+ competitors. Quest for Excellence: selected from 3,911 College Prep Scholars. Civics Unplugged reported a rate (11%), not counts. Full values in Table 2, Appendix B.</p>
+  </figure>
+
+  <figure class="fig" aria-labelledby="f2t">
+    <p class="fig-title" id="f2t"><b>Figure 2.</b>The pool, drawn to count</p>
+    <p class="fig-sub">One dot per person in the pool. Crimson dots are the people selected. One of them is the respondent.</p>
+    <div class="pool-head">
+      <div><label for="poolSel">Honor or program</label><select id="poolSel"></select></div>
+      <p class="pool-read" id="poolRead" aria-live="polite"></p>
+    </div>
+    <div class="pool-wrap"><canvas id="pool" role="img" aria-label="Dot field of the applicant pool"></canvas></div>
+    <ul class="pool-legend">
+      <li><span class="g"></span>Everyone in the pool</li>
+      <li><span class="sw sw-hi"></span>Selected</li>
+      <li><span class="sw sw-hollow" style="border-color:var(--ink)"></span>n = 1 (placement is illustrative)</li>
+    </ul>
+    <p class="fig-note"><b>Note:</b> dots are placed at random; only the counts are real. For &ldquo;X+&rdquo; pools the minimum reported size is drawn.</p>
+  </figure>
+</section>
+
+<section id="timeline" aria-labelledby="h-tl">
+  <p class="sec-no">&sect; 5</p>
+  <h2 id="h-tl">Fieldwork periods</h2>
+  <p class="lede">Every dated role, 2015 to 2026, grouped by kind of work. Hover or focus a bar for details.</p>
+  <figure class="fig" aria-labelledby="f3t">
+    <p class="fig-title" id="f3t"><b>Figure 3.</b>Roles held, by lane and date</p>
+    <p class="fig-sub">Solid bars have month-level dates. Hollow bars were reported by year or season only, so their edges are approximate.</p>
+    <ul class="key" id="tlKey"></ul>
+    <div id="tl"></div>
+    <p class="fig-note"><b>Source:</b> respondent's records. Roles still running are drawn to September 2026 and marked &ldquo;present&rdquo;. Titles are the most senior held; earlier titles in the same organization are listed in the tooltip.</p>
+  </figure>
+</section>
+
+<section id="crosstabs" aria-labelledby="h-x">
+  <p class="sec-no">&sect; 6</p>
+  <h2 id="h-x">Crosstabs</h2>
+  <p class="lede">Honors reported by the respondent, cross-tabulated by category. Programs and fellowships that are not honors (TASS, Ballotpedia, and so on) appear in Figure 1 but are excluded here.</p>
+  <div class="tbl-wrap">
+    <table class="report" id="xtab">
+      <caption style="padding:12px 10px 10px"><b>Table 1.</b> Honors by category</caption>
+      <thead><tr><th scope="col">Category</th><th scope="col" class="n">Honors listed</th><th scope="col" class="n">With published selectivity</th><th scope="col" class="n">Most selective</th><th scope="col">Honors</th></tr></thead>
+      <tbody></tbody>
+      <tfoot></tfoot>
+    </table>
+  </div>
+</section>
+
+<section id="press" aria-labelledby="h-press">
+  <p class="sec-no">&sect; 7</p>
+  <h2 id="h-press">Media coverage</h2>
+  <ul class="press">
+    <li><span class="outlet">The Wall Street Journal<span class="num">Apr 16, 2025</span></span>
+      <div><a href="https://www.wsj.com/us-news/education/harvard-bound-students-stand-firm-while-some-columbia-prospects-think-twice-013d9afa" target="_blank" rel="noopener">Harvard-Bound Students Stand Firm While Some Columbia Prospects Think Twice</a><p>Contributor.</p></div></li>
+    <li><span class="outlet">The Nation<span class="num">Oct 11, 2024</span></span>
+      <div><a href="https://www.thenation.com/article/society/artificial-intelligence-chatgpt-college-applications/" target="_blank" rel="noopener">AI Is Taking Over College Admissions</a><p>Contributor.</p></div></li>
+  </ul>
+  <p class="where" style="font:400 14px/1.5 var(--sans);color:var(--ink-2);margin-top:12px">Diversify Our Narrative, where he was 1 of 5 executives (5,000+ student organizers, 800+ district chapters), was featured in TIME, Bloomberg, Vox, ABC Nightline, and The Washington Post.</p>
+</section>
+
+<section id="contact" aria-labelledby="h-contact">
+  <p class="sec-no">&sect; 8</p>
+  <h2 id="h-contact">Respondent contact information</h2>
+  <p class="lede">Collected for follow-up interviews only. The respondent has agreed to be recontacted.</p>
+  <div class="contact">
+    <div class="form-head"><span>Recontact form</span><span class="num">ID 0001</span></div>
+    <dl>
+      <div class="row"><dt>Name</dt><dd>Husam Sokar</dd></div>
+      <div class="row"><dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/husam-sokar-089648227/" target="_blank" rel="noopener">linkedin.com/in/husam-sokar-089648227</a></dd></div>
+      <div class="row"><dt>Email</dt><dd><!-- PLACEHOLDER: Husam's email address --><span class="blank">[email]</span></dd></div>
+      <div class="row"><dt>Current location</dt><dd>Cambridge, MA (Harvard College)</dd></div>
+      <div class="row"><dt>Preferred language</dt><dd>English or Arabic</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="appendix" id="appendix" aria-labelledby="h-app">
+  <p class="sec-no">Appendix A</p>
+  <h2 id="h-app">Methodology</h2>
+  <dl class="method-list">
+    <dt>Population</dt><dd>Husam Sokar.</dd>
+    <dt>Sample</dt><dd>The entire population (n = 1). No sampling error is possible; measurement error is the respondent's responsibility.</dd>
+    <dt>Frame</dt><dd>Fresno and Clovis, California (2015&ndash;2025); Sacramento; Reno, NV; Orange, CA; Washington, DC&ndash;Baltimore; Cambridge and Boston, MA (2025&ndash;); San Francisco (summer 2026); South Korea; Lithuania, Poland, and Hungary; Puerto Rico; Europe.</dd>
+    <dt>Mode</dt><dd>Self-administered, in English. Arabic available on request.</dd>
+    <dt>Weighting</dt><dd>None. The sample already matches the population on every demographic.</dd>
+    <dt>Instrument</dt><dd>Questions were written to be answered with counts from the respondent's records. Opinion items were dropped at the pretest stage.</dd>
+    <dt>Background covariates</dt><dd>Grew up doing billing and back-office work as an admin assistant at his father's law firm. Summa Cum Laude, Clovis Community College. Concentrating in Applied Math in Government and Economics.</dd>
+    <dt>Disclosure</dt><dd>The analyst and the respondent are the same person. Readers should weigh the findings accordingly.</dd>
+  </dl>
+
+  <p class="sec-no" style="margin-top:48px">Appendix B</p>
+  <div class="tbl-wrap">
+    <table class="report" id="selTable">
+      <caption style="padding:12px 10px 10px"><b>Table 2.</b> Values plotted in Figures 1 and 2</caption>
+      <thead><tr><th scope="col">Honor or program</th><th scope="col">Category</th><th scope="col" class="n">Selected</th><th scope="col" class="n">Pool</th><th scope="col">Pool is</th><th scope="col" class="n">Rate</th><th scope="col" class="n">1 in</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <p class="sec-no" style="margin-top:48px">Notes</p>
+  <ol class="notes">
+    <li id="n1">The Harvard Youth Poll is run by the Institute of Politics at the Harvard Kennedy School. This page is not affiliated with it and uses none of its data. <a href="#r1" aria-label="Back to reference 1">&uarr;</a></li>
+    <li id="n2">Median of the 25 rates in Figure 1, which is about 2.6% (between the 12th and 13th, Mock Trial MVP and Quest for Excellence). &ldquo;1 in 38&rdquo; is its reciprocal, rounded. <a href="#r2" aria-label="Back to reference 2">&uarr;</a></li>
+    <li id="n3">Q1 and Q2 are the only percentage items, because they are the only ones where the respondent's answer is a fact about himself that can be expressed as a share of one person. <a href="#r3" aria-label="Back to reference 3">&uarr;</a></li>
+    <li id="n4">Rates are computed from the counts as listed, not re-reported. &ldquo;~&rdquo; counts and &ldquo;top X%&rdquo; figures are approximate at the source and drawn as hollow markers. Honors with no reported pool (e.g. Gilman Scholar, Boys State, CHSSA top 15) are omitted from the figure but counted in Table 1. <a href="#r4" aria-label="Back to reference 4">&uarr;</a></li>
+  </ol>
+
+  <footer class="colophon"><span>n = 1 &middot; A survey report about Husam Sokar</span><span>Set in Public Sans, Source Serif 4, Archivo Narrow and Red Hat Mono</span></footer>
+</section>
+
+</main>
+</div>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s){return document.querySelector(s)};
+var fmtInt=function(n){return Math.round(n).toLocaleString("en-US")};
+
+/* ---------------- data: selectivity ---------------- */
+/* sel = selected, pool = pool size; plus = pool reported as "X+"; approx = "~" or "top X%" */
+var CATS={startup:"Startup",schol:"Scholarship",natl:"National",lead:"Leadership",debate:"Debate",program:"Program"};
+var S=[
+ {id:"slc",name:"NSDA Student Leadership Council",cat:"program",sel:23,pool:140000,plus:true,basis:"members"},
+ {id:"cong",name:"NSDA Nationals finalist, Congressional Debate",cat:"debate",sel:20,pool:50000,plus:true,basis:"competitors"},
+ {id:"soty",name:"NSDA Student of the Year",cat:"natl",sel:86,pool:140000,plus:true,basis:"members"},
+ {id:"coke",name:"Coca-Cola Scholar",cat:"schol",sel:150,pool:105000,plus:true,basis:"applicants"},
+ {id:"ppr",name:"Princeton Prize in Race Relations, San Francisco",cat:"natl",sel:3,pool:600,plus:true,basis:"applicants"},
+ {id:"gates",name:"Gates Scholar",cat:"schol",sel:750,pool:48000,plus:true,basis:"applicants"},
+ {id:"telora",name:"Telora Fellowship finalist (withdrew)",cat:"startup",sel:16,pool:1000,plus:true,basis:"applicants"},
+ {id:"elks",name:"Elks Most Valuable Student semifinalist",cat:"schol",sel:500,pool:21000,plus:true,basis:"applicants"},
+ {id:"cool",name:"Coolidge Scholarship Senator",cat:"lead",sel:100,pool:4100,plus:true,basis:"applicants"},
+ {id:"qfe",name:"QuestBridge Quest for Excellence Award, Humanities",cat:"schol",sel:100,pool:3911,approx:true,basis:"Prep Scholars"},
+ {id:"mock",name:"California Mock Trial Finals MVP",cat:"debate",sel:128,pool:5000,plus:true,basis:"competitors"},
+ {id:"taco",name:"Taco Bell Live Más Scholar",cat:"schol",sel:400,pool:14000,approx:true,basis:"applicants"},
+ {id:"tass",name:"Telluride Association Summer Seminar",cat:"program",sel:72,pool:2400,plus:true,basis:"applicants"},
+ {id:"jetson",name:"Jetson, paid intern",cat:"program",sel:40,pool:1000,plus:true,basis:"applicants"},
+ {id:"climate",name:"Intl. Climate Science Olympiad semifinalist",cat:"natl",rate:0.05,pool:55000,plus:true,approx:true,basis:"entrants",topPct:5},
+ {id:"jfk",name:"JFK Profile in Courage Essay Contest, top 5%",cat:"natl",sel:150,pool:2800,plus:true,approx:true,basis:"entrants"},
+ {id:"nd",name:"Notre Dame Leadership Seminars",cat:"lead",sel:90,pool:1500,plus:true,approx:true,basis:"applicants"},
+ {id:"psjp",name:"Princeton Summer Journalism Program finalist",cat:"lead",sel:60,pool:900,plus:true,approx:true,basis:"applicants"},
+ {id:"leg",name:"NSDA National Legislation Author",cat:"debate",sel:41,pool:500,plus:true,basis:"submissions"},
+ {id:"civics",name:"Civics Unplugged Fellow",cat:"program",rate:0.11,basis:"applicants",rateOnly:true},
+ {id:"usc",name:"USC Young Leaders Summit Scholar",cat:"lead",sel:200,pool:1800,plus:true,approx:true,basis:"applicants"},
+ {id:"hsd",name:"High School Diplomats finalist",cat:"lead",sel:80,pool:700,plus:true,approx:true,basis:"applicants"},
+ {id:"ballot",name:"Ballotpedia Research Fellow",cat:"program",sel:12,pool:90,plus:true,basis:"applicants"},
+ {id:"qbprep",name:"QuestBridge College Prep Scholar",cat:"schol",sel:3911,pool:16000,basis:"applicants"},
+ {id:"qbmatch",name:"QuestBridge National College Match finalist",cat:"schol",sel:7287,pool:25500,basis:"applicants"}
+];
+S.forEach(function(d){ if(d.rate==null) d.rate=d.sel/d.pool; });
+S.sort(function(a,b){return a.rate-b.rate});
+/* basis "submissions" for Legislation Author: CONTENT says "1 of 41 from 500+"; keep the neutral word "entries" */
+S.forEach(function(d){ if(d.basis==="submissions") d.basis="entries"; });
+
+function pctStr(r){
+  var p=r*100, s;
+  if(p<0.1) s=p.toFixed(3); else if(p<1) s=p.toFixed(2); else if(p<10) s=p.toFixed(1); else s=p.toFixed(1);
+  s=s.replace(/(\.\d*?[1-9])0+$/,"$1").replace(/\.0+$/,"");
+  return s+"%";
+}
+function rateLabel(d){ return (d.approx?"~":"")+(d.plus?"≤":"")+pctStr(d.rate); }
+function oneIn(d){ var n=1/d.rate; return (d.approx?"~":"")+fmtInt(n>=100?Math.round(n/10)*10:n); }
+function countLabel(d){
+  if(d.rateOnly) return d.rate*100+"% acceptance reported; pool size not reported";
+  if(d.topPct) return "top "+d.topPct+"% of "+fmtInt(d.pool)+(d.plus?"+":"")+" "+d.basis;
+  return (d.approx?"~":"")+fmtInt(d.sel)+" of "+fmtInt(d.pool)+(d.plus?"+":"")+" "+d.basis;
+}
+
+/* log scale 0.01% .. 100% */
+var LMIN=Math.log10(0.0001), LMAX=0;
+function xPct(r){ return (Math.log10(r)-LMIN)/(LMAX-LMIN)*100; }
+var TICKS=[[0.0001,"0.01%","1 in 10,000"],[0.001,"0.1%","1 in 1,000"],[0.01,"1%","1 in 100"],[0.1,"10%","1 in 10"],[1,"100%","everyone"]];
+
+function axis(el){
+  TICKS.forEach(function(t){
+    var s=document.createElement("span"); s.className="tick"; s.style.left=xPct(t[0])+"%";
+    var b=document.createElement("b"); b.textContent=t[1]; s.appendChild(b); s.appendChild(document.createTextNode(t[2]));
+    el.appendChild(s);
+  });
+}
+axis($("#axTop")); axis($("#axBot"));
+
+var rowsEl=$("#selRows"), tip=$("#tip");
+var current="coke";
+S.forEach(function(d){
+  var li=document.createElement("li"); li.className="sel-row"; li.dataset.id=d.id;
+  var btn=document.createElement("button"); btn.type="button";
+  btn.setAttribute("aria-label",d.name+": "+countLabel(d)+", rate "+rateLabel(d)+". Show in Figure 2.");
+  var nm=document.createElement("span"); nm.className="sel-name";
+  var c=document.createElement("span"); c.className="cat"; c.textContent=CATS[d.cat];
+  var n=document.createElement("span"); n.className="nm"; n.textContent=d.name;
+  nm.appendChild(c); nm.appendChild(n);
+  var tr=document.createElement("span"); tr.className="sel-track";
+  for(var e=-4;e<=0;e++){ for(var k=1;k<10;k++){ if(e===0&&k>1)break; var g=document.createElement("span"); g.className="grid"+(k===1?" major":""); g.style.left=xPct(k*Math.pow(10,e))+"%"; if(k!==1)g.style.opacity=".55"; tr.appendChild(g);} }
+  var stem=document.createElement("span"); stem.className="stem"; stem.style.width=xPct(d.rate)+"%"; tr.appendChild(stem);
+  var mk=document.createElement("span"); mk.className="mk"+(d.approx?" approx":""); mk.style.left=xPct(d.rate)+"%"; tr.appendChild(mk);
+  var v=document.createElement("span"); v.className="sel-val"; v.textContent=rateLabel(d);
+  var sm=document.createElement("small"); sm.textContent="1 in "+oneIn(d); v.appendChild(sm);
+  btn.appendChild(nm); btn.appendChild(tr); btn.appendChild(v);
+  btn.addEventListener("click",function(){ select(d.id,true); });
+  function show(ev){
+    tip.textContent="";
+    var vv=document.createElement("span"); vv.className="v"; vv.textContent=rateLabel(d)+"  ·  1 in "+oneIn(d); tip.appendChild(vv);
+    var a=document.createElement("div"); a.textContent=d.name; a.style.fontWeight="600"; tip.appendChild(a);
+    var m=document.createElement("div"); m.className="m"; m.textContent=countLabel(d)+" · "+CATS[d.cat]; tip.appendChild(m);
+    placeTip(ev, mk);
+  }
+  tr.addEventListener("pointermove",show); tr.addEventListener("pointerleave",hideTip);
+  btn.addEventListener("focus",function(){show(null)}); btn.addEventListener("blur",hideTip);
+  li.appendChild(btn); rowsEl.appendChild(li);
+});
+
+function placeTip(ev, anchor){
+  tip.classList.add("on");
+  var x,y; if(ev&&ev.clientX!=null){x=ev.clientX;y=ev.clientY;} else {var r=anchor.getBoundingClientRect(); x=r.left+r.width/2; y=r.top;}
+  var w=tip.offsetWidth,h=tip.offsetHeight, vw=document.documentElement.clientWidth;
+  var L=x+14; if(L+w>vw-8) L=x-w-14; if(L<8) L=8;
+  var T=y-h-12; if(T<8) T=y+18;
+  tip.style.left=L+"px"; tip.style.top=T+"px";
+}
+function hideTip(){ tip.classList.remove("on"); }
+window.addEventListener("scroll",hideTip,{passive:true});
+
+/* ---------------- Figure 2: pool ---------------- */
+var poolSel=$("#poolSel");
+S.forEach(function(d){ var o=document.createElement("option"); o.value=d.id; o.textContent=d.name; poolSel.appendChild(o); });
+poolSel.addEventListener("change",function(){ select(poolSel.value,false); });
+
+function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; var t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+var canvas=$("#pool");
+function drawPool(){
+  var d=S.filter(function(x){return x.id===current})[0];
+  var N, K, perHundred=false;
+  if(d.rateOnly){ N=100; K=Math.round(d.rate*100); perHundred=true; }
+  else if(d.topPct){ N=d.pool; K=Math.round(d.pool*d.rate); }
+  else { N=d.pool; K=d.sel; }
+  var W=canvas.parentNode.clientWidth, maxH=W<640?460:420;
+  var s=Math.sqrt(W*maxH/N); s=Math.min(s, 16);
+  var cols=Math.max(1,Math.floor(W/s)); s=W/cols;
+  var rows=Math.ceil(N/cols), H=Math.ceil(rows*s);
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=Math.round(W*dpr); canvas.height=Math.round(H*dpr); canvas.style.height=H+"px";
+  var ctx=canvas.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,W,H);
+  var cs=getComputedStyle(document.documentElement);
+  var poolC=cs.getPropertyValue("--pool").trim()||"#c4c2ba", hiC=cs.getPropertyValue("--hi").trim()||"#a51c30";
+  var round=s>=4, gs=round? s*0.62 : Math.max(0.9,s*0.78);
+  ctx.fillStyle=poolC;
+  for(var i=0;i<N;i++){
+    var cx=(i%cols)*s+s/2, cy=Math.floor(i/cols)*s+s/2;
+    if(round){ ctx.beginPath(); ctx.arc(cx,cy,gs/2,0,6.2832); ctx.fill(); }
+    else ctx.fillRect(cx-gs/2,cy-gs/2,gs,gs);
+  }
+  /* choose K distinct positions */
+  var r=rng(N*31+K), picked=new Set(), list=[];
+  while(list.length<K){ var p=Math.floor(r()*N); if(!picked.has(p)){picked.add(p);list.push(p);} }
+  ctx.fillStyle=hiC;
+  var hs=Math.max(3, round? s*0.72 : 3.2);
+  list.forEach(function(p){ var cx=(p%cols)*s+s/2, cy=Math.floor(p/cols)*s+s/2; ctx.beginPath(); ctx.arc(cx,cy,hs/2,0,6.2832); ctx.fill(); });
+  /* him: the selected dot closest to the centre-ish of the field */
+  var best=list[0], bd=1e18, tx=W*0.62, ty=H*0.42;
+  list.forEach(function(p){ var cx=(p%cols)*s+s/2, cy=Math.floor(p/cols)*s+s/2, dd=(cx-tx)*(cx-tx)+(cy-ty)*(cy-ty); if(dd<bd){bd=dd;best=p;} });
+  var hx=(best%cols)*s+s/2, hy=Math.floor(best/cols)*s+s/2, rr=Math.max(9,hs+6);
+  ctx.lineWidth=5; ctx.strokeStyle="#ffffff"; ctx.beginPath(); ctx.arc(hx,hy,rr,0,6.2832); ctx.stroke();
+  ctx.lineWidth=2; ctx.strokeStyle="#111111"; ctx.beginPath(); ctx.arc(hx,hy,rr,0,6.2832); ctx.stroke();
+  var lx=hx+rr+6, label="n = 1";
+  ctx.font="600 13px 'Red Hat Mono', ui-monospace, monospace";
+  var tw=ctx.measureText(label).width; if(lx+tw+8>W) lx=hx-rr-6-tw-8;
+  ctx.fillStyle="#ffffff"; ctx.fillRect(lx,hy-10,tw+8,20);
+  ctx.strokeStyle="#111111"; ctx.lineWidth=1; ctx.strokeRect(lx+.5,hy-9.5,tw+7,19);
+  ctx.fillStyle="#111111"; ctx.textBaseline="middle"; ctx.fillText(label,lx+4,hy+1);
+
+  var read=$("#poolRead"); read.textContent="";
+  var st=document.createElement("strong"); st.textContent=(d.approx?"~":"")+fmtInt(K); read.appendChild(st);
+  read.appendChild(document.createTextNode(perHundred ? " of every 100 applicants (the program reported an 11% rate but not its pool size, so 100 are drawn)." :
+    " selected from "+fmtInt(N)+(d.plus?"+":"")+" "+d.basis+". Rate "+rateLabel(d)+", or 1 in "+oneIn(d)+"."));
+  canvas.setAttribute("aria-label",d.name+": "+(d.approx?"about ":"")+fmtInt(K)+" selected dots among "+fmtInt(N)+" pool dots.");
+}
+function select(id, scroll){
+  current=id; poolSel.value=id;
+  Array.prototype.forEach.call(rowsEl.children,function(li){ li.setAttribute("aria-current", li.dataset.id===id?"true":"false"); });
+  drawPool();
+  if(scroll){ var f=canvas.closest("figure"), r=f.getBoundingClientRect(); if(r.top>window.innerHeight*0.6||r.bottom<0){ f.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"}); } }
+}
+select("coke",false);
+
+/* ---------------- Table 2 ---------------- */
+var tb=$("#selTable tbody");
+S.forEach(function(d){
+  var tr=document.createElement("tr");
+  [[d.name,"th"],[CATS[d.cat]],[d.rateOnly?"n/r":(d.topPct?"top "+d.topPct+"%":(d.approx?"~":"")+fmtInt(d.sel)),"n"],[d.rateOnly?"n/r":fmtInt(d.pool)+(d.plus?"+":""),"n"],[d.basis],[rateLabel(d),"n"],[oneIn(d),"n"]].forEach(function(c){
+    var el=document.createElement(c[1]==="th"?"th":"td"); if(c[1]==="th") el.scope="row"; if(c[1]==="n") el.className="n"; el.textContent=c[0]; tr.appendChild(el);
+  });
+  tb.appendChild(tr);
+});
+
+/* ---------------- Table 1: crosstabs ---------------- */
+var HON=[
+ {cat:"Startup",items:["LeapYear ($30K grant)","Telora Fellowship finalist, withdrew ($55K + 6-month residency)","Startups @ Harvard grant (XFund)"],sel:1,best:"telora"},
+ {cat:"Scholarships",items:["Coca-Cola Scholar","Gates Scholar","Benjamin A. Gilman Scholar","QuestBridge National College Match Finalist","QuestBridge College Prep Scholar","Quest for Excellence Award, Humanities","Taco Bell Live Más Scholar ($10K)","Elks Most Valuable Student Semifinalist"],sel:7,best:"coke"},
+ {cat:"National recognition",items:["Princeton Prize in Race Relations","NSDA Student of the Year","JFK Profile in Courage Essay Contest, top 5%","National African American Recognition Program","Intl. Geography Olympiad Team USA qualifier (7th nationally)","Intl. Climate Science Olympiad semifinalist","Ethics Bowl CA state quarterfinalist","National History Day 2× Valley Champion","Summa Cum Laude, Clovis Community College","CA State Seal of Biliteracy in Arabic"],sel:4,best:"soty"},
+ {cat:"Leadership programs",items:["Coolidge Scholarship Senator","ACLU National Advocacy Institute","Princeton Summer Journalism Program finalist","Notre Dame Leadership Seminars","High School Diplomats finalist","USC Young Leaders Summit Scholar","American Legion California Boys State","President's Volunteer Service Award, Lifetime"],sel:5,best:"cool"},
+ {cat:"Speech, debate & mock trial",items:["NSDA Nationals Finalist, Congressional Debate","NSDA National Semifinalist, Congressional Debate","4× NSDA National Qualifier","NSDA National Legislation Author","CHSSA Congressional Debate semifinalist","CHSSA Public Forum octofinalist","UOP Invitational 3× champion","Berkeley National Congress Tournament, 3rd","California Mock Trial Finals MVP"],sel:3,best:"cong"}
+];
+var xb=$("#xtab tbody"), totL=0, totS=0;
+HON.forEach(function(h){
+  var b=S.filter(function(d){return d.id===h.best})[0];
+  totL+=h.items.length; totS+=h.sel;
+  var tr=document.createElement("tr");
+  var th=document.createElement("th"); th.scope="row"; th.textContent=h.cat; tr.appendChild(th);
+  var a=document.createElement("td"); a.className="n"; a.textContent=h.items.length; tr.appendChild(a);
+  var c=document.createElement("td"); c.className="n"; c.textContent=h.sel; tr.appendChild(c);
+  var m=document.createElement("td"); m.className="n"; m.textContent=rateLabel(b); m.title=b.name; tr.appendChild(m);
+  var it=document.createElement("td"); it.className="items"; it.textContent=h.items.join(" · "); tr.appendChild(it);
+  xb.appendChild(tr);
+});
+var ft=document.createElement("tr");
+[["Total","th"],[totL,"n"],[totS,"n"],[rateLabel(S.filter(function(d){return d.id==="cong"})[0]),"n"],["Most selective honor overall: NSDA Nationals finalist, Congressional Debate",""]].forEach(function(c){
+  var el=document.createElement(c[1]==="th"?"th":"td"); if(c[1]==="th")el.scope="row"; if(c[1]==="n")el.className="n"; if(!c[1])el.className="items"; el.textContent=c[0]; ft.appendChild(el);
+});
+$("#xtab tfoot").appendChild(ft);
+
+/* ---------------- Figure 3: timeline ---------------- */
+var LANES=[
+ {id:"svc",name:"Service & organizing",c:"var(--s-svc)"},
+ {id:"pol",name:"Policy & advocacy",c:"var(--s-pol)"},
+ {id:"res",name:"Research & journalism",c:"var(--s-res)"},
+ {id:"hvd",name:"Harvard",c:"var(--s-hvd)"},
+ {id:"ent",name:"Enterprise",c:"var(--s-ent)"}
+];
+var NOW=2026+8/12; /* Sep 2026 */
+function ym(y,m){return y+(m-1)/12}
+function ye(y,m){return y+m/12}
+/* a = approximate (year/season only) */
+var R=[
+ {l:"svc",t:"Volunteer, Central California Food Bank",s:2015,e:2022,d:"Most Sundays, 2015–2021",a:1},
+ {l:"svc",t:"Volunteer, Masjid Fresno Saturday School",s:2018,e:2022,d:"Most Saturdays, 2018–2021",a:1},
+ {l:"svc",t:"VP & Executive Director, Muslim Community Association of Fresno",s:ym(2021,9),e:ye(2025,12),d:"Sep 2021 – Dec 2025. Board from Sep 2021 (Director of Outreach, Relations, External Relations); VP & ED from May 2022"},
+ {l:"svc",t:"Executive Director, LegislativeLift",s:ym(2022,4),e:ye(2022,12),d:"Apr – Dec 2022. Earlier volunteer, Outreach Director. 11K+ members"},
+ {l:"svc",t:"NSDA Student Leadership Council",s:ym(2024,5),e:ye(2025,5),d:"May 2024 – May 2025. 1 of 23 students"},
+ {l:"svc",t:"Exec. Director of Operations, Diversify Our Narrative",s:ym(2024,6),e:ye(2025,1),d:"Jun 2024 – Jan 2025. 1 of 5 executives"},
+ {l:"svc",t:"Managing Director, California High School Democrats",s:ym(2024,7),e:ye(2025,2),d:"Jul 2024 – Feb 2025. 1 of 9 directors"},
+ {l:"svc",t:"Election Fellow, Voters of Tomorrow",s:ym(2024,9),e:ye(2024,10),d:"Sep – Oct 2024. 1 of 50 paid fellows"},
+ {l:"pol",t:"Lead Advocate, CAIR",s:ym(2021,5),e:ye(2023,5),d:"May 2021 – May 2023, Sacramento. Five California bills"},
+ {l:"pol",t:"Advocacy Fellow, Encode Justice",s:2022,e:2023,d:"2022",a:1},
+ {l:"pol",t:"Congressional Intern, Office of Kevin McCarthy",s:ym(2022,6),e:ye(2022,12),d:"Jun – Dec 2022, Clovis, CA"},
+ {l:"pol",t:"Public Health Policy Analyst, Institute for Youth in Policy",s:2023,e:2024,d:"2023",a:1},
+ {l:"pol",t:"National Muslim Caucus, High School Democrats of America",s:2023,e:2026,d:"2023 – 2025",a:1},
+ {l:"pol",t:"Founder & President, bayloop",s:ym(2023,10),e:ye(2024,12),d:"Oct 2023 – Dec 2024. Think tank on restrictive zoning"},
+ {l:"res",t:"Economics research, Chapman University",s:ym(2022,7),e:ye(2022,10),d:"Jul – Oct 2022"},
+ {l:"res",t:"Senior English Writer, White House in Arabic",s:ym(2022,7),e:ye(2024,4),d:"Jul 2022 – Apr 2024. Arabic↔English translation and editing"},
+ {l:"res",t:"Econometrics research, University of Nevada, Reno",s:ym(2022,10),e:ye(2023,4),d:"Oct 2022 – Apr 2023, under Prof. Mark Pingle"},
+ {l:"res",t:"Research, University of Houston",s:ym(2023,1),e:ye(2023,3),d:"Jan – Mar 2023"},
+ {l:"res",t:"Researcher, The World in Us",s:2023,e:2025,d:"2023 – 2024",a:1},
+ {l:"res",t:"Press Officer, Youth Climate Action Team",s:2023,e:2025,d:"2023 – 2024",a:1},
+ {l:"res",t:"Research Fellow, Ballotpedia",s:ym(2024,1),e:ye(2024,3),d:"Jan – Mar 2024. 1 of 12 from 90+"},
+ {l:"hvd",t:"Fellow, IOP Policy Program in Economics; SPARK Fellow",s:ym(2025,6),e:ye(2025,8),d:"Summer 2025",a:1},
+ {l:"hvd",t:"Service, Ethics & Leadership Fellowships",s:ym(2025,8),e:NOW,d:"Aug 2025 – present",p:1},
+ {l:"hvd",t:"Chair, Harvard Model Congress",s:ym(2025,9),e:NOW,d:"Staff from Sep 2025; Chair from Jan 2026",p:1},
+ {l:"hvd",t:"Harvard Youth Poll; associate to Amb. Katherine Tai (IOP)",s:ym(2025,9),e:ye(2026,5),d:"Sep 2025 – May 2026"},
+ {l:"hvd",t:"Senior Associate, Harvard Global Research & Consulting",s:ym(2025,9),e:ye(2026,2),d:"Sep 2025 – Feb 2026"},
+ {l:"hvd",t:"Project Team Lead, Harvard Crimson Business Board",s:ym(2025,10),e:NOW,d:"From Oct 2025; team lead from Dec 2025",p:1},
+ {l:"hvd",t:"Mentor, Radcliffe Emerging Leaders Program",s:ym(2025,10),e:ye(2026,4),d:"Oct 2025 – Apr 2026"},
+ {l:"ent",t:"Founder, Electric Deals (age 14–15)",s:ym(2020,3),e:ye(2020,10),d:"Mar – Oct 2020"},
+ {l:"ent",t:"Paid Intern, Jetson",s:ym(2023,6),e:ye(2023,8),d:"Summer 2023. 1 of 40 from 1,000+",a:1},
+ {l:"ent",t:"Co-founder & CEO, stealth startup",s:ym(2026,6),e:NOW,d:"Jun 2026 – present. Backed by DoorDash's early team",p:1}
+];
+var key=$("#tlKey");
+LANES.forEach(function(L){ var li=document.createElement("li"); var sw=document.createElement("span"); sw.className="sw"; sw.style.background=L.c; li.appendChild(sw); li.appendChild(document.createTextNode(L.name)); key.appendChild(li); });
+(function(){ var li=document.createElement("li"); var sw=document.createElement("span"); sw.className="sw"; sw.style.border="1.5px solid #44433f"; sw.style.background="#fff"; li.appendChild(sw); li.appendChild(document.createTextNode("Approximate dates")); key.appendChild(li); })();
+
+var NS="http://www.w3.org/2000/svg";
+function el(n,a,p){ var e=document.createElementNS(NS,n); for(var k in a) e.setAttribute(k,a[k]); if(p) p.appendChild(e); return e; }
+var T0=2015, T1=2027;
+function drawTL(){
+  var host=$("#tl"); host.textContent="";
+  var W=host.clientWidth, phone=W<640;
+  var laneW=phone?0:158, padR=phone?4:8, rowH=phone?40:21, laneGap=phone?30:16, top=26;
+  var plotX=laneW, plotW=W-laneW-padR;
+  var x=function(t){return plotX+(t-T0)/(T1-T0)*plotW};
+  var rowsN=R.length, H=top+rowsN*rowH+LANES.length*laneGap+(phone?LANES.length*20:0)+28;
+  var svg=el("svg",{viewBox:"0 0 "+W+" "+H,width:W,height:H,role:"img","aria-label":"Timeline of "+R.length+" roles from 2015 to 2026 in five lanes"},host);
+  var gGrid=el("g",{},svg);
+  for(var y=T0;y<=T1;y++){
+    var gx=x(y);
+    el("line",{x1:gx,x2:gx,y1:top-6,y2:H-22,stroke:"#e6e5df","stroke-width":1},gGrid);
+    if(y<T1 && (!phone || y%2===1 || y===2026)){
+      var lab=phone?"’"+String(y).slice(2):String(y);
+      var tt=el("text",{x:x(y+0.5),y:top-10,"text-anchor":"middle","font-size":12,fill:"#76746e"},gGrid); tt.textContent=lab;
+      var tb=el("text",{x:x(y+0.5),y:H-6,"text-anchor":"middle","font-size":12,fill:"#76746e"},gGrid); tb.textContent=lab;
+    }
+  }
+  /* present line */
+  el("line",{x1:x(NOW),x2:x(NOW),y1:top-6,y2:H-22,stroke:"#111","stroke-width":1},svg);
+  var pl=el("text",{x:x(NOW)+4,y:H-24,"font-size":11,fill:"#111","font-weight":600},svg); pl.textContent=phone?"now":"Sep 2026";
+  var cy=top;
+  LANES.forEach(function(L){
+    var items=R.filter(function(r){return r.l===L.id}).sort(function(a,b){return a.s-b.s||b.e-a.e});
+    var laneTop=cy;
+    if(phone){
+      var lt=el("text",{x:0,y:cy+14,"font-size":13,"font-weight":600,fill:"#111"},svg); lt.textContent=L.name.toUpperCase(); lt.setAttribute("letter-spacing",".04em");
+      cy+=20;
+    }
+    items.forEach(function(r){
+      var g=el("g",{"class":"bar",tabindex:0,role:"img","aria-label":r.t+", "+r.d+" ("+L.name+")"},svg);
+      var bx=x(r.s), bw=Math.max(3,x(r.e)-x(r.s)), bh=phone?10:12, by=phone?cy+24:cy+(rowH-bh)/2;
+      el("rect",{"class":"hit",x:0,y:cy,width:W,height:rowH,fill:"transparent"},g);
+      var mark=el("rect",{"class":"mark",x:bx,y:by,width:bw,height:bh,rx:Math.min(3,bw/2),fill:r.a?"#ffffff":L.c,stroke:r.a?L.c:"none","stroke-width":r.a?1.5:0},g);
+      if(r.a){ mark.setAttribute("x",bx+.75); mark.setAttribute("y",by+.75); mark.setAttribute("width",Math.max(2,bw-1.5)); mark.setAttribute("height",bh-1.5); }
+      if(r.p){ el("path",{d:"M"+(bx+bw)+" "+by+" l5 "+(bh/2)+" l-5 "+(bh/2)+"z",fill:L.c},g); }
+      var label=r.t+(r.p?" (present)":"");
+      var tx=el("text",{"font-size":phone?13:12.5,fill:"#111"},g);
+      tx.textContent=label;
+      if(phone){ tx.setAttribute("x",0); tx.setAttribute("y",cy+15); }
+      else {
+        tx.setAttribute("y",cy+rowH/2+4.3);
+        var endX=bx+bw+(r.p?10:6);
+        tx.setAttribute("x",endX);
+        if(tx.getComputedTextLength()+endX > W-2){ tx.setAttribute("x",bx-6); tx.setAttribute("text-anchor","end"); }
+      }
+      if(phone){ /* shrink text if it overflows */ var tl=tx.getComputedTextLength(); if(tl>W){ tx.setAttribute("textLength",W-2); tx.setAttribute("lengthAdjust","spacingAndGlyphs"); } }
+      function show(ev){
+        tip.textContent="";
+        var v=document.createElement("span"); v.className="v"; v.textContent=r.d.split(". ")[0]; tip.appendChild(v);
+        var a=document.createElement("div"); a.style.fontWeight="600"; a.textContent=r.t; tip.appendChild(a);
+        var rest=r.d.split(". ").slice(1).join(". ");
+        var m=document.createElement("div"); m.className="m";
+        var k=document.createElement("span"); k.className="k"; k.style.background=L.c; m.appendChild(k);
+        m.appendChild(document.createTextNode(L.name+(r.a?" · approximate dates":"")+(rest?" · "+rest:""))); tip.appendChild(m);
+        placeTip(ev, mark);
+      }
+      g.addEventListener("pointermove",show); g.addEventListener("pointerleave",hideTip);
+      g.addEventListener("focus",function(){show(null)}); g.addEventListener("blur",hideTip);
+      cy+=rowH;
+    });
+    if(!phone){
+      el("line",{x1:0,x2:W,y1:laneTop,y2:laneTop,stroke:"#111","stroke-width":1},svg);
+      var lt2=el("text",{x:0,y:laneTop+15,"font-size":13,"font-weight":600,fill:"#111"},svg); lt2.textContent=L.name;
+      var sw=el("rect",{x:0,y:laneTop+22,width:22,height:3,fill:L.c},svg);
+    } else {
+      el("line",{x1:0,x2:W,y1:laneTop,y2:laneTop,stroke:"#111","stroke-width":1},svg);
+    }
+    cy+=laneGap;
+  });
+  svg.setAttribute("height",cy+10); svg.setAttribute("viewBox","0 0 "+W+" "+(cy+10));
+  /* move bottom axis labels to the end */
+  Array.prototype.forEach.call(svg.querySelectorAll("text"),function(t){ if(+t.getAttribute("y")===H-6) t.setAttribute("y",cy+6); });
+  Array.prototype.forEach.call(svg.querySelectorAll("line"),function(l){ if(+l.getAttribute("y2")===H-22) l.setAttribute("y2",cy-10); });
+  pl.setAttribute("y",top-10); pl.setAttribute("x",x(NOW)+4);
+  if(!phone){ pl.textContent=""; }
+}
+drawTL();
+
+var rt, lastW=document.documentElement.clientWidth;
+window.addEventListener("resize",function(){ clearTimeout(rt); rt=setTimeout(function(){ var w=document.documentElement.clientWidth; if(w!==lastW){ lastW=w; drawTL(); drawPool(); } },120); });
+if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(function(){ drawTL(); drawPool(); }); }
+})();
+</script>
+</body>
+</html>
