@@ -1020,7 +1020,7 @@ function globeUpdate(now, dt) {
   var hl = G.hero;
   if (hl.cx !== G.cx || hl.cy !== G.cy || hl.R !== G.R) G.dirty = true;
   G.cx = hl.cx; G.cy = hl.cy; G.R = hl.R;
-  G.topPx = F.hb + M.lh * 0.5;
+  G.topPx = F.wide || !F.box ? F.hb + M.lh * 0.5 : (F.box.y1 + 1) * M.lh;
   var act = G.code;
   /* motion */
   var coasting = Math.abs(G.vlon) + Math.abs(G.vlat) > 0.0004;
