@@ -31,7 +31,7 @@ button{font:inherit;color:inherit}
 
 /* ---------- masthead ---------- */
 .mast{border-top:3px solid var(--red);background:#fff}
-.mast .in{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:14px;padding-bottom:12px}
+.mast>.in{display:flex;align-items:center;justify-content:space-between;gap:20px;padding-top:14px;padding-bottom:12px}
 .mark{display:flex;align-items:baseline;gap:12px;text-decoration:none;color:var(--navy)}
 .mark b{font:700 31px/1 Cinzel,Georgia,serif;letter-spacing:.015em}
 .mark b i{font-style:normal;color:var(--red)}
@@ -63,14 +63,16 @@ h1 .num{white-space:nowrap}
 .box{border:3px solid var(--box);background:#fff;padding:20px 26px 24px}
 .facts{display:grid;grid-template-columns:150px minmax(0,1fr);gap:9px 16px;margin:0}
 .facts dt{font-weight:700}
-.facts dd{margin:0}
+.facts dd{margin:0;min-width:0}
+.facts dt.full{grid-column:1/-1;margin-top:6px}
+.facts dd.full{grid-column:1/-1}
 
 /* the tracker: congress.gov chevrons, here the scene buttons */
 .tracker{list-style:none;margin:0;padding:2px 0 4px 8px;display:flex;overflow-x:auto;scrollbar-width:thin}
 .tracker li{flex:0 0 auto;margin-left:-8px}
 .tracker button{display:block;border:0;background:#8a8a8a;padding:1px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 11px) 0,100% 50%,calc(100% - 11px) 100%,0 100%,11px 50%)}
 .tracker li:first-child button{clip-path:polygon(0 0,calc(100% - 11px) 0,100% 50%,calc(100% - 11px) 100%,0 100%)}
-.tracker span{display:block;background:#fff;font-size:11.5px;line-height:18px;padding:2px 20px 2px 22px;white-space:nowrap;clip-path:inherit}
+.tracker span{display:block;background:#fff;font-size:11.5px;line-height:20px;padding:2px 17px 2px 21px;white-space:nowrap;clip-path:inherit}
 .tracker li:first-child span{padding-left:12px}
 .tracker button:hover span{background:#eef3f7}
 .tracker button[aria-current="step"]{background:#2c2c2c}
@@ -102,7 +104,8 @@ h1 .num{white-space:nowrap}
 .rail .big{font:700 20px/1.1 var(--sans);color:var(--navy);display:block}
 .cos{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
 .cos div{font-size:11.5px;color:var(--grey);line-height:1.3}
-.script{counter-reset:s}
+.script{counter-reset:s;list-style:none;padding:0;margin:0}
+.script li{font-size:12px}
 .script li{counter-increment:s;padding-left:22px;position:relative;line-height:1.45;margin:0 0 7px;color:#33383c}
 .script li::before{content:counter(s);position:absolute;left:0;top:1px;font:700 10.5px/16px var(--sans);width:16px;text-align:center;background:#e9e9e6;color:#555}
 .script li.now::before{background:#333;color:#fff}
@@ -257,13 +260,13 @@ mark.cur{background:#ffb13b}
 @media (max-width:640px){
   :root{--lh:27px}
   .in{padding:0 16px}
-  .mast .in{flex-wrap:wrap;padding-top:12px;padding-bottom:10px}
+  .mast>.in{flex-wrap:wrap;padding-top:12px;padding-bottom:10px}
   .mark b{font-size:25px}.mark span{font-size:12.5px}
   .mnav{display:none}
   .band select{min-width:0;width:108px;font-size:12px}
   h1{font-size:19px}
   .box{padding:14px 14px 16px;border-width:2px}
-  .facts{grid-template-columns:1fr;gap:2px}
+  .facts{grid-template-columns:minmax(0,1fr);gap:2px}
   .facts dd{margin-bottom:9px}
   .screen{padding:6px}.screen svg{border-radius:10px/8px}
   .pbar{padding:0 6px 6px;gap:6px}
