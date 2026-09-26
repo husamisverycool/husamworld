@@ -1130,7 +1130,7 @@ const Garage = (() => {
   let hits = [], hovering = false, ray, ndc;
   let monitor, screenMesh, glass, caseLED, monLED, screenLight, spot, tubeMat, tubeLight, dust, dustBase, steam = [];
   let IDLE_T, IDLE_DIR;
-  let doorSecs = [], doorOpen = 0, doorAnim = null, spillMat = null, spillLight = null, moonLight = null, introT = null;
+  let hurryFn = null, doorSecs = [], doorOpen = 0, doorAnim = null, spillMat = null, spillLight = null, moonLight = null, introT = null;
   let lastT = 0, fluoro = 0, fluoroSeq = null, MARK16 = null;
 
   // ---------- the CRT screen: a live canvas texture ----------
@@ -1377,10 +1377,10 @@ const Garage = (() => {
       }],
       ['cinder block walls', () => {
         const bt = TX.block(); const wm = mat({ map: bt, roughness: .96, color: 0xd8d2c6 });
-        add(new T.PlaneGeometry(8, 3), wm, 0, 1.5, -1.25, S, false);
+        add(new T.PlaneGeometry(7.2, 3), wm, -.4, 1.5, -1.25, S, false);
         const lt = bt.clone(); lt.needsUpdate = true; lt.repeat.set(3.5, 2);
         const lw = add(new T.PlaneGeometry(6, 3), mat({ map: lt, roughness: .96, color: 0xd8d2c6 }), -3.2, 1.5, 1.75, S, false); lw.rotation.y = Math.PI / 2;
-        const ceil = add(new T.PlaneGeometry(8, 7), mat({ color: 0x2a2826, roughness: 1 }), 0, 3, 1.5, S, false); ceil.rotation.x = Math.PI / 2;
+        const ceil = add(new T.PlaneGeometry(7.2, 5.3), mat({ color: 0x2a2826, roughness: 1 }), -.4, 3, 1.35, S, false); ceil.rotation.x = Math.PI / 2;
         box(.07, .11, .02, mat({ color: 0xe6dfcf, roughness: .6 }), -1.35, .45, -1.24);
       }],
       ['pegboard and tools', () => {
@@ -1590,7 +1590,7 @@ const Garage = (() => {
     const sp = add(new T.PlaneGeometry(4.2, 5.4), spillMat, X + 2.05, .004, 1.35, S, false); sp.rotation.x = -Math.PI / 2;
     spillLight = new T.PointLight(0xffb870, 0, 7, 1.6); spillLight.position.set(2.2, 1.3, 1.2); S.add(spillLight);
     // the bronze plaque and a wall sconce beside the door
-    const pl = add(new T.PlaneGeometry(.44, .55), mat({ map: TX.plaque(), roughness: .38, metalness: .55 }), X + .012, 1.5, 4.72, S, false); pl.rotation.y = Math.PI / 2;
+    const pl = add(new T.PlaneGeometry(.44, .55), mat({ map: TX.plaque(), roughness: .42, metalness: .35 }), X + .022, 1.5, 4.72, S, false); pl.rotation.y = Math.PI / 2;
     box(.03, .6, .5, mat({ color: 0x2c1e08, roughness: .5, metalness: .5 }), X + .002, 1.5, 4.72, S, false);
     box(.08, .16, .1, mat({ color: 0x1b1b1b, roughness: .5, metalness: .6 }), X + .05, 2.25, 4.72, S, false);
     add(new T.SphereGeometry(.035, 12, 10), new T.MeshStandardMaterial({ color: 0xffe6b8, emissive: 0xffc070, emissiveIntensity: 2 }), X + .1, 2.2, 4.72, S, false);
@@ -1624,8 +1624,8 @@ const Garage = (() => {
   // the opening shot: from the driveway at night, looking in at an angle through the door (the Apple-garage photo angle)
   function drivePose(k = 0) {
     const a = aspect();
-    const pos = a >= 1 ? new T.Vector3(7.8, 1.5, 4.4) : new T.Vector3(10.6, 1.75, 5.3);
-    const tgt = a >= 1 ? new T.Vector3(.6, 1.2, -.2) : new T.Vector3(1.9, 1.25, .9);
+    const pos = a >= 1 ? new T.Vector3(11.4, 1.5, 6.3) : new T.Vector3(15.5, 1.7, 7.1);
+    const tgt = a >= 1 ? new T.Vector3(1.4, 1.75, .9) : new T.Vector3(2.4, 1.6, 1.4);
     if (k) pos.lerp(tgt, k);
     return { pos, tgt };
   }
@@ -1649,7 +1649,7 @@ const Garage = (() => {
   function bindInput() {
     const cv = $('#gl');
     addEventListener('pointermove', e => { mouse.x = e.clientX / innerWidth; mouse.y = e.clientY / innerHeight; mouse.moved = true; if (e.target === cv) pick(e); }, { passive: true });
-    cv.addEventListener('click', e => { pick(e); if (hovering && (mode === 'idle' || mode === 'intro')) Flow.start(); else if (hovering && mode === 'standing') Flow.sitDown(); });
+    cv.addEventListener('click', e => { pick(e); if (!hovering && mode === 'intro') { hurryFn && hurryFn(); return; } if (hovering && (mode === 'idle' || mode === 'intro')) Flow.start(); else if (hovering && mode === 'standing') Flow.sitDown(); });
   }
   function pick(e) {
     if (!ok) return; ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
@@ -1704,13 +1704,17 @@ const Garage = (() => {
       mode = 'intro'; scrSet('saver'); clearTimeout(introT); doorAnim = null; setDoor(0);
       const dp = drivePose(); cam.pos.copy(dp.pos); cam.tgt.copy(dp.tgt); S.fog.density = .06;
       start();
-      tweenTo(drivePose(.1), 1500, Ease.outCubic, () => {
+      tweenTo(drivePose(.12), 1300, Ease.outCubic, () => {
         doorAnim = { t0: performance.now(), dur: 2700, from: doorOpen, to: 1 }; Sound.door(2.7);
-        introT = setTimeout(() => {
-          tweenTo(now => idlePose(now, { pos: new T.Vector3(), tgt: new T.Vector3() }), 3600, Ease.inOutCubic, () => { mode = 'idle'; S.fog.density = .13; onArrive && onArrive(); }, p => { S.fog.density = lerp(.06, .13, p); });
-        }, 1500);
+        introT = setTimeout(() => walkIn(3300), 1300);
       });
+      function walkIn(ms) {
+        const f0 = S.fog.density;
+        tweenTo(now => idlePose(now, { pos: new T.Vector3(), tgt: new T.Vector3() }), ms, Ease.inOutCubic, () => { mode = 'idle'; S.fog.density = .13; const f = onArrive; onArrive = null; f && f(); }, p => { S.fog.density = lerp(f0, .13, p); });
+      }
+      hurryFn = () => { if (mode !== 'intro') return; clearTimeout(introT); if (doorOpen < 1) doorAnim = { t0: performance.now(), dur: 600, from: doorOpen, to: 1 }; walkIn(1100); };
     },
+    hurry() { hurryFn && hurryFn(); },
     openDoorNow() { clearTimeout(introT); if (doorOpen < 1) doorAnim = { t0: performance.now(), dur: 700, from: doorOpen, to: 1 }; S.fog.density = .13; },
     powerOn() {
       caseLED.material.emissive.setHex(0x30ff50); caseLED.material.emissiveIntensity = 1.2;
@@ -2592,8 +2596,8 @@ document.addEventListener('click', e => {
 const APPS = {
   /* ---------- The Garage: Henry's "My Showcase" home (a small website in a window), rebuilt for the builds ---------- */
   showcase: {
-    title: 'The Garage - Showcase', icon: 'computer', size: [860, 620], minSize: [380, 280], status: 'HusamOS 95  ·  C:\\GARAGE',
-    pos: (ww, hh, W, H) => [Math.max(8, Math.round(Math.min(W - ww - 8, (W - ww) / 2 + 40))), Math.max(8, Math.round((H - 32 - hh) / 2))],
+    title: 'The Garage - Showcase', icon: 'computer', size: [880, 700], minSize: [380, 280], status: 'C:\\GARAGE',
+    pos: (ww, hh, W, H) => [W >= 1100 ? Math.min(W - ww - 8, 212) : Math.max(8, Math.round((W - ww) / 2)), Math.max(8, Math.round((H - 32 - hh) / 2))],
     mount(b, w) {
       const open = (id, label) => `<p class="sc-open"><button class="btn" type="button" data-open="${id}"><img src="${ICONS[DESK.find(d => d.id === id).icon]}" alt="">${label}</button></p>`;
       const P = {
