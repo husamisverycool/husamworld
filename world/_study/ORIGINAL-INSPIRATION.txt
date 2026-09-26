@@ -1,0 +1,137 @@
+look at all this context: 
+Claude finished the response
+find cool portfolio websites of people for inspiration and a website of like cool design features think really deeply and give me a ridiculously long list of everything in every sphere of the interrnet the best ones posible
+Compiling a huge list of portfolio and design inspiration sites.
+Compiling a huge list of portfolio and design inspiration sites.
+I'll pull some current lists so the sites I name are live and recent, then build the big one.
+Searched the web
+Claude’s response was interrupted.
+by portfolio i just mean personal websites
+Compiling a lengthy list of notable personal websites.
+Compiling a lengthy list of notable personal websites.
+Got it — personal sites, not case-study showcases. One more search so I'm not missing the good personal-site galleries.
+Searched the web
+Here's the big one. Everything below is a real site I know of or that surfaced in current roundups; personal sites change often, so a few may have been redesigned since I last saw them (which is half the fun of visiting).
+Part 1 — Personal websites worth studying
+The interactive / "holy crap" tier
+
+* bruno-simon.com — drive a 3D car around his résumé. The most-copied personal site of the decade.
+* dennissnellenberg.com — loading transition greets you in multiple languages, then a minimal layout with award-winning smooth interactions. [Wedoflow](https://www.wedoflow.com/post/best-inspirational-portfolio-websites)
+* yasio.dev — Jan Baszczok's site: a code-editor look filled with smooth 3D interactions, dark, one-page. [Wedoflow](https://www.wedoflow.com/post/best-inspirational-portfolio-websites)
+* rauno.me — Rauno Freiberg's playground of micro-interactions; possibly the best "craft" site on the web.
+* paco.me — Paco Coursey, quiet, dark, perfect type, tiny details everywhere.
+* emilkowal.ski — Emil Kowalski, animation-focused, each element feels physical.
+* joshwcomeau.com — interactive, visually rich blog posts packed with real teaching; sound effects, a dark-mode toggle that's a genuine delight. [Curious](https://curious.page/blog/best-personal-website-examples-developers)
+* brittanychiang.com — the gold standard for developer sites for years: clean, immediately tells you who she is and where she's worked. [Curious](https://curious.page/blog/best-personal-website-examples-developers)
+* lynnandtonic.com — Lynn Fisher redesigns yearly; resize the browser window and watch what happens.
+* jhey.dev — Jhey Tompkins, CSS/GSAP wizardry, a bear that follows your cursor.
+* cassie.codes — Cassie Evans, SVG-animated site with a scrolling character.
+* sarahdrasner.com — SVG animation pioneer's home.
+* robbowen.digital — Rob Bowen, generative visuals and 3D.
+* henry.codes / henryheffernan.com — Henry Heffernan's site is a 3D-rendered PC you actually boot into; there's a working desktop OS inside.
+* dustinbrett.com — a full working web desktop as a personal site.
+* ryo.lu — Ryo Lu (Notion design), ambient and strange.
+* benjamin.gg / benjaminlittlefield — sort of a game-console UI.
+* chen.gg, ronny.fyi, davidhaz.com — Awwwards-circuit developers with heavy WebGL.
+* keitakei.com and mostafa-taha types on the awwwards portfolio index; the index itself is worth trawling (awwwards.com/websites/portfolio).
+
+The typography-and-restraint tier (mostly text, all taste)
+
+* frankchimero.com — long-form essays, immaculate type.
+* rsms.me — Rasmus Andersson (Inter typeface); nerdy and beautiful.
+* craigmod.com — writer/walker; huge margins, photography, newsletters.
+* jasonsantamaria.com — the classic art-directed blog.
+* markboulton.co.uk, robinrendle.com, chriscoyier.net — front-end elder statesmen with hand-built sites.
+* maggieappleton.com — the "digital garden" archetype: notes with growth stages, illustrations, wiki links.
+* gwern.net — dense, sidenote-laden, hover-popup link previews; the most extreme reader-focused site.
+* sive.rs — Derek Sivers, brutally simple, loads instantly.
+* kottke.org — 25+ years of one person's blog.
+* paulstamatiou.com — photography + long gear posts.
+* leerob.io — Vercel's Lee Robinson, the Next.js "minimal dev site" template that thousands cloned.
+* rafa.design, mds.is (Matt D. Smith), andy.works, benji.org, alexanderobenauer.com.
+* world.hey.com/dhh and world.hey.com/jason — Basecamp founders; pure text.
+* danluu.com and jvns.ca — deliberately unstyled/handmade; proof content wins.
+* stephango.com — Steph Ango (Obsidian CEO); Flexoki color scheme, calm.
+* brianlovin.com, hamel.dev, jxnl.co, simonwillison.net — dev/AI writers with personality.
+
+Playful / weird / delightful
+
+* nicolasglinoer or the "Website of the Year" crowd on godly.website (search "portfolio" tag).
+* daniel.haxx.se, joel.is, and tom.dev — tiny, hand-coded.
+* hakim.se — Hakim El Hattab (reveal.js), experiments gallery.
+* aristidebenoist.com, adrienlaurent.fr, olivier-guilleux.com — French-Awwwards crowd, cursor-driven galleries.
+* kylewebster.com, jessicahische.is — Jessica Hische's site rotates the tagline "Jessica Hische is…"
+* alice-lee.com — a scrollable header with parallax illustration and a grid of interactive illustrations. [ZipWP](https://zipwp.com/resources/personal-website-examples/)
+* neal.fun — not a portfolio, but Neal Agarwal's personal playground of web toys.
+* tholman.com — Tim Holman, experiments (obnoxious.css, elevator.js).
+* nevflynn.com, activetheory.net (team, but same spirit).
+* ertdfgcvb.xyz — Andreas Gysin; ASCII-art rendering everything.
+* pudding.cool authors' personal sites (e.g., russellsamora.com) for data-viz personal pages.
+* keremciu, saisonlabs, and "personal OS" sites like dustinbrett above.
+
+Product / design leaders
+
+* arlenmccluskey.com — gradient scheme, clean lines, modern serif; about page mixes profession with travel and hiking. [Site Builder Report](https://www.sitebuilderreport.com/inspiration/personal-websites)
+* julie.zhuo, lennysan.com, andrewchen.com, ryanhoover.me (mostly newsletter-driven landing pages).
+* linusrogge, tinytelephone, rauno again, raphaelsalaja.com, jakubkrehel.com, nicolasdemont.
+* benthompson (stratechery) style: one-column, always-on-brand.
+
+Creators & writers
+
+* aliabdaal.com — separate pages for each identity: author, YouTuber, podcaster, course creator, newsletter. [Site Builder Report](https://www.sitebuilderreport.com/inspiration/personal-websites)
+* petermckinnon.com — home page is a collage of images with a parallax effect. [Colorlib](https://colorlib.com/wp/personal-websites/)
+* austinkleon.com, seths.blog, jamesclear.com, tim.blog — the "one idea, one email box" school.
+* nathanbarry.com, patflynn.com, ness labs (anne-laure), farnamstreet.
+
+Photographers / artists
+
+* juliaplakhotnik-style minimal galleries; also mattdelamater, chrisburkard.com, cerealmag-esque layouts.
+* zachlieberman.net — daily creative-coding sketches.
+* jamesturrell.com, refikanadol.com, tokujin.com — artist sites with unusual navigation.
+* lucieandsimon, timothyarchibald, eliotlee — image-first, no chrome.
+
+Old-school / brutalist / tiny web
+
+* cern.ch/info.cern.ch (the first website), motherfuckingwebsite.com, txti.es.
+* personalsit.es — literally a directory of thousands of personal sites, submit-your-own.
+* indieweb.org/Examples and the "webrings" resurgence (e.g., css-tricks-era webrings, the "yesterweb").
+* bear blog (bearblog.dev/discover) and omg.lol — browse hundreds of tiny personal pages.
+* neocities.org/browse — the wildest, most hand-made personal pages on the internet.
+* special.fish, tilde.club, wiki.xxiivv.com (Devine Lu Linvega — hand-built ecosystem, one of the most singular sites online).
+* 100r.co (Hundred Rabbits), merveilles.town members' sites, low-tech magazine's solar-powered site.
+
+Part 2 — Galleries of design features & inspiration
+Whole-site galleries
+
+* awwwards.com (daily juried; the ceiling of animation/WebGL)
+* godly.website — extremely high curation, maybe 3–5 sites a week; exceptional animation, scroll effects, visual storytelling [Colorlib](https://colorlib.com/wp/showcase-inspiration-sites-web-design/)
+* siteinspire.com — hand-picked since 2010; favors clean, editorial, typographically sophisticated design [Colorlib](https://colorlib.com/wp/showcase-inspiration-sites-web-design/)
+* minimal.gallery, darkmodedesign.com, httpster.net, land-book.com, lapa.ninja, onepagelove.com, bestwebsite.gallery, cssdesignawards.com, thefwa.com, cssnectar.com, admiretheweb.com, siteofsites.com, websitevice.com, maxibestof.one, landing.love, afreshwebsite.com, curated.design, cofolios.com (portfolio-specific), personalsit.es, hoverstat.es, dribbble.com, behance.net, muz.li.
+
+UI components, patterns & micro-interactions
+
+* mobbin.com, refero.design, pageflows.com, uxarchive.com, screenlane.com, nicelydone.club, saaspo.com, saasframe.io, landingfolio.com, collectui.com, uigarage.net, pttrns.com, scrnshts.club, goodux.appcues.com, ui-patterns.com, stacksorted.com (buttons/cards/grids), uiverse.io (open-source CSS components), component.gallery, footer.design, navbar.gallery, checklist.design, emptystat.es, 404s.design, cursor.design, loaders.design, calltoidea.com, pageflows, sidebar.io (daily 5 links), design-systems.gallery, designsystems.surf.
+
+Motion, animation & scroll
+
+* codrops (tympanus.net/codrops) — the single best archive of "how did they do that" demos.
+* codepen.io/picks, codepen.io/trending, css-tricks.com archives, gsap.com/showcase, lenis.darkroom.engineering, framer.com/motion showcase, spline.design/community, threejs.org/examples, twitter/x "web animation" accounts (@jh3yy, @emilkowalski_, @raunofreiberg), animista.net, easings.net, cubic-bezier.com, motion.dev (Motion One), pattern.monster, hover.dev, buildui.com/recipes, ui.aceternity.com, magicui.design, ui.shadcn.com (block gallery), 21st.dev, reactbits.dev, ui.lukacho.com, motion-primitives.com.
+
+Type, color, texture
+
+* fontsinuse.com, typewolf.com, fontshare.com, typespecimens.io, uncut.wtf, velvetyne.fr, collletttivo.it, fonts.google.com/knowledge, coolors.co, realtimecolors.com, huemint.com, colorhunt.co, colorffy.com, khroma.co, fffuel.co (gradient/SVG generators), haikei.app, css-pattern.com, noisegrain / grainy gradients demos, shadows.brumm.af, neumorphism.io, glassmorphism generators, cssgradient.io, meshgradient.in, svgator, unDraw, humaaans, blush.design, storyset.
+
+Layout / dev-craft references
+
+* every-layout.dev, smolcss.dev, web.dev/patterns, csslayout.io, cssgrid.io, learn shadcn blocks, tailwindcss.com/plus (UI blocks), brutalistwebsites.com, bento.me + bentogrids.com, gridness.co, layout.land, thegallery.io, design.dev, awesomescreenshot for annotations, bookmark "Pinterest: web design" boards, are.na channels (are.na/search web design), savee.it, cosmos.so, mymind, klart.
+
+Experimental / art-of-the-web
+
+* cargo.site/showcase, hoverstat.es, thecreativesloth.com, loveisart, humanmusic, netart.rocks, rhizome.org/art, arena.na "net art", experiments.withgoogle.com, chromeexperiments, shadertoy.com, openprocessing.org, fxhash.xyz, glitch.com showcases, itch.io (game-like sites), thedoc.rocks, obscura, interesting-and-useless websites lists on neal.fun.
+
+Trend & commentary (to know why things look the way they do)
+
+* smashingmagazine.com, alistapart.com, uxcollective (uxdesign.cc), designer news, css-weekly, frontendfoc.us, bytes.dev, tympanus, "The State of CSS/JS" reports, are.na blog, it's nice that, eyeondesign (AIGA), creativeboom, abduzeedo, designtaxi, thebrandidentity.com, siteinspire's own blog, godly's newsletter.
+
+Bookmark these three if you bookmark nothing else: personalsit.es (the sheer volume of personal sites), godly.website (the ceiling), and codrops (how it's built).
+Want me to narrow this into a shortlist for a specific vibe (minimal text, playful 3D, blog-first, etc.) or drop it into a doc you can keep adding to? Look into everything in this, every conceivable way, and understand all the context, and then try to deduce, like, a really good way to incorporate the best possible elements in a very, very creative and unique way for a personal website displaying my work and stuff.
