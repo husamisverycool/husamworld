@@ -101,7 +101,7 @@ html.ready:not(.started) .start-hint{opacity:1;transform:translate(-50%,0);point
 /* key legend */
 .keys{position:fixed;left:16px;bottom:max(16px,env(safe-area-inset-bottom));z-index:21;display:flex;flex-wrap:wrap;gap:6px 14px;max-width:min(560px,calc(100vw - 32px));padding:9px 12px;border-radius:8px;background:rgba(34,30,25,.78);color:#fff;font:500 13px/1.3 var(--text);opacity:0;transform:translateY(12px);transition:opacity .5s,transform .5s var(--spring)}
 html.started .keys{opacity:1;transform:none}
-html.started.drove .keys{opacity:.0;transform:translateY(12px);pointer-events:none}
+html.started.drove .keys,html.started.exit-on .keys{opacity:0;transform:translateY(12px);pointer-events:none}
 html.touch .keys{display:none}
 .keys span{white-space:nowrap}
 
@@ -380,7 +380,7 @@ html.has-world .drive{display:inline-flex;align-items:center}
 //  husam.world : the front door. A drivable homage to Bruno Simon's 2019 folio.
 //  Everything (models, matcaps, letters, sounds) is generated in code.
 // ============================================================================
-var DISTRICTS = [{"id": "bill", "file": "bill.html", "name": "The Capitol", "line": "Advocacy and legislation: five California bills worked end to end, a congressional internship, and LegislativeLift.", "paint": "FIVE CALIFORNIA BILLS, WORKED END TO END", "paint2": "AB 1766  ·  AB 1947  ·  SB 1161  ·  AB 2549  ·  SB 1038", "bg": "#d6d8d3", "ink": "#151515"}, {"id": "speech", "file": "speech.html", "name": "The Chamber", "line": "Debate, speech and Mock Trial: NSDA National Finalist in Congressional Debate, and California Mock Trial Finals MVP.", "paint": "NSDA NATIONAL FINALIST  ·  MOCK TRIAL FINALS MVP", "paint2": "KNOCK OVER THE DEBATE CARDS", "bg": "#fcfbf7", "ink": "#151513"}, {"id": "translation", "file": "translation.html", "name": "The Bridge", "line": "Arabic and English: editing and translating for White House in Arabic, with 350K+ readers and viewers.", "paint": "ARABIC ↔ ENGLISH  ·  WHITE HOUSE IN ARABIC", "paint2": "", "bg": "#edf0ef", "ink": "#172029"}, {"id": "n1", "file": "n1.html", "name": "The Polling Station", "line": "Research: the Harvard Youth Poll, the Institute of Politics, econometrics, and consulting for UNICEF and the UN.", "paint": "HARVARD YOUTH POLL  ·  INSTITUTE OF POLITICS  ·  ECONOMETRICS", "paint2": "", "bg": "#fcfcfa", "ink": "#111111"}, {"id": "triptik", "file": "triptik.html", "name": "The Map Room", "line": "Roots and the route: Fresno and Clovis to Cambridge, with every stop in between.", "paint": "ROOTS AND THE ROUTE, FRESNO TO CAMBRIDGE", "paint2": "", "bg": "#f7f4e8", "ink": "#1c2420"}, {"id": "os", "file": "os.html", "name": "The Garage", "line": "Building things: Electric Deals at 14, bayloop, startup grants, and now a company in stealth.", "paint": "ELECTRIC DEALS AT 14  ·  BAYLOOP  ·  A STARTUP IN STEALTH", "paint2": "", "bg": "#101211", "ink": "#d9f2d0"}, {"id": "depths", "file": "depths.html", "name": "The Pier", "line": "Honors, measured by rarity. Coca-Cola Scholar: 1 of 150 from 105,000+.", "paint": "HONORS BY RARITY: 1 OF 150 FROM 105,000+", "paint2": "", "bg": "#0b2e4a", "ink": "#e6f4ff"}, {"id": "weeks", "file": "weeks.html", "name": "The Plaza", "line": "How much he does at once: one tile for every week since 2015. Drive over them.", "paint": "ONE TILE FOR EVERY WEEK SINCE 2015", "paint2": "", "bg": "#ffffff", "ink": "#111111"}, {"id": "everywhere", "file": "everywhere.html", "name": "The Airport", "line": "Harvard institutions and travel: South Korea, Lithuania, Poland, Hungary, Puerto Rico, and Model Congress in Boston and Europe.", "paint": "SOUTH KOREA  ·  LITHUANIA  ·  POLAND  ·  HUNGARY  ·  PUERTO RICO", "paint2": "", "bg": "#000000", "ink": "#ffffff"}, {"id": "contact", "file": null, "name": "The Mailbox", "line": "Bump it to say hello. LinkedIn, or email.", "paint": "BUMP IT TO SAY HELLO", "paint2": "", "bg": "#fbf2dc", "ink": "#221e19"}];
+var DISTRICTS = [{"id": "bill", "file": "bill.html", "name": "The Capitol", "line": "Advocacy and legislation: five California bills worked end to end, a congressional internship, and LegislativeLift.", "paint": "FIVE CALIFORNIA BILLS, WORKED END TO END", "paint2": "AB 1766  ·  AB 1947  ·  SB 1161  ·  AB 2549  ·  SB 1038", "bg": "#d6d8d3", "ink": "#151515"}, {"id": "speech", "file": "speech.html", "name": "The Chamber", "line": "Debate, speech and Mock Trial: NSDA National Finalist in Congressional Debate, and California Mock Trial Finals MVP.", "paint": "NSDA NATIONAL FINALIST  ·  MOCK TRIAL FINALS MVP", "paint2": "KNOCK OVER THE DEBATE CARDS", "bg": "#fcfbf7", "ink": "#151513"}, {"id": "translation", "file": "translation.html", "name": "The Bridge", "line": "Arabic and English: editing and translating for White House in Arabic, with 350K+ readers and viewers.", "paint": "ARABIC TO ENGLISH AND BACK", "paint2": "WHITE HOUSE IN ARABIC  ·  350K+ READERS AND VIEWERS", "bg": "#edf0ef", "ink": "#172029"}, {"id": "n1", "file": "n1.html", "name": "The Polling Station", "line": "Research: the Harvard Youth Poll, the Institute of Politics, econometrics, and consulting for UNICEF and the UN.", "paint": "HARVARD YOUTH POLL  ·  INSTITUTE OF POLITICS  ·  ECONOMETRICS", "paint2": "", "bg": "#fcfcfa", "ink": "#111111"}, {"id": "triptik", "file": "triptik.html", "name": "The Map Room", "line": "Roots and the route: Fresno and Clovis to Cambridge, with every stop in between.", "paint": "ROOTS AND THE ROUTE, FRESNO TO CAMBRIDGE", "paint2": "", "bg": "#f7f4e8", "ink": "#1c2420"}, {"id": "os", "file": "os.html", "name": "The Garage", "line": "Building things: Electric Deals at 14, bayloop, startup grants, and now a company in stealth.", "paint": "ELECTRIC DEALS AT 14  ·  BAYLOOP  ·  A STARTUP IN STEALTH", "paint2": "", "bg": "#101211", "ink": "#d9f2d0"}, {"id": "depths", "file": "depths.html", "name": "The Pier", "line": "Honors, measured by rarity. Coca-Cola Scholar: 1 of 150 from 105,000+.", "paint": "HONORS BY RARITY: 1 OF 150 FROM 105,000+", "paint2": "", "bg": "#0b2e4a", "ink": "#e6f4ff"}, {"id": "weeks", "file": "weeks.html", "name": "The Plaza", "line": "How much he does at once: one tile for every week since 2015. Drive over them.", "paint": "ONE TILE FOR EVERY WEEK SINCE 2015", "paint2": "", "bg": "#ffffff", "ink": "#111111"}, {"id": "everywhere", "file": "everywhere.html", "name": "The Airport", "line": "Harvard institutions and travel: South Korea, Lithuania, Poland, Hungary, Puerto Rico, and Model Congress in Boston and Europe.", "paint": "SOUTH KOREA  ·  LITHUANIA  ·  POLAND  ·  HUNGARY  ·  PUERTO RICO", "paint2": "", "bg": "#000000", "ink": "#ffffff"}, {"id": "contact", "file": null, "name": "The Mailbox", "line": "Bump it to say hello. LinkedIn, or email.", "paint": "BUMP IT TO SAY HELLO", "paint2": "", "bg": "#fbf2dc", "ink": "#221e19"}];
 
 var doc = document, html = doc.documentElement;
 function $(id){ return doc.getElementById(id); }
@@ -578,7 +578,7 @@ function initUniforms() {
 
 // ---------------------------------------------------------------- GLSL
 var GLSL_NIGHT = 'uniform float uNightMix; uniform vec3 uNightTint;\nvec3 nightify(vec3 c){ float l = dot(c, vec3(0.3, 0.59, 0.11)); return mix(c, l * uNightTint, uNightMix); }\n';
-var GLSL_HASH = 'float hash21(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }\n';
+var GLSL_HASH = 'float hash21(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }\nfloat vnoise(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f); return mix(mix(hash21(i), hash21(i + vec2(1.0, 0.0)), f.x), mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), f.x), f.y); }\n';
 var GLSL_REVEAL_VS = [
   '#if !defined(NO_REVEAL) && !defined(REVEALED)',
   '  float rd = length(wp.xy - uRevealCenter);',
@@ -592,8 +592,7 @@ var GLSL_REVEAL_FS = '#if !defined(NO_REVEAL) && !defined(REVEALED)\n  if (vW.z 
 
 var VS_MATCAP = [
   'uniform float uReveal; uniform vec2 uRevealCenter;',
-  'varying vec3 vN; varying vec3 vWN; varying vec3 vW; varying vec3 vV;',
-  '#ifdef USE_INSTANCING_COLOR', 'varying vec3 vIC;', '#endif',
+  'varying vec3 vN; varying vec3 vWN; varying vec3 vW; varying vec3 vV; varying vec3 vIC;',
   'void main(){',
   '  mat4 m = modelMatrix;',
   '#ifdef USE_INSTANCING', '  m = m * instanceMatrix;', '#endif',
@@ -604,7 +603,7 @@ var VS_MATCAP = [
   '  vec4 mv = viewMatrix * wp;',
   '  vV = -mv.xyz;',
   '  vN = normalize(mat3(viewMatrix) * vWN);',
-  '#ifdef USE_INSTANCING_COLOR', '  vIC = instanceColor;', '#endif',
+  '#ifdef USE_INSTANCING_COLOR', '  vIC = instanceColor;', '#else', '  vIC = vec3(1.0);', '#endif',
   '  gl_Position = projectionMatrix * mv;',
   '}'
 ].join('\n');
@@ -613,8 +612,7 @@ var FS_MATCAP = [
   'uniform sampler2D uMatcap; uniform vec3 uColor; uniform vec3 uEmissive; uniform float uNight;',
   'uniform vec3 uTint; uniform vec3 uIndirect; uniform float uIndirectStrength; uniform float uLights;',
   'uniform sampler2D uShadowTex; uniform float uShadowStrength; uniform vec3 uShadowColor; uniform vec4 uRect;',
-  'varying vec3 vN; varying vec3 vWN; varying vec3 vW; varying vec3 vV;',
-  '#ifdef USE_INSTANCING_COLOR', 'varying vec3 vIC;', '#endif',
+  'varying vec3 vN; varying vec3 vWN; varying vec3 vW; varying vec3 vV; varying vec3 vIC;',
   GLSL_NIGHT,
   'void main(){',
   GLSL_REVEAL_FS,
@@ -624,8 +622,7 @@ var FS_MATCAP = [
   '  vec3 ay = cross(vd, ax);',
   '  vec2 muv = vec2(dot(ax, n), dot(ay, n)) * 0.495 + 0.5;',
   '  vec3 mc = texture2D(uMatcap, muv).rgb;',
-  '  vec3 base = uColor;',
-  '#ifdef USE_INSTANCING_COLOR', '  base *= vIC;', '#endif',
+  '  vec3 base = uColor * vIC;',
   '#ifdef STRATA',
   '  float z = vW.z + 0.07 * sin(vW.x * 1.3 + vW.y * 0.9) + 0.05 * sin(vW.x * 3.1 - vW.y * 2.3);',
   '  base = vec3(0.47, 0.36, 0.29);',
@@ -695,7 +692,7 @@ var FS_ASPHALT = [
   'void main(){',
   '  if (hash21(floor(gl_FragCoord.xy)) > uPaint) discard;',
   '  vec3 c = uColor;',
-  '  c *= 1.0 + (hash21(floor(vW.xy * 5.0)) - 0.5) * uGrain;',
+  '  c *= 1.0 + (vnoise(vW.xy * 2.3) - 0.5) * uGrain + (vnoise(vW.xy * 9.0) - 0.5) * uGrain * 0.6;',
   '  c *= 1.0 - smoothstep(0.36, 0.5, abs(vUv.y - 0.5)) * 0.18;',
   '  vec2 uv = (vW.xy - uRect.xy) / uRect.zw;',
   '  float sh = texture2D(uShadowTex, uv).r * uShadowStrength;',
@@ -1615,15 +1612,15 @@ function buildVegetation() {
   var bloom = month === 1 || month === 2;
   orchard(-24, 38, -18, -10.5, 2.5, 2.3);
   orchard(-25, -16, 9, 20, 2.5, 2.3);
-  orchard(44, 57, 5, 29, 2.5, 2.3);
-  orchard(67, 74, -17, 30, 2.5, 2.3);
+  orchard(44, 58, 21, 30, 2.5, 2.3);
+  orchard(68.6, 74.6, -17, 27.5, 2.5, 2.3);
   orchard(88, 111, 18, 27.5, 2.5, 2.3);
   orchard(44, 71, 49, 60, 2.5, 2.3);
   orchard(93, 116, 55, 60.5, 2.5, 2.3);
   orchard(166, 205, 54.5, 68, 2.5, 2.3);
   orchard(242, 279, 84.5, 99, 2.5, 2.3);
   // valley oaks and Cambridge maples
-  [[-22, 2], [16, 19], [36, 20], [40, -7], [60, 14], [92, 31], [100, 58.5], [141, 58], [140, 88], [147, 70], [165, 91], [226, 121], [236, 121.5], [247, 121], [259, 121.5], [270, 118], [276, 108], [224, 109.5], [269.5, 97]].forEach(function (p, i) {
+  [[-22, 2], [16, 19], [36, 20], [40, -7], [60, 14], [92, 31], [100, 58.5], [143, 50], [140, 88], [162, 92.5], [226, 121], [236, 121.5], [247, 121], [259, 121.5], [270, 118], [276, 108], [224, 109.5], [269.5, 97]].forEach(function (p, i) {
     TREES.push({ x: p[0], y: p[1], s: 1.5 + R() * 0.5, kind: p[1] > 104 || (p[0] > 260) ? 'maple' : 'oak' });
   });
   var n = TREES.length;
@@ -1675,7 +1672,7 @@ function buildFresno() {
     x.fillStyle = PAL.green; rrect(x, 0, 0, w, h, 34); x.fill();
     x.strokeStyle = '#fff'; x.lineWidth = 12; rrect(x, 16, 16, w - 32, h - 32, 22); x.stroke();
     x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle';
-    x.font = '800 150px ' + FONT.cond; x.fillText('FRESNO', w / 2, h * 0.43);
+    fitFont(x, 'FRESNO', '800', 150, FONT.cond, w - 90); x.fillText('FRESNO', w / 2, h * 0.43);
     x.font = '700 44px ' + FONT.cond; x.fillText('HOME, 2015\u20132025', w / 2, h * 0.79);
   });
   var sg = new THREE.Group(); sg.position.set(-13.2, 5.2, 0); sg.rotation.z = 0.42; g.add(sg);
@@ -1851,26 +1848,27 @@ function buildBridge() {
   // overhead gantries: English on the Fresno side, Arabic on the Cambridge side
   function gantry(x, draw) {
     var gg = group(x, 38), post = mat('#8a9096', { cap: 'metal' }), green = mat(PAL.green);
-    cyl(gg, post, 0, -3.9, 2.2, 0.16, 4.4, { col: 'cyl' }); cyl(gg, post, 0, 3.9, 2.2, 0.16, 4.4, { col: 'cyl' });
-    box(gg, post, 0, 0, 4.3, 0.22, 8.2, 0.22);
+    cyl(gg, post, 0, -3.9, 2.0, 0.15, 4.0, { col: 'cyl' }); cyl(gg, post, 0, 3.9, 2.0, 0.15, 4.0, { col: 'cyl' });
+    box(gg, post, 0, 0, 3.9, 0.2, 8.1, 0.2);
     var tex = canvasTex(1024, 300, draw);
-    box(gg, green, 0, 0, 3.35, 0.14, 5.8, 1.7, 0, { cast: false });
-    signPlane(gg, tex, 5.7, 1.62, 0.076, 0, 3.35, PI / 2);
-    signPlane(gg, tex, 5.7, 1.62, -0.076, 0, 3.35, -PI / 2);
-    casters.push({ x: x, y: 38, w: 0.2, d: 5.8, rz: 0, zb: 2.5, zt: 4.2, round: false });
+    box(gg, green, 0, 0, 3.1, 0.14, 5.1, 1.5, 0, { cast: false });
+    signPlane(gg, tex, 5.0, 1.46, 0.076, 0, 3.1, PI / 2);
+    signPlane(gg, tex, 5.0, 1.46, -0.076, 0, 3.1, -PI / 2);
+    casters.push({ x: x, y: 38, w: 0.2, d: 5.1, rz: 0, zb: 2.35, zt: 3.9, round: false });
     finalizeGroup(gg, 'gantry');
   }
   function signFrame(x, w, h) { x.fillStyle = PAL.green; x.fillRect(0, 0, w, h); x.strokeStyle = '#fff'; x.lineWidth = 10; rrect(x, 14, 14, w - 28, h - 28, 22); x.stroke(); x.fillStyle = '#fff'; x.textBaseline = 'middle'; }
   gantry(72.4, function (x, w, h) {
     signFrame(x, w, h); x.textAlign = 'left';
-    x.font = '800 118px ' + FONT.cond; x.fillText('THE BRIDGE', 56, h * 0.4);
-    x.font = '700 50px ' + FONT.cond; x.fillText('TRANSLATION  \u00b7  ARABIC \u2194 ENGLISH', 58, h * 0.76);
+    fitFont(x, 'THE BRIDGE', '800', 118, FONT.cond, w - 250); x.fillText('THE BRIDGE', 56, h * 0.4);
+    fitFont(x, 'TRANSLATION  \u00b7  ARABIC TO ENGLISH AND BACK', '700', 46, FONT.cond, w - 120); x.fillText('TRANSLATION  \u00b7  ARABIC TO ENGLISH AND BACK', 58, h * 0.76);
     x.save(); x.translate(w - 110, h * 0.42); x.beginPath(); x.moveTo(-34, -40); x.lineTo(34, 0); x.lineTo(-34, 40); x.closePath(); x.fill(); x.restore();
   });
   gantry(87.6, function (x, w, h) {
     signFrame(x, w, h); x.direction = 'rtl'; x.textAlign = 'right';
     x.font = '700 104px ' + FONT.ar; x.fillText('\u0627\u0644\u062c\u0633\u0631', w - 56, h * 0.38);
-    x.font = '700 46px ' + FONT.ar; x.fillText('\u0627\u0644\u062a\u0631\u062c\u0645\u0629  \u00b7  \u0627\u0644\u0639\u0631\u0628\u064a\u0629 \u2194 \u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0629', w - 58, h * 0.76);
+    var arLine = '\u0627\u0644\u062a\u0631\u062c\u0645\u0629  \u00b7  \u0645\u0646 \u0627\u0644\u0639\u0631\u0628\u064a\u0629 \u0625\u0644\u0649 \u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0629 \u0648\u0628\u0627\u0644\u0639\u0643\u0633';
+    fitFont(x, arLine, '700', 44, FONT.ar, w - 120); x.fillText(arLine, w - 58, h * 0.76);
     x.direction = 'ltr';
     x.save(); x.translate(110, h * 0.4); x.beginPath(); x.moveTo(34, -40); x.lineTo(-34, 0); x.lineTo(34, 40); x.closePath(); x.fill(); x.restore();
   });
@@ -1924,6 +1922,10 @@ function buildGas(c) {
   box(g, white, 0, 0, 3.2, 7.4, 5.0, 0.42);
   box(g, red, 0, 0, 3.02, 7.5, 5.1, 0.2);
   box(g, mat('#fff4d6', { emissive: '#fff1c8', night: true }), 0, 0, 2.97, 6.6, 4.2, 0.06, 0, { cast: false });
+  [[0, -2.42, 7.4, 0.16], [0, 2.42, 7.4, 0.16]].forEach(function (s) { box(g, red, s[0], s[1], 3.45, s[2], s[3], 0.1, 0, { cast: false }); });
+  [[-3.62, 0], [3.62, 0]].forEach(function (s) { box(g, red, s[0], s[1], 3.45, 0.16, 5.0, 0.1, 0, { cast: false }); });
+  var fas = canvasTex(1024, 128, function (x, w, h) { x.fillStyle = '#f3eee4'; x.fillRect(0, 0, w, h); x.fillStyle = '#c2432f'; x.textAlign = 'center'; x.textBaseline = 'middle'; fitFont(x, 'ROAD MAPS  \u00b7  GAS  \u00b7  DIRECTIONS', '800', 92, FONT.cond, w - 40); x.fillText('ROAD MAPS  \u00b7  GAS  \u00b7  DIRECTIONS', w / 2, h / 2 + 4); });
+  signPlane(g, fas, 7.2, 0.4, 0, -2.52, 3.2, 0);
   // pump island and two round-shouldered pumps
   box(g, conc, 0, 0, 0.1, 4.2, 1.0, 0.2, 0, { col: 'box' });
   [-1.2, 1.2].forEach(function (x) {
@@ -1967,7 +1969,7 @@ function buildGas(c) {
   var disc = canvasTex(360, 360, function (x, w, h) {
     x.fillStyle = '#c2432f'; x.beginPath(); x.arc(w / 2, h / 2, w / 2 - 2, 0, TAU); x.fill();
     x.fillStyle = '#fff'; x.beginPath(); x.arc(w / 2, h / 2, w / 2 - 26, 0, TAU); x.fill();
-    x.fillStyle = '#c2432f'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = '900 118px ' + FONT.cond; x.fillText('MAPS', w / 2, h / 2 + 4);
+    x.fillStyle = '#c2432f'; x.textAlign = 'center'; x.textBaseline = 'middle'; fitFont(x, 'MAPS', '900', 118, FONT.cond, w - 110); x.fillText('MAPS', w / 2, h / 2 + 4);
     x.font = '700 30px ' + FONT.cond; x.fillText('FREE ROAD MAPS', w / 2, h / 2 + 76);
   });
   part(tall, GEO.cyl, mat('#f3eee4'), 0, 0.02, 5.6, 1.15, 1.15, 0.16, 0, { rx: PI / 2 });
@@ -2004,24 +2006,26 @@ function buildGarage(c) {
   box(g, wood, -3.6, 0.6, 0.45, 1.0, 4.6, 0.9);
   box(g, mat('#8c8a84'), -4.05, 0.6, 1.9, 0.12, 4.4, 1.5);
   for (var t = 0; t < 7; t++) box(g, mat(['#c2432f', '#2c4f8a', '#e0a13a', '#5b6a3a'][t % 4]), -3.95, -1.4 + t * 0.62, 1.7 + (t % 3) * 0.3, 0.1, 0.12, 0.4 + (t % 2) * 0.2, 0, { cast: false });
-  box(g, wood, -1.9, 0, 0.8, 1.4, 2.0, 0.08);
-  [[-2.5, -0.9], [-1.3, -0.9], [-2.5, 0.9], [-1.3, 0.9]].forEach(function (p) { box(g, wood, p[0], p[1], 0.4, 0.08, 0.08, 0.8); });
-  box(g, mat(PAL.beige), -2.05, 0, 1.28, 0.95, 1.0, 0.9);
-  box(g, mat('#cfc5ae'), -2.55, 0, 1.28, 0.3, 0.7, 0.7);
-  box(g, mat(PAL.beige), -1.5, 0, 0.86, 0.35, 0.9, 0.05);
-  box(g, dark, -0.55, 0.2, 0.55, 0.5, 0.5, 0.08); cyl(g, dark, -0.55, 0.2, 0.28, 0.05, 0.5);
+  var dg = new THREE.Group(); dg.position.set(2.3, 0.5, 0); dg.rotation.z = -0.9; g.add(dg);
+  box(dg, wood, 0, 0, 0.8, 1.1, 1.7, 0.08);
+  [[-0.45, -0.75], [0.45, -0.75], [-0.45, 0.75], [0.45, 0.75]].forEach(function (p) { box(dg, wood, p[0], p[1], 0.4, 0.08, 0.08, 0.8); });
+  box(dg, mat(PAL.beige), -0.12, 0, 1.3, 0.85, 0.98, 0.9);
+  box(dg, mat('#cfc5ae'), -0.66, 0, 1.28, 0.3, 0.7, 0.68);
+  box(dg, mat(PAL.beige), 0.38, 0.05, 0.87, 0.28, 0.9, 0.05);
+  box(dg, dark, 1.0, 0.35, 0.55, 0.5, 0.5, 0.08); cyl(dg, dark, 1.0, 0.35, 0.28, 0.05, 0.5);
   [[-1.2, -2.6], [0.3, -2.6], [1.8, -2.6]].forEach(function (p, i) { box(g, mat(['#c49a64', '#b88c58', '#d2a870'][i]), p[0], p[1], 0.35, 0.8, 0.6, 0.7 - i * 0.1); });
-  part(g, GEO.sphere, mat('#fff4d6', { emissive: '#ffe7a8' }), 0.5, 0, 3.0, 0.14, 0.14, 0.16, 0, { cast: false });
   // the CRT screen (redrawn to blink the cursor)
   crt = canvasTex(512, 380, function (x, w, h) { crtDraw(x, w, h, true); });
   crt.minFilter = THREE.LinearFilter; crt.generateMipmaps = false;
-  var scr = signPlane(g, crt, 0.72, 0.56, -1.565, 0, 1.3, -PI / 2, { self: 1 });
-  var glowC = new THREE.Mesh(GEO.plane, glowMat('#6dff8a', 0.5, true)); glowC.scale.set(3.4, 3.4, 1); glowC.position.set(c[0] - 0.6, c[1], 0.06); glowC.renderOrder = 4; scene.add(glowC);
+  var scr = signPlane(dg, crt, 0.7, 0.54, 0.315, 0, 1.33, PI / 2, { self: 1 });
+  var glowC = new THREE.Mesh(GEO.plane, glowMat('#6dff8a', 0.55, true)); glowC.scale.set(3.6, 3.6, 1); glowC.position.set(c[0] + 3.2, c[1] - 0.6, 0.06); glowC.renderOrder = 4; scene.add(glowC);
+  part(g, GEO.cone, mat('#2f3a3a'), 2.3, 0.5, 3.2, 0.28, 0.28, 0.25, 0, { cast: false });
+  part(g, GEO.sphere, mat('#fff4d6', { emissive: '#ffe7a8' }), 2.3, 0.5, 3.02, 0.1, 0.1, 0.1, 0, { cast: false });
   var glowD = new THREE.Mesh(GEO.plane, glowMat('#ffd48a', 0.55, false)); glowD.scale.set(9, 8, 1); glowD.position.set(c[0] + 5.2, c[1], 0.05); glowD.renderOrder = 4; scene.add(glowD);
   // a sign on the south wall
   var tex = canvasTex(640, 170, function (x, w, h) {
     x.fillStyle = '#1f2a2a'; rrect(x, 0, 0, w, h, 16); x.fill();
-    x.fillStyle = '#ffd35c'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.font = '800 86px ' + FONT.cond; x.fillText('ELECTRIC DEALS', w / 2, h * 0.43);
+    x.fillStyle = '#ffd35c'; x.textAlign = 'center'; x.textBaseline = 'middle'; fitFont(x, 'ELECTRIC DEALS', '800', 86, FONT.cond, w - 60); x.fillText('ELECTRIC DEALS', w / 2, h * 0.43);
     x.fillStyle = '#e8e2d2'; x.font = '700 34px ' + FONT.cond; x.fillText('EST. 2020, AGE 14', w / 2, h * 0.8);
   });
   signPlane(g, tex, 3.0, 0.8, 0.4, -3.52, 2.6, 0);
@@ -2276,13 +2280,13 @@ function buildSky() {
 var LAYOUT = {
   bill:        { pad: [26, 6.4],     lm: [26, 14.2],   text: [23.2, 6.7, 'right'] },
   speech:      { pad: [52, 6.4],     lm: [52, 13.4],   text: [49.2, 6.7, 'right'] },
-  translation: { pad: [69.5, 44.6],  lm: [80, 38],     text: [66.8, 44.9, 'right'], spawn: [70, 41.4, PI] },
+  translation: { pad: [63.8, 44.8],  lm: [80, 38],     text: [61.2, 45.1, 'right'], spawn: [65.6, 41.9, PI] },
   n1:          { pad: [106, 44.6],   lm: [105, 51.5],  text: [108.8, 44.9, 'left'], em: 2.0 },
   triptik:     { pad: [116.5, 32.2], lm: [124, 27.5],  text: [113.8, 32.5, 'right'] },
   os:          { pad: [131.2, 58],   lm: [124, 58],    text: [114, 51.8, 'left'] },
   depths:      { pad: [155, 67.4],   lm: [155, 58],    text: [152.3, 67.7, 'right'] },
   weeks:       { pad: [199.6, 81],   lm: [181.5, 82],  text: [167, 88.4, 'left'] },
-  everywhere:  { pad: [208.8, 99],   lm: [198, 97],    text: [218.5, 92, 'left'] },
+  everywhere:  { pad: [208.8, 99],   lm: [198, 97],    text: [193, 110.3, 'left'] },
   contact:     { pad: [249.4, 108.6],lm: [244.6, 109.5], text: [241.4, 109.1, 'right'] }
 };
 DISTRICTS.forEach(function (d) {
@@ -2784,6 +2788,7 @@ function updateAreas() {
   var show = best && bd < 11.5 ? best : null;
   if (show !== nearArea) {
     nearArea = show;
+    html.classList.toggle('exit-on', !!show);
     var ex = $('exit');
     if (show) {
       $('exitNo').textContent = String(show.d.index + 1);
@@ -2794,7 +2799,7 @@ function updateAreas() {
       ex.classList.add('show');
     } else ex.classList.remove('show');
   }
-  $('exit').classList.toggle('on', !!activeArea);
+  if (!!activeArea !== updateAreas.on) { updateAreas.on = !!activeArea; $('exit').classList.toggle('on', updateAreas.on); }
 }
 $('exitGo').addEventListener('click', function () { var a = activeArea || nearArea; if (a) interact(a); });
 
@@ -2970,7 +2975,7 @@ function applyTod(force) {
   var cl = new THREE.Color().copy(s.bot).lerp(new THREE.Color(1, 1, 1), 0.55);
   clouds.forEach(function (c) { c.material.color.copy(cl); c.material.opacity = lerp(0.85, 0.35, night); });
   fogs.forEach(function (f) { f.material.color.copy(cl); });
-  if (post) { post.u.uGlow.value.copy(s.bot).lerp(new THREE.Color(1, 1, 1), 0.35); post.u.uGlowAlpha.value = lerp(0.42, 0.18, night); }
+  if (post) { post.u.uGlow.value.copy(s.bot).lerp(new THREE.Color(1, 1, 1), 0.35); post.u.uGlowAlpha.value = lerp(0.2, 0.1, night); }
   if (force || (todState.anim == null && Math.abs(h - todState.shadowHour) > 0.5)) { todState.shadowHour = h; if (casters.length && ready) paintShadows(h); }
   $('timeClock').textContent = fmtClock(h);
   $('timePhase').textContent = (todState.preview != null ? 'Preview: ' : 'Your time: ') + phaseName(h).toLowerCase();
@@ -3021,10 +3026,19 @@ function initPost() {
 
 // ---------------------------------------------------------------- camera (Bruno's angle, eased follow, zoom)
 var CAM_DIR = new THREE.Vector3(1.135, -1.45, 1.15).normalize();
-var camState = { eased: new THREE.Vector3(0, 0, 0), target: new THREE.Vector3(0, 0, 0), zoom: 0.5, zoomT: 0.5, extra: 1, dir: CAM_DIR.clone(), follow: false };
+var camState = { eased: new THREE.Vector3(0, 0, 0), target: new THREE.Vector3(0, 0, 0), zoom: 0.58, zoomT: 0.58, extra: 1, dir: CAM_DIR.clone(), follow: false };
 function aspectFactor() { var a = camera.aspect; return a < 1 ? Math.min(2.1, Math.pow(1 / a, 0.8)) : 1; }
+var _focus = new THREE.Vector2();
 function updateCamera(dt, snap) {
-  if (camState.follow && car.inWorld) camState.target.set(car.body.position.x, car.body.position.y, 0);
+  if (camState.follow && car.inWorld) {
+    var px = car.body.position.x, py = car.body.position.y, fx = 0, fy = 0, best = 1e9;
+    DISTRICTS.forEach(function (d) { var dd = Math.hypot(d.L.pad[0] - px, d.L.pad[1] - py); if (dd < best) { best = dd; fx = d.L.lm[0]; fy = d.L.lm[1]; } });
+    var w = 0.42 * clamp((13 - best) / 7, 0, 1);
+    var tx = (fx - px) * w, ty = (fy - py) * w;
+    var k2 = snap ? 1 : 1 - Math.pow(0.96, dt * 60);
+    _focus.x += (tx - _focus.x) * k2; _focus.y += (ty - _focus.y) * k2;
+    camState.target.set(px + _focus.x, py + _focus.y, 0);
+  }
   var k = snap ? 1 : 1 - Math.pow(1 - 0.15, dt * 60);
   camState.eased.lerp(camState.target, k);
   camState.zoom += (camState.zoomT - camState.zoom) * (snap ? 1 : 1 - Math.pow(0.9, dt * 60));
@@ -3096,7 +3110,7 @@ function planBuild() {
   enqueue(buildCambridge);
   enqueue(buildVegetation);
   enqueue(function () {
-    var ex = [[-4, 0, 9]]; DISTRICTS.forEach(function (d) { ex.push([d.L.pad[0], d.L.pad[1], 3.8]); });
+    var ex = [[-4, 0, 9]]; DISTRICTS.forEach(function (d) { ex.push([d.L.pad[0], d.L.pad[1], 3.8]); var t = d.L.text, sg = t[2] === 'right' ? -1 : 1; for (var k = 0; k < 5; k++) ex.push([t[0] + sg * k * 3.6, t[1] - 1, 3.4]); });
     ex.push([80, 38, 9], [201.4, 96, 4], [155, 67, 4], [244.6, 109.5, 3]);
     buildLamps(ex);
   });
