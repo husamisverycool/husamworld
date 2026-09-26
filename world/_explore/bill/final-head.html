@@ -92,6 +92,7 @@ h1 .num{white-space:nowrap}
 .pbar .where{margin-left:auto;font-size:12px;color:#bbb;text-align:right}
 .caption{background:#111;color:#fbf6e6;font:600 17px/1.45 var(--cel);padding:14px 18px 16px;min-height:96px;border-radius:0 0 4px 4px}
 .caption b{color:#f2b632;font-weight:700}
+.caption a{color:#8fd8e6}
 .caption .sc{display:block;font:400 13px/1 var(--toon);color:#e8672c;margin-bottom:7px;letter-spacing:.02em}
 
 /* ---------- right rail ---------- */
@@ -229,8 +230,8 @@ mark.cur{background:#ffb13b}
 .play .walk{animation:walkin var(--dur,2.4s) steps(12) var(--del,0s) both}
 .play .walk .lA{animation:legs .34s steps(1) infinite}
 .play .walk .lB{animation:legs2 .34s steps(1) infinite}
-.play .late{animation:showat .01s steps(1) var(--del,2s) both}
-.play .early{animation:hideat .01s steps(1) var(--del,2s) both}
+.play .late{animation:showat .01s linear var(--del,2s) both}
+.play .early{animation:hideat .01s linear var(--del,2s) both}
 .play .pop-in{transform-box:fill-box;transform-origin:50% 100%;animation:popin .5s steps(4) var(--del,0s) both}
 .play .ring{transform-box:fill-box;transform-origin:50% 100%;animation:ring .24s steps(2) infinite}
 .play .flag{transform-box:fill-box;transform-origin:0 50%;animation:flag 1s steps(2) infinite}

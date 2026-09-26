@@ -100,9 +100,9 @@ SC.push(function(){
   s+=g(c+st,'','boil');
   s+='<rect class="ink" x="-10" y="730" width="1620" height="190" fill="#7fb446"/>';
   s+=g(palm(150,760,420)+palm(1450,760,420,true),'','boil');
-  s+=g(g(bill('AB 1766',{pose:'sit',mouth:'flat'}),'','sighs'),'translate(960 702) scale(.74)','early boil','--del:4.6s');
-  s+=g(bill('AB 1766',{pose:'wave'}),'translate(960 700) scale(.74)','late boil','--del:4.6s');
-  s+=g(g(person({walk:true}),'','walk','--from:-900px;--dur:2.8s;--del:1.4s'),'translate(700 860) scale(.84)','boil');
+  s+=g(g(bill('AB 1766',{pose:'sit',mouth:'flat'}),'','sighs'),'translate(990 706) scale(.9)','early boil','--del:4.6s');
+  s+=g(bill('AB 1766',{pose:'wave'}),'translate(990 700) scale(.9)','late boil','--del:4.6s');
+  s+=g(g(person({walk:true}),'','walk','--from:-900px;--dur:2.8s;--del:1.4s'),'translate(700 880) scale(.95)','boil');
   return s;
 });
 /* 1 · upstairs: Assembly green, Senate red */
@@ -143,7 +143,7 @@ SC.push(function(){
   b+='<rect class="ink" x="330" y="450" width="700" height="260" fill="#bfe6ee"/>';
   b+='<rect class="ink" style="stroke-width:5" x="1080" y="450" width="200" height="280" fill="#1b4b6f"/><rect class="ink" style="stroke-width:4" x="1100" y="470" width="160" height="112" fill="#fbf6e6"/>'+T(1180,506,22,'Office of')+T(1180,536,24,'Kevin')+T(1180,566,24,'McCarthy');
   s+=g(b,'','boil');
-  s+=g(bill('INTERN',{pose:'raise',mouth:'o'}),'translate(800 650) scale(.56)','boil');
+  s+=g(bill('INTERN',{pose:'raise',mouth:'o'}),'translate(820 598) scale(.58)','boil');
   s+=g('<rect class="ink" x="380" y="600" width="600" height="110" fill="#8a5530"/>'+T(680,670,30,'INTERN · JUNE – DEC. 2022',{fill:'#fbf6e6',ls:'2'}),'','boil');
   s+=g(g('<path class="ink" style="stroke-width:5" d="M440 600 l10 -40 h80 l10 40z" fill="#d63a2f"/><path class="ink" style="stroke-width:5" d="M430 556 q60 -40 120 0 l-12 12 q-48 -22 -96 0z" fill="#d63a2f"/>','','ring'),'','boil');
   s+='<path d="M420 540 l-24 -18 M420 520 l-8 -26 M560 540 l24 -18 M560 520 l8 -26" stroke="'+INK+'" stroke-width="5" stroke-linecap="round"/>';
@@ -166,8 +166,8 @@ SC.push(function(){
   s+='<rect class="ink" x="-10" y="640" width="1620" height="60" fill="#b07a44"/><rect class="ink" x="-10" y="698" width="1620" height="220" fill="#6b4125"/>';
   s+=g(bill('AB 1766',{pose:'cheer',mouth:'o'}),'translate(800 560) scale(.66)','boil');
   var p='<path class="ink" fill="#fbf6e6" d="M600 470 H1000 L980 700 H620Z"/>'+T(800,530,34,'LEGISLATIVELIFT',{ls:'2',fill:'#1b4b6f'});
-  p+=T(800,584,30,'volunteer',{w:'600'})+'<path class="strike" d="M720 574 H880" stroke="#c0392b" stroke-width="5" style="--del:1.6s"/>';
-  p+=g(T(800,626,30,'Outreach Director',{w:'600'})+'<path class="strike" d="M680 616 H920" stroke="#c0392b" stroke-width="5" style="--del:3s"/>','','late','--del:1.6s');
+  p+=T(800,584,30,'volunteer',{w:'600'})+'<path class="strike" d="M732 574 H868" stroke="#c0392b" stroke-width="5" style="--del:1.6s"/>';
+  p+=g(T(800,626,30,'Outreach Director',{w:'600'})+'<path class="strike" d="M668 616 H932" stroke="#c0392b" stroke-width="5" style="--del:3s"/>','','late','--del:1.6s');
   p+=g(T(800,670,32,'Executive Director',{style:'font-style:italic;fill:#1c3f8f'}),'','late','--del:3s');
   s+=g(p,'','boil');
   var cr='';var cols=['#b97b52','#8a5a3c','#e0b089','#6b4125','#c98e62','#f2c9a0'];
@@ -188,7 +188,7 @@ SC.push(function(){
   b+='<rect class="ink" x="1080" y="340" width="400" height="180" fill="#1b4b6f"/>'+T(1280,392,24,'CALIFORNIA HIGH',{fill:'#fbf6e6',ls:'2'})+T(1280,424,24,'SCHOOL DEMOCRATS',{fill:'#fbf6e6',ls:'2'})+T(1280,482,42,'1 of 9',{font:'Shrikhand',w:'400',fill:'#f2b632'});
   s+=g(b,'','boil');
   s+='<rect class="ink" x="-10" y="700" width="1620" height="220" fill="#b86b36"/>';
-  s+=g(bill('1 OF 50',{pose:'phone',mouth:'o'}),'translate(800 700) scale(.58)','boil');
+  s+=g(bill('1 OF 50',{pose:'phone',mouth:'o'}),'translate(800 612) scale(.6)','boil');
   var t='<rect class="ink" x="130" y="600" width="1340" height="40" fill="#8a5530"/><rect class="ink" x="160" y="640" width="1280" height="120" fill="#6b3f22"/>'+T(800,714,34,'VOTERS OF TOMORROW · PHONE BANK · 1 OF 50 FELLOWS',{fill:'#fbf6e6',ls:'1'});
   s+=g(t,'','boil');
   [330,1080,1270].forEach(function(x){s+=g(g('<path class="ink" style="stroke-width:5" d="M'+(x-40)+' 600 l10 -36 h60 l10 36z" fill="#2d4fa0"/><path class="ink" style="stroke-width:5" d="M'+(x-50)+' 560 q50 -34 100 0 l-10 10 q-40 -18 -80 0z" fill="#2d4fa0"/>','','ring'),'','boil');});
@@ -217,8 +217,8 @@ SC.push(function(){
   s+=g('<path class="ink" d="M560 700 L1040 700 L1060 880 L540 880Z" fill="#fbf6e6"/><path d="M620 820 H980" stroke="'+INK+'" stroke-width="4"/>'+T(640,812,40,'×',{anchor:'start'})+T(800,760,26,'H. R. 2026 · APPROVED',{ls:'2'}),'','boil');
   s+=g('<path d="M680 812 c20 -40 40 -40 30 0 c-6 24 30 -30 50 -20 c20 10 -10 30 20 20 c30 -10 40 -40 60 -10 c10 14 30 -6 60 -8" fill="none" stroke="#1c2f6e" stroke-width="6" stroke-linecap="round"/>'+
        '<g transform="rotate(-10 820 790)"><rect x="700" y="750" width="240" height="84" fill="none" stroke="#c0392b" stroke-width="7"/>'+T(820,810,50,'SIGNED',{fill:'#c0392b',ls:'6'})+'</g>','','jubil');
-  s+=g(bill('AB 1766',{pose:'hold',mouth:'flat',look:'up'}),'translate(800 640) scale(.7)','waiting boil');
-  s+=g(g(bill('AB 1766',{pose:'cheer',mouth:'o'}),'','jumper'),'translate(800 640) scale(.7)','jubil boil');
+  s+=g(bill('AB 1766',{pose:'hold',mouth:'flat',look:'up'}),'translate(800 640) scale(.8)','waiting boil');
+  s+=g(g(bill('AB 1766',{pose:'cheer',mouth:'o'}),'','jumper'),'translate(800 640) scale(.8)','jubil boil');
   s+=g(star(560,300,40,'#f2b632')+star(1060,260,34,'#fbf6e6')+star(480,470,26,'#fbf6e6')+star(1120,450,44,'#f2b632')+star(800,120,30,'#fbf6e6'),'','stars');
   return s;
 });
