@@ -50,10 +50,12 @@ p{margin:0}
 .cover-head{display:grid;grid-template-columns:minmax(0,190px) minmax(0,470px);gap:10px 44px;align-items:start}
 .cover-kick{font:400 16px/1.2 var(--serif);color:#fff}
 .cover-kick span{display:block}
+.cover-lead{font:400 clamp(21px,2.3vw,28px)/1.18 var(--serif);color:var(--slate);margin:0 0 10px}
+.cover-lead b{font-weight:400;color:#fff}
 .cover-intro{font-size:14px;line-height:1.5;color:#2b1a1d}
-.cover h1{font:400 clamp(76px,12vw,156px)/.86 var(--serif);color:#ffe3e4;margin:22px 0 8px;letter-spacing:-.02em}
-.cover h1 span{display:block}
-.cover-key{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:12px;color:#2b1a1d;margin:6px 0 4px}
+/* FAR14's "2014" page: the year sits top left, one line, and the bubbles take the page */
+.cover h1{font:400 clamp(58px,9.4vw,122px)/1 var(--serif);color:#ffe3e4;margin:18px 0 0;letter-spacing:-.02em;white-space:nowrap}
+.cover-key{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:12px;color:#2b1a1d;margin:10px 0 0}
 .cover-key i{display:inline-block;border-radius:50%;vertical-align:-2px;margin-right:6px}
 .bubwrap{position:relative;margin-top:6px}
 #bub:focus:not(:focus-visible),#gh:focus:not(:focus-visible){outline:none}
@@ -158,23 +160,35 @@ td.z{color:#c9c1bb}
   .steps{padding:8vh 0 30vh}
   .step{min-height:62vh;align-items:flex-start;padding-top:20px}
   .gh-row{grid-template-columns:minmax(0,1fr)}
-  .years-list{flex-direction:row;flex-wrap:nowrap;gap:4px;order:-1;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-  .years-list::-webkit-scrollbar{display:none}
+  /* GitHub's year list, wrapped: all twelve years in two rows of six, nothing hidden sideways */
+  .years-list{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px 4px;order:-1}
   .life-cap{display:none}
   .life-wrap{margin-top:8px}
   .gh-head{margin-bottom:4px}
-  .years-list button{padding:4px 9px;font-size:12px;width:auto;white-space:nowrap}
+  .years-list button{padding:3px 0;font-size:12px;text-align:center;white-space:nowrap}
 }
 @media (max-width:860px){
   .page{margin:0 0 10px;padding:40px 18px 36px}
   .folio{right:18px;top:16px}
   .grid{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px}
-  .cover-head{grid-template-columns:1fr;gap:10px}
+  .cover-head{grid-template-columns:1fr;gap:8px}
+  .cover-lead{margin-bottom:8px}
+  .cover-intro{font-size:13.5px;line-height:1.45}
+  .cover h1{margin-top:10px}
+  .cover-key{gap:3px 16px;font-size:11.5px;margin-top:6px;justify-content:flex-end;text-align:right} /* clear of the bottom-left corner */
   .colophon{padding:0 18px 0 88px}
   .gh-card{padding:8px 8px 6px}
   .step h3{font-size:26px}
 }
 @media (max-width:420px){ .num{font-size:42px} .mod h3{font-size:16.5px} }
+/* phone table: the district names turn on their side, as an axis label does, so all eleven columns fit */
+@media (max-width:640px){
+  table{min-width:0;font-size:12px}
+  th,td{padding:5px 2px}
+  thead th:not(:first-child){writing-mode:vertical-rl;transform:rotate(180deg);text-align:left;white-space:nowrap;font-size:12.5px;padding:6px 0 4px;vertical-align:bottom}
+  thead th i{margin:0 0 5px}
+  tbody th{font-size:13px}
+}
 @media (prefers-reduced-motion:reduce){ *{animation:none!important;transition:none!important} }
 </style>
 </head>
@@ -185,16 +199,19 @@ td.z{color:#c9c1bb}
   <span class="folio">husam.world / the plaza</span>
   <div class="cover-head">
     <p class="cover-kick"><span>The Plaza</span><span>Annual Report</span></p>
-    <p class="cover-intro">Every week since January 2015, counted. This report doesn&rsquo;t say what anything was; each thing belongs to another district of this world, and is only named there. It counts how many things were going on at once, when, and in which district. Each bubble below is one week, in its year&rsquo;s column. The bigger the bubble, the more was going on.</p>
+    <div>
+      <p class="cover-lead"><b data-calc="peak">7</b> things at once, every week for <b data-calc="pkWeeks">13</b> weeks straight. <b data-calc="weeksCounted">611</b> weeks since January 2015, and not one blank on the chart.</p>
+      <p class="cover-intro">Each bubble is one week, in its year&rsquo;s column, newest year first. The bigger the bubble, the more was going on. Nothing here is named: each thing belongs to another district of this world, and is only named there.</p>
+    </div>
   </div>
-  <h1 id="cov-title"><span>2015&ndash;</span><span>2026</span></h1>
-  <div class="cover-key" aria-hidden="true">
-    <span><i style="width:7px;height:7px;background:#ffc5c7"></i>A week with only the weekend on</span>
-    <span><i style="width:12px;height:12px;background:#fff"></i>Things on weekdays (bigger is more)</span>
-    <span><i style="width:14px;height:14px;background:var(--slate)"></i>The most at once: <b data-calc="peak">7</b></span>
-  </div>
+  <h1 id="cov-title">2015&ndash;2026</h1>
   <div class="bubwrap">
-    <svg id="bub" role="img" aria-label="Bubbles, one per week since 2015, in twelve year columns. The columns stay small and pale until 2020, then fill with larger bubbles; the largest, darkest ones fall in October 2022 and from October to December 2025." tabindex="0"></svg>
+    <svg id="bub" role="img" aria-label="Bubbles, one per week since 2015, in twelve year columns, newest year first. From 2026 back to 2021 the columns are tall with large bubbles; the largest, darkest ones fall from October to December 2025 and in October 2022. From 2020 back to 2015 they shrink to small pale weekend bubbles." tabindex="0"></svg>
+  </div>
+  <div class="cover-key" aria-hidden="true">
+    <span><i style="width:14px;height:14px;background:var(--slate)"></i>The most at once: <b data-calc="peak">7</b></span>
+    <span><i style="width:12px;height:12px;background:#fff"></i>Things on weekdays (bigger is more)</span>
+    <span><i style="width:7px;height:7px;background:#ffc5c7"></i>A week with only the weekend on</span>
   </div>
 </section>
 
@@ -210,7 +227,7 @@ td.z{color:#c9c1bb}
 <section class="page weeks" aria-labelledby="wk-title">
   <span class="folio">The Weeks</span>
   <h2 class="pt" id="wk-title">The Weeks</h2>
-  <p class="pt-dek">One year at a time, the way a contribution graph draws one: a column per week, a row per day. Scroll to walk through the years, or pick one.</p>
+  <p class="pt-dek">One year at a time, the way a contribution graph draws one: a column per week, a row per day. It opens on the busiest stretch, then goes back to where it started.</p>
   <div class="scrolly">
     <figure class="stage" id="stage" style="margin:0">
       <div class="gh-row">
@@ -234,9 +251,16 @@ td.z{color:#c9c1bb}
     </figure>
 
     <div class="steps" id="steps">
+      <div class="step" data-year="2025" data-hl="peak25"><div class="step-in">
+        <h3>2025</h3>
+        <p>Start at the top. <b data-calc="peak">7</b> things at once, every week from <b data-calc="pkFrom">October 1</b> to <b data-calc="pkTo">December 31, 2025</b>: <b data-calc="pkWeeks">13</b> weeks in a row.</p>
+        <p data-calc="pkList">4 in the Airport, 2 in the Polling Station, 1 in the Map Room.</p>
+        <svg class="fig" id="juggler" viewBox="0 0 300 190" role="img" aria-label="A stick figure juggling seven balls, coloured by district, saying: Seven. Don't talk to me."></svg>
+      </div></div>
+
       <div class="step" data-year="2015" data-hl="weekend"><div class="step-in">
         <h3>2015</h3>
-        <p>It starts on Sundays. From 2015, most Sundays had one standing commitment, and the weekdays had nothing on the chart at all. That pink bottom row is the whole year.</p>
+        <p>Ten years earlier, it was one day a week. From 2015, most Sundays had a standing commitment, and the weekdays had nothing on the chart at all. That pink bottom row is the whole year.</p>
         <p>The weekends belong to <a href="triptik.html">the Map Room</a>.</p>
         <svg class="fig" viewBox="0 0 300 150" role="img" aria-label="A stick figure next to a speech bubble that says: Weekdays, free. Sundays, not.">
           <g fill="none" stroke="#1d1a18" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M63 25c9-1 16 6 16 15s-7 16-16 16-15-7-15-16 6-15 15-15z"/><path d="M63 56v45M63 70l-17 18M63 70l19-9M63 101l-13 32M63 101l13 32"/><path d="M130 18c50-3 104-2 150 1 6 1 9 5 9 11l-1 34c0 6-4 10-10 10-48 2-98 2-147 0-6 0-10-4-10-10l1-35c0-6 3-10 8-11z" fill="#fff"/><path d="M121 58L85 44" stroke-width="1.6"/></g>
@@ -264,20 +288,13 @@ td.z{color:#c9c1bb}
       <div class="step" data-year="2022" data-hl="peak22"><div class="step-in">
         <h3>2022</h3>
         <p>The year the grid goes dark. Every one of its 52 weeks has something in it, and by October it reaches <b data-calc="peak">7</b> at once, across <b data-calc="d22">4</b> districts, for <b data-calc="run22">4</b> weeks.</p>
-        <p>It won&rsquo;t reach <b data-calc="peak">7</b> again for three years.</p>
+        <p>It won&rsquo;t reach <b data-calc="peak">7</b> again for three years: not until the stretch this story opened on.</p>
       </div></div>
 
       <div class="step" data-year="2024" data-hl="widest"><div class="step-in">
         <h3>2024</h3>
         <p>Not the most things, but the widest spread. In the week of <b data-calc="widestDate">July 1</b>, things were going on in <b data-calc="widestN">5</b> different districts at once:</p>
         <p data-calc="widestList">2 in the Capitol, 1 in the Chamber, 1 in the Map Room, 1 in the Garage, 1 in the Pier.</p>
-      </div></div>
-
-      <div class="step" data-year="2025" data-hl="peak25"><div class="step-in">
-        <h3>2025</h3>
-        <p>The busiest stretch. <b data-calc="peak">7</b> things at once, every week from <b data-calc="pkFrom">October 1</b> to <b data-calc="pkTo">December 31, 2025</b>: <b data-calc="pkWeeks">13</b> weeks in a row.</p>
-        <p data-calc="pkList">4 in the Airport, 2 in the Polling Station, 1 in the Map Room.</p>
-        <svg class="fig" id="juggler" viewBox="0 0 300 190" role="img" aria-label="A stick figure juggling seven balls, coloured by district, saying: Seven. Don't talk to me."></svg>
       </div></div>
 
       <div class="step" data-year="2026" data-hl="now"><div class="step-in">
@@ -493,6 +510,7 @@ var CALC={
   pkWeeks:String(HB[1]-HB[0]+1),
   pkList:cap1(listText(WK[HB[0]].byM,true))+'.',
   pkToAll:longDay(WK[endAll].e,true),
+  weeksCounted:fmt(PAST.length),
   nowText:(ENDED?'The last cell is the end of 2026. ':'The outlined cell is this week, the week of '+longDay(cur.s,true)+'. ')+(cur.n?'Right now: '+listText(cur.by,true)+'.':'')
 };
 document.querySelectorAll('[data-calc]').forEach(function(n){var k=n.getAttribute('data-calc');if(CALC[k]!==undefined)n.textContent=CALC[k];});
@@ -610,26 +628,28 @@ function wire(svg,hit,ringAt){
     return placed;
   }
   function build(){
-    var m=document.documentElement.clientWidth<600?'phone':'wide';
+    var m=document.documentElement.clientWidth<860?'phone':'wide';
     if(m===mode)return;mode=m;
-    var per=m==='phone'?6:12,Wd=m==='phone'?520:1040,colW=Wd/per,rows=Math.ceil(NY/per),lab=24,y=0;
+    var RG=6,per=m==='phone'?6:12,Wd=m==='phone'?520:1040,colW=Wd/per,rows=Math.ceil(NY/per),lab=24,y=0;
     circles=[];svg.textContent='';
     var bands=[];
     for(var r=0;r<rows;r++){
       var cols=[],top=0;
-      for(var c=0;c<per;c++){var k=r*per+c;if(k>=NY)break;var p=pack(byYear[k],colW);p.forEach(function(o){if(o.y-o.r<top)top=o.y-o.r;});cols.push(p);}
+      for(var c=0;c<per;c++){var k=r*per+c;if(k>=NY)break;var p=pack(byYear[NY-1-k],colW);p.forEach(function(o){if(o.y-o.r<top)top=o.y-o.r;});cols.push(p);}
       y+=(-top)+6;var base=y;
       cols.forEach(function(p,c){p.forEach(function(o){circles.push({x:c*colW+o.x,y:base+o.y,r:o.r,w:o.w});});});
-      bands.push({base:base,n:cols.length});y+=lab+(r<rows-1?14:0);
+      bands.push({base:base,n:cols.length});y+=lab+(r<rows-1?RG:0);
     }
     svg.setAttribute('viewBox','0 0 '+Wd+' '+y);
+    /* FAR14 runs a hairline between the columns of its bubble field */
+    bands.forEach(function(bd,r){var top=r?bands[r-1].base+lab+RG:0;for(var c=1;c<bd.n;c++)E('line',{x1:c*colW,x2:c*colW,y1:top,y2:bd.base,stroke:'#fff','stroke-opacity':.35,'stroke-width':1,'vector-effect':'non-scaling-stroke'},svg);});
     var g=E('g',null,svg);
     circles.forEach(function(o,k){
       var w=o.w,fill=w.n>=PKA.max?'var(--slate)':w.n?'#fff':'#ffc5c7';
       var el=E('circle',{'class':'b',cx:o.x.toFixed(1),cy:o.y.toFixed(1),r:o.r.toFixed(2),fill:fill},g);
-      el.style.animationDelay=(((w.y-Y0)*70)+(w.w)*4)+'ms';
+      el.style.animationDelay=(((Y1-w.y)*70)+(w.w)*4)+'ms';
     });
-    bands.forEach(function(bd,r){for(var c=0;c<bd.n;c++){var t=E('text',{x:(c+.5)*colW,y:bd.base+18,'text-anchor':'middle',fill:'#fff','font-family':'Rozha One, Georgia, serif','font-size':m==='phone'?20:17},svg);t.textContent=Y0+r*per+c;}});
+    bands.forEach(function(bd,r){for(var c=0;c<bd.n;c++){var t=E('text',{x:(c+.5)*colW,y:bd.base+18,'text-anchor':'middle',fill:'#fff','font-family':'Rozha One, Georgia, serif','font-size':m==='phone'?20:17},svg);t.textContent=Y1-(r*per+c);}});
     ring=E('circle',{r:0,fill:'none',stroke:'#1f2a38','stroke-width':2,'pointer-events':'none'},svg);
     byI={};circles.forEach(function(o){byI[o.w.i]=o;});
   }
@@ -750,8 +770,7 @@ var GH={year:2025,hl:null};
     var b=H('b',null,String(on),title);
     title.appendChild(document.createTextNode(' of '+past.length+' weeks with something on in '+GH.year+(past.length<52?' so far':'')));
     for(var yb in btns)btns[yb].setAttribute('aria-pressed',String(+yb===GH.year));
-    if(list.scrollWidth>list.clientWidth){var ab=btns[GH.year];list.scrollLeft=Math.max(0,ab.offsetLeft-list.clientWidth/2+ab.offsetWidth/2-list.offsetLeft);}
-    drawLife();
+        drawLife();
   }
   var ringEl=null;
   function hit(x,y){
