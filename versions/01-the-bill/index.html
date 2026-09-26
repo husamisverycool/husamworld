@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Husam Sokar</title>
 <meta name="description" content="H. R. 2026, the Husam Sokar Act: Husam Sokar of Fresno, California, set as a bill in the House of Representatives.">
+<script>try{if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){document.documentElement.classList.add("press");}}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
@@ -66,8 +67,8 @@ a:hover{text-decoration-color:var(--red);color:var(--red)}
 .portrait{margin:0;width:104px}
 .portrait img{display:block;width:104px;height:130px;object-fit:cover;object-position:50% 30%;filter:grayscale(1) contrast(1.05);border:1px solid var(--ink)}
 .portrait figcaption{font-size:12px;line-height:16px;margin-top:6px;color:var(--ink-2);text-align:center;font-style:italic}
-.status h1{font-size:28px;line-height:34px;margin:0 0 4px;font-weight:700;letter-spacing:.005em}
-.status h1 .num{font-weight:400}
+.status .st-h{font-size:28px;line-height:34px;margin:0 0 4px;font-weight:700;letter-spacing:.005em}
+.status .st-h .num{font-weight:400}
 .status .cong{margin:0 0 14px;color:var(--ink-2);font-size:15px;line-height:22px}
 .facts{margin:0;display:grid;grid-template-columns:max-content 1fr;column-gap:18px;row-gap:6px;font-size:15px;line-height:22px}
 .facts dt{font-weight:700}
@@ -147,8 +148,6 @@ del.am,ins.am{text-decoration:none;color:inherit}
 del.am{display:none}
 .enr del.am{display:inline;color:var(--red);text-decoration:line-through;text-decoration-thickness:1.5px;text-decoration-color:var(--red)}
 .enr ins.am{color:var(--red);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;text-decoration-color:var(--red)}
-.enr del.am::before{content:"[";text-decoration:none;display:inline-block}
-.enr del.am::after{content:"]";display:inline-block}
 .enr ins.am::before{content:"";}
 
 /* margin notes */
@@ -182,7 +181,7 @@ del.am{display:none}
   .mshort{max-width:100%}
 }
 @media (max-width:600px){
-  :root{--fs:16px;--lh:26px;--ind:1em;--gut:40px}
+  :root{--fs:16px;--lh:26px;--ind:1em;--gut:16px}
   .desk{padding:0 0 24px}
   .sheet{margin:0 0 10px;padding:46px 16px 54px var(--gut);box-shadow:none}
   .gutter{width:calc(var(--gut) - 10px)}
@@ -193,7 +192,7 @@ del.am{display:none}
   .status-top{gap:16px}
   .portrait,.portrait img{width:80px}
   .portrait img{height:100px}
-  .status h1{font-size:22px;line-height:28px}
+  .status .st-h{font-size:22px;line-height:28px}
   .facts{grid-template-columns:1fr;row-gap:0}
   .facts dd{margin-bottom:8px}
   .bar-in{padding:8px 16px}
@@ -221,13 +220,140 @@ del.am{display:none}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition:none!important;animation:none!important}
 }
+
+/* ================= UPGRADE LAYER ================= */
+*{border-radius:0!important}
+/* cover: the press run */
+.cover{position:relative;max-width:1400px;margin:0 auto 28px;background:var(--paper);padding:clamp(18px,2.6vw,40px) clamp(16px,3.4vw,56px) clamp(22px,3vw,44px);overflow:hidden;box-shadow:0 1px 0 rgba(0,0,0,.08),0 10px 30px -18px rgba(0,0,0,.35)}
+.cover::before,.cover::after{content:"";position:absolute;width:18px;height:18px;border:0 solid var(--ink);pointer-events:none}
+.cover::before{top:8px;left:8px;border-top-width:1px;border-left-width:1px}
+.cover::after{bottom:8px;right:8px;border-bottom-width:1px;border-right-width:1px}
+.cover-meta{display:flex;justify-content:space-between;gap:16px;font-weight:700;font-size:clamp(11px,1.1vw,15px);line-height:1.35;letter-spacing:.06em;border-bottom:1px solid var(--ink);padding-bottom:12px;margin-bottom:clamp(10px,1.6vw,22px)}
+.cm-r{text-align:right}
+.cover-h{margin:0;font-weight:400}
+.cv{display:block}
+.fit{white-space:nowrap;line-height:.84;letter-spacing:-.015em}
+.cv1{font-size:clamp(52px,14vw,230px);font-weight:400;padding-top:.04em}
+.cv2{font-size:clamp(64px,19vw,300px);font-weight:700}
+.cv3{font-size:clamp(46px,13.5vw,230px);font-weight:700;padding-bottom:.06em}
+.cv-rule{height:0;border-top:6px solid var(--ink);border-bottom:1px solid var(--ink);padding-top:3px;margin:clamp(8px,1.4vw,20px) 0 clamp(10px,1.6vw,24px)}
+.cover-sub{margin:clamp(14px,2vw,26px) 0 0;max-width:40em;font-size:clamp(15px,1.35vw,19px);line-height:1.45;border-top:1px solid var(--ink);padding-top:12px}
+.cs-k{font-weight:700;letter-spacing:.16em;margin-right:.6em}
+.roller{position:absolute;left:0;right:0;top:-40px;height:26px;background:linear-gradient(to bottom,rgba(20,20,20,0),rgba(20,20,20,.9) 45%,rgba(20,20,20,.9) 55%,rgba(20,20,20,0));opacity:0;pointer-events:none}
+.press-skip{display:none;position:absolute;right:clamp(16px,3.4vw,56px);bottom:10px;margin:0;font-size:12px;font-style:italic;color:var(--ink-2)}
+.press .press-skip{display:block;animation:fadeout .3s 1.1s both}
+.press .cover .cv,.press .cover-meta{animation:ink .56s cubic-bezier(.2,.75,.2,1) both}
+.press .cover-meta{animation-delay:0s}
+.press .cv1{animation-delay:.14s}
+.press .cv-rule{animation-delay:.34s}
+.press .cv2{animation-delay:.46s}
+.press .cv3{animation-delay:.64s}
+.press .cv4{animation-delay:.82s}
+.press .roller{animation:roll 1.3s cubic-bezier(.5,0,.4,1) both}
+@keyframes ink{0%{clip-path:inset(0 0 100% 0);opacity:.15;transform:translateY(-.06em)}55%{opacity:1}100%{clip-path:inset(0 0 -20% 0);opacity:1;transform:none}}
+@keyframes roll{0%{top:-40px;opacity:.9}90%{opacity:.8}100%{top:100%;opacity:0}}
+@keyframes fadeout{to{opacity:0}}
+
+/* popover refs */
+.ref{cursor:help;text-decoration:underline dotted var(--red);text-decoration-thickness:1.5px;text-underline-offset:4px;transition:background-color .15s ease,color .15s ease}
+.ref:hover,.ref[aria-expanded="true"]{background:var(--red-wash);color:var(--red)}
+.ref:focus-visible{outline:2px solid var(--red);outline-offset:1px}
+.pop{position:fixed;z-index:40;width:min(330px,calc(100vw - 32px));background:var(--paper);border:1px solid var(--ink);border-top:4px solid var(--red);padding:12px 14px 13px;font-size:14.5px;line-height:21px;box-shadow:0 18px 40px -22px rgba(0,0,0,.55),4px 4px 0 var(--desk);opacity:0;transform:translateY(4px);transition:opacity .14s ease,transform .14s ease;pointer-events:none}
+.pop.show{opacity:1;transform:none;pointer-events:auto}
+.pop[hidden]{display:block;visibility:hidden}
+.pop-l{display:flex;justify-content:space-between;gap:10px;color:var(--red);font-variant-caps:all-small-caps;letter-spacing:.08em;font-size:14px;line-height:18px;margin-bottom:6px}
+.pop-t{font-weight:700;font-size:16px;line-height:21px;margin:0 0 4px}
+.pop-b{margin:0}
+.pop-m{margin:8px 0 0;padding-top:7px;border-top:1px solid var(--hair);font-style:italic;color:var(--ink-2);font-size:13.5px;line-height:19px}
+
+/* line hover band */
+.txt{position:relative;z-index:1}
+.lnband{position:absolute;left:calc(var(--gut) - 44px);right:280px;height:var(--lh);background:var(--red-wash);border-left:2px solid var(--red);pointer-events:none;opacity:0;transition:opacity .12s ease,top .08s ease;z-index:0}
+.lnband.on{opacity:1}
+@media (max-width:1079px){.lnband{right:40px}}
+.gutter span{pointer-events:auto;cursor:copy;padding-left:10px;transition:color .12s ease,transform .12s ease}
+.gutter span.on{color:var(--red);font-weight:700;transform:translateX(-3px)}
+
+/* copy control */
+.email{font-variant-numeric:lining-nums}
+.copy{font:inherit;font-size:11.5px;line-height:18px;letter-spacing:.1em;text-transform:uppercase;margin:0 .15em 0 .5em;padding:0 7px;border:1px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer;vertical-align:2px;display:inline-flex;align-items:center;gap:5px;transition:background-color .15s ease,color .15s ease}
+.copy:hover{background:var(--ink);color:var(--paper)}
+.copy.done{background:var(--ink);color:var(--paper)}
+.copy.done::before{content:"";width:8px;height:4px;border-left:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg) translateY(-1px);animation:tick .22s ease both}
+@keyframes tick{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+
+/* signature + stamp */
+.sign{margin-top:calc(var(--lh)*1.6);border-top:2px solid var(--ink);padding-top:16px}
+.sign-h{margin:0;font-size:15px;line-height:22px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.sign-i{margin:4px 0 12px;font-size:15.5px;line-height:23px;color:var(--ink-2)}
+.pad-wrap{position:relative;height:170px;border-bottom:1.5px solid var(--ink);background:repeating-linear-gradient(to bottom,transparent 0,transparent 33px,#f0f0ec 33px,#f0f0ec 34px)}
+#pad{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;display:block}
+.pad-x{position:absolute;left:4px;bottom:6px;font-size:26px;line-height:26px;pointer-events:none}
+.sign-row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:15px}
+.sign-btns{display:flex;gap:8px}
+.btn{font:inherit;font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding:7px 16px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
+.btn:hover{background:var(--red);border-color:var(--red)}
+.btn.ghost{background:var(--paper);color:var(--ink)}
+.btn.ghost:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.stamp{position:absolute;right:6%;top:18px;padding:10px 18px 8px;border:4px double var(--red);color:var(--red);text-align:center;transform:rotate(-8deg);opacity:0;pointer-events:none;mix-blend-mode:multiply;background:rgba(255,255,255,.0)}
+.stamp b{display:block;font-size:clamp(26px,4.4vw,40px);line-height:1;letter-spacing:.12em;font-weight:700}
+.stamp-d{display:block;margin-top:6px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;border-top:1.5px solid var(--red);padding-top:4px}
+.stamp.down{opacity:.92;animation:slam .42s cubic-bezier(.2,1.5,.35,1) both}
+@keyframes slam{0%{opacity:0;transform:scale(2.3) rotate(-15deg)}55%{opacity:.95;transform:scale(.95) rotate(-7deg)}100%{opacity:.92;transform:scale(1) rotate(-8deg)}}
+.shake{animation:shake .34s linear both}
+@keyframes shake{0%,100%{transform:none}20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,1px)}80%{transform:translate(2px,-1px)}}
+.law .tracker .lawstep .chev{background:var(--red)}
+
+/* toast */
+.toast{position:fixed;left:16px;bottom:16px;z-index:50;max-width:calc(100vw - 32px);background:var(--paper);border:1px solid var(--ink);padding:9px 14px;font-size:14px;line-height:20px;box-shadow:4px 4px 0 var(--ink);transform:translateY(140%);transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+.toast.show{transform:none}
+.toast b{color:var(--red);font-weight:700;margin-right:.4em;font-variant-caps:all-small-caps;letter-spacing:.08em;font-size:1.08em}
+
+/* slip-law masthead (hidden on wide) */
+.slip-mast{display:none}
+.f-slip{display:none;justify-content:space-between;gap:12px}
+.bar-slip{display:none;color:var(--ink-2);font-style:italic}
+
+/* ======= SLIP LAW: the bill re-typesets itself when the window narrows ======= */
+@media (max-width:699px){
+  :root{--gut:18px}
+  .gutter,.lnband{display:none!important}
+  .sheet{padding-left:18px;padding-right:18px}
+  .folio{left:18px;right:18px;text-align:left;font-size:11.5px;letter-spacing:.04em;font-weight:700}
+  .f-bill,.runfoot{display:none}
+  .f-slip{display:flex}
+  .bar-slip{display:inline}
+  .mast .roman,.mast .mrow,.mast .mshort,.mast .rule2,.mast .house,.mast .date,.mast .intro,.mast .rule1,.mast .abill,.mast .enrolled-line,.mast .ltitle,.mast .rule3{display:none!important}
+  .slip-mast{display:block}
+  .sl-top{margin:0 0 6px;padding-bottom:6px;border-bottom:3px double var(--ink);font-size:12px;font-weight:700;letter-spacing:.05em}
+  .sl-act{margin:18px 0 6px;text-align:center;font-weight:700;font-size:30px;line-height:36px;letter-spacing:.02em}
+  .sl-row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start}
+  .sl-title{margin:0;font-size:15px;line-height:22px;padding-left:1em;text-indent:-1em}
+  .sl-br{margin:0;font-size:11.5px;line-height:16px;text-align:right;font-weight:700;white-space:nowrap}
+  .sl-side{margin:14px 0 0;font-size:12px;font-style:italic;border-top:1px solid var(--ink);padding-top:6px}
+  .note{border-left:0;padding:0;margin:0 0 4px;font-size:12.5px;line-height:17px}
+  .note::before{content:"";display:block;width:24px;border-top:1px solid var(--red-soft);margin:2px 0 4px}
+  .t1{margin-left:var(--ind)}
+  .enact{margin-top:6px}
+}
+/* re-typeset flourish when crossing between bill and slip law */
+.retype .mast>*,.retype .folio,.retype .txt,.retype .attest{animation:ink .62s cubic-bezier(.2,.75,.2,1) both}
+.retype .txt{animation-delay:.12s}
+.retype .desk .sheet{animation:settle .7s cubic-bezier(.2,.75,.2,1) both}
+@keyframes settle{0%{transform:scale(.985);filter:grayscale(1) contrast(.9)}100%{transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  .press .cover .cv,.press .cover-meta,.press .roller{animation:none!important}
+  .stamp.down{opacity:.92}
+  .toast{transition:none}
+}
 </style>
 </head>
 <body>
 
 <div class="bar" role="region" aria-label="Text versions">
   <div class="bar-in">
-    <div class="bar-id"><b>H.R.&thinsp;2026</b><span class="long">, Husam Sokar Act</span> <span class="code" data-code>IH</span></div>
+    <div class="bar-id"><b>H.R.&thinsp;2026</b><span class="long">, Husam Sokar Act</span> <span class="code" data-code>IH</span> <span class="bar-slip">· slip law</span></div>
     <div class="vers">
       <span class="vers-l">Text version:</span>
       <div class="seg" role="group" aria-label="Text version">
@@ -238,8 +364,23 @@ del.am{display:none}
   </div>
 </div>
 <p class="vh" aria-live="polite" id="live"></p>
+<div class="pop" id="pop" role="tooltip" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <main class="desk">
+
+<section class="cover" id="cover" aria-label="Title page">
+  <div class="cover-meta"><span>119TH CONGRESS<br>2D SESSION</span><span class="cm-r">IN THE HOUSE OF REPRESENTATIVES<br>SEPTEMBER 26, 2026</span></div>
+  <h1 class="cover-h">
+    <span class="cv fit cv1">H.&#8202;R.&#8202;2026</span>
+    <span class="cv cv-rule" aria-hidden="true"></span>
+    <span class="cv fit cv2">HUSAM</span>
+    <span class="cv fit cv3">SOKAR&#8202;ACT</span>
+  </h1>
+  <p class="cv cv4 cover-sub"><span class="cs-k">A BILL</span> To recognize Husam Sokar of Fresno, California, who learns how institutions actually run and then does the work inside them, and for other purposes.</p>
+  <div class="roller" aria-hidden="true"></div>
+  <p class="press-skip" aria-hidden="true">Printing. Press any key to skip.</p>
+</section>
 
 <!-- ================= STATUS ================= -->
 <section class="status" aria-labelledby="h1">
@@ -250,7 +391,7 @@ del.am{display:none}
       <figcaption>Sponsor</figcaption>
     </figure>
     <div>
-      <h1 id="h1"><span class="num">H.R.2026 —</span> Husam Sokar Act</h1>
+      <h2 class="st-h" id="h1"><span class="num">H.R.2026 —</span> Husam Sokar Act</h2>
       <p class="cong">119th Congress (2025–2026)</p>
       <dl class="facts">
         <dt>Sponsor</dt><dd>Mr. Sokar [Fresno, CA] (Introduced 09/26/2026)</dd>
@@ -280,7 +421,7 @@ del.am{display:none}
     </li>
     <li class="pend">
       <span class="chev">Became Law</span>
-      <span class="det"><span class="where">Pending</span><span class="when">—</span><span class="what">Awaiting further action.</span></span>
+      <span class="det"><span class="where">Pending</span><span class="when">—</span><span class="what">Awaiting signature. <a href="#sign">Sign it at the end</a>.</span></span>
     </li>
   </ol>
 </section>
@@ -290,6 +431,12 @@ del.am{display:none}
   <div class="gutter" aria-hidden="true"></div>
 
   <header class="mast">
+    <div class="slip-mast">
+      <p class="sl-top"><span>PUBLIC LAW 119–2026—SEPT. 26, 2026</span></p>
+      <p class="sl-act">An Act</p>
+      <div class="sl-row"><p class="sl-title">To recognize Husam Sokar of Fresno, California, a sophomore at Harvard College who learns how institutions actually run and then does the work inside them, and for other purposes.</p><p class="sl-br">Sept. 26, 2026<br>[H.R. 2026]</p></div>
+      <p class="sl-side">Husam Sokar Act.</p>
+    </div>
     <div class="roman" aria-hidden="true">I</div>
     <div class="mrow">
       <div class="congress"><span>119TH CONGRESS</span><span>2D SESSION</span></div>
@@ -357,7 +504,7 @@ del.am{display:none}
 <!-- ================= PAGE 2 ================= -->
 <article class="sheet" aria-label="Page 2">
   <div class="gutter" aria-hidden="true"></div>
-  <div class="folio" aria-hidden="true">2</div>
+  <div class="folio" aria-hidden="true"><span class="f-bill">2</span><span class="f-slip"><span>PUBLIC LAW 119–2026—SEPT. 26, 2026</span><span>2</span></span></div>
   <div class="txt">
     <section class="prov has-note" id="sec-3" tabindex="0" aria-labelledby="h-sec-3">
       <aside class="note"><b>Legislative history.</b> Honors from high school and Harvard, each with its selectivity where one was given. <span class="am-n">Amdt. to para. (1): National Semifinalist, Congressional Debate, preceded Finalist.</span></aside>
@@ -379,7 +526,7 @@ del.am{display:none}
             <li><p class="ln t2">(C) a recipient of the Quest for Excellence Award in Humanities, 1 of about 100 from 3,911.</p></li>
           </ol>
         </li>
-        <li><p class="ln t1">(9) He was selected for the Telluride Association Summer Seminar in 2024, 1 of 72 from more than 2,400, a tuition-free seminar in Critical Black Studies, where he was elected house chair.</p></li>
+        <li><p class="ln t1">(9) He was selected for the <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="tass">Telluride Association Summer Seminar</span> in 2024, 1 of 72 from more than 2,400, a tuition-free seminar in Critical Black Studies, where he was elected house chair.</p></li>
         <li><p class="ln t1">(10) He was a Coolidge Scholarship Senator, 1 of 100 from more than 4,100.</p></li>
         <li><p class="ln t1">(11) He is a Benjamin A. Gilman Scholar and a Taco Bell Live Más Scholar ($10,000; 1 of about 400 from 14,000).</p></li>
         <li><p class="ln t1">(12) He placed in the top 5 percent of the JFK Profile in Courage Essay Contest (about 150 of more than 2,800).</p></li>
@@ -401,7 +548,7 @@ del.am{display:none}
         <li>
           <p class="ln t1">(3) <span class="head">Bill</span>.—The term “bill” means—</p>
           <ol>
-            <li><p class="ln t2">(A) AB 1766, AB 1947, SB 1161, AB 2549, and SB 1038 of the California Legislature, as described in section 101; and</p></li>
+            <li><p class="ln t2">(A) <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="ab1766">AB 1766</span>, <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="ab1947">AB 1947</span>, <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="sb1161">SB 1161</span>, <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="ab2549">AB 2549</span>, and <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="sb1038">SB 1038</span> of the California Legislature, as described in section 101; and</p></li>
             <li><p class="ln t2">(B) the billing Husam handled growing up, as an admin assistant in billing and back-office operations at his father’s law firm.</p></li>
           </ol>
         </li>
@@ -418,7 +565,7 @@ del.am{display:none}
 <!-- ================= PAGE 3: TITLE I ================= -->
 <article class="sheet" aria-label="Page 3">
   <div class="gutter" aria-hidden="true"></div>
-  <div class="folio" aria-hidden="true">3</div>
+  <div class="folio" aria-hidden="true"><span class="f-bill">3</span><span class="f-slip"><span>PUBLIC LAW 119–2026—SEPT. 26, 2026</span><span>3</span></span></div>
   <div class="txt">
     <h2 class="ln title-h" id="title-1">TITLE I—PUBLIC SERVICE AND ADVOCACY</h2>
     <div class="gap"></div>
@@ -426,13 +573,13 @@ del.am{display:none}
     <section class="prov has-note" id="sec-101" tabindex="0" aria-labelledby="h-sec-101">
       <aside class="note"><b>Legislative history.</b> Council on American-Islamic Relations (CAIR), Sacramento. Lead Advocate, May 2021–May 2023.</aside>
       <h3 class="ln sech" id="h-sec-101"><span class="s">SEC. 101.</span> <span class="head"><b>California legislation.</b></span></h3>
-      <p class="ln ta">(a) <span class="head">In General</span>.—As Lead Advocate for CAIR in Sacramento, Husam was the lead community advocate for AB 1766 (California IDs for All), working with the office of Assemblymember Jim Patterson, through Legislative Director Ian Coolbear, and with the office of Senator Shannon Grove.</p>
+      <p class="ln ta">(a) <span class="head">In General</span>.—As Lead Advocate for <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="cair">CAIR</span> in Sacramento, Husam was the lead community advocate for <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="ab1766">AB 1766</span> (California IDs for All), working with the office of Assemblymember Jim Patterson, through Legislative Director Ian Coolbear, and with the office of Senator Shannon Grove.</p>
       <p class="ln ta">(b) <span class="head">Additional Measures</span>.—Husam also advocated for—</p>
       <ol>
-        <li><p class="ln t1">(1) AB 1947, Freedom from Hate Crimes;</p></li>
-        <li><p class="ln t1">(2) SB 1161, Transit Safety;</p></li>
-        <li><p class="ln t1">(3) AB 2549, Ending Street Harassment; and</p></li>
-        <li><p class="ln t1">(4) SB 1038, limits on biometric surveillance by law enforcement.</p></li>
+        <li><p class="ln t1">(1) <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="ab1947">AB 1947</span>, Freedom from Hate Crimes;</p></li>
+        <li><p class="ln t1">(2) <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="sb1161">SB 1161</span>, Transit Safety;</p></li>
+        <li><p class="ln t1">(3) <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="ab2549">AB 2549</span>, Ending Street Harassment; and</p></li>
+        <li><p class="ln t1">(4) <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="sb1038">SB 1038</span>, limits on biometric surveillance by law enforcement.</p></li>
       </ol>
       <p class="ln ta">(c) <span class="head">Count</span>.—Five California bills, worked end to end.</p>
     </section>
@@ -440,13 +587,13 @@ del.am{display:none}
     <section class="prov has-note" id="sec-102" tabindex="0" aria-labelledby="h-sec-102">
       <aside class="note"><b>Legislative history.</b> U.S. House of Representatives, Clovis district office. June–December 2022.</aside>
       <h3 class="ln sech" id="h-sec-102"><span class="s">SEC. 102.</span> <span class="head"><b>Service in the House of Representatives.</b></span></h3>
-      <p class="ln t0">Husam served as a Congressional Intern in the Office of Kevin McCarthy in Clovis, California.</p>
+      <p class="ln t0">Husam served as a Congressional Intern in the <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="mccarthy">Office of Kevin McCarthy</span> in Clovis, California.</p>
     </section>
 
     <section class="prov has-note" id="sec-103" tabindex="0" aria-labelledby="h-sec-103">
       <aside class="note"><b>Legislative history.</b> Board member from Sep 2021; also Director of Outreach, Director of Relations, and Director of External Relations. VP &amp; Executive Director, May 2022–Dec 2025. <span class="am-n">Amdt. to subsec. (a): board member → Vice President and Executive Director.</span></aside>
       <h3 class="ln sech" id="h-sec-103"><span class="s">SEC. 103.</span> <span class="head"><b>Muslim Community Association of Fresno.</b></span></h3>
-      <p class="ln ta">(a) <span class="head">Office</span>.—Husam served as <del class="am">a member of the board</del> <ins class="am">Vice President and Executive Director</ins> of the Muslim Community Association of Fresno, a youth-driven nonprofit.</p>
+      <p class="ln ta">(a) <span class="head">Office</span>.—Husam served as <del class="am">a member of the board</del> <ins class="am">Vice President and Executive Director</ins> of the <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="mcaf">Muslim Community Association of Fresno</span>, a youth-driven nonprofit.</p>
       <p class="ln ta">(b) <span class="head">Record</span>.—During Husam’s service, the Association—</p>
       <ol>
         <li><p class="ln t1">(1) held more than 150 community events;</p></li>
@@ -465,20 +612,20 @@ del.am{display:none}
     <section class="prov has-note" id="sec-104" tabindex="0" aria-labelledby="h-sec-104">
       <aside class="note"><b>Legislative history.</b> Volunteer, then Outreach Director. Executive Director, April–December 2022. <span class="am-n">Amdt.: volunteer → Executive Director.</span></aside>
       <h3 class="ln sech" id="h-sec-104"><span class="s">SEC. 104.</span> <span class="head"><b>LegislativeLift.</b></span></h3>
-      <p class="ln t0">Husam served as <del class="am">a volunteer</del> <ins class="am">Executive Director</ins> of LegislativeLift, a global Muslim civil-rights nonprofit of more than 11,000 members and more than 80 volunteers, with events in Egypt, India, and the United States, scholar programs, and work on legislative literacy.</p>
+      <p class="ln t0">Husam served as <del class="am">a volunteer</del> <ins class="am">Executive Director</ins> of <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="ll">LegislativeLift</span>, a global Muslim civil-rights nonprofit of more than 11,000 members and more than 80 volunteers, with events in Egypt, India, and the United States, scholar programs, and work on legislative literacy.</p>
     </section>
 
     <section class="prov has-note" id="sec-105" tabindex="0" aria-labelledby="h-sec-105">
       <aside class="note"><b>Legislative history.</b> NSDA, May 2024–May 2025. Diversify Our Narrative, Jun 2024–Jan 2025. CA High School Democrats, Jul 2024–Feb 2025. Voters of Tomorrow, Sep–Oct 2024. bayloop, Oct 2023–Dec 2024.</aside>
       <h3 class="ln sech" id="h-sec-105"><span class="s">SEC. 105.</span> <span class="head"><b>National organizing.</b></span></h3>
-      <p class="ln ta">(a) <span class="head">Speech and Debate</span>.—Husam served on the Student Leadership Council of the National Speech &amp; Debate Association, 1 of 23 students representing more than 140,000 members to the national board.</p>
-      <p class="ln ta">(b) <span class="head">Curriculum Equity</span>.—As Executive Director of Operations of Diversify Our Narrative, Husam was 1 of 5 executives leading a national 501(c)(3) of more than 5,000 student organizers and more than 800 district chapters, featured in TIME, Bloomberg, Vox, ABC Nightline, and The Washington Post.</p>
+      <p class="ln ta">(a) <span class="head">Speech and Debate</span>.—Husam served on the Student Leadership Council of the <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="nsda">National Speech &amp; Debate Association</span>, 1 of 23 students representing more than 140,000 members to the national board.</p>
+      <p class="ln ta">(b) <span class="head">Curriculum Equity</span>.—As Executive Director of Operations of <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="don">Diversify Our Narrative</span>, Husam was 1 of 5 executives leading a national 501(c)(3) of more than 5,000 student organizers and more than 800 district chapters, featured in TIME, Bloomberg, Vox, ABC Nightline, and The Washington Post.</p>
       <p class="ln ta">(c) <span class="head">Elections</span>.—Husam was—</p>
       <ol>
-        <li><p class="ln t1">(1) Managing Director of California High School Democrats, 1 of 9 directors managing all regions; and</p></li>
-        <li><p class="ln t1">(2) an Election Fellow with Voters of Tomorrow, 1 of 50 paid fellows, phone banking and canvassing.</p></li>
+        <li><p class="ln t1">(1) Managing Director of <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="chsd">California High School Democrats</span>, 1 of 9 directors managing all regions; and</p></li>
+        <li><p class="ln t1">(2) an Election Fellow with <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="vot">Voters of Tomorrow</span>, 1 of 50 paid fellows, phone banking and canvassing.</p></li>
       </ol>
-      <p class="ln ta">(d) <span class="head">Housing</span>.—Husam founded bayloop, a Fresno think tank against restrictive zoning, which organized 7 youth phone banks across the Central Valley and did legislative research with the National Low-Income Housing Coalition.</p>
+      <p class="ln ta">(d) <span class="head">Housing</span>.—Husam founded <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="bayloop">bayloop</span>, a Fresno think tank against restrictive zoning, which organized 7 youth phone banks across the Central Valley and did legislative research with the National Low-Income Housing Coalition.</p>
     </section>
   </div>
   <p class="runfoot" aria-hidden="true">•HR 2026 <span class="code" data-code>IH</span></p>
@@ -487,7 +634,7 @@ del.am{display:none}
 <!-- ================= PAGE 4: TITLE II ================= -->
 <article class="sheet" aria-label="Page 4">
   <div class="gutter" aria-hidden="true"></div>
-  <div class="folio" aria-hidden="true">4</div>
+  <div class="folio" aria-hidden="true"><span class="f-bill">4</span><span class="f-slip"><span>PUBLIC LAW 119–2026—SEPT. 26, 2026</span><span>4</span></span></div>
   <div class="txt">
     <h2 class="ln title-h" id="title-2">TITLE II—HARVARD</h2>
     <div class="gap"></div>
@@ -501,7 +648,7 @@ del.am{display:none}
     <section class="prov has-note" id="sec-202" tabindex="0" aria-labelledby="h-sec-202">
       <aside class="note"><b>Legislative history.</b> Staff from September 2025. Chair (Senior Staff) from January 2026. <span class="am-n">Amdt. to subsec. (a): staff → Chair.</span></aside>
       <h3 class="ln sech" id="h-sec-202"><span class="s">SEC. 202.</span> <span class="head"><b>Harvard Model Congress.</b></span></h3>
-      <p class="ln ta">(a) <span class="head">Office</span>.—Husam serves as <del class="am">a member of the staff</del> <ins class="am">Chair (Senior Staff)</ins> of Harvard Model Congress, Boston and Europe.</p>
+      <p class="ln ta">(a) <span class="head">Office</span>.—Husam serves as <del class="am">a member of the staff</del> <ins class="am">Chair (Senior Staff)</ins> of <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="hmc">Harvard Model Congress</span>, Boston and Europe.</p>
       <p class="ln ta">(b) <span class="head">Duties</span>.—In that office, Husam—</p>
       <ol>
         <li><p class="ln t1">(1) directs the Boston conference, North America’s largest congressional simulation, with more than 1,500 delegates from more than 100 schools; and</p></li>
@@ -512,7 +659,7 @@ del.am{display:none}
     <section class="prov has-note" id="sec-203" tabindex="0" aria-labelledby="h-sec-203">
       <aside class="note"><b>Legislative history.</b> Global Programs Associate from October 2025. Project Team Lead from December 2025. <span class="am-n">Amdt. to subsec. (a): Associate → Project Team Lead.</span></aside>
       <h3 class="ln sech" id="h-sec-203"><span class="s">SEC. 203.</span> <span class="head"><b>The Harvard Crimson Business Board.</b></span></h3>
-      <p class="ln ta">(a) <span class="head">Office</span>.—Husam serves as <del class="am">Global Programs Associate</del> <ins class="am">Project Team Lead, TPR/AlgoEd,</ins> on the Business Board of The Harvard Crimson, the nation’s oldest daily college newspaper (established 1873), a media enterprise of more than $1,000,000.</p>
+      <p class="ln ta">(a) <span class="head">Office</span>.—Husam serves as <del class="am">Global Programs Associate</del> <ins class="am">Project Team Lead, TPR/AlgoEd,</ins> on the Business Board of <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="crimson">The Harvard Crimson</span>, the nation’s oldest daily college newspaper (established 1873), a media enterprise of more than $1,000,000.</p>
       <p class="ln ta">(b) <span class="head">Camps</span>.—Husam leads international writing and leadership camps run with The Princeton Review and AlgoEd.</p>
       <p class="ln ta">(c) <span class="head">Earlier Duties</span>.—As an associate, Husam—</p>
       <ol>
@@ -540,7 +687,7 @@ del.am{display:none}
       <h3 class="ln sech" id="h-sec-205"><span class="s">SEC. 205.</span> <span class="head"><b>Other service.</b></span></h3>
       <p class="ln t0">At Harvard, Husam has also served—</p>
       <ol>
-        <li><p class="ln t1">(1) as Senior Associate, Harvard Global Research and Consulting Group, consulting for UNICEF and the Urban Institute, with work also for the WHO and the United Nations;</p></li>
+        <li><p class="ln t1">(1) as Senior Associate, <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="hgrcg">Harvard Global Research and Consulting Group</span>, consulting for UNICEF and the Urban Institute, with work also for the WHO and the United Nations;</p></li>
         <li><p class="ln t1">(2) as a mentor in the Emerging Leaders Program of the Harvard Radcliffe Institute, working with Boston high-school sophomores on leadership and social activism;</p></li>
         <li><p class="ln t1">(3) in operations for the Harvard College China Forum, America’s largest conference on US-China relations;</p></li>
         <li><p class="ln t1">(4) as Assistant Director of Operations, Harvard International Relations Council (Harvard Model UN and Harvard National Model UN); and</p></li>
@@ -554,7 +701,7 @@ del.am{display:none}
 <!-- ================= PAGE 5: TITLE III ================= -->
 <article class="sheet" aria-label="Page 5">
   <div class="gutter" aria-hidden="true"></div>
-  <div class="folio" aria-hidden="true">5</div>
+  <div class="folio" aria-hidden="true"><span class="f-bill">5</span><span class="f-slip"><span>PUBLIC LAW 119–2026—SEPT. 26, 2026</span><span>5</span></span></div>
   <div class="txt">
     <h2 class="ln title-h" id="title-3">TITLE III—RESEARCH AND JOURNALISM</h2>
     <div class="gap"></div>
@@ -562,9 +709,9 @@ del.am{display:none}
     <section class="prov has-note" id="sec-301" tabindex="0" aria-labelledby="h-sec-301">
       <aside class="note"><b>Legislative history.</b> Institute of Politics, Harvard Kennedy School, Sep 2025–May 2026. Policy Program in Economics, summer 2025.</aside>
       <h3 class="ln sech" id="h-sec-301"><span class="s">SEC. 301.</span> <span class="head"><b>Institute of Politics.</b></span></h3>
-      <p class="ln ta">(a) <span class="head">In General</span>.—At the Institute of Politics at the Harvard Kennedy School, Husam—</p>
+      <p class="ln ta">(a) <span class="head">In General</span>.—At the <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="iop">Institute of Politics</span> at the Harvard Kennedy School, Husam—</p>
       <ol>
-        <li><p class="ln t1">(1) was an analyst on the Harvard Youth Poll, America’s largest poll of 18- to 29-year-olds;</p></li>
+        <li><p class="ln t1">(1) was an analyst on the <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="poll">Harvard Youth Poll</span>, America’s largest poll of 18- to 29-year-olds;</p></li>
         <li><p class="ln t1">(2) was an associate to Ambassador Katherine Tai, the 19th United States Trade Representative; and</p></li>
         <li><p class="ln t1">(3) consulted for the Red Cross and the United Nations.</p></li>
       </ol>
@@ -574,7 +721,7 @@ del.am{display:none}
     <section class="prov has-note" id="sec-302" tabindex="0" aria-labelledby="h-sec-302">
       <aside class="note"><b>Legislative history.</b> White House in Arabic (WHiA), July 2022–April 2024. Senior English Writer and intern, under Marah Bukai, Washington Bureau Chief, Al-Arab Media Organization.</aside>
       <h3 class="ln sech" id="h-sec-302"><span class="s">SEC. 302.</span> <span class="head"><b>Translation.</b></span></h3>
-      <p class="ln ta">(a) <span class="head">In General</span>.—At White House in Arabic, Husam edited and translated press briefings, op-eds, and documentary scripts between Arabic and English, for more than 350,000 combined readers and viewers (more than 150,000 readers and 200,000 viewers).</p>
+      <p class="ln ta">(a) <span class="head">In General</span>.—At <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="whia">White House in Arabic</span>, Husam edited and translated press briefings, op-eds, and documentary scripts between Arabic and English, for more than 350,000 combined readers and viewers (more than 150,000 readers and 200,000 viewers).</p>
       <p class="ln ta">(b) <span class="head">Works</span>.—Articles Husam edited or translated include—</p>
       <ol class="cite">
         <li><p class="ln t1">(1) “<a href="https://whia.us/en/5461/" target="_blank" rel="noopener">Mustafa Al-Kazemi’s Crucial Role in the MENA Region</a>”;</p></li>
@@ -605,7 +752,7 @@ del.am{display:none}
         <li><p class="ln t1">(2) the University of Houston; and</p></li>
         <li><p class="ln t1">(3) Chapman University.</p></li>
       </ol>
-      <p class="ln ta">(b) <span class="head">Policy Research</span>.—Husam was a Research Fellow at Ballotpedia, 1 of 12 from more than 90 applicants, and a Public Health Policy Analyst at the Institute for Youth in Policy.</p>
+      <p class="ln ta">(b) <span class="head">Policy Research</span>.—Husam was a Research Fellow at <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="ballot">Ballotpedia</span>, 1 of 12 from more than 90 applicants, and a Public Health Policy Analyst at the Institute for Youth in Policy.</p>
     </section>
   </div>
   <p class="runfoot" aria-hidden="true">•HR 2026 <span class="code" data-code>IH</span></p>
@@ -614,7 +761,7 @@ del.am{display:none}
 <!-- ================= PAGE 6: TITLE IV + V ================= -->
 <article class="sheet" aria-label="Page 6">
   <div class="gutter" aria-hidden="true"></div>
-  <div class="folio" aria-hidden="true">6</div>
+  <div class="folio" aria-hidden="true"><span class="f-bill">6</span><span class="f-slip"><span>PUBLIC LAW 119–2026—SEPT. 26, 2026</span><span>6</span></span></div>
   <div class="txt">
     <h2 class="ln title-h" id="title-4">TITLE IV—ENTERPRISE</h2>
     <div class="gap"></div>
@@ -649,7 +796,7 @@ del.am{display:none}
     <section class="prov has-note" id="sec-404" tabindex="0" aria-labelledby="h-sec-404">
       <aside class="note"><b>Legislative history.</b> Jetson, summer 2023. Law firm, growing up.</aside>
       <h3 class="ln sech" id="h-sec-404"><span class="s">SEC. 404.</span> <span class="head"><b>Prior commercial experience.</b></span></h3>
-      <p class="ln ta">(a) <span class="head">Fintech</span>.—Husam was a paid intern at Jetson, a fintech company for teens, 1 of 40 from more than 1,000 applicants.</p>
+      <p class="ln ta">(a) <span class="head">Fintech</span>.—Husam was a paid intern at <span class="ref" tabindex="0" role="button" aria-haspopup="true" data-ref="jetson">Jetson</span>, a fintech company for teens, 1 of 40 from more than 1,000 applicants.</p>
       <p class="ln ta">(b) <span class="head">Back Office</span>.—Husam grew up working billing and back-office operations as an admin assistant at his father’s law firm.</p>
     </section>
 
@@ -663,7 +810,7 @@ del.am{display:none}
       <ol class="cite">
         <li><p class="ln t1">(1) through LinkedIn, at <a href="https://www.linkedin.com/in/husam-sokar-089648227/" target="_blank" rel="noopener">linkedin.com/in/husam-sokar-089648227</a>; or</p></li>
         <!-- PLACEHOLDER: email address. Replace [email] with Husam's address. -->
-        <li><p class="ln t1">(2) by electronic mail, at [email].</p></li>
+        <li><p class="ln t1">(2) by electronic mail, at <span class="email" id="email">[email]</span><button type="button" class="copy" data-copy="email" aria-label="Copy email address"><span class="copy-t">Copy</span></button>.</p></li>
       </ol>
     </section>
 
@@ -681,6 +828,20 @@ del.am{display:none}
       <span class="att-n"><span class="sc">Husam Sokar</span>,<br><i>Sponsor.</i></span>
     </div>
   </div>
+
+  <section class="sign" id="sign" aria-labelledby="sign-h">
+    <h2 class="sign-h" id="sign-h">Approval</h2>
+    <p class="sign-i">This Act awaits a signature. Draw one on the line with a mouse, pen, or finger, or press <b>Sign</b>.</p>
+    <div class="pad-wrap">
+      <canvas id="pad" role="img" aria-label="Signature line. Draw here to sign."></canvas>
+      <span class="pad-x" aria-hidden="true">X</span>
+      <div class="stamp" id="stamp" aria-hidden="true"><b>BECAME LAW</b><span class="stamp-d" id="stamp-date"></span></div>
+    </div>
+    <div class="sign-row">
+      <span class="sign-cap"><i>Approved</i> <span id="sign-date">________________</span></span>
+      <span class="sign-btns"><button type="button" class="btn" id="sign-btn">Sign</button><button type="button" class="btn ghost" id="sign-clear">Clear</button></span>
+    </div>
+  </section>
   <p class="runfoot" aria-hidden="true">•HR 2026 <span class="code" data-code>IH</span></p>
 </article>
 
@@ -698,62 +859,316 @@ del.am{display:none}
 <script>
 (function(){
   var root=document.documentElement;
+  var reduce=false; try{reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+  var live=document.getElementById('live');
+  function say(t){ if(live){ live.textContent=''; setTimeout(function(){live.textContent=t;},30);} }
+
+  /* ---------- toast ---------- */
+  var toastEl=document.getElementById('toast'), toastT=0;
+  function toast(k,msg){
+    if(!toastEl) return;
+    toastEl.innerHTML='';
+    var b=document.createElement('b'); b.textContent=k; toastEl.appendChild(b);
+    toastEl.appendChild(document.createTextNode(msg));
+    toastEl.classList.add('show');
+    clearTimeout(toastT); toastT=setTimeout(function(){toastEl.classList.remove('show');},2200);
+  }
+
+  /* ---------- clipboard ---------- */
+  function copyText(t){
+    if(navigator.clipboard&&window.isSecureContext){ return navigator.clipboard.writeText(t).catch(function(){ return legacyCopy(t); }); }
+    return Promise.resolve(legacyCopy(t));
+  }
+  function legacyCopy(t){
+    var ta=document.createElement('textarea'); ta.value=t; ta.setAttribute('readonly','');
+    ta.style.position='fixed'; ta.style.top='-100px'; document.body.appendChild(ta); ta.select();
+    try{document.execCommand('copy');}catch(e){} document.body.removeChild(ta);
+  }
+
+  /* ---------- press run (cover) ---------- */
+  function endPress(){ root.classList.remove('press'); }
+  if(root.classList.contains('press')){
+    var pt=setTimeout(endPress,1500);
+    ['keydown','pointerdown','wheel','touchstart'].forEach(function(ev){
+      window.addEventListener(ev,function once(){ clearTimeout(pt); endPress(); window.removeEventListener(ev,once); },{passive:true});
+    });
+  }
+
+  /* ---------- fit giant cover type to the plate ---------- */
+  function fit(){
+    var cover=document.getElementById('cover'); if(!cover) return;
+    var cs=getComputedStyle(cover);
+    var w=cover.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+    var caps={cv1:0.16,cv2:0.21,cv3:0.2};
+    cover.querySelectorAll('.fit').forEach(function(el){
+      el.style.fontSize='100px';
+      var nat=el.scrollWidth||1;
+      var cap=0.2*window.innerWidth; for(var k in caps){ if(el.classList.contains(k)) cap=caps[k]*window.innerWidth; }
+      var size=Math.min(100*w/nat*0.995, cap, 300);
+      el.style.fontSize=Math.max(36,size)+'px';
+    });
+  }
+
+  /* ---------- line numbers ---------- */
+  var sheets=[].slice.call(document.querySelectorAll('.sheet'));
+  sheets.forEach(function(sheet){
+    var band=document.createElement('div'); band.className='lnband'; band.setAttribute('aria-hidden','true');
+    sheet.insertBefore(band,sheet.firstChild); sheet._band=band; sheet._lines=[];
+  });
   function number(){
-    var sheets=document.querySelectorAll('.sheet');
-    for(var s=0;s<sheets.length;s++){
-      var sheet=sheets[s], g=sheet.querySelector('.gutter');
-      if(!g) continue;
+    sheets.forEach(function(sheet){
+      var g=sheet.querySelector('.gutter'); if(!g) return;
+      sheet._lines=[];
+      if(getComputedStyle(g).display==='none'){ g.textContent=''; return; }
       var sr=sheet.getBoundingClientRect(), frag=document.createDocumentFragment(), n=0;
-      var els=sheet.querySelectorAll('.ln');
-      for(var i=0;i<els.length;i++){
-        var el=els[i];
-        if(!el.offsetParent) continue;
-        var cs=getComputedStyle(el), lh=parseFloat(cs.lineHeight);
-        if(!lh) continue;
+      sheet.querySelectorAll('.ln').forEach(function(el){
+        if(!el.offsetParent) return;
+        var cs=getComputedStyle(el), lh=parseFloat(cs.lineHeight); if(!lh) return;
         var r=el.getBoundingClientRect();
         var h=r.height-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);
-        var lines=Math.max(1,Math.round(h/lh));
-        var top0=r.top-sr.top+parseFloat(cs.paddingTop);
+        var lines=Math.max(1,Math.round(h/lh)), top0=r.top-sr.top+parseFloat(cs.paddingTop);
         for(var k=0;k<lines;k++){
           n++;
-          var sp=document.createElement('span');
-          sp.textContent=n;
-          sp.style.top=(top0+k*lh)+'px';
-          sp.style.height=lh+'px';
-          sp.style.lineHeight=lh+'px';
-          frag.appendChild(sp);
+          var sp=document.createElement('span'); sp.textContent=n;
+          var t=top0+k*lh;
+          sp.style.top=t+'px'; sp.style.height=lh+'px'; sp.style.lineHeight=lh+'px';
+          sp.dataset.n=n;
+          frag.appendChild(sp); sheet._lines.push({top:t,h:lh,el:sp,n:n});
         }
-      }
-      g.textContent='';
-      g.appendChild(frag);
-    }
+      });
+      g.textContent=''; g.appendChild(frag);
+    });
   }
   var raf=0;
-  function schedule(){ if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(function(){raf=0;number();}); }
+  function schedule(){ if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(function(){raf=0;fit();number();}); }
 
+  /* line hover: the number lights up, the line gets a wash */
+  sheets.forEach(function(sheet,idx){
+    var cur=null;
+    function clear(){ if(cur){cur.el.classList.remove('on');cur=null;} sheet._band.classList.remove('on'); }
+    sheet.addEventListener('mousemove',function(e){
+      if(!sheet._lines.length) return;
+      var y=e.clientY-sheet.getBoundingClientRect().top, hit=null;
+      for(var i=0;i<sheet._lines.length;i++){ var L=sheet._lines[i]; if(y>=L.top&&y<L.top+L.h){hit=L;break;} }
+      if(hit===cur) return;
+      clear();
+      if(hit){ cur=hit; hit.el.classList.add('on'); sheet._band.style.top=hit.top+'px'; sheet._band.classList.add('on'); }
+    });
+    sheet.addEventListener('mouseleave',clear);
+    var g=sheet.querySelector('.gutter');
+    if(g) g.addEventListener('click',function(e){
+      var n=e.target&&e.target.dataset&&e.target.dataset.n; if(!n) return;
+      var cite='H.R. 2026, page '+(idx+1)+', line '+n;
+      copyText(cite); toast('Copied',cite);
+    });
+  });
+
+  /* ---------- Introduced / Enrolled ---------- */
   var buttons=document.querySelectorAll('.seg button');
-  var live=document.getElementById('live');
   function setVersion(v){
     var enr=(v==='enr');
     root.classList.toggle('enr',enr);
-    for(var i=0;i<buttons.length;i++){ buttons[i].setAttribute('aria-pressed', buttons[i].getAttribute('data-v')===v ? 'true':'false'); }
-    var codes=document.querySelectorAll('[data-code]');
-    for(var j=0;j<codes.length;j++){ codes[j].textContent=enr?'ENR':'IH'; }
-    if(live) live.textContent=enr?'Showing the enrolled text, with amendments marked: struck text in brackets, inserted text underlined.':'Showing the text as introduced.';
+    buttons.forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-v')===v?'true':'false'); });
+    document.querySelectorAll('[data-code]').forEach(function(c){ c.textContent=enr?'ENR':'IH'; });
+    say(enr?'Showing the enrolled text, with amendments marked: struck text crossed out, inserted text underlined in red.':'Showing the text as introduced.');
     schedule();
   }
-  for(var b=0;b<buttons.length;b++){
-    buttons[b].addEventListener('click',function(){ setVersion(this.getAttribute('data-v')); });
+  buttons.forEach(function(b){ b.addEventListener('click',function(){ setVersion(b.getAttribute('data-v')); }); });
+
+  /* ---------- bill <-> slip law re-typesetting ---------- */
+  var mq=window.matchMedia?matchMedia('(max-width:699px)'):null, rt=0;
+  function onMode(){
+    var slip=mq.matches;
+    if(!reduce){ root.classList.remove('retype'); void root.offsetWidth; root.classList.add('retype'); clearTimeout(rt); rt=setTimeout(function(){root.classList.remove('retype');},900); }
+    toast('Re-typeset', slip?'as a slip law: new masthead, no line numbers.':'as a bill in the House, with line numbers.');
+    schedule();
+  }
+  if(mq){ if(mq.addEventListener) mq.addEventListener('change',onMode); else if(mq.addListener) mq.addListener(onMode); }
+
+  /* ---------- counsel's-note popovers ---------- */
+  var D={
+    ab1766:['California Assembly Bill','AB 1766 · California IDs for All','Husam was the lead community advocate for this bill as Lead Advocate for CAIR, working with the office of Asm. Jim Patterson (Legislative Director Ian Coolbear) and the office of Sen. Shannon Grove.','CAIR, Sacramento · May 2021 – May 2023'],
+    ab1947:['California Assembly Bill','AB 1947 · Freedom from Hate Crimes','One of five California bills Husam worked end to end as Lead Advocate for CAIR.','CAIR, Sacramento · May 2021 – May 2023'],
+    sb1161:['California Senate Bill','SB 1161 · Transit Safety','One of five California bills Husam worked end to end as Lead Advocate for CAIR.','CAIR, Sacramento · May 2021 – May 2023'],
+    ab2549:['California Assembly Bill','AB 2549 · Ending Street Harassment','One of five California bills Husam worked end to end as Lead Advocate for CAIR.','CAIR, Sacramento · May 2021 – May 2023'],
+    sb1038:['California Senate Bill','SB 1038 · Biometric surveillance','Limits on biometric surveillance by law enforcement. One of five California bills Husam worked end to end as Lead Advocate for CAIR.','CAIR, Sacramento · May 2021 – May 2023'],
+    cair:['Organization','CAIR','Lead Advocate in Sacramento. Lead community advocate for AB 1766; advocated for AB 1947, SB 1161, AB 2549, and SB 1038.','May 2021 – May 2023'],
+    mccarthy:['U.S. House of Representatives','Office of Kevin McCarthy','Congressional Intern in Clovis, California.','June – December 2022'],
+    mcaf:['Nonprofit','Muslim Community Association of Fresno','Youth-driven. 150+ community events. $240K+ raised for Syrian and Afghan refugees and Pakistan flood victims. A $500K pledge for Fresno’s first Muslim women’s transitional home.','Board from Sep 2021 · VP & Executive Director, May 2022 – Dec 2025'],
+    ll:['Nonprofit','LegislativeLift','Global Muslim civil-rights nonprofit: 11K+ members, 80+ volunteers, events in Egypt, India, and the U.S. Scholar programs and legislative literacy.','Volunteer, then Outreach Director · Executive Director, Apr – Dec 2022'],
+    nsda:['Association','National Speech & Debate Association','Student Leadership Council: 1 of 23 students representing 140,000+ members to the national board. National Tournament Finalist in Congressional Debate, 1 of 20 from 50,000+. Student of the Year, 1 of 86.','Council, May 2024 – May 2025'],
+    don:['Nonprofit, 501(c)(3)','Diversify Our Narrative','5,000+ student organizers and 800+ district chapters pushing curriculum equity reform. Featured in TIME, Bloomberg, Vox, ABC Nightline, and The Washington Post.','Executive Director of Operations, 1 of 5 executives · Jun 2024 – Jan 2025'],
+    chsd:['Political organization','California High School Democrats','Managing Director, 1 of 9 directors managing all regions. Also National Muslim Caucus, High School Democrats of America, 2023–2025.','Jul 2024 – Feb 2025'],
+    vot:['Political organization','Voters of Tomorrow','Election Fellow, 1 of 50 paid fellows. Phone banking and canvassing.','Sep – Oct 2024'],
+    bayloop:['Think tank','bayloop','Fresno-based, fighting restrictive zoning. 7 youth phone banks across the Central Valley; legislative research with the National Low-Income Housing Coalition.','Founder & President · Oct 2023 – Dec 2024'],
+    hmc:['Harvard','Harvard Model Congress','North America’s largest congressional simulation: 1,500+ delegates from 100+ schools in Boston. HMC Europe: 500+ delegates from 20+ countries.','Staff from Sep 2025 · Chair (Senior Staff) from Jan 2026'],
+    crimson:['Harvard','The Harvard Crimson','The nation’s oldest daily college newspaper, est. 1873, a $1M+ media enterprise. Business Board camps with The Princeton Review and AlgoEd; Global Quiz Bowl; workshops in South Korea.','Associate from Oct 2025 · Project Team Lead from Dec 2025'],
+    iop:['Harvard Kennedy School','Institute of Politics','Analyst on the Harvard Youth Poll. Associate to Ambassador Katherine Tai, 19th U.S. Trade Representative. Consulting for the Red Cross and the United Nations.','Sep 2025 – May 2026 · Policy Program in Economics, summer 2025'],
+    poll:['Institute of Politics','Harvard Youth Poll','America’s largest poll of 18–29-year-olds. Husam worked on it as an analyst.','Sep 2025 – May 2026'],
+    whia:['Publication','White House in Arabic (WHiA)','Edited and translated press briefings, op-eds, and documentary scripts between Arabic and English under Marah Bukai, Washington Bureau Chief of Al-Arab Media Organization. 350K+ combined readers and viewers.','Jul 2022 – Apr 2024'],
+    ballot:['Research','Ballotpedia','Research Fellow, 1 of 12 from 90+ applicants.','Jan – Mar 2024'],
+    jetson:['Fintech','Jetson','Fintech for teens. Paid intern, 1 of 40 from 1,000+ applicants.','Summer 2023'],
+    tass:['Seminar','Telluride Association Summer Seminar','1 of 72 selected from 2,400+ applicants for a tuition-free seminar in Critical Black Studies, Washington DC–Baltimore. Elected house chair.','Summer 2024'],
+    hgrcg:['Harvard','Harvard Global Research and Consulting Group','Senior Associate. Consulting for UNICEF and the Urban Institute, and also the WHO and the UN.','Sep 2025 – Feb 2026']
+  };
+  var pop=document.getElementById('pop'), openRef=null, hideT=0, showT=0;
+  function fill(k){
+    var d=D[k]; pop.innerHTML='';
+    function el(tag,cls,txt){ var e=document.createElement(tag); e.className=cls; if(txt!=null) e.textContent=txt; pop.appendChild(e); return e; }
+    var l=el('div','pop-l'); var a=document.createElement('span'); a.textContent='Note of legislative counsel'; var b=document.createElement('span'); b.textContent=d[0]; l.appendChild(a); l.appendChild(b);
+    el('p','pop-t',d[1]); el('p','pop-b',d[2]); el('p','pop-m',d[3]);
+  }
+  function place(ref){
+    var rects=ref.getClientRects(), r=rects[0]||ref.getBoundingClientRect();
+    var pw=pop.offsetWidth, ph=pop.offsetHeight, vw=document.documentElement.clientWidth, vh=window.innerHeight;
+    var x=Math.min(Math.max(16,r.left-12),vw-pw-16);
+    var y=r.bottom+10; if(y+ph>vh-12) y=Math.max(60,r.top-ph-10);
+    pop.style.left=x+'px'; pop.style.top=y+'px';
+  }
+  function show(ref){
+    clearTimeout(hideT);
+    if(openRef&&openRef!==ref) openRef.setAttribute('aria-expanded','false');
+    openRef=ref; fill(ref.dataset.ref);
+    pop.hidden=false; place(ref); pop.classList.add('show');
+    ref.setAttribute('aria-expanded','true'); ref.setAttribute('aria-describedby','pop');
+  }
+  function hide(){
+    pop.classList.remove('show');
+    if(openRef){ openRef.setAttribute('aria-expanded','false'); openRef.removeAttribute('aria-describedby'); }
+    openRef=null;
+    setTimeout(function(){ if(!openRef) pop.hidden=true; },160);
+  }
+  document.querySelectorAll('.ref').forEach(function(ref){
+    if(!D[ref.dataset.ref]) return;
+    ref.setAttribute('aria-expanded','false');
+    ref.addEventListener('mouseenter',function(){ clearTimeout(hideT); clearTimeout(showT); showT=setTimeout(function(){show(ref);},90); });
+    ref.addEventListener('mouseleave',function(){ clearTimeout(showT); hideT=setTimeout(hide,180); });
+    ref.addEventListener('focus',function(){ show(ref); });
+    ref.addEventListener('blur',function(){ hideT=setTimeout(hide,120); });
+    ref.addEventListener('click',function(e){ e.stopPropagation(); if(openRef===ref&&pop.classList.contains('show')) hide(); else show(ref); });
+    ref.addEventListener('keydown',function(e){
+      if(e.key==='Enter'||e.key===' '){ e.preventDefault(); if(openRef===ref) hide(); else show(ref); }
+      if(e.key==='Escape'){ hide(); }
+    });
+  });
+  pop.addEventListener('mouseenter',function(){ clearTimeout(hideT); });
+  pop.addEventListener('mouseleave',function(){ hideT=setTimeout(hide,180); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') hide(); });
+  document.addEventListener('click',function(e){ if(openRef&&!pop.contains(e.target)) hide(); });
+  window.addEventListener('scroll',function(){ if(openRef) place(openRef); },{passive:true});
+
+  /* ---------- email copy ---------- */
+  document.querySelectorAll('.copy').forEach(function(btn){
+    var t=btn.querySelector('.copy-t'), timer=0;
+    btn.addEventListener('click',function(){
+      var src=document.getElementById(btn.dataset.copy); var val=src?src.textContent.trim():'';
+      copyText(val);
+      btn.classList.add('done'); t.textContent='Copied'; say('Email address copied.');
+      clearTimeout(timer); timer=setTimeout(function(){ btn.classList.remove('done'); t.textContent='Copy'; },1600);
+    });
+  });
+
+  /* ---------- sign into law ---------- */
+  var pad=document.getElementById('pad'), ctx=pad&&pad.getContext('2d');
+  var strokes=[], curS=null, inkLen=0, signed=false, autoRun=0;
+  var stamp=document.getElementById('stamp'), sd=document.getElementById('sign-date'), stD=document.getElementById('stamp-date');
+  var track=document.querySelectorAll('.tracker li'), lawLi=track[track.length-1], curLi=document.querySelector('.tracker .cur');
+  var lawOrig=lawLi?lawLi.querySelector('.det').innerHTML:'';
+  function sizePad(){
+    if(!pad) return;
+    var r=pad.getBoundingClientRect(), dpr=Math.min(window.devicePixelRatio||1,2);
+    pad.width=Math.round(r.width*dpr); pad.height=Math.round(r.height*dpr);
+    ctx.setTransform(dpr,0,0,dpr,0,0); redraw();
+  }
+  function seg(a,b){
+    ctx.strokeStyle='#141414'; ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.lineWidth=b.w; ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+  }
+  function redraw(){
+    if(!ctx) return; ctx.clearRect(0,0,pad.width,pad.height);
+    strokes.forEach(function(s){ for(var i=1;i<s.length;i++) seg(s[i-1],s[i]); if(s.length===1){ ctx.fillStyle='#141414'; ctx.beginPath(); ctx.arc(s[0].x,s[0].y,s[0].w/2,0,7); ctx.fill(); } });
+  }
+  function addPoint(x,y,t,pressure){
+    var p={x:x,y:y,t:t,w:3};
+    var last=curS[curS.length-1];
+    if(last){
+      var dx=x-last.x, dy=y-last.y, d=Math.sqrt(dx*dx+dy*dy), dt=Math.max(1,t-last.t);
+      if(d<0.6) return;
+      var v=d/dt;                        /* px per ms */
+      var target=Math.max(0.9,Math.min(4.8,4.8-v*1.9));
+      if(pressure&&pressure!==0.5) target*=0.55+pressure;
+      p.w=last.w*0.62+target*0.38;       /* ink physics: fast = thin, slow = pooled */
+      inkLen+=d; curS.push(p); seg(last,p);
+    } else { p.w=3.4; curS.push(p); }
+  }
+  function lawNow(){
+    if(signed) return; signed=true;
+    var now=new Date(), ds=now.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    sd.textContent=ds; stD.textContent='H.R. 2026 · '+ds;
+    stamp.classList.remove('down'); void stamp.offsetWidth; stamp.classList.add('down');
+    var desk=document.querySelector('.desk');
+    if(!reduce){ setTimeout(function(){ desk.classList.remove('shake'); void desk.offsetWidth; desk.classList.add('shake'); setTimeout(function(){desk.classList.remove('shake');},400); },150); }
+    if(curLi){ curLi.classList.remove('cur'); curLi.classList.add('done'); curLi.removeAttribute('aria-current'); }
+    if(lawLi){
+      lawLi.classList.remove('pend'); lawLi.classList.add('cur');
+      lawLi.setAttribute('aria-current','step');
+      lawLi.querySelector('.det').innerHTML='<span class="where">Signed</span><span class="when"></span><span class="what">Approved by a reader of this page.</span>';
+      lawLi.querySelector('.when').textContent=ds;
+    }
+    root.classList.add('law');
+    say('Became law. The tracker has advanced to its final step.');
+    toast('Became law','H.R. 2026 · the tracker has advanced.');
+  }
+  function unlaw(){
+    signed=false; strokes=[]; inkLen=0; cancelAnimationFrame(autoRun); redraw();
+    stamp.classList.remove('down'); sd.textContent='________________'; stD.textContent='';
+    if(curLi){ curLi.classList.add('cur'); curLi.classList.remove('done'); curLi.setAttribute('aria-current','step'); }
+    if(lawLi){ lawLi.classList.add('pend'); lawLi.classList.remove('cur'); lawLi.removeAttribute('aria-current'); lawLi.querySelector('.det').innerHTML=lawOrig; }
+    root.classList.remove('law'); say('Signature cleared.');
+  }
+  if(pad){
+    var drawing=false;
+    pad.addEventListener('pointerdown',function(e){
+      drawing=true; try{pad.setPointerCapture(e.pointerId);}catch(_){}
+      var r=pad.getBoundingClientRect(); curS=[]; strokes.push(curS);
+      addPoint(e.clientX-r.left,e.clientY-r.top,e.timeStamp,e.pressure); e.preventDefault();
+    });
+    pad.addEventListener('pointermove',function(e){
+      if(!drawing) return; var r=pad.getBoundingClientRect();
+      var evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+      if(!evs.length) evs=[e];
+      evs.forEach(function(c){ addPoint(c.clientX-r.left,c.clientY-r.top,c.timeStamp,c.pressure); });
+    });
+    function up(){ if(!drawing) return; drawing=false; if(inkLen>70) lawNow(); }
+    pad.addEventListener('pointerup',up); pad.addEventListener('pointercancel',up);
+    document.getElementById('sign-clear').addEventListener('click',unlaw);
+    document.getElementById('sign-btn').addEventListener('click',function(){
+      if(signed) { lawNow(); return; }
+      var r=pad.getBoundingClientRect(), W=r.width, H=r.height, N=150, pts=[];
+      for(var i=0;i<=N;i++){
+        var u=i/N, ang=u*Math.PI*2*5.2;
+        var x=W*(0.1+0.62*u)+Math.cos(ang)*W*0.022;
+        var y=H*0.62-Math.sin(ang)*H*0.2*(1-0.5*u)-(u<0.08?(0.08-u)*H*2.2:0);
+        pts.push([x,y]);
+      }
+      pts.push([W*0.74,H*0.72]); pts.push([W*0.86,H*0.66]);
+      curS=[]; strokes.push(curS);
+      if(reduce){ pts.forEach(function(p,i){ addPoint(p[0],p[1],i*6,0.5); }); lawNow(); return; }
+      var t0=performance.now(), idx=0;
+      (function step(now){
+        var target=Math.min(pts.length,Math.floor((now-t0)/650*pts.length));
+        while(idx<target){ var sp=0.6+0.5*Math.sin(idx/7); addPoint(pts[idx][0],pts[idx][1],idx*9/sp,0.5); idx++; }
+        if(idx<pts.length) autoRun=requestAnimationFrame(step); else lawNow();
+      })(t0);
+    });
   }
 
-  number();
-  window.addEventListener('resize',schedule);
+  /* ---------- boot ---------- */
+  fit(); number(); sizePad();
+  window.addEventListener('resize',function(){ schedule(); clearTimeout(window.__pz); window.__pz=setTimeout(sizePad,120); });
   window.addEventListener('load',schedule);
-  if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(schedule); }
-  if(window.ResizeObserver){
-    var ro=new ResizeObserver(schedule);
-    document.querySelectorAll('.sheet').forEach(function(s){ro.observe(s);});
-  }
+  if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(function(){ schedule(); }); }
+  if(window.ResizeObserver){ var ro=new ResizeObserver(schedule); sheets.forEach(function(s){ro.observe(s);}); }
 })();
 </script>
 </body>

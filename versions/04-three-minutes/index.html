@@ -57,15 +57,16 @@ a:hover{text-decoration-thickness:3px}
 .placard-row{display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;padding:28px 0 36px}
 .placard{
   position:relative;background:var(--card);background-image:var(--grain);
-  padding:18px 26px 20px;transform:rotate(-1.2deg);
+  padding:18px 26px 20px;transform:perspective(1100px) rotateX(0deg) rotate(-1.2deg) scale(1);transform-origin:50% 100%;
+  transition:transform 1.25s cubic-bezier(.16,1.45,.36,1),filter 1s ease;
   box-shadow:0 1px 0 #e9e5d8,0 14px 18px -12px rgba(40,25,5,.55);
   border-top:10px solid var(--ink);
   max-width:100%;
 }
 .placard::after{content:"";position:absolute;left:6px;right:6px;bottom:-9px;height:9px;background:linear-gradient(#bfb9a8,#e4dfd1);transform:skewX(-12deg);z-index:-1}
 .placard .role{font-family:var(--sans);font-weight:800;font-size:13px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 2px}
-.placard h1{font-family:var(--display);font-weight:900;font-size:clamp(64px,15vw,150px);line-height:.82;letter-spacing:.01em;text-transform:uppercase;margin:0}
-.placard .first{display:block;font-size:.36em;letter-spacing:.08em;line-height:1;margin-bottom:.06em}
+.placard h1{font-family:var(--display);font-weight:900;font-size:clamp(64px,18vw,300px);line-height:.8;letter-spacing:.005em;text-transform:uppercase;margin:0;outline:none}
+.placard .first{display:block}
 .placard .from{font-family:var(--sans);font-size:14px;margin:12px 0 0;color:var(--pencil)}
 .bill{
   flex:1 1 260px;max-width:340px;font-family:var(--sans);font-size:14px;line-height:1.45;color:#2d2213;
@@ -124,48 +125,136 @@ mark{background:linear-gradient(100deg,transparent 0 2px,var(--hilite) 3px calc(
 @keyframes thud{0%,60%{transform:none}64%{transform:translateY(2px)}70%{transform:translateY(-1px)}76%,100%{transform:none}}
 .shock{transform-origin:40px 62px;transform-box:view-box}
 
+
+/* ---------- the RISE moment ---------- */
+.chamber{position:relative;transition:background-color 1.1s ease,min-height .9s cubic-bezier(.6,0,.2,1);min-height:0}
+.chamber::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity 1.1s ease;
+  background:radial-gradient(ellipse 60% 70% at 28% 0%,rgba(255,236,190,.16),transparent 70%)}
+.js .chamber.dark{background-color:#0d0d0f;min-height:100vh;min-height:100svh}
+.js .chamber.dark::before{opacity:1}
+.chamber.dark header{position:relative}
+.js .chamber.dark .placard{transform:perspective(1100px) rotateX(66deg) rotate(-1.2deg) scale(.9);filter:brightness(.42)}
+.js .chamber.dark .docket{color:#8f897c}
+.js .chamber.dark .bill{display:none}
+.js .chamber.dark .placard-row{padding-bottom:28px}
+.chamber.lit .placard h1 .first,.chamber.lit .placard h1 .last{display:block;animation:standup 1s cubic-bezier(.2,1.3,.35,1) both}
+.chamber.lit .placard h1 .last{animation-delay:.12s}
+@keyframes standup{from{transform:translateY(.35em) scaleY(.4);opacity:.3}to{transform:none;opacity:1}}
+.placard h1 .first,.placard h1 .last{transform-origin:50% 100%}
+.rise{display:none}
+.js .chamber.dark .rise{display:flex;flex-wrap:wrap;align-items:center;gap:14px 26px;padding:6px 0 56px}
+.greet{flex:1 0 100%;margin:0;font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  font-size:clamp(22px,3.2vw,40px);line-height:1.1;color:#f3efe6;min-height:1.2em}
+.greet span{display:inline-block;animation:greet .5s cubic-bezier(.2,.9,.3,1) both}
+.greet [lang=ar]{font-family:"Noto Naskh Arabic","Geeza Pro","Arial",sans-serif;text-transform:none;letter-spacing:0;font-weight:700}
+@keyframes greet{from{transform:translateY(60%);opacity:0;filter:blur(3px)}to{transform:none;opacity:1;filter:none}}
+.rise-btn{font-family:var(--display);font-weight:900;text-transform:uppercase;font-size:clamp(28px,4.6vw,58px);line-height:.95;letter-spacing:.01em;
+  padding:22px 30px 20px;background:var(--card-yellow);background-image:var(--grain);color:var(--ink);border:0;border-radius:0;cursor:pointer;
+  box-shadow:0 0 0 0 rgba(245,211,33,.5);animation:ping 2.4s ease-out infinite}
+.rise-btn:focus-visible{outline:3px solid #fff;outline-offset:5px}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(245,211,33,.45)}70%,100%{box-shadow:0 0 0 22px rgba(245,211,33,0)}}
+.rise-meta{display:flex;flex-direction:column;gap:6px;font-family:var(--sans);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#9b958a}
+.rise-skip{background:none;border:0;padding:0;color:#d9d4c8;font:inherit;letter-spacing:inherit;text-transform:inherit;text-decoration:underline;text-underline-offset:4px;cursor:pointer;text-align:left}
+kbd{font-family:var(--sans);border:1px solid #6b665d;padding:1px 6px;font-size:11px}
+
+/* magnetic pull (fine pointers only, set by JS) */
+.mag{translate:var(--mx,0px) var(--my,0px);transition:translate .35s cubic-bezier(.2,.9,.3,1.3)}
+.mag .mi{display:inline-block;translate:var(--ix,0px) var(--iy,0px);transition:translate .35s cubic-bezier(.2,.9,.3,1.3)}
+
+/* sound toggle */
+.snd{display:none}
+.js .snd{display:inline-flex;align-items:center;gap:7px;background:none;border:1.5px solid currentColor;border-radius:0;color:inherit;cursor:pointer;
+  font-family:var(--sans);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;line-height:1}
+.snd i{display:inline-block;width:8px;height:8px;border:1.5px solid currentColor}
+.snd[aria-pressed="true"] i{background:var(--hilite);border-color:var(--hilite)}
+.docket .snd{margin-left:auto}
+
+/* gwern-style notes */
+.js a.term{color:inherit;text-decoration:underline dotted;text-decoration-color:var(--ballpoint);text-decoration-thickness:1.5px;text-underline-offset:4px;cursor:help}
+a.term{color:inherit;text-decoration:none}
+a.term::after{content:attr(data-n);font-family:var(--sans);font-size:.55em;font-weight:800;color:var(--ballpoint);vertical-align:super;line-height:0;margin-left:1px}
+a.term:hover,a.term[aria-expanded="true"]{background:rgba(29,59,166,.08)}
+.fn{margin:34px 0 0;padding:16px 0 0 1.4em;border-top:1px solid var(--rule);font-family:var(--sans);font-size:13px;line-height:1.5;color:var(--pencil)}
+.fn-h{font-family:var(--sans);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin:34px 0 -22px;color:var(--pencil)}
+.fn li{margin:0 0 .5em;padding-left:.2em}
+.fn li::marker{color:var(--ballpoint);font-weight:800}
+.fn li:target{background:rgba(205,244,94,.55)}
+.fn b{color:var(--ink)}
+.pop{position:fixed;z-index:60;max-width:min(340px,calc(100vw - 32px));background:#fff;background-image:var(--grain);color:var(--ink);
+  border:1.5px solid var(--ink);padding:12px 14px 13px;font-family:var(--sans);font-size:13.5px;line-height:1.5;
+  box-shadow:6px 6px 0 rgba(21,21,19,.9);transform-origin:var(--ox,20px) 0;animation:popin .16s cubic-bezier(.2,.9,.3,1.2)}
+.pop[hidden]{display:none}
+.pop .ptag{display:block;font-family:var(--hand);font-weight:700;color:var(--ballpoint);font-size:15px;line-height:1.1;margin-bottom:4px}
+.pop b{font-weight:800}
+@keyframes popin{from{opacity:0;transform:translateY(-4px) scale(.97)}to{opacity:1;transform:none}}
+
+/* draggable cards */
+@media (min-width:1100px) and (pointer:fine){.js .stack{cursor:grab;touch-action:none}.js .stack.grabbing{cursor:grabbing}}
+.tcard.held{z-index:50!important;box-shadow:0 22px 30px -12px rgba(0,0,0,.45),inset 0 0 0 1px rgba(0,0,0,.06)}
+.toss{display:none}
+@media (min-width:1100px){.js .toss{display:block;position:absolute;left:-74px;top:46%;font-family:var(--hand);color:#2d2213;font-size:15px;line-height:1.1;transform:rotate(-8deg);width:64px;text-align:right}}
+
+/* copy control */
+.copyrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.copy{display:none}
+.js .copy{display:inline-grid;position:relative;overflow:hidden;height:30px;min-width:92px;background:var(--ink);color:var(--card-yellow);border:0;border-radius:0;cursor:pointer;
+  font-family:var(--sans);font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;padding:0 12px}
+.copy .c1,.copy .c2{grid-area:1/1;display:flex;align-items:center;justify-content:center;gap:6px;transition:transform .32s cubic-bezier(.2,.9,.3,1.2),opacity .2s}
+.copy .c2{transform:translateY(110%);opacity:0}
+.copy.done .c1{transform:translateY(-110%);opacity:0}
+.copy.done .c2{transform:none;opacity:1}
+.copy svg{width:13px;height:13px}
+.copy svg path{stroke-dasharray:20;stroke-dashoffset:20}
+.copy.done svg path{stroke-dashoffset:0;transition:stroke-dashoffset .35s .12s ease-out}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
 /* ---------- timekeeper ---------- */
 .tk{display:none}
 .js .tk{
-  display:block;position:fixed;right:10px;bottom:10px;z-index:30;width:92px;
+  display:flex;align-items:center;gap:12px;position:fixed;left:0;right:0;top:0;z-index:30;height:50px;padding:0 16px;
+  background:var(--ink);color:#fff;box-shadow:0 6px 14px -8px rgba(0,0,0,.6);
   transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .3s;
 }
-.js .tk.away{transform:translateY(calc(100% + 40px));opacity:0;pointer-events:none}
+.js .tk.away{transform:translateY(-110%);opacity:0;pointer-events:none}
 .tk-clock{
-  font-family:var(--display);font-weight:900;font-size:20px;line-height:1;letter-spacing:.02em;
-  background:var(--ink);color:#fff;padding:6px 10px 5px;display:flex;justify-content:space-between;align-items:baseline;
-  margin:0 0 6px;
+  font-family:var(--display);font-weight:900;font-size:28px;line-height:1;letter-spacing:.02em;
+  color:#fff;display:flex;align-items:baseline;gap:10px;margin:0;flex:1;
 }
-.tk-clock small{font-family:var(--sans);font-size:7px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:#cfcfcf}
+.tk-clock small{font-family:var(--sans);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:#cfcfcf}
+.tk .snd{font-size:10px;padding:4px 7px}
+.tk-prog{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--hilite);transform-origin:0 50%;transform:scaleX(var(--p,0))}
 .tk-board{
-  position:relative;background:var(--board);background-image:var(--grain);
-  padding:14px 8px 10px;transform:rotate(2deg);transition:transform .25s;
-  box-shadow:0 12px 18px -10px rgba(30,18,5,.7);
+  position:relative;width:36px;flex:0 0 36px;background:var(--board);padding:3px;transition:transform .25s;
 }
-.tk-board.bump{transform:rotate(2deg) translateY(-8px)}
-.rings{position:absolute;left:0;right:0;top:-7px;display:flex;justify-content:space-around;padding:0 22%;z-index:20}
+.tk-board.bump{transform:translateY(3px)}
+.rings{display:none;position:absolute;left:0;right:0;top:-7px;justify-content:space-around;padding:0 22%;z-index:20}
 .rings i{display:block;width:8px;height:20px;border:2.5px solid #b9bcc0;border-radius:6px;background:transparent}
-.stack{position:relative;perspective:700px;aspect-ratio:3/3.6}
+.stack{position:relative;perspective:700px;aspect-ratio:3/3.6;user-select:none;-webkit-user-select:none}
 .tcard{
   position:absolute;inset:0;background-color:var(--card);background-image:var(--grain),linear-gradient(170deg,#fff 0%,#f3f0e6 100%);
   display:flex;align-items:center;justify-content:center;
   font-family:var(--display);font-weight:900;color:var(--ink);line-height:.8;letter-spacing:-.01em;
-  font-size:62px;transform-origin:50% 0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  font-size:26px;transform-origin:50% 0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
   transition:transform .6s cubic-bezier(.45,.05,.25,1.2),visibility 0s linear 0s;
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.06),0 1px 0 rgba(0,0,0,.18);
 }
 .tcard.y{background-color:var(--card-yellow);background-image:var(--grain),linear-gradient(170deg,#f9dc34 0%,#eec814 100%)}
-.tcard.word{font-size:34px;letter-spacing:.02em}
-.tcard.small{font-size:52px}
-.tcard .lbl{position:absolute;left:0;right:0;top:9px;text-align:center;font-family:var(--sans);font-size:8px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(0,0,0,.45);line-height:1}
+.tcard.word{font-size:11px;letter-spacing:.02em}
+.tcard.small{font-size:19px}
+.tcard .lbl{display:none;position:absolute;left:0;right:0;top:9px;text-align:center;font-family:var(--sans);font-size:8px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:rgba(0,0,0,.45);line-height:1}
 .tcard.up{transform:rotateX(178deg);visibility:hidden;transition:transform .6s cubic-bezier(.45,.05,.25,1.2),visibility 0s linear .6s}
 .hand{display:none}
 
 @media (min-width:1100px){
-  .js .tk{right:36px;bottom:0;width:216px}
-  .tk-clock{font-size:40px;padding:8px 14px 6px}
+  .js .tk{display:block;left:auto;top:auto;right:36px;bottom:0;width:216px;height:auto;padding:0;background:none;box-shadow:none;color:var(--ink)}
+  .js .tk.away{transform:translateY(calc(100% + 40px))}
+  .tk-prog{display:none}
+  .tk .snd{position:absolute;right:0;top:-30px;background:var(--paper);color:var(--ink);font-size:10px}
+  .tk-clock{font-size:40px;padding:8px 14px 6px;background:var(--ink);justify-content:space-between;margin:0 0 6px}
   .tk-clock small{font-size:10px}
-  .tk-board{padding:20px 14px 70px;transform:rotate(3deg)}
+  .tk-board{width:auto;padding:20px 14px 70px;transform:rotate(3deg);background-image:var(--grain);box-shadow:0 12px 18px -10px rgba(30,18,5,.7)}
+  .rings{display:flex}
+  .tcard .lbl{display:block}
   .tk-board.bump{transform:rotate(1.5deg) translateY(-14px)}
   .tcard{font-size:150px}
   .tcard.small{font-size:128px}
@@ -175,8 +264,8 @@ mark{background:linear-gradient(100deg,transparent 0 2px,var(--hilite) 3px calc(
   .rings{top:-10px}
   .hand{display:block;position:absolute;left:-18px;right:-10px;bottom:-40px;height:150px;pointer-events:none}
 }
-@media (max-width:699px){
-  .speech{padding-bottom:40px}
+@media (max-width:1099px){
+  .qa details,.fn li,#ballot,#questions{scroll-margin-top:64px}
 }
 
 /* ---------- section headings on the desk ---------- */
@@ -198,6 +287,7 @@ mark{background:linear-gradient(100deg,transparent 0 2px,var(--hilite) 3px calc(
 }
 .askers button::before{content:"";position:absolute;left:10px;top:50%;width:14px;height:14px;margin-top:-7px;border:1.5px solid var(--ink)}
 .askers button[aria-pressed="true"]::after{content:"\2713";position:absolute;left:10px;top:50%;transform:translateY(-58%) rotate(-8deg);font-family:var(--hand);font-weight:700;font-size:22px;color:var(--ballpoint);line-height:1}
+.askers button.mag{transition:transform .12s,box-shadow .12s,translate .35s cubic-bezier(.2,.9,.3,1.3)}
 .askers button:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
 .askers button:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
 .qa{margin:0;padding:0;list-style:none}
@@ -272,14 +362,16 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
 <body>
 <a class="skip" href="#speech">Skip to the speech</a>
 
+<div class="chamber" id="chamber">
 <header class="wrap">
   <div class="docket" aria-label="Round information">
     <span>Congressional Debate</span><span>Speech in affirmation</span><span>Three minutes, then questions</span>
+    <button type="button" class="snd mag" data-sound aria-pressed="false"><i aria-hidden="true"></i>Sound off</button>
   </div>
   <div class="placard-row">
     <div class="placard">
       <p class="role">Representative</p>
-      <h1><span class="first">Husam</span>Sokar</h1>
+      <h1 id="name" tabindex="-1"><span class="first">Husam</span> <span class="last">Sokar</span></h1>
       <p class="from">Harvard College &middot; from Fresno &amp; Clovis, California</p>
     </div>
     <div class="bill">
@@ -287,7 +379,13 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
       <p>A Resolution to Affirm Husam Sokar. Harvard sophomore in Applied Math in Government and Economics. Co-founder &amp; CEO of a stealth startup, backed by DoorDash&rsquo;s early team. NSDA National Finalist in Congressional Debate.</p>
     </div>
   </div>
+  <div class="rise" id="rise">
+    <p class="greet" id="greet" aria-hidden="true"><span>The chair recognizes the speaker</span></p>
+    <button type="button" class="rise-btn mag" id="rise-btn"><span class="mi">Recognize the speaker</span></button>
+    <div class="rise-meta"><span>or press <kbd>Enter</kbd></span><button type="button" class="rise-skip" id="rise-skip">Skip to the floor</button></div>
+  </div>
 </header>
+</div>
 
 <main class="wrap" id="main">
   <div class="col">
@@ -307,17 +405,17 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
       <p data-t>Representatives, the resolution in front of you asks one thing: affirm Husam Sokar.<span class="br" aria-hidden="true">/</span> Here is my thesis. <span class="ul">I learn how institutions actually run, and then I do the work inside them.</span><span class="br" aria-hidden="true">/</span> Three points: organizing, institutions, and building.</p>
 
       <p class="cue">Point one &middot; Organizing</p>
-      <p data-t>First, organizing. I grew up in Fresno and Clovis, in the Central Valley, doing billing and back-office work at my father&rsquo;s law firm.<span class="br" aria-hidden="true">/</span> From 2021 to 2025 I helped lead the Muslim Community Association of Fresno, a youth-driven nonprofit, and finished as Vice President and Executive Director. We ran <mark>more than 150 community events</mark>. We raised <mark>more than $240,000</mark> for Syrian and Afghan refugees and Pakistan flood victims.<span class="br" aria-hidden="true">/</span> And we secured a <mark>$500,000 pledge</mark> for Fresno&rsquo;s first transitional home for Muslim women, facing homelessness and domestic abuse.<span class="note" aria-hidden="true">slow down</span></p>
+      <p data-t>First, organizing. I grew up in Fresno and Clovis, in the Central Valley, doing billing and back-office work at my father&rsquo;s <a class="term" href="#n-firm" data-note="n-firm">law firm</a>.<span class="br" aria-hidden="true">/</span> From 2021 to 2025 I helped lead the <a class="term" href="#n-mcaf" data-note="n-mcaf">Muslim Community Association of Fresno</a>, a youth-driven nonprofit, and finished as Vice President and Executive Director. We ran <mark>more than 150 community events</mark>. We raised <mark>more than $240,000</mark> for Syrian and Afghan refugees and Pakistan flood victims.<span class="br" aria-hidden="true">/</span> And we secured a <mark>$500,000 pledge</mark> for Fresno&rsquo;s first transitional home for Muslim women, facing homelessness and domestic abuse.<span class="note" aria-hidden="true">slow down</span></p>
 
-      <p data-t>At the same time, in Sacramento, I was CAIR&rsquo;s lead community advocate for <span class="ul">AB 1766, California IDs for All</span>, working with the offices of Assemblymember Jim Patterson and Senator Shannon Grove. I also pushed bills on hate crimes, transit safety, street harassment, and biometric surveillance.<span class="br" aria-hidden="true">/</span> <mark>Five California bills</mark>, worked end to end.</p>
+      <p data-t>At the same time, in Sacramento, I was <a class="term" href="#n-cair" data-note="n-cair">CAIR</a>&rsquo;s lead community advocate for <a class="term" href="#n-ab1766" data-note="n-ab1766"><span class="ul">AB 1766, California IDs for All</span></a>, working with the offices of Assemblymember Jim Patterson and Senator Shannon Grove. I also pushed bills on hate crimes, transit safety, street harassment, and biometric surveillance.<span class="br" aria-hidden="true">/</span> <a class="term" href="#n-bills" data-note="n-bills"><mark>Five California bills</mark></a>, worked end to end.</p>
 
       <p class="cue">Point two &middot; Institutions</p>
-      <p data-t>Second, institutions. At Harvard I don&rsquo;t just join things; I help run them. I&rsquo;m a Chair on the senior staff of Harvard Model Congress, directing the Boston conference: North America&rsquo;s largest congressional simulation, with <mark>more than 1,500 delegates from more than 100 schools</mark>.<span class="br" aria-hidden="true">/</span> The debater now runs the debate.<span class="note" aria-hidden="true">look up</span></p>
+      <p data-t>Second, institutions. At Harvard I don&rsquo;t just join things; I help run them. I&rsquo;m a Chair on the senior staff of <a class="term" href="#n-hmc" data-note="n-hmc">Harvard Model Congress</a>, directing the Boston conference: North America&rsquo;s largest congressional simulation, with <mark>more than 1,500 delegates from more than 100 schools</mark>.<span class="br" aria-hidden="true">/</span> The debater now runs the debate.<span class="note" aria-hidden="true">look up</span></p>
 
-      <p data-t>At the Institute of Politics, I was an analyst on the Harvard Youth Poll, America&rsquo;s largest poll of 18-to-29-year-olds, and an associate to <span class="ul">Ambassador Katherine Tai</span>, the 19th U.S. Trade Representative.<span class="br" aria-hidden="true">/</span> On The Harvard Crimson&rsquo;s Business Board, I lead international writing and leadership camps. I traveled to <mark>South Korea</mark> to mentor students and teach two weeks of workshops.</p>
+      <p data-t>At the <a class="term" href="#n-iop" data-note="n-iop">Institute of Politics</a>, I was an analyst on the <a class="term" href="#n-poll" data-note="n-poll">Harvard Youth Poll</a>, America&rsquo;s largest poll of 18-to-29-year-olds, and an associate to <a class="term" href="#n-tai" data-note="n-tai"><span class="ul">Ambassador Katherine Tai</span></a>, the 19th U.S. Trade Representative.<span class="br" aria-hidden="true">/</span> On <a class="term" href="#n-crimson" data-note="n-crimson">The Harvard Crimson&rsquo;s Business Board</a>, I lead international writing and leadership camps. I traveled to <mark>South Korea</mark> to mentor students and teach two weeks of workshops.</p>
 
       <p class="cue">Point three &middot; Building</p>
-      <p data-t>Third, building. I started at fourteen, with a store called Electric Deals: retail arbitrage on Facebook and drop-shipping on eBay. <mark>More than 400 products shipped</mark>, and about $20,000 in revenue on Facebook alone, at roughly a 43 percent margin.<span class="br" aria-hidden="true">/</span> Today I&rsquo;m <span class="ul">Co-founder and CEO of a stealth startup, backed by DoorDash&rsquo;s early team</span>. I spent the summer of 2026 building it full-time in San Francisco. It&rsquo;s in stealth, so that is all I&rsquo;ll say from this podium.<span class="note" aria-hidden="true">smile</span></p>
+      <p data-t>Third, building. I started at fourteen, with a store called <a class="term" href="#n-ed" data-note="n-ed">Electric Deals</a>: retail arbitrage on Facebook and drop-shipping on eBay. <mark>More than 400 products shipped</mark>, and about $20,000 in revenue on Facebook alone, at roughly a 43 percent margin.<span class="br" aria-hidden="true">/</span> Today I&rsquo;m <a class="term" href="#n-startup" data-note="n-startup"><span class="ul">Co-founder and CEO of a stealth startup, backed by DoorDash&rsquo;s early team</span></a>. I spent the summer of 2026 building it full-time in San Francisco. It&rsquo;s in stealth, so that is all I&rsquo;ll say from this podium.<span class="note" aria-hidden="true">smile</span></p>
 
       <p class="cue">Impacts</p>
       <p data-t>The impact: each point is the same move at a different scale.<span class="br" aria-hidden="true">/</span> In Sacramento, I learned how a bill moves, then worked five of them end to end. At Harvard Model Congress, I learned how a chamber runs, then helped direct one for more than 1,500 delegates.<span class="br" aria-hidden="true">/</span> That is the pattern you&rsquo;re voting on: learn the institution, then do the work inside it.</p>
@@ -342,6 +440,22 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
       </svg>
       <p><b>The Chair</b>Thank you, Representative. That is time. We now move into a period of questioning.</p>
     </div>
+
+    <p class="fn-h" id="fn-h">Notes to the manuscript</p>
+    <ol class="fn" aria-labelledby="fn-h">
+      <li id="n-firm"><b>Law firm.</b> Admin assistant at my father&rsquo;s law firm, working billing and back-office operations.</li>
+      <li id="n-mcaf"><b>Muslim Community Association of Fresno.</b> Youth-driven nonprofit. Board member from Sep 2021; VP &amp; Executive Director, May 2022&ndash;Dec 2025 (earlier Director of Outreach, Relations, and External Relations). 150+ events; $240K+ raised; $500K pledge for Fresno&rsquo;s first Muslim women&rsquo;s transitional home. Clothing and food drives, mentoring groups at local mosques and Islamic schools.</li>
+      <li id="n-cair"><b>CAIR.</b> Lead Advocate, May 2021&ndash;May 2023, Sacramento.</li>
+      <li id="n-ab1766"><b>AB 1766 (California IDs for All).</b> Lead community advocate. Worked with Asm. Jim Patterson&rsquo;s office (Legislative Director Ian Coolbear) and Sen. Shannon Grove&rsquo;s office.</li>
+      <li id="n-bills"><b>Five bills.</b> AB 1766, California IDs for All; AB 1947, Freedom from Hate Crimes; SB 1161, Transit Safety; AB 2549, Ending Street Harassment; SB 1038, limits on biometric surveillance by law enforcement.</li>
+      <li id="n-hmc"><b>Harvard Model Congress.</b> Staff since Sep 2025; Chair (Senior Staff) since Jan 2026. Boston: 1,500+ delegates, 100+ schools. Also staffing HMC Europe: 500+ delegates, 20+ countries.</li>
+      <li id="n-iop"><b>Institute of Politics, Harvard Kennedy School.</b> Sep 2025&ndash;May 2026. Also consulting for the Red Cross and the United Nations. Summer 2025: Fellow, Policy Program in Economics, researching the impact of international students on Harvard and U.S. universities.</li>
+      <li id="n-poll"><b>Harvard Youth Poll.</b> America&rsquo;s largest poll of 18&ndash;29-year-olds. I was an analyst.</li>
+      <li id="n-tai"><b>Ambassador Katherine Tai.</b> 19th U.S. Trade Representative. I was her associate at the IOP.</li>
+      <li id="n-crimson"><b>The Harvard Crimson Business Board.</b> The nation&rsquo;s oldest daily college newspaper (est. 1873). Project Team Lead, TPR/AlgoEd, since Dec 2025: international camps with The Princeton Review and AlgoEd. Earlier, Global Programs Associate: moderated and judged international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.</li>
+      <li id="n-ed"><b>Electric Deals.</b> Mar&ndash;Oct 2020, at 14&ndash;15. Facebook retail arbitrage: 131+ positive reviews, 400+ products shipped, ~$20,000 revenue, ~43% margin. eBay drop-shipping: 150+ positive reviews, ~$8,000 revenue, ~39% margin.</li>
+      <li id="n-startup"><b>Stealth startup.</b> Co-founder &amp; CEO since June 2026, full-time. Backed by DoorDash&rsquo;s early team. Summer 2026 in San Francisco. It&rsquo;s in stealth; that&rsquo;s all for now.</li>
+    </ol>
   </article>
 
   <section class="sec" id="questions" aria-labelledby="q-h">
@@ -489,7 +603,9 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
         <dt>LinkedIn</dt>
         <dd><a href="https://www.linkedin.com/in/husam-sokar-089648227/" target="_blank" rel="noopener">linkedin.com/in/husam-sokar-089648227</a></dd>
         <dt>Email</dt>
-        <dd>[email]<!-- PLACEHOLDER: Husam's email address --></dd>
+        <dd class="copyrow"><span id="email">[email]</span><!-- PLACEHOLDER: Husam's email address (also set data-copy on the button) -->
+          <button type="button" class="copy mag" id="copy" data-copy="[email]" aria-describedby="email"><span class="c1">Copy</span><span class="c2" aria-hidden="true"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7.5l3.2 3L12 3.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"/></svg>Copied</span></button>
+          <span class="sr" role="status" id="copy-status"></span></dd>
       </dl>
     </div>
   </section>
@@ -497,13 +613,17 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
   </div>
 </main>
 
+<div class="pop" id="pop" role="tooltip" hidden></div>
 <footer class="wrap"><div class="col">Motion to adjourn. &nbsp;Husam Sokar &middot; Cambridge, MA and Fresno, CA</div></footer>
 
 <aside class="tk away" id="tk" aria-label="Timekeeper">
   <p class="tk-clock"><small>Time left</small><span id="tk-time" aria-live="off">3:00</span></p>
+  <button type="button" class="snd mag" data-sound aria-pressed="false"><i aria-hidden="true"></i>Sound off</button>
+  <span class="tk-prog" id="tk-prog" aria-hidden="true"></span>
   <div class="tk-board" id="tk-board">
     <div class="rings" aria-hidden="true"><i></i><i></i></div>
-    <div class="stack" aria-hidden="true">
+    <span class="toss" aria-hidden="true">grab a card and toss it</span>
+    <div class="stack" id="stack" aria-hidden="true">
       <div class="tcard">3<span class="lbl">minutes</span></div>
       <div class="tcard">2<span class="lbl">minutes left</span></div>
       <div class="tcard">1<span class="lbl">minute left</span></div>
@@ -544,7 +664,7 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
   var tk=document.getElementById('tk'),board=document.getElementById('tk-board'),out=document.getElementById('tk-time');
   var cards=[].slice.call(document.querySelectorAll('.tcard'));
   var speech=document.getElementById('speech'),chair=document.getElementById('chair');
-  var cur=-1,ticking=false,hot=-1,struck=false;
+  var cur=-1,ticking=false,hot=-1,struck=false,prog=document.getElementById('tk-prog');
 
   function remaining(){
     var line=window.innerHeight*0.55,words=0;
@@ -565,10 +685,12 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
     var rem=TOTAL*(1-pos.w/totalWords);
     var done=pos.i>=paras.length;
     out.textContent=done?'0:00':fmt(rem);
+    prog.style.setProperty('--p',Math.min(1,Math.max(0,pos.w/totalWords)).toFixed(4));
     var idx=cardFor(rem,done);
     if(idx!==cur){
       cards.forEach(function(c,k){c.classList.toggle('up',k<idx);c.style.zIndex=20-k;});
-      if(cur!==-1&&!reduce){board.classList.add('bump');setTimeout(function(){board.classList.remove('bump');},260);}
+      releaseCard();
+      if(cur!==-1){snap(idx===5?0.9:0.6);if(!reduce){board.classList.add('bump');setTimeout(function(){board.classList.remove('bump');},260);}}
       cur=idx;
     }
     if(pos.i!==hot){
@@ -579,7 +701,7 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
     tk.classList.toggle('away',!show);
     if(done&&!struck){
       var cr=chair.getBoundingClientRect();
-      if(cr.top<vh*0.9&&cr.bottom>0){struck=true;if(!reduce)chair.classList.add('strike');}
+      if(cr.top<vh*0.9&&cr.bottom>0){struck=true;if(!reduce)chair.classList.add('strike');setTimeout(gavel,reduce?0:420);}
     }
   }
   function onScroll(){if(!ticking){ticking=true;requestAnimationFrame(update);}}
@@ -587,11 +709,183 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
   window.addEventListener('resize',onScroll);
   update();
 
+
+  /* ================= sound (opt-in, synthesized) ================= */
+  var ac=null,soundOn=false;
+  function actx(){
+    if(!ac){var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;ac=new AC();}
+    if(ac.state==='suspended')ac.resume();return ac;
+  }
+  function noise(a,dur){var n=Math.floor(a.sampleRate*dur),b=a.createBuffer(1,n,a.sampleRate),d=b.getChannelData(0);for(var i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);return b;}
+  function burst(a,t0,dur,type,freq,q,gain){
+    var s=a.createBufferSource();s.buffer=noise(a,dur);
+    var f=a.createBiquadFilter();f.type=type;f.frequency.value=freq;f.Q.value=q;
+    var g=a.createGain();g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(gain,t0+0.003);g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    s.connect(f);f.connect(g);g.connect(a.destination);s.start(t0);s.stop(t0+dur+0.02);
+  }
+  function snap(v){
+    if(!soundOn)return;var a=actx();if(!a)return;var t0=a.currentTime+0.01;v=v||0.6;
+    burst(a,t0,0.05,'bandpass',2600,0.8,0.5*v);          // cardstock whip
+    burst(a,t0+0.085,0.035,'highpass',1800,0.7,0.35*v);  // lands on the stack
+  }
+  function knock(a,t0,g0){
+    var o=a.createOscillator(),g=a.createGain();o.type='sine';
+    o.frequency.setValueAtTime(190,t0);o.frequency.exponentialRampToValueAtTime(62,t0+0.16);
+    g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(g0,t0+0.004);g.gain.exponentialRampToValueAtTime(0.0001,t0+0.22);
+    o.connect(g);g.connect(a.destination);o.start(t0);o.stop(t0+0.25);
+    burst(a,t0,0.045,'bandpass',950,2.5,g0*0.7);         // hard maple crack
+  }
+  function gavel(){if(!soundOn)return;var a=actx();if(!a)return;var t0=a.currentTime+0.01;knock(a,t0,0.9);knock(a,t0+0.11,0.18);}
+  var sndBtns=[].slice.call(document.querySelectorAll('[data-sound]'));
+  function setSound(on){
+    soundOn=on;
+    sndBtns.forEach(function(b){b.setAttribute('aria-pressed',on?'true':'false');b.lastChild.textContent=on?'Sound on':'Sound off';});
+  }
+  sndBtns.forEach(function(b){b.addEventListener('click',function(){setSound(!soundOn);if(soundOn){actx();snap(0.7);}});});
+
+  /* ================= RISE: recognize the speaker ================= */
+  var chamber=document.getElementById('chamber'),riseBtn=document.getElementById('rise-btn'),greetEl=document.getElementById('greet');
+  var greetings=[['en','The chair recognizes the speaker'],['ar','الرئاسة تمنح الكلمة للمتحدث'],['en','Thank you, Presiding Officer'],['ar','شكرًا، حضرة رئيس الجلسة']];
+  var gi=0,gTimer=null,dark=false;
+  function rise(focusName){
+    if(!dark)return;dark=false;clearInterval(gTimer);
+    chamber.classList.remove('dark');chamber.classList.add('lit');
+    window.removeEventListener('scroll',riseOnScroll);document.removeEventListener('keydown',riseOnKey);
+    if(focusName){var n=document.getElementById('name');n.focus({preventScroll:true});}
+    gavel();onScroll();
+  }
+  function riseOnScroll(){if(window.scrollY>60)rise(false);}
+  function riseOnKey(e){
+    if(e.key==='Enter'&&!(e.target&&e.target.closest&&e.target.closest('a,.rise-skip,.snd'))){e.preventDefault();rise(true);}
+    else if(e.key==='Escape'){rise(false);}
+  }
+  if(!reduce&&window.scrollY<40&&!location.hash){
+    dark=true;chamber.classList.add('dark');
+    gTimer=setInterval(function(){
+      gi=(gi+1)%greetings.length;var g=greetings[gi],s=document.createElement('span');
+      s.textContent=g[1];s.setAttribute('lang',g[0]);if(g[0]==='ar')s.setAttribute('dir','rtl');
+      greetEl.replaceChildren(s);
+    },1700);
+    riseBtn.addEventListener('click',function(){rise(true);});
+    document.getElementById('rise-skip').addEventListener('click',function(){rise(false);document.getElementById('speech').scrollIntoView({block:'start'});});
+    window.addEventListener('scroll',riseOnScroll,{passive:true});
+    document.addEventListener('keydown',riseOnKey);
+    riseBtn.focus({preventScroll:true});
+    onScroll();
+  }
+
+  /* ================= magnetic buttons (fine pointers) ================= */
+  if(!reduce&&window.matchMedia('(pointer: fine)').matches){
+    var magRaf=0,mx=-1e4,my=-1e4;
+    window.addEventListener('pointermove',function(e){mx=e.clientX;my=e.clientY;if(!magRaf)magRaf=requestAnimationFrame(magnet);},{passive:true});
+    function magnet(){
+      magRaf=0;
+      [].slice.call(document.querySelectorAll('.mag')).forEach(function(el){
+        var r=el.getBoundingClientRect();if(!r.width)return;
+        var cx=r.left+r.width/2,cy=r.top+r.height/2,dx=mx-cx,dy=my-cy;
+        var reach=Math.max(r.width,r.height)/2+70,d=Math.hypot(dx,dy);
+        if(d<reach){var k=(1-d/reach)*0.42;
+          el.style.setProperty('--mx',(dx*k).toFixed(1)+'px');el.style.setProperty('--my',(dy*k).toFixed(1)+'px');
+          el.style.setProperty('--ix',(dx*k*0.45).toFixed(1)+'px');el.style.setProperty('--iy',(dy*k*0.45).toFixed(1)+'px');
+        }else if(el.style.getPropertyValue('--mx')){['--mx','--my','--ix','--iy'].forEach(function(p){el.style.removeProperty(p);});}
+      });
+    }
+  }
+
+  /* ================= draggable, tossable cards ================= */
+  var stack=document.getElementById('stack'),drag=null,spring=null;
+  function wide(){return window.matchMedia('(min-width: 1100px) and (pointer: fine)').matches;}
+  function releaseCard(){
+    if(spring){cancelAnimationFrame(spring.raf);spring=null;}
+    if(drag){drag=null;stack.classList.remove('grabbing');}
+    cards.forEach(function(c){c.style.transform='';c.style.transition='';c.classList.remove('held');});
+  }
+  function place(c,x,y,r){c.style.transform='translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px) rotate('+r.toFixed(2)+'deg)';}
+  stack.addEventListener('pointerdown',function(e){
+    if(!wide()||cur<0)return;
+    releaseCard();
+    var c=cards[cur];stack.setPointerCapture(e.pointerId);stack.classList.add('grabbing');
+    c.classList.add('held');c.style.transition='none';
+    drag={c:c,x0:e.clientX,y0:e.clientY,x:0,y:0,vx:0,vy:0,t:performance.now()};
+  });
+  stack.addEventListener('pointermove',function(e){
+    if(!drag)return;var now=performance.now(),dt=Math.max(8,now-drag.t);
+    var nx=e.clientX-drag.x0,ny=e.clientY-drag.y0;
+    drag.vx=(nx-drag.x)/dt*1000;drag.vy=(ny-drag.y)/dt*1000;drag.x=nx;drag.y=ny;drag.t=now;
+    place(drag.c,nx,ny,nx*0.06);
+  });
+  function letGo(){
+    if(!drag)return;var c=drag.c,s={c:c,x:drag.x,y:drag.y,vx:drag.vx,vy:drag.vy,r:drag.x*0.06,vr:drag.vx*0.02,last:performance.now()};
+    drag=null;stack.classList.remove('grabbing');
+    if(reduce){releaseCard();return;}
+    if(Math.hypot(s.vx,s.vy)>400)snap(0.5);
+    var landed=false;
+    function step(now){
+      var dt=Math.min(0.032,(now-s.last)/1000);s.last=now;
+      var k=160,d=11;                                  // stiff spring, a little wobble
+      s.vx+=(-k*s.x-d*s.vx)*dt;s.vy+=(-k*s.y-d*s.vy)*dt;s.vr+=(-k*s.r-d*s.vr)*dt;
+      s.x+=s.vx*dt;s.y+=s.vy*dt;s.r+=s.vr*dt;place(c,s.x,s.y,s.r);
+      if(!landed&&Math.hypot(s.x,s.y)<6&&Math.hypot(s.vx,s.vy)<600){landed=true;snap(0.35);}
+      if(Math.abs(s.x)+Math.abs(s.y)<0.4&&Math.abs(s.vx)+Math.abs(s.vy)<4&&Math.abs(s.r)<0.1){spring=null;c.style.transform='';c.style.transition='';c.classList.remove('held');return;}
+      spring.raf=requestAnimationFrame(step);
+    }
+    spring={raf:requestAnimationFrame(step)};
+  }
+  stack.addEventListener('pointerup',letGo);stack.addEventListener('pointercancel',letGo);
+
+  /* ================= gwern-style popover notes ================= */
+  var pop=document.getElementById('pop'),popFor=null,hideT=0,showT=0;
+  function showPop(a){
+    clearTimeout(hideT);var li=document.getElementById(a.getAttribute('data-note'));if(!li)return;
+    if(popFor&&popFor!==a)popFor.setAttribute('aria-expanded','false');
+    pop.innerHTML='<span class="ptag">Note '+a.getAttribute('data-n')+'</span>'+li.innerHTML;
+    pop.hidden=false;popFor=a;a.setAttribute('aria-expanded','true');a.setAttribute('aria-describedby','pop');
+    var rects=a.getClientRects(),r=rects[0]||a.getBoundingClientRect(),pw=pop.offsetWidth,ph=pop.offsetHeight,vw=document.documentElement.clientWidth;
+    var left=Math.min(Math.max(12,r.left-8),vw-pw-12),top=r.bottom+10;
+    if(top+ph>window.innerHeight-12)top=Math.max(12,r.top-ph-10);
+    pop.style.left=left+'px';pop.style.top=top+'px';pop.style.setProperty('--ox',Math.max(10,r.left-left)+'px');
+  }
+  function hidePop(){if(!popFor)return;pop.hidden=true;popFor.setAttribute('aria-expanded','false');popFor.removeAttribute('aria-describedby');popFor=null;}
+  var fine=window.matchMedia('(hover: hover)').matches;
+  [].slice.call(document.querySelectorAll('a.term')).forEach(function(a,i){
+    a.setAttribute('data-n',String(i+1));a.setAttribute('aria-expanded','false');
+    if(fine){
+      a.addEventListener('mouseenter',function(){clearTimeout(showT);showT=setTimeout(function(){showPop(a);},110);});
+      a.addEventListener('mouseleave',function(){clearTimeout(showT);hideT=setTimeout(hidePop,220);});
+    }
+    a.addEventListener('focus',function(){showPop(a);});
+    a.addEventListener('blur',function(){hideT=setTimeout(hidePop,150);});
+    a.addEventListener('click',function(e){
+      if(!fine){e.preventDefault();if(popFor===a)hidePop();else showPop(a);}
+    });
+  });
+  pop.addEventListener('mouseenter',function(){clearTimeout(hideT);});
+  pop.addEventListener('mouseleave',function(){hideT=setTimeout(hidePop,200);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')hidePop();});
+  document.addEventListener('click',function(e){if(popFor&&!e.target.closest('a.term,.pop'))hidePop();});
+  window.addEventListener('scroll',function(){if(popFor&&!pop.matches(':hover'))hidePop();},{passive:true});
+
+  /* ================= copy control ================= */
+  var copyBtn=document.getElementById('copy'),copyStatus=document.getElementById('copy-status'),copyT=0;
+  function copied(){
+    copyBtn.classList.add('done');copyStatus.textContent='Copied to clipboard';
+    clearTimeout(copyT);copyT=setTimeout(function(){copyBtn.classList.remove('done');copyStatus.textContent='';},1800);
+  }
+  function fallbackCopy(txt){
+    var ta=document.createElement('textarea');ta.value=txt;ta.setAttribute('readonly','');ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(err){}ta.remove();return ok;
+  }
+  copyBtn.addEventListener('click',function(){
+    var txt=copyBtn.getAttribute('data-copy');
+    if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(txt).then(copied,function(){if(fallbackCopy(txt))copied();});}
+    else if(fallbackCopy(txt))copied();
+  });
+
   // questioning: recognize a questioner
   var askers=document.getElementById('askers');
   [].slice.call(document.querySelectorAll('#qa details')).forEach(function(d,n){
     var li=document.createElement('li'),b=document.createElement('button');
-    b.type='button';b.setAttribute('aria-pressed','false');
+    b.type='button';b.className='mag';b.setAttribute('aria-pressed','false');
     b.textContent=d.querySelector('summary').lastChild.textContent;
     b.addEventListener('click',function(){
       b.setAttribute('aria-pressed','true');
