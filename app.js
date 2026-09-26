@@ -6,10 +6,8 @@
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   function $(s, r) { return (r || document).querySelector(s); }
   function $$(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
-  var store = {
-    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
-  };
+  // Nothing is remembered between visits: every open is a first visit.
+  var store = { get: function () { return null; }, set: function () {} };
   function pad(n) { return String(n).padStart(2, '0'); }
   function hashStr(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 
@@ -460,7 +458,7 @@
     }
   }
   var hello = $('#hello'), seen = false;
-  try { seen = sessionStorage.getItem('hw:hello') === '1'; sessionStorage.setItem('hw:hello', '1'); } catch (e) { seen = true; }
+  try { history.scrollRestoration = 'manual'; } catch (e) {}
   if (reduce || seen || location.hash) { start(); return; }
   var words = ['hello', 'hola', 'مرحبا', 'bonjour', 'ciao', 'こんにちは', 'olá', 'husam.world'], wi = 0, done = false;
   var span = hello.querySelector('span');

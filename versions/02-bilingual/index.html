@@ -257,7 +257,8 @@ footer .ar{font-size:1rem}
 /* greeting: Hello / مرحبا, resolving into the name. Under 1.4s, skippable, never shown with reduced motion. */
 (function(){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  try{ if(sessionStorage.getItem('hs-greet')) return; sessionStorage.setItem('hs-greet','1'); }catch(e){}
+  if(location.hash) return;
+  try{ history.scrollRestoration='manual'; }catch(e){} window.scrollTo(0,0);
   var d=document.createElement('div'); d.className='intro'; d.setAttribute('aria-hidden','true');
   d.innerHTML='<div class="intro-en" lang="en"></div><div class="intro-ar" lang="ar" dir="rtl"></div>';
   document.body.appendChild(d);

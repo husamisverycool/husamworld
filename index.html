@@ -33,7 +33,6 @@
     // Decide the lens before first paint so there's no flash.
     (function () {
       var lens = null;
-      try { lens = localStorage.getItem('hw:lens'); } catch (e) {}
       if (!lens) {
         var wide = matchMedia('(min-width: 800px)').matches;
         var still = matchMedia('(prefers-reduced-motion: reduce)').matches;

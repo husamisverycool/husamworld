@@ -759,6 +759,7 @@ footer{font-family:var(--sans);font-size:13px;color:#3b2c17;padding:40px 0 120px
     if(e.key==='Enter'&&!(e.target&&e.target.closest&&e.target.closest('a,.rise-skip,.snd'))){e.preventDefault();rise(true);}
     else if(e.key==='Escape'){rise(false);}
   }
+  if(!location.hash){try{history.scrollRestoration='manual';}catch(e){} window.scrollTo(0,0);}
   if(!reduce&&window.scrollY<40&&!location.hash){
     dark=true;chamber.classList.add('dark');
     gTimer=setInterval(function(){
