@@ -113,13 +113,13 @@
     var x = this.x, css = this.css, dpr = this.dpr, rad = css * this.o.planet / 2, cx = css / 2, cy = css / 2 + (this.o.dy || 0) * css;
     var f = B.f, u = B.u, r = B.r;
     // ground, per pixel at a low resolution (the hub's colour rules + two-band toon light + coloured shadow)
-    var res = this.g.width, d = this.img.data, k = 0;
+    var res = this.g.width, d = this.img.data, k = 0, fields = this.o.detail;
     for (var py = 0; py < res; py++) for (var px = 0; px < res; px++, k += 4) {
       var sx = (px + .5) / res * 2 - 1, sy = 1 - (py + .5) / res * 2, rr = sx * sx + sy * sy;
       if (rr > 1) { d[k + 3] = 0; continue; }
       var sz = Math.sqrt(1 - rr), n = [sx * r[0] + sy * u[0] + sz * f[0], sx * r[1] + sy * u[1] + sz * f[1], sx * r[2] + sy * u[2] + sz * f[2]];
       var lat = Math.asin(clamp(n[1], -1, 1)) / DEG, nz = vnoise(n[0] * 3.1 + 7, n[1] * 3.1, n[2] * 3.1) - .5, nz2 = vnoise(n[0] * 9, n[1] * 9 + 3, n[2] * 9);
-      var base = lat + nz * 40 < -4 ? GOLD : GREEN; if (nz2 > .7) base = lat < 5 ? FIELD : SPRING; if (lat > 58 + nz * 10) base = GREEN;
+      var base = lat + nz * 40 < -4 ? GOLD : GREEN; if (fields && nz2 > .7) base = lat < 5 ? FIELD : SPRING; if (lat > 58 + nz * 10) base = GREEN;
       var dl = sx * LDIR[0] + sy * LDIR[1] + sz * LDIR[2], band = smooth(-.01, .05, dl), hi = smooth(.74, .8, dl) * .07, rim = Math.pow(1 - sz, 3) * .16 * band;
       for (var c = 0; c < 3; c++) {
         var lit = base[c] * LIGHT[c], sh = base[c] + (base[c] * SHADOW[c] - base[c]) * .62;
@@ -132,8 +132,9 @@
     function P(p, lift) { var q = lift ? scale(p, 1 + lift) : p; return [cx + dot(q, r) * rad, cy - dot(q, u) * rad, dot(p, f)]; }
     var lw = this.o.line, tr = rad * .052 * this.o.tree;
     // trees behind the limb first, so the ones on the far side peek over the horizon like on the title planet
+    var faceMax = this.o.faceTrees;
     function tree(t, front) {
-      var z = dot(t.p, f); if (front ? z < 0 : (z >= 0 || z < -.16)) return;
+      var z = dot(t.p, f); if (front ? (z < 0 || z > faceMax) : (z >= 0 || z < -.16)) return;
       var q = P(t.p, .075 * t.s), s = tr * t.s;
       x.beginPath(); x.arc(q[0], q[1], s, 0, TAU); x.fillStyle = t.c; x.fill(); x.lineWidth = lw * .7; x.strokeStyle = INK; x.stroke();
     }
@@ -251,7 +252,7 @@
         'a.row:hover .dia,a.row.on .dia,a.row:focus-visible .dia{transform:rotate(45deg) scale(1.35)}' +
         '.here{cursor:default}' +
         // narrow screens: planet and the way home side by side, the list below
-        '@media (max-width:560px){.inner{grid-template-columns:146px 1fr;grid-template-rows:auto auto;grid-template-areas:"map home" "list list";gap:12px}.map{width:146px;height:146px}.home{align-self:end;margin-bottom:9px;font-size:14px;padding:12px 10px 10px}}' +
+        '@media (max-width:560px){.inner{grid-template-columns:136px 1fr;grid-template-rows:auto auto;grid-template-areas:"map home" "list list";gap:10px 12px;padding:12px}.map{width:136px;height:136px}.row{min-height:42px;padding:4px 8px 4px 6px}.row b{font-size:14px}.row span{font-size:13.5px;margin-top:1px}.home{align-self:end;margin-bottom:9px;font-size:14px;padding:12px 10px 10px}}' +
         '@media (max-height:520px) and (min-width:561px){.inner{grid-template-columns:150px 1fr}.map{width:150px;height:150px}}' +
         // stagger the list in (paco.me\'s data-animate: each item a beat after the last)
         '.panel.in li,.panel.in .home{animation:rise .34s cubic-bezier(.23,1,.32,1) both;animation-delay:calc(var(--i) * 22ms + 60ms)}' +
@@ -278,8 +279,8 @@
 
       // ---------------------------------------------------------- the two planets
       var carT = hereSite[0];
-      var mini = new Planet($('.mini'), { planet: .82, line: 1.6, tree: 1.35, roadScale: 1.25, roadSteps: 360, detail: false, car: .2, groundMax: 2, dy: -.02 });
-      var big = new Planet($('.big'), { planet: .8, line: 2, tree: 1, roadScale: 1, roadSteps: 700, detail: true, car: .12, groundMax: 1.25 });
+      var mini = new Planet($('.mini'), { planet: .82, line: 1.6, tree: 1.5, roadScale: 1.3, roadSteps: 360, detail: false, car: .34, groundMax: 2, dy: -.02, faceTrees: .3 });
+      var big = new Planet($('.big'), { planet: .8, line: 2, tree: 1, roadScale: 1, roadSteps: 700, detail: true, car: .13, groundMax: 1.25, faceTrees: .55 });
       mini.size(56);
       // the trigger looks down at the car, nose up the screen: the planet as you see it while driving
       var miniB = basis(norm(mix(road(carT), roadTan(carT), -.28)), roadTan(carT));
@@ -287,7 +288,7 @@
       function drawMini() { mini.draw(miniB, { car: carT, hop: hop }); }
       drawMini();
 
-      var cur = null, want = null, raf = 0, last = 0, bigSize = 0, pinEls = $$('.pin'), active = null;
+      var flying = false, cur = null, want = null, raf = 0, last = 0, bigSize = 0, pinEls = $$('.pin'), active = null;
       function homeView() { var s = SITE[here]; return s ? facing(ll(s[1], s[2])) : facing(road(0)); }
       function sizeBig() { var s = Math.round(map.getBoundingClientRect().width) || 200; if (s !== bigSize) { bigSize = s; big.size(s); } }
       function drawBig() {
@@ -332,7 +333,8 @@
           var dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = (a.top + a.height / 2) - (b.top + b.height / 2);
           inner.style.overflow = 'visible';
           map.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')', background: 'transparent', boxShadow: 'none' }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.32,.72,0,1)' })
-            .onfinish = function () { inner.style.overflow = ''; };
+            .onfinish = function () { inner.style.overflow = ''; flying = false; };
+          flying = true;
           $('.paper').animate([{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 240, easing: 'cubic-bezier(.23,1,.32,1)' });
           // the map turns from the driver's view to north-up while it grows, then the car hops once
           var from = miniB; cur = from; want = homeView(); drawBig(); last = performance.now(); if (!raf) raf = requestAnimationFrame(tick);
@@ -371,12 +373,12 @@
       // ---------------------------------------------------------- the station camera: point at a place and the planet turns to show it
       $$('a.row').forEach(function (a) {
         var id = a.getAttribute('data-id');
-        a.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'touch') focusPlace(id); });
+        a.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse' && !flying) focusPlace(id); });
         a.addEventListener('focus', function () { focusPlace(id); });
       });
       pinEls.forEach(function (a) {
         var id = a.getAttribute('data-id');
-        a.addEventListener('pointerenter', function () { pinEls.forEach(function (el) { el.classList.toggle('on', el === a); }); $$('a.row').forEach(function (el) { el.classList.toggle('on', el.getAttribute('data-id') === id); }); });
+        a.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'mouse' || flying) return; pinEls.forEach(function (el) { el.classList.toggle('on', el === a); }); $$('a.row').forEach(function (el) { el.classList.toggle('on', el.getAttribute('data-id') === id); }); });
       });
       map.addEventListener('pointerleave', function () { if (active) focusPlace(active); });
       // drag the planet round (the hub's map lets you do the same)

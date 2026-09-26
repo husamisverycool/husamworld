@@ -152,6 +152,7 @@ html.os-live #page{display:none}
 .win{position:absolute;display:flex;flex-direction:column;background:var(--lg);padding:3px;box-shadow:var(--win);pointer-events:auto;min-width:0;max-width:100%}
 .win.min{visibility:hidden;pointer-events:none}
 .win-bar{height:20px;flex:none;display:flex;align-items:center;gap:4px;background:var(--navy);color:#fff;padding:0 2px 0 3px;touch-action:none}
+@media (pointer:fine){.win:not(.max) .win-bar{cursor:move}.win-bar .wb{cursor:pointer}}
 .win.inactive .win-bar{background:var(--dg)}
 .win.inactive .win-title{color:var(--lg)}
 .win.inactive .win-ico{opacity:.5}
@@ -185,11 +186,11 @@ html.os-live #page{display:none}
 @keyframes shake{10%,90%{translate:-2px 0}20%,80%{translate:4px 0}30%,50%,70%{translate:-8px 0}40%,60%{translate:8px 0}}
 
 #dragframe{position:absolute;z-index:99990;pointer-events:none;mix-blend-mode:difference;display:none}
-#dragframe i{position:absolute;background:#fff linear-gradient(45deg,#000 25%,transparent 25%,transparent 75%,#000 75%) 0 0/2px 2px}
-#dragframe i:nth-child(1){left:0;right:0;top:0;height:5px}
-#dragframe i:nth-child(2){left:0;right:0;bottom:0;height:5px}
-#dragframe i:nth-child(3){left:0;top:0;bottom:0;width:5px}
-#dragframe i:nth-child(4){right:0;top:0;bottom:0;width:5px}
+#dragframe i{position:absolute;background-color:#fff;background-image:linear-gradient(45deg,#000 25%,transparent 25%),linear-gradient(-45deg,#000 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#000 75%),linear-gradient(-45deg,transparent 75%,#000 75%);background-size:4px 4px;background-position:0 0,0 2px,2px -2px,-2px 0}
+#dragframe i:nth-child(1){left:0;right:0;top:0;height:6px}
+#dragframe i:nth-child(2){left:0;right:0;bottom:0;height:6px}
+#dragframe i:nth-child(3){left:0;top:0;bottom:0;width:6px}
+#dragframe i:nth-child(4){right:0;top:0;bottom:0;width:6px}
 .dim{position:absolute;inset:0;z-index:99980;background:conic-gradient(#000 25%,transparent 0 50%,#000 0 75%,transparent 0) 0 0/2px 2px;opacity:.55}
 .modal-shield{position:absolute;inset:0;z-index:99980}
 
@@ -351,7 +352,6 @@ html.os-live #page{display:none}
 .ed-logo i{width:30px;height:30px;border-radius:50%;background:#111;display:grid;place-items:center;flex:none}
 .ed-logo svg{width:14px;height:20px}
 .ed-search{flex:1;min-width:60px;max-width:280px;background:#f0f2f5;border-radius:20px;padding:7px 14px;color:#65676b;font-size:14px;white-space:nowrap;overflow:hidden}
-.ed-note{margin:10px 14px 0;padding:8px 12px;background:#fff8d6;border:1px solid #f1d77a;border-radius:8px;font-size:13px;color:#5c4b00}
 .ed-wrap{padding:12px 14px 18px;display:flex;flex-direction:column;gap:12px}
 .ed-card{background:#fff;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.2);padding:16px}
 .ed-hero{display:flex;gap:14px;align-items:center}
@@ -361,15 +361,11 @@ html.os-live #page{display:none}
 .ed-hero p{margin:3px 0 0;color:#65676b;font-size:14px}
 .ed-shops{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
 .ed-shop h4{margin:0 0 2px;font-size:17px}
-.ed-kind{display:inline-block;margin:0 0 10px;padding:2px 9px;border-radius:12px;background:#e7f3ff;color:#1b4f8a;font-size:12px;font-weight:600}
+.ed-kind{margin:0 0 10px;color:#65676b;font-size:14px}
 .ed-rows{margin:0;display:grid;grid-template-columns:1fr auto;border-top:1px solid #e4e6eb}
 .ed-rows dt,.ed-rows dd{margin:0;padding:8px 0;border-bottom:1px solid #e4e6eb}
 .ed-rows dt{color:#65676b;font-size:14px}
 .ed-rows dd{font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
-.ed-how h4{margin:0 0 6px;font-size:17px}
-.ed-how p{margin:0 0 8px}
-.ed-total{margin:0;padding:10px 12px;border-radius:8px;background:#111;color:#fff;font-weight:600}
-.ed-total b{color:#ffd400}
 .ed-foot{text-align:center;color:#8a8d91;font-size:12px;padding:4px 0 8px}
 .ed a{color:#216fdb}
 
@@ -536,6 +532,8 @@ html.noglass .g-scan,html.noglass .g-flick,html.noglass .g-smudge{display:none}
   .wb.mx{display:none}
   .wb.x{margin-left:4px}
   .st-grip svg{display:none}
+  /* full-screen sheets: the status bar starts after the bottom-left 72px corner (kept free for the world button) */
+  html.os-live .win:not(.dialog) .win-status{padding-left:70px}
   .st-sp{display:none}
   .doc{padding:20px 18px 24px}
   .task{flex:0 0 38px;padding:0;justify-content:center}
@@ -573,13 +571,12 @@ html.noglass .g-scan,html.noglass .g-flick,html.noglass .g-smudge{display:none}
 .pg-doc a:visited{color:#551a8b}
 .pg-doc a:focus-visible,.pg-tools a:focus-visible{outline:2px dotted #000;outline-offset:2px}
 .pg-doc hr{border:0;height:2px;margin:28px 0 0;box-shadow:inset 0 1px var(--dg),inset 0 -1px #fff;background:var(--lg)}
-.pg-plaque{max-width:440px;margin:0 auto;padding:22px 26px 18px;text-align:center;color:#2a1a05;background:radial-gradient(ellipse at 30% 20%,rgba(255,236,190,.55),transparent 55%),linear-gradient(135deg,#c89c50,#8d6526 55%,#6b4a19);border:6px double #3f2a0c;box-shadow:inset 0 0 0 2px rgba(255,230,170,.45),0 2px 0 #000;text-shadow:0 1px 0 rgba(255,235,190,.5)}
-.pg-plaque .pl-t{font:700 clamp(34px,6vw,46px)/1 var(--serif);letter-spacing:.14em;text-transform:uppercase;margin:0}
-.pg-plaque .pg-sub{font:700 15px var(--serif);letter-spacing:.22em;text-transform:uppercase;margin:8px 0 14px;padding-bottom:12px;border-bottom:2px solid rgba(63,42,12,.6)}
-.pg-plaque dl{display:grid;grid-template-columns:auto auto;justify-content:center;gap:4px 18px;margin:0;font:700 17px/1.3 var(--serif);letter-spacing:.12em;text-transform:uppercase}
+.pg-plaque{max-width:440px;margin:0 auto;padding:24px 26px 18px;text-align:center;color:#2a1a05;background:radial-gradient(ellipse at 30% 20%,rgba(255,236,190,.55),transparent 55%),linear-gradient(135deg,#c89c50,#8d6526 55%,#6b4a19);border:6px double #3f2a0c;box-shadow:inset 0 0 0 2px rgba(255,230,170,.45),0 2px 0 #000;text-shadow:0 1px 0 rgba(255,235,190,.5);font-family:var(--serif)}
+.pg-plaque .pl-t{font:700 clamp(26px,4.4vw,34px)/1.1 var(--serif);letter-spacing:.03em;margin:0;padding-bottom:14px;border-bottom:2px solid rgba(63,42,12,.6)}
+.pg-plaque dl{display:grid;grid-template-columns:auto auto;justify-content:center;gap:4px 18px;margin:14px 0 0;font:700 18px/1.3 var(--serif);letter-spacing:.03em}
 .pg-plaque dt{text-align:right}.pg-plaque dd{margin:0;text-align:left}
 .pg-plaque .redact{color:#2a1a05;letter-spacing:-1px}
-.pg-lm{font:italic 13px var(--serif);margin:14px 0 0!important;letter-spacing:.06em}
+.pg-lm{font:700 12px/1.3 var(--serif);margin:14px 0 0!important;padding-top:10px;border-top:2px solid rgba(63,42,12,.6);letter-spacing:.03em}
 .pg-intro{margin:22px 0 0!important;max-width:40em}
 .pg-wink{font-style:italic;color:#333}
 .pg-doc code{font:17px var(--mono)}
@@ -596,7 +593,7 @@ html.noglass .g-scan,html.noglass .g-flick,html.noglass .g-smudge{display:none}
 <div id="garage" class="layer" hidden>
   <canvas id="gl" aria-label="A dim garage at night. A beige CRT computer sits on a workbench, its screen running a starfield." role="img"></canvas>
   <div id="loader" aria-live="polite">
-    <p>HSBIOS garage loader, v1.0 06/2026</p>
+    <p>HSBIOS garage loader, v1.0</p>
     <p id="ld-status" class="dots">LOADING GARAGE (0/0)</p>
     <div class="ll" id="ld-list"></div>
   </div>
@@ -682,70 +679,58 @@ html.noglass .g-scan,html.noglass .g-flick,html.noglass .g-smudge{display:none}
     </div>
     <article class="pg-doc">
       <header class="pg-plaque">
-        <h1 class="pl-t">The Garage</h1>
-        <p class="pg-sub">Things built here</p>
+        <h1 class="pl-t">BUILT IN THIS GARAGE</h1>
         <dl>
-          <dt>2020</dt><dd>Electric Deals</dd>
-          <dt>2023</dt><dd>bayloop</dd>
+          <dt>2020</dt><dd>ELECTRIC DEALS</dd>
+          <dt>2023</dt><dd>BAYLOOP</dd>
           <dt>2026</dt><dd><span class="redact" aria-hidden="true">&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</span><span class="sr">A stealth startup</span></dd>
         </dl>
-        <p class="pg-lm">HusamOS landmark no. 95</p>
+        <p class="pg-lm">HUSAMOS REGISTERED LANDMARK NO. 95</p>
       </header>
-      <p class="pg-intro">Two online stores at 14, a think tank on zoning, and now a company I can't name yet. Every program on the HusamOS desktop, written out.</p>
+      <p class="pg-intro">From two online stores at 14 to a stealth startup: every program on the HusamOS desktop, written out.</p>
 
       <section id="p-stealth" aria-labelledby="h-stealth">
-        <h2 id="h-stealth">Now: stealth.zip</h2>
+        <h2 id="h-stealth">stealth.zip <small>(summer 2026)</small></h2>
         <p>Co-founder &amp; CEO of a stealth startup, backed by DoorDash's early team.</p>
         <p>Spent summer 2026 building it full-time in San Francisco.</p>
-        <p class="pg-wink">That's everything in the readable part of the archive. We'd tell you more, but then it wouldn't be stealth.</p>
+        <p class="pg-wink">The rest of the archive is encrypted.</p>
       </section>
 
       <section id="p-deals" aria-labelledby="h-deals">
-        <h2 id="h-deals">Electric Deals <small>(March to October 2020, age 14 to 15)</small></h2>
-        <p>Two online stores, two models: retail arbitrage on Facebook, drop-shipping on eBay.</p>
-        <h3>The Facebook store (retail arbitrage)</h3>
+        <h2 id="h-deals">Electric Deals <small>(March to October 2020)</small></h2>
+        <p>At 14, I ran two online stores at once: retail arbitrage on Facebook and drop-shipping on eBay. Together they brought in about $28,000 in revenue and 281+ positive reviews.</p>
         <ul>
-          <li>131+ positive reviews</li>
-          <li>400+ products shipped</li>
-          <li>About $20,000 in revenue</li>
-          <li>About 43% margin</li>
+          <li><strong>Facebook store.</strong> Shipped 400+ products for about $20,000 in revenue at a ~43% margin, with 131+ positive reviews.</li>
+          <li><strong>eBay store.</strong> About $8,000 in revenue at a ~39% margin, with 150+ positive reviews.</li>
         </ul>
-        <h3>The eBay store (drop-shipping)</h3>
-        <ul>
-          <li>150+ positive reviews</li>
-          <li>About $8,000 in revenue</li>
-          <li>About 39% margin</li>
-        </ul>
-        <p>Together: about $28,000 in revenue and 281+ positive reviews.</p>
       </section>
 
       <section id="p-bayloop" aria-labelledby="h-bayloop">
         <h2 id="h-bayloop">bayloop <small>(October 2023 to December 2024)</small></h2>
-        <p>Founder &amp; president of bayloop, a Fresno-based think tank fighting restrictive zoning.</p>
+        <p>Founder &amp; President. I founded bayloop, a Fresno-based think tank fighting restrictive zoning.</p>
         <ul>
           <li>Organized 7 youth phone banks across the Central Valley.</li>
-          <li>Legislative research with the National Low-Income Housing Coalition.</li>
+          <li>Conducted legislative research with the National Low-Income Housing Coalition.</li>
         </ul>
       </section>
 
       <section id="p-jetson" aria-labelledby="h-jetson">
         <h2 id="h-jetson">Jetson <small>(summer 2023)</small></h2>
-        <p>Paid intern at Jetson, fintech for teens. 1 of 40 selected from 1,000+ applicants.</p>
+        <p>Selected 1 of 40 from 1,000+ applicants for a paid internship at Jetson, a fintech company for teens.</p>
       </section>
 
       <section id="p-office" aria-labelledby="h-office">
         <h2 id="h-office">Back office</h2>
-        <p>I grew up doing billing and back-office operations as an admin assistant at my father's law firm.</p>
+        <p>I grew up working billing and back-office operations as an admin assistant at my father's law firm.</p>
       </section>
 
       <section id="p-grants" aria-labelledby="h-grants">
-        <h2 id="h-grants">Grants</h2>
-        <p><strong>These are personal honors, not company financing.</strong> None of them is money raised by the startup.</p>
+        <h2 id="h-grants">Grants <small>(startup honors)</small></h2>
         <ul>
-          <li><strong>LeapYear:</strong> $30K grant, backed by Hank Couture and Charlton Soesanto.</li>
-          <li><strong>Startups @ Harvard:</strong> non-dilutive grant, backed by XFund.</li>
-          <li><strong>Telora Fellowship:</strong> finalist for a $55K grant and a 6-month residency (1 of 16 from 1K+). Withdrew.</li>
-          <li><strong>GripTape Challenger:</strong> grant, 2023.</li>
+          <li><strong>LeapYear.</strong> $30K grant, backed by Hank Couture and Charlton Soesanto.</li>
+          <li><strong>Telora Fellowship.</strong> 1 of 16 finalists from 1K+ applicants for a $55K grant and a 6-month residency. Withdrew.</li>
+          <li><strong>Startups @ Harvard.</strong> Non-dilutive grant, backed by XFund.</li>
+          <li><strong>GripTape Challenger.</strong> Grant, 2023.</li>
         </ul>
       </section>
 
@@ -1285,14 +1270,15 @@ const Garage = (() => {
       g.strokeStyle = 'rgba(40,26,6,.85)'; g.lineWidth = 6; g.strokeRect(34, 34, w - 68, h - 68); g.lineWidth = 2; g.strokeRect(46, 46, w - 92, h - 92);
       const hl = g.createRadialGradient(w * .3, h * .2, 0, w * .3, h * .2, w * .7); hl.addColorStop(0, 'rgba(255,236,190,.35)'); hl.addColorStop(1, 'rgba(255,236,190,0)'); g.fillStyle = hl; g.fillRect(0, 0, w, h);
       const T = (t, y, f, sp) => { g.font = f; g.textAlign = 'center'; if (sp) g.letterSpacing = sp; g.fillStyle = 'rgba(255,238,200,.45)'; g.fillText(t, w / 2, y + 2); g.fillStyle = '#2a1a05'; g.fillText(t, w / 2, y); g.letterSpacing = '0px'; };
-      T('THE GARAGE', 138, 'bold 58px Georgia, "Times New Roman", serif', '6px');
-      T('THINGS BUILT HERE', 188, 'bold 26px Georgia, "Times New Roman", serif', '5px');
-      g.fillStyle = '#2a1a05'; g.fillRect(110, 214, w - 220, 4);
-      T('2020  ELECTRIC DEALS', 282, 'bold 30px Georgia, "Times New Roman", serif', '2px');
-      T('2023  BAYLOOP', 338, 'bold 30px Georgia, "Times New Roman", serif', '2px');
-      g.font = 'bold 30px Georgia, serif'; g.fillStyle = '#2a1a05'; g.textAlign = 'left'; g.fillText('2026', 118, 394); g.fillRect(222, 368, 172, 32);
-      g.fillRect(110, 432, w - 220, 4);
-      T('HUSAMOS LANDMARK No. 95', 490, 'italic 24px Georgia, "Times New Roman", serif', '2px');
+      T('BUILT IN THIS', 124, 'bold 46px Georgia, "Times New Roman", serif', '2px');
+      T('GARAGE', 178, 'bold 46px Georgia, "Times New Roman", serif', '2px');
+      g.fillStyle = '#2a1a05'; g.fillRect(90, 210, w - 180, 4);
+      T('2020  ELECTRIC DEALS', 272, 'bold 30px Georgia, "Times New Roman", serif', '1px');
+      T('2023  BAYLOOP', 328, 'bold 30px Georgia, "Times New Roman", serif', '1px');
+      g.font = 'bold 30px Georgia, serif'; g.fillStyle = '#2a1a05'; g.textAlign = 'left'; g.fillText('2026', 118, 384); g.fillRect(222, 358, 172, 32);
+      g.fillRect(90, 420, w - 180, 4);
+      T('HUSAMOS REGISTERED', 474, 'bold 22px Georgia, "Times New Roman", serif', '1px');
+      T('LANDMARK NO. 95', 506, 'bold 22px Georgia, "Times New Roman", serif', '1px');
       const r = rng(77); for (let i = 0; i < 900; i++) { g.fillStyle = `rgba(${r() < .5 ? '40,30,10' : '60,110,80'},${r() * .12})`; const s = 1 + r() * 3; g.fillRect(r() * w, r() * h, s, s); }
       [[32, 32], [w - 32, 32], [32, h - 32], [w - 32, h - 32]].forEach(([x, y]) => { g.fillStyle = '#4a3310'; g.beginPath(); g.arc(x, y, 9, 0, 7); g.fill(); g.fillStyle = 'rgba(255,230,170,.5)'; g.beginPath(); g.arc(x - 2, y - 2, 3, 0, 7); g.fill(); });
     }),
@@ -2635,6 +2621,11 @@ document.addEventListener('click', e => {
   const c = e.target.closest('.win [data-close]'); if (c) { const w = WM.get(c.closest('.win').dataset.win); if (w) WM.close(w); }
 });
 
+// The bronze plaque (after California Registered Historical Landmark No. 976, the HP garage): cast in capitals, as plaques are.
+const PLAQUE = tag => `<${tag === 'h1' ? 'header' : 'div'} class="pg-plaque"${tag === 'h1' ? '' : ' role="img" aria-label="A bronze plaque. Built in this garage: 2020, Electric Deals. 2023, bayloop. 2026, redacted. HusamOS Registered Landmark No. 95."'}>
+  <${tag === 'h1' ? 'h1' : 'p'} class="pl-t">BUILT IN THIS GARAGE</${tag === 'h1' ? 'h1' : 'p'}>
+  <dl><dt>2020</dt><dd>ELECTRIC DEALS</dd><dt>2023</dt><dd>BAYLOOP</dd><dt>2026</dt><dd><span class="redact" aria-hidden="true">&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;</span><span class="sr">A stealth startup</span></dd></dl>
+  <p class="pg-lm">HUSAMOS REGISTERED LANDMARK NO. 95</p></${tag === 'h1' ? 'header' : 'div'}>`;
 const APPS = {
   /* ---------- The Garage: Henry's "My Showcase" home (a small website in a window), rebuilt for the builds ---------- */
   showcase: {
@@ -2652,15 +2643,15 @@ const APPS = {
           <p>Co-founder &amp; CEO of a stealth startup, backed by DoorDash's early team.</p>
           <p>Spent summer 2026 building it full-time in San Francisco.</p>
           <p>The rest of the archive is encrypted.</p></div>` },
-        deals: { nav: 'ELECTRIC DEALS', html: get('deals', 'Looking for the store?', 'Click here to open the saved 2020 page!') + hd('Electric Deals', 'Facebook + eBay', 'Entrepreneur, age 14', 'March - October 2020') + `<div class="sc-txt">
-          <p>At 14, I ran two online stores at once, one on each model: retail arbitrage on Facebook and drop-shipping on eBay. Together they brought in about <b>$28,000</b> in revenue and <b>281+</b> positive reviews.</p>
+        deals: { nav: 'ELECTRIC DEALS', html: get('deals', 'Looking for the store?', 'Click here to open the saved 2020 page!') + hd('Electric Deals', 'Facebook + eBay', 'Entrepreneur at 14', 'March - October 2020') + `<div class="sc-txt">
+          <p>At 14, I ran two online stores at once: retail arbitrage on Facebook and drop-shipping on eBay. Together they brought in about <b>$28,000</b> in revenue and <b>281+</b> positive reviews.</p>
           <ul><li><b>Facebook store.</b> Shipped 400+ products for about $20,000 in revenue at a ~43% margin, with 131+ positive reviews.</li>
           <li><b>eBay store.</b> About $8,000 in revenue at a ~39% margin, with 150+ positive reviews.</li></ul></div>` },
         bayloop: { nav: 'BAYLOOP', html: get('bayloop', 'Looking for the notes?', 'Click here to open bayloop.txt!') + hd('bayloop', 'Fresno, CA', 'Founder &amp; President', 'October 2023 - December 2024') + `<div class="sc-txt">
           <p>I founded bayloop, a Fresno-based think tank fighting restrictive zoning.</p>
           <ul><li>Organized 7 youth phone banks across the Central Valley.</li><li>Conducted legislative research with the National Low-Income Housing Coalition.</li></ul></div>` },
         jetson: { nav: 'JETSON', html: get('jetson', 'Looking for the paperwork?', 'Click here to open Jetson Properties!') + hd('Jetson', 'Fintech for teens', 'Paid Intern', 'Summer 2023') + `<div class="sc-txt">
-          <p>Selected as 1 of 40 interns from 1,000+ applicants for a paid internship at Jetson, a fintech company for teens.</p></div>` },
+          <p>Selected 1 of 40 from 1,000+ applicants for a paid internship at Jetson, a fintech company for teens.</p></div>` },
         office: { nav: 'BACK OFFICE', html: get('office', 'Looking for the ledger?', 'Click here to open Back office.txt!') + hd('Back office', "My father's law firm", 'Admin Assistant', 'Growing up') + `<div class="sc-txt">
           <p>I grew up working billing and back-office operations as an admin assistant at my father's law firm.</p></div>` },
         grants: { nav: 'GRANTS', html: get('grants', 'Looking for the files?', 'Click here to open the Grants folder!') + hd('Grants', 'Startup honors', 'Grants and a fellowship', '') + `<div class="sc-txt"><ul>
@@ -2709,7 +2700,6 @@ const APPS = {
         <div class="bz-page" tabindex="0" aria-label="Electric Deals, saved page from 2020">
           <div class="ed">
             <div class="ed-top"><span class="ed-logo"><i>${BOLT('#ffd400')}</i>Electric Deals</span><span class="ed-search" aria-hidden="true">Search Electric Deals</span></div>
-            <p class="ed-note">This page was saved in 2020. It may look newer than your computer.</p>
             <div class="ed-wrap">
               <section class="ed-card ed-hero"><div class="big">${BOLT('#111')}</div><div><h3>Electric Deals</h3><p>Two online stores, March to October 2020. Started at 14.</p></div></section>
               <div class="ed-shops">
@@ -2718,9 +2708,8 @@ const APPS = {
                 <section class="ed-card ed-shop"><h4>eBay store</h4><p class="ed-kind">Drop-shipping</p>
                   <dl class="ed-rows"><dt>Positive reviews</dt><dd>150+</dd><dt>Revenue</dt><dd>about $8,000</dd><dt>Margin</dt><dd>~39%</dd></dl></section>
               </div>
-              <section class="ed-card ed-how"><h4>How it worked</h4>
-                <p>Two models side by side: retail arbitrage on Facebook, drop-shipping on eBay.</p>
-                <p class="ed-total">Together: <b>about $28,000</b> in revenue and <b>281+</b> positive reviews.</p></section>
+              <section class="ed-card ed-shop"><h4>Both stores</h4><p class="ed-kind">March to October 2020</p>
+                <dl class="ed-rows"><dt>Revenue</dt><dd>about $28,000</dd><dt>Positive reviews</dt><dd>281+</dd></dl></section>
               <p class="ed-foot">&copy; 2020 Electric Deals</p>
             </div>
           </div>
@@ -2749,7 +2738,7 @@ const APPS = {
           <p class="zip-deny" role="status" aria-live="polite"></p>
         </div></div>
         <div class="list95"><table><thead><tr><th scope="col">Name</th><th scope="col">Status</th><th scope="col">Modified</th></tr></thead><tbody>
-          <tr class="sel" tabindex="0" data-f="readme"><td><img src="${ICONS.doc}" alt="">README.TXT</td><td>Readable</td><td>Jun 2026</td></tr>
+          <tr class="sel" tabindex="0" data-f="readme"><td><img src="${ICONS.doc}" alt="">README.TXT</td><td>Readable</td><td>Summer 2026</td></tr>
           <tr tabindex="0" data-f="enc"><td><img src="${ICONS.lock}" alt="">${red(8)}</td><td>Encrypted</td><td>&mdash;</td></tr>
           <tr tabindex="0" data-f="enc"><td><img src="${ICONS.lock}" alt="">${red(5)}</td><td>Encrypted</td><td>&mdash;</td></tr>
           <tr tabindex="0" data-f="enc"><td><img src="${ICONS.lock}" alt="">${red(11)}</td><td>Encrypted</td><td>&mdash;</td></tr>
@@ -2791,7 +2780,7 @@ const APPS = {
     menu: ['File', 'Edit', 'Search', 'Help'],
     mount(b) {
       b.innerHTML = `<label class="sr" for="n-bay">bayloop.txt</label><textarea id="n-bay" class="notes" spellcheck="false"></textarea>`;
-      $('textarea', b).value = 'bayloop\n=======\nFounder & President, October 2023 to December 2024.\n\nA Fresno-based think tank fighting restrictive zoning.\n\n* Organized 7 youth phone banks across the Central Valley.\n* Legislative research with the National Low-Income Housing Coalition.\n';
+      $('textarea', b).value = 'bayloop\n=======\nFounder & President, October 2023 to December 2024.\n\nA Fresno-based think tank fighting restrictive zoning.\n\n* Organized 7 youth phone banks across the Central Valley.\n* Conducted legislative research with the National Low-Income Housing Coalition.\n';
     }
   },
   office: {
@@ -2813,15 +2802,14 @@ const APPS = {
     mount(b, w) {
       const G = [
         { n: 'LeapYear', a: '$30K grant', by: 'Hank Couture and Charlton Soesanto', note: '' },
-        { n: 'Startups @ Harvard', a: 'Grant, non-dilutive', by: 'XFund', note: '' },
         { n: 'Telora Fellowship', a: 'Finalist: $55K grant + 6-month residency', by: '', note: '1 of 16 from 1K+. Withdrew.' },
+        { n: 'Startups @ Harvard', a: 'Grant, non-dilutive', by: 'XFund', note: '' },
         { n: 'GripTape Challenger', a: 'Grant', by: '', note: '2023' }
       ];
       b.style.background = 'var(--lg)';
       b.innerHTML = `<div class="xp">
         <div class="xp-tools"><span>Address</span><span class="field">C:\\GARAGE\\Grants</span>
           <button class="btn" type="button" data-v="details" aria-pressed="true">Details</button><button class="btn" type="button" data-v="icons" aria-pressed="false">Large icons</button></div>
-        <p class="xp-note"><b>Personal honors, not company financing.</b> None of these is money raised by the startup.</p>
         <div class="xp-list" tabindex="-1">
           <table><thead><tr><th scope="col">Name</th><th scope="col">Award</th><th scope="col">Backed by</th><th scope="col">Note</th></tr></thead>
           <tbody>${G.map((g, i) => `<tr tabindex="0" data-i="${i}"><td><img src="${ICONS.doc}" alt="">${g.n}</td><td>${g.a}</td><td>${g.by}</td><td>${g.note}</td></tr>`).join('')}</tbody></table>
@@ -3038,7 +3026,7 @@ function Mines(root, w) {
    Prompt: a small command interpreter (daedalOS's terminal commands)
    --------------------------------------------------------------------- */
 const FILES = {
-  'BAYLOOP.TXT': () => 'bayloop\n=======\nFounder & President, October 2023 to December 2024.\n\nA Fresno-based think tank fighting restrictive zoning.\n\n* Organized 7 youth phone banks across the Central Valley.\n* Legislative research with the National Low-Income Housing Coalition.',
+  'BAYLOOP.TXT': () => 'bayloop\n=======\nFounder & President, October 2023 to December 2024.\n\nA Fresno-based think tank fighting restrictive zoning.\n\n* Organized 7 youth phone banks across the Central Valley.\n* Conducted legislative research with the National Low-Income Housing Coalition.',
   'BACKOFF.TXT': () => "BACK OFFICE\n===========\nI grew up doing billing and back-office operations as an admin assistant at my father's law firm.",
   'README.TXT': () => "Co-founder & CEO of a stealth startup, backed by DoorDash's early team.\nSpent summer 2026 building it full-time in San Francisco.",
   'JETSON.LNK': () => 'Jetson: paid intern, summer 2023. Fintech for teens. 1 of 40 from 1,000+ applicants.',
@@ -3047,10 +3035,10 @@ const FILES = {
 };
 const GRANT_FILES = {
   'LEAPYEAR.DOC': 'LeapYear: $30K grant, backed by Hank Couture and Charlton Soesanto.',
+  'TELORA.DOC': 'Telora Fellowship: 1 of 16 finalists from 1K+ applicants for a $55K grant + 6-month residency. Withdrew.',
   'STARTU~1.DOC': 'Startups @ Harvard: non-dilutive grant, backed by XFund.',
-  'TELORA.DOC': 'Telora Fellowship: finalist ($55K grant + 6-month residency, 1 of 16 from 1K+). Withdrew.',
   'GRIPTAPE.DOC': 'GripTape Challenger: grant, 2023.',
-  'README.TXT': 'Personal honors, not company financing. None of these is money raised by the startup.'
+  'README.TXT': 'Startup honors: three grants and a fellowship finalist spot.'
 };
 function Term(root, w) {
   root.innerHTML = '<div class="term" role="log" aria-label="Prompt"><pre class="t-out"></pre><div class="t-line"><span class="t-ps">C:\\GARAGE&gt;</span><input class="t-in" aria-label="Command" autocomplete="off" autocapitalize="off" spellcheck="false"></div></div>';
@@ -3064,7 +3052,7 @@ function Term(root, w) {
   const dirList = () => {
     if (cwd.endsWith('GRANTS')) { print(' Directory of ' + cwd + '\n'); print('.            <DIR>'); print('..           <DIR>'); Object.keys(GRANT_FILES).forEach(f => print(f.padEnd(13) + '<FILE>')); print('\n        5 file(s)'); return; }
     print(' Volume in drive C is GARAGE\n Directory of ' + cwd + '\n');
-    [['GRANTS', '<DIR>', '4 honors'], ['ELECTR~1.HTM', '<FILE>', '03-2020'], ['BAYLOOP.TXT', '<FILE>', '10-2023'], ['JETSON.LNK', '<FILE>', '2023'], ['BACKOFF.TXT', '<FILE>', ''], ['STEALTH.ZIP', '<FILE>', '06-2026  (encrypted)'], ['README.TXT', '<FILE>', 'from STEALTH.ZIP'], ['MINES.EXE', '<FILE>', '']].forEach(([n, t, d]) => print(n.padEnd(13) + t.padEnd(8) + d));
+    [['GRANTS', '<DIR>', '4 honors'], ['ELECTR~1.HTM', '<FILE>', '03-2020'], ['BAYLOOP.TXT', '<FILE>', '10-2023'], ['JETSON.LNK', '<FILE>', '2023'], ['BACKOFF.TXT', '<FILE>', ''], ['STEALTH.ZIP', '<FILE>', '2026  (encrypted)'], ['README.TXT', '<FILE>', 'from STEALTH.ZIP'], ['MINES.EXE', '<FILE>', '']].forEach(([n, t, d]) => print(n.padEnd(13) + t.padEnd(8) + d));
     print('\n        8 file(s)    1 dir(s)');
   };
   const help = () => print([
@@ -3110,7 +3098,7 @@ function Term(root, w) {
         pwMode = true; setPs(); return;
       case 'whoami': return print("husam. Co-founder & CEO of a stealth startup, backed by DoorDash's early team.");
       case 'ver': case 'version': return print('HusamOS 95 [Version 4.00.2020]');
-      case 'date': case 'time': return print('HusamOS keeps no clock. Build dates: Electric Deals 03/2020, bayloop 10/2023, stealth 06/2026.');
+      case 'date': case 'time': return print('HusamOS keeps no clock. Build dates: Electric Deals 03/2020, bayloop 10/2023, stealth.zip summer 2026.');
       case 'uptime': return print('Up since 03/2020 (the first store). Operator since age 14.');
       case 'neofetch': case 'systeminfo': return neofetch();
       case 'color': { const m = { a: 'c-a', b: 'c-b', e: 'c-e', f: 'c-f', 7: '' }; const k = (arg || '7').toLowerCase(); term.className = 'term ' + (m[k] || ''); return; }
@@ -3272,13 +3260,13 @@ try { Flow.init(); } catch (e) {
     var x = this.x, css = this.css, dpr = this.dpr, rad = css * this.o.planet / 2, cx = css / 2, cy = css / 2 + (this.o.dy || 0) * css;
     var f = B.f, u = B.u, r = B.r;
     // ground, per pixel at a low resolution (the hub's colour rules + two-band toon light + coloured shadow)
-    var res = this.g.width, d = this.img.data, k = 0;
+    var res = this.g.width, d = this.img.data, k = 0, fields = this.o.detail;
     for (var py = 0; py < res; py++) for (var px = 0; px < res; px++, k += 4) {
       var sx = (px + .5) / res * 2 - 1, sy = 1 - (py + .5) / res * 2, rr = sx * sx + sy * sy;
       if (rr > 1) { d[k + 3] = 0; continue; }
       var sz = Math.sqrt(1 - rr), n = [sx * r[0] + sy * u[0] + sz * f[0], sx * r[1] + sy * u[1] + sz * f[1], sx * r[2] + sy * u[2] + sz * f[2]];
       var lat = Math.asin(clamp(n[1], -1, 1)) / DEG, nz = vnoise(n[0] * 3.1 + 7, n[1] * 3.1, n[2] * 3.1) - .5, nz2 = vnoise(n[0] * 9, n[1] * 9 + 3, n[2] * 9);
-      var base = lat + nz * 40 < -4 ? GOLD : GREEN; if (nz2 > .7) base = lat < 5 ? FIELD : SPRING; if (lat > 58 + nz * 10) base = GREEN;
+      var base = lat + nz * 40 < -4 ? GOLD : GREEN; if (fields && nz2 > .7) base = lat < 5 ? FIELD : SPRING; if (lat > 58 + nz * 10) base = GREEN;
       var dl = sx * LDIR[0] + sy * LDIR[1] + sz * LDIR[2], band = smooth(-.01, .05, dl), hi = smooth(.74, .8, dl) * .07, rim = Math.pow(1 - sz, 3) * .16 * band;
       for (var c = 0; c < 3; c++) {
         var lit = base[c] * LIGHT[c], sh = base[c] + (base[c] * SHADOW[c] - base[c]) * .62;
@@ -3291,8 +3279,9 @@ try { Flow.init(); } catch (e) {
     function P(p, lift) { var q = lift ? scale(p, 1 + lift) : p; return [cx + dot(q, r) * rad, cy - dot(q, u) * rad, dot(p, f)]; }
     var lw = this.o.line, tr = rad * .052 * this.o.tree;
     // trees behind the limb first, so the ones on the far side peek over the horizon like on the title planet
+    var faceMax = this.o.faceTrees;
     function tree(t, front) {
-      var z = dot(t.p, f); if (front ? z < 0 : (z >= 0 || z < -.16)) return;
+      var z = dot(t.p, f); if (front ? (z < 0 || z > faceMax) : (z >= 0 || z < -.16)) return;
       var q = P(t.p, .075 * t.s), s = tr * t.s;
       x.beginPath(); x.arc(q[0], q[1], s, 0, TAU); x.fillStyle = t.c; x.fill(); x.lineWidth = lw * .7; x.strokeStyle = INK; x.stroke();
     }
@@ -3410,7 +3399,7 @@ try { Flow.init(); } catch (e) {
         'a.row:hover .dia,a.row.on .dia,a.row:focus-visible .dia{transform:rotate(45deg) scale(1.35)}' +
         '.here{cursor:default}' +
         // narrow screens: planet and the way home side by side, the list below
-        '@media (max-width:560px){.inner{grid-template-columns:146px 1fr;grid-template-rows:auto auto;grid-template-areas:"map home" "list list";gap:12px}.map{width:146px;height:146px}.home{align-self:end;margin-bottom:9px;font-size:14px;padding:12px 10px 10px}}' +
+        '@media (max-width:560px){.inner{grid-template-columns:136px 1fr;grid-template-rows:auto auto;grid-template-areas:"map home" "list list";gap:10px 12px;padding:12px}.map{width:136px;height:136px}.row{min-height:42px;padding:4px 8px 4px 6px}.row b{font-size:14px}.row span{font-size:13.5px;margin-top:1px}.home{align-self:end;margin-bottom:9px;font-size:14px;padding:12px 10px 10px}}' +
         '@media (max-height:520px) and (min-width:561px){.inner{grid-template-columns:150px 1fr}.map{width:150px;height:150px}}' +
         // stagger the list in (paco.me\'s data-animate: each item a beat after the last)
         '.panel.in li,.panel.in .home{animation:rise .34s cubic-bezier(.23,1,.32,1) both;animation-delay:calc(var(--i) * 22ms + 60ms)}' +
@@ -3437,8 +3426,8 @@ try { Flow.init(); } catch (e) {
 
       // ---------------------------------------------------------- the two planets
       var carT = hereSite[0];
-      var mini = new Planet($('.mini'), { planet: .82, line: 1.6, tree: 1.35, roadScale: 1.25, roadSteps: 360, detail: false, car: .2, groundMax: 2, dy: -.02 });
-      var big = new Planet($('.big'), { planet: .8, line: 2, tree: 1, roadScale: 1, roadSteps: 700, detail: true, car: .12, groundMax: 1.25 });
+      var mini = new Planet($('.mini'), { planet: .82, line: 1.6, tree: 1.5, roadScale: 1.3, roadSteps: 360, detail: false, car: .34, groundMax: 2, dy: -.02, faceTrees: .3 });
+      var big = new Planet($('.big'), { planet: .8, line: 2, tree: 1, roadScale: 1, roadSteps: 700, detail: true, car: .13, groundMax: 1.25, faceTrees: .55 });
       mini.size(56);
       // the trigger looks down at the car, nose up the screen: the planet as you see it while driving
       var miniB = basis(norm(mix(road(carT), roadTan(carT), -.28)), roadTan(carT));
@@ -3446,7 +3435,7 @@ try { Flow.init(); } catch (e) {
       function drawMini() { mini.draw(miniB, { car: carT, hop: hop }); }
       drawMini();
 
-      var cur = null, want = null, raf = 0, last = 0, bigSize = 0, pinEls = $$('.pin'), active = null;
+      var flying = false, cur = null, want = null, raf = 0, last = 0, bigSize = 0, pinEls = $$('.pin'), active = null;
       function homeView() { var s = SITE[here]; return s ? facing(ll(s[1], s[2])) : facing(road(0)); }
       function sizeBig() { var s = Math.round(map.getBoundingClientRect().width) || 200; if (s !== bigSize) { bigSize = s; big.size(s); } }
       function drawBig() {
@@ -3491,7 +3480,8 @@ try { Flow.init(); } catch (e) {
           var dx = (a.left + a.width / 2) - (b.left + b.width / 2), dy = (a.top + a.height / 2) - (b.top + b.height / 2);
           inner.style.overflow = 'visible';
           map.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')', background: 'transparent', boxShadow: 'none' }, { transform: 'none' }], { duration: 420, easing: 'cubic-bezier(.32,.72,0,1)' })
-            .onfinish = function () { inner.style.overflow = ''; };
+            .onfinish = function () { inner.style.overflow = ''; flying = false; };
+          flying = true;
           $('.paper').animate([{ opacity: 0, transform: 'scale(.94)' }, { opacity: 1, transform: 'none' }], { duration: 240, easing: 'cubic-bezier(.23,1,.32,1)' });
           // the map turns from the driver's view to north-up while it grows, then the car hops once
           var from = miniB; cur = from; want = homeView(); drawBig(); last = performance.now(); if (!raf) raf = requestAnimationFrame(tick);
@@ -3530,12 +3520,12 @@ try { Flow.init(); } catch (e) {
       // ---------------------------------------------------------- the station camera: point at a place and the planet turns to show it
       $$('a.row').forEach(function (a) {
         var id = a.getAttribute('data-id');
-        a.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'touch') focusPlace(id); });
+        a.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse' && !flying) focusPlace(id); });
         a.addEventListener('focus', function () { focusPlace(id); });
       });
       pinEls.forEach(function (a) {
         var id = a.getAttribute('data-id');
-        a.addEventListener('pointerenter', function () { pinEls.forEach(function (el) { el.classList.toggle('on', el === a); }); $$('a.row').forEach(function (el) { el.classList.toggle('on', el.getAttribute('data-id') === id); }); });
+        a.addEventListener('pointerenter', function (e) { if (e.pointerType !== 'mouse' || flying) return; pinEls.forEach(function (el) { el.classList.toggle('on', el === a); }); $$('a.row').forEach(function (el) { el.classList.toggle('on', el.getAttribute('data-id') === id); }); });
       });
       map.addEventListener('pointerleave', function () { if (active) focusPlace(active); });
       // drag the planet round (the hub's map lets you do the same)
