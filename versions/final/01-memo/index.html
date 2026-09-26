@@ -372,7 +372,7 @@ ol.arc li.now .t b{color:var(--blue)}
   </div>
   <dl class="meta">
     <div><dt>Founder</dt><dd>Husam Sokar</dd></div>
-    <div><dt>Stage</dt><dd>Pre-seed / Seed</dd></div>
+    <div><dt>Status</dt><dd>Stealth</dd></div>
     <div><dt>Sector</dt><dd><span class="rd" tabindex="0" role="img" aria-label="Redacted (stealth)" style="--w:11ch"></span></dd></div>
     <div><dt>Base</dt><dd>San Francisco <span style="color:var(--ink-3)">(summer&nbsp;2026)</span></dd></div>
   </dl>
@@ -593,7 +593,7 @@ ol.arc li.now .t b{color:var(--blue)}
         <ul class="hon">
           <li>Coca-Cola Scholar<span class="x">1 of 150 from 105,000+</span></li>
           <li>Gates Scholar<span class="x">1 of 750 from 48,000+</span></li>
-          <li>Benjamin A. Gilman Scholar<span class="x">&nbsp;</span></li>
+          <li>Benjamin A. Gilman Scholar</li>
           <li>NSDA Student of the Year<span class="x">1 of 86 from 140,000+</span></li>
           <li>NSDA National Finalist, Congressional Debate<span class="x">1 of 20 from 50,000+</span></li>
           <li>California Mock Trial Finals MVP<span class="x">1 of 128 from 5,000+</span></li>
@@ -710,12 +710,12 @@ ol.arc li.now .t b{color:var(--blue)}
     if(e.key==='d'||e.key==='D') setDil(!body.classList.contains('dil'));
   });
 
-  var pop=document.getElementById('pop'), cur=null, hideT=0;
+  var pop=document.getElementById('pop'), cur=null, hideT=0, shownAt=0;
   function esc(s){return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function show(fn){
     clearTimeout(hideT);
     if(cur && cur!==fn){cur.setAttribute('aria-expanded','false');cur._claim.classList.remove('lit')}
-    cur=fn;var s=S[fn.dataset.s]; if(!s) return;
+    cur=fn;shownAt=Date.now();var s=S[fn.dataset.s]; if(!s) return;
     pop.innerHTML='<div class="pk"><span>SOURCE '+fn.dataset.i+'</span><span>'+(s.h?'PUBLIC':'RECORD')+'</span></div>'+
       '<p class="pt">'+esc(s.t)+'</p><p>'+esc(s.d)+'</p>'+
       (s.h?'<a href="'+s.h+'" target="_blank" rel="noopener">'+esc(s.hl||'Open source')+' ↗</a>':'');
@@ -747,7 +747,7 @@ ol.arc li.now .t b{color:var(--blue)}
   pop.addEventListener('mouseleave',function(){hide()});
   pop.addEventListener('focusout',function(e){if(!pop.contains(e.relatedTarget)&&e.relatedTarget!==cur) hide()});
   document.addEventListener('click',function(e){if(!pop.contains(e.target)&&!e.target.classList.contains('fn')) hide(true)});
-  addEventListener('scroll',function(){if(pop.classList.contains('on')&&!pop.matches(':hover')) hide(true)},{passive:true});
+  addEventListener('scroll',function(){if(pop.classList.contains('on')&&!pop.matches(':hover')&&Date.now()-shownAt>400) hide(true)},{passive:true});
 
   /* ---------- Redaction bars: tap/enter shows the tooltip ---------- */
   document.querySelectorAll('.rd').forEach(function(r){
