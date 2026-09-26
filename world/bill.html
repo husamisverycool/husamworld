@@ -11,8 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@500;600;700&family=Cinzel:wght@600;700&family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Shrikhand&display=swap" rel="stylesheet">
 <style>
 :root{
-  --navy:#1b4b6f;--navy-2:#245276;--link:#1f5d93;--red:#a3231c;--red-2:#c0392b;
-  --bg:#f4f4f2;--band:#5d6873;--ink:#1f2326;--grey:#5f666d;--rule:#d5d5d2;--box:#cfcfcc;
+  --navy:#1b4b6f;--navy-2:#245276;--link:#36c;--link-h:#24478f;--red:#a3231c;--red-2:#c0392b;
+  --bg:#eee;--band:#a6adbd;--ink:#1f2326;--grey:#5f666d;--rule:#d5d5d2;--box:#cfcfcc;
   --paper:#fff;--desk:#dcdcd6;--text:#151515;--text-2:#4f4f4f;--green:#2f7d4a;--crimson:#b2332b;--ins:#1c3f8f;
   --sans:Arial,"Helvetica Neue",Helvetica,"Liberation Sans",sans-serif;
   --serif:"Old Standard TT","Century Schoolbook","New Century Schoolbook","TeX Gyre Schola",Georgia,serif;
@@ -21,9 +21,10 @@
 }
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-top:56px}
-body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.55 var(--sans)}
+/* congress.gov: body{font-family:Arial,Helvetica,sans-serif;font-size:.75rem;color:#333;line-height:1.333} */
+body{margin:0;background:var(--paper);color:#333;font:12px/1.333 var(--sans)}
 a{color:var(--link)}
-a:hover{color:var(--red)}
+a:hover,a:focus{color:var(--link-h);text-decoration:none}
 :focus-visible{outline:3px solid #e8a33d;outline-offset:2px}
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 a.vh:focus{position:fixed!important;left:12px;top:12px;width:auto;height:auto;clip:auto;overflow:visible;background:#fff;color:var(--navy);padding:8px 12px;z-index:60;border:2px solid var(--navy)}
@@ -43,44 +44,57 @@ button{font:inherit;color:inherit}
 .mnav a:hover{text-decoration:underline}
 .band{background:var(--band);padding:14px 0}
 .band form{display:flex;gap:0;margin:0}
-.band select,.band input{font:13px var(--sans);border:2px solid #fff;border-radius:0;padding:9px 10px;background:#fff;color:#222;height:42px}
+.band select,.band input{font:13px var(--sans);border:3px solid var(--navy);border-radius:0;padding:9px 10px;background:#fff;color:#222;height:42px}
 .band select{border-right:0;min-width:150px;appearance:none;-webkit-appearance:none;padding-right:30px;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' fill='none' stroke='%231b4b6f' stroke-width='2.4'/></svg>") no-repeat right 10px center}
-.band input{flex:1;min-width:0;border-left:2px solid var(--navy)}
+.band input{flex:1;min-width:0;border-left:0;border-color:#1f5fc9}
 .band button{width:46px;height:42px;border:0;background:var(--navy);display:grid;place-items:center;cursor:pointer}
 .band button svg{width:20px;height:20px}
-.found{color:#fff;font-size:12.5px;margin-top:8px;min-height:18px}
-.found a{color:#fff}
+.found{color:#1d2124;font-size:12px;margin-top:8px;min-height:16px}
 
 /* ---------- title block ---------- */
-.top{background:var(--bg);border-bottom:1px solid var(--rule);padding:14px 0 30px}
-.crumb{font-size:11.5px;color:var(--grey);margin:0}
+.top{background:var(--bg);padding:12px 0 26px}
+.crumb{font-size:11px;color:#666;margin:0}
 .crumb a{color:var(--link)}
-h1{font:700 23px/1.3 var(--sans);margin:16px 0 3px;color:#1d2124;max-width:960px}
+h1{font:700 20px/1.1 var(--sans);margin:22px 0 4px;color:#202a43;max-width:960px}
 h1 .num{white-space:nowrap}
-.cong{margin:0;color:var(--grey);font-size:12.5px}
+.cong{margin:0;color:#666;font-size:12px}
 .ov{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:34px;margin-top:22px;align-items:start}
-.tab-l{display:inline-flex;align-items:center;gap:12px;background:var(--red);color:#fff;font-weight:700;font-size:12px;letter-spacing:.04em;padding:7px 14px}
-.tab-l small{font-weight:400;opacity:.85;letter-spacing:0}
-.box{border:3px solid var(--box);background:#fff;padding:20px 26px 24px}
-.facts{display:grid;grid-template-columns:150px minmax(0,1fr);gap:9px 16px;margin:0}
+/* congress.gov: .overview_label{background-color:#98382a;border-bottom:3px solid #4a0d0c;height:30px;line-height:30px;padding:0 15px}
+   .overview_label .label_text{color:#fff;font-size:1em;text-transform:uppercase}  <- the only uppercase on the record, as on congress.gov */
+.tab-l{position:relative;z-index:2;display:inline-flex;align-items:center;background:#98382a;border-bottom:3px solid #4a0d0c;color:#fff;height:33px;line-height:30px;padding:0 15px}
+.tab-l h2{margin:0;font:700 12px/30px var(--sans);text-transform:uppercase;color:#fff}
+.tab-l button{margin-left:30px;border:0;background:none;color:#fff;font:11px/30px var(--sans);padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.tab-l button:hover{text-decoration:underline}
+.tab-l button svg{width:9px;height:9px}
+/* congress.gov: .overview{padding:32px 30px 5px;border:2px solid #889daa;box-shadow:0 0 6px #999}; the label overlaps it by 15px */
+.box{position:relative;margin-top:-15px;border:2px solid #889daa;box-shadow:0 0 6px #999;background:#fff;padding:32px 30px 24px}
+.ov.hid .box{display:none}
+.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:10px 18px;margin:0;line-height:16px}
 .facts dt{font-weight:700}
 .facts dd{margin:0;min-width:0}
 .facts dt.full{grid-column:1/-1;margin-top:6px}
 .facts dd.full{grid-column:1/-1}
 
-/* the tracker: congress.gov chevrons, here the scene buttons */
-.tracker{list-style:none;margin:0;padding:2px 0 4px 8px;display:flex;overflow-x:auto;scrollbar-width:thin}
-.tracker li{flex:0 0 auto;margin-left:-8px}
-.tracker button{display:block;border:0;background:#8a8a8a;padding:1px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 11px) 0,100% 50%,calc(100% - 11px) 100%,0 100%,11px 50%)}
-.tracker li:first-child button{clip-path:polygon(0 0,calc(100% - 11px) 0,100% 50%,calc(100% - 11px) 100%,0 100%)}
-.tracker span{display:block;background:#fff;font-size:11.5px;line-height:20px;padding:2px 17px 2px 21px;white-space:nowrap;clip-path:inherit}
-.tracker li:first-child span{padding-left:12px}
-.tracker button:hover span{background:#eef3f7}
-.tracker button[aria-current="step"]{background:#2c2c2c}
-.tracker button[aria-current="step"] span{background:#333;color:#fff;font-weight:700}
-.tracker .sig.done span{background:var(--red);color:#fff;font-weight:700}
-.tracker .sig.done{background:var(--red)}
-.tr-note{font-size:11.5px;color:var(--grey);margin:6px 0 0}
+/* the tracker, rebuilt on congress.gov's own .bill_progress:
+   li{font-size:.6875rem;height:1rem;line-height:1rem;border:1px solid #8f8f8f;border-right:0;background:#fff;color:#767676;text-align:center}
+   li:not(:last-child):after{transform:scale(.707) rotate(45deg);border-top:1px solid;border-right:1px solid}
+   li.passed{color:#000;background:#f7f7f7}  li.selected{background:#424242;color:#fff;font-weight:bold}
+   The items float, so on a phone the row wraps onto new lines (checked live at 390px); it never scrolls sideways. */
+.tracker{--h:18px;list-style:none;margin:0;padding:0 10px 0 0;display:flex;flex-wrap:wrap;row-gap:6px}
+.tracker li{position:relative;flex:0 0 auto;min-width:5.4rem;height:calc(var(--h) + 2px);border:1px solid #8f8f8f;border-right:0;background:#fff;color:#767676}
+.tracker li:first-child{min-width:5rem}
+.tracker li:last-child{border-right:1px solid #8f8f8f}
+.tracker li:not(:last-child)::after{content:"";position:absolute;z-index:1;top:0;right:calc(var(--h) / -2 - .5px);width:var(--h);height:var(--h);transform:scale(.707) rotate(45deg);border-top:1px solid #8f8f8f;border-right:1px solid #8f8f8f;background:inherit;pointer-events:none}
+.tracker button{display:block;width:100%;height:var(--h);border:0;background:none;color:inherit;font:11px/var(--h) var(--sans);padding:0 .9rem 0 1.1rem;white-space:nowrap;cursor:pointer;text-align:center}
+.tracker li:first-child button{padding-left:.6rem}
+.tracker li.passed{background:#f7f7f7;color:#000}
+.tracker li.selected{background:#424242;color:#fff}
+.tracker li.selected button{font-weight:700}
+.tracker li:not(.selected) button:hover{text-decoration:underline}
+.tracker li.sig.done{background:#98382a;color:#fff}
+.tracker li.sig.done button{font-weight:700}
+@media (pointer:coarse){.tracker{--h:26px}}
+.tr-note{font-size:11px;color:#666;margin:7px 0 0}
 
 /* ---------- the player ---------- */
 .player{margin-top:20px}
@@ -96,72 +110,80 @@ h1 .num{white-space:nowrap}
 .caption a{color:#8fd8e6}
 .caption .sc{display:block;font:400 13px/1 var(--toon);color:#e8672c;margin-bottom:7px;letter-spacing:.02em}
 
-/* ---------- right rail ---------- */
-.rail h2{font:700 12.5px/1.3 var(--sans);margin:0 0 8px;color:#1d2124}
-.rail section{border-top:1px solid var(--rule);padding:12px 0 14px}
-.rail section:first-child{border-top:0;padding-top:0}
-.rail p,.rail ul{margin:0;font-size:12.5px}
+/* ---------- right rail (congress.gov .tertiary_section: border-top:1px solid #ccc; h3 bold 13px #666) ---------- */
+.rail h2{font:700 13px/1.333 var(--sans);margin:0 0 7px;color:#666}
+.rail section{border-top:1px solid #ccc;padding:10px 0 16px}
+.rail p,.rail ul{margin:0;font-size:12px}
 .rail ul{list-style:none;padding:0}
-.rail li{margin:3px 0}
-.rail .big{font:700 20px/1.1 var(--sans);color:var(--navy);display:block}
-.cos{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
-.cos div{font-size:11.5px;color:var(--grey);line-height:1.3}
-.script{counter-reset:s;list-style:none;padding:0;margin:0}
-.script li{font-size:12px}
-.script li{counter-increment:s;padding-left:22px;position:relative;line-height:1.45;margin:0 0 7px;color:#33383c}
-.script li::before{content:counter(s);position:absolute;left:0;top:1px;font:700 10.5px/16px var(--sans);width:16px;text-align:center;background:#e9e9e6;color:#555}
-.script li.now::before{background:#333;color:#fff}
+.rail li{margin:0 0 6px}
+.script{list-style:decimal;padding:0 0 0 18px!important;margin:0}
+.script li{line-height:1.45;margin:0 0 7px;color:#333;padding-left:2px}
+.script li::marker{color:#767676;font-size:11px}
+.script li.now{color:#000}
+.script li.now::marker{color:#000;font-weight:700}
 
-/* ---------- tabs (anchors) ---------- */
-.tabs{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--rule)}
-.tabs .in{display:flex;gap:4px;overflow-x:auto;padding-top:10px;scrollbar-width:none}
-.tabs a{flex:0 0 auto;font-size:13px;text-decoration:none;color:#333;background:#eee;border:1px solid var(--rule);border-bottom:0;padding:8px 14px;margin-bottom:-1px}
-.tabs a[aria-current="true"]{background:#fff;color:var(--red);font-weight:700;border-bottom:1px solid #fff}
-.sec{padding:30px 0 10px}
-.sec-h{font:700 19px/1.3 var(--sans);margin:0 0 4px}
-.sec-h em{font-style:normal;color:var(--red)}
-.sec-sub{margin:0 0 16px;color:var(--grey);font-size:12.5px}
+/* ---------- tabs: congress.gov .tabs_links
+   li{border:1px solid #ccc;border-bottom:0;background-color:#f7f7f7;margin-right:5px}  a{font-size:.6875rem;color:#666}
+   li.selected{background-color:#fff;margin-bottom:-1px;border-color:#999}  li.selected a{color:#900;font-weight:bold}
+   The strip is not sticky there, so it is not sticky here. ---------- */
+.tabs{background:var(--bg);border-bottom:1px solid #999}
+.tabs ul{list-style:none;margin:0 auto;display:flex;flex-wrap:wrap;gap:5px 5px;padding-top:0}
+.tabs li{flex:0 0 auto;border:1px solid #ccc;border-bottom:0;background:#f7f7f7;margin-bottom:-1px}
+.tabs li:not(.selected){border-bottom:1px solid #999}
+.tabs a{display:block;font-size:11px;line-height:28px;text-decoration:none;color:#666;padding:0 10px}
+.tabs a:hover{color:#333;text-decoration:underline}
+.tabs li.selected{background:#fff;border-color:#999;border-bottom:1px solid #fff}
+.tabs li.selected a{color:#900;font-weight:700}
+.sec{padding:30px 24px 10px}
+.sec-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 20px}
+.sec-h{font:700 17px/1.3 var(--sans);margin:0 0 6px;color:#202a43}
+.sec-h em{font-style:normal;color:#900}
+.sec-sub{margin:0 0 14px;color:#333;font-size:12px}
+.sec-sub a{font-size:12px}
 
-/* actions + measures tables */
+/* actions + related-bills tables: congress.gov table.item_table
+   {border-top:1px solid #333} thead th{background-color:#f5f5f5;border-bottom-color:#333} td{border-top:1px solid #ddd;padding:12px 10px} .date{width:15%;white-space:nowrap} */
 table{border-collapse:collapse;width:100%}
-th,td{text-align:left;border-bottom:1px solid var(--rule);padding:10px 12px;vertical-align:top}
-thead th{background:#ececea;font-size:12px;border-bottom:1px solid #c9c9c6}
-td.d{white-space:nowrap;font-variant-numeric:tabular-nums;width:150px}
-td.ch{width:170px;color:#3b4146}
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:0}
-.dot.a{background:var(--green)}.dot.s{background:var(--crimson)}.dot.h{background:var(--navy)}.dot.f{background:#c98a1b}.dot.c{background:#7a7a7a}
-.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:12px;color:var(--grey);margin:0 0 12px}
-.meas td:first-child{white-space:nowrap;font-weight:700;width:110px}
-.meas a.bn{font-weight:700}
+.item{border-top:1px solid #333}
+.item th,.item td{text-align:left;vertical-align:top;padding:12px 10px;font-weight:400;border-top:1px solid #ddd}
+.item thead th{background:#f5f5f5;font-weight:700;border-top:0;border-bottom:1px solid #333}
+.item td.d{white-space:nowrap;width:15%}
+.item td.ch{width:12%}
+.meas td:first-child{white-space:nowrap;width:12%}
+.acts tr.new td{background:#f7f7f7}
 
 /* ---------- the bill text ---------- */
 .desk{background:var(--desk);padding:34px 0 60px;margin-top:10px}
 .sheet{position:relative;max-width:1060px;margin:0 auto;background:var(--paper);color:var(--text);font:17.5px/var(--lh) var(--serif);padding:58px 300px 70px 112px;box-shadow:0 1px 0 rgba(0,0,0,.08),0 14px 34px -22px rgba(0,0,0,.45);font-variant-numeric:lining-nums}
 .sheet .gut{position:absolute;left:0;top:0;width:78px;pointer-events:none;user-select:none;-webkit-user-select:none}
 .gut span{position:absolute;right:0;font-size:12px;line-height:14px;color:#6a6a6a;font-variant-numeric:tabular-nums}
-.gut i{position:absolute;right:-12px;width:40px;border-top:1px dashed #b9b9b4;font-style:normal;font-size:10px;line-height:12px;color:#8a8a86;text-align:right;padding-top:2px;letter-spacing:.04em}
-.g-head{display:flex;justify-content:space-between;align-items:flex-start;font-size:13px;line-height:17px;letter-spacing:.09em}
-.g-head b{font-size:24px;line-height:26px;letter-spacing:.03em}
+/* a page turn: GPO restarts the count at 1 on every page and prints the page number at the head */
+.gut i{position:absolute;left:16px;font-style:normal;font:700 12px/14px var(--serif);color:var(--text)}
+.gut i::after{content:"";position:absolute;left:0;width:30px;top:-9px;border-top:1px solid #c8c8c3}
+/* GPO page one: '117TH CONGRESS / 1ST SESSION' set in caps and small caps, bill number bold at right */
+.g-head{display:flex;justify-content:space-between;align-items:flex-start;font-size:15px;line-height:18px;font-variant-caps:small-caps}
+.g-head b{font-size:24px;line-height:26px;font-variant-caps:normal}
 .g-purpose{border-top:1px solid var(--text);margin:12px 0 0;padding-top:10px;font-size:16px;line-height:24px}
-.g-house{text-align:center;letter-spacing:.11em;font-size:14px;margin:24px 0 0}
-.g-date{text-align:center;font-variant-caps:all-small-caps;letter-spacing:.09em;font-size:17px;margin:2px 0 0}
+.g-house{text-align:center;letter-spacing:.02em;font-size:14px;margin:24px 0 0}
+.g-date{text-align:center;font-variant-caps:small-caps;letter-spacing:.02em;font-size:16px;margin:2px 0 0}
 .g-intro{padding-left:1.4em;text-indent:-1.4em;font-size:15px;line-height:22px;margin:14px 0 0}
-.g-intro .smc,.smc{font-variant-caps:all-small-caps;letter-spacing:.04em;font-size:1.06em}
+/* GPO sets surnames and subsection headings in caps and small caps: Mr. DEFAZIO, (a) IN GENERAL.— */
+.g-intro .smc,.smc{font-variant-caps:small-caps;letter-spacing:.02em}
 .g-rule{border:0;border-top:3px double var(--text);margin:18px 0 0}
 .g-abill{font:700 62px/1 var(--serif);text-align:center;letter-spacing:.16em;margin:22px 0 10px;padding-left:.16em}
 .g-pur2{text-align:center;margin:0}
 .digest{border:1px solid #c8c8c3;padding:14px 20px 16px;margin:24px 0 0;font-size:15px;line-height:23px}
-.digest h2{margin:0 0 6px;text-align:center;font:400 17px/1.3 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.12em}
+.digest h2{margin:0 0 6px;text-align:center;font:400 16px/1.3 var(--serif);font-variant-caps:all-small-caps;letter-spacing:.03em}
 .digest p{margin:0 0 6px;text-indent:0}
 .lines{margin-top:var(--lh)}
 .lines p,.lines li{margin:0;text-indent:1.6em}
 .lines p.enact{font-style:italic}
 .lines h2{font:700 17.5px/var(--lh) var(--serif);letter-spacing:.03em;margin:var(--lh) 0 0}
-.lines h3{font:400 17.5px/var(--lh) var(--serif);text-align:center;letter-spacing:.07em;margin:calc(var(--lh)*2) 0 0}
+.lines h3{font:400 17.5px/var(--lh) var(--serif);text-align:center;letter-spacing:.01em;margin:calc(var(--lh)*2) 0 0}
 .lines ol{list-style:none;margin:0;padding:0}
 .lines ol li{text-indent:0;padding-left:3.2em}
 .lines .toc li{padding-left:1.6em;text-indent:0}
-.lines .toc .tt{padding-left:0;text-align:center;letter-spacing:.05em;font-size:15.5px}
+.lines .toc .tt{padding-left:0;text-align:center;font-size:15.5px}
 .lines a{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;text-decoration-color:#9a9a96}
 .lines a:hover{color:var(--red);text-decoration-color:var(--red)}
 a.bn{text-decoration-style:dotted;cursor:help}
@@ -172,7 +194,11 @@ mark{background:#ffe27a;color:inherit;padding:0 1px}
 mark.cur{background:#ffb13b}
 .side{position:absolute;right:26px;width:238px;font:13px/18px var(--serif);color:var(--text-2);border-top:1px solid #c8c8c3;padding-top:6px}
 .side b{color:var(--text);font-weight:700}
-.side .k{display:block;font:700 10.5px/14px var(--sans);letter-spacing:.09em;text-transform:uppercase;color:#8a8a86;margin-bottom:2px}
+/* gwern.net sidenotes: a numeral that matches the marker in the text, then the note in the body face */
+.side .k{font-style:italic}
+.side .n{float:left;margin:0 6px 0 0;font:700 12px/18px var(--serif);color:var(--text)}
+sup.sn a{text-decoration:none!important;color:inherit}
+sup.sn{font:700 .6em/0 var(--serif);vertical-align:.6em;margin-left:1px;color:var(--text-2)}
 .runfoot{position:absolute;left:112px;bottom:24px;font:700 12px/16px var(--serif);letter-spacing:.02em}
 
 /* signature + stamp */
@@ -193,7 +219,8 @@ mark.cur{background:#ffb13b}
 .after{font:italic 15px/22px var(--serif);color:var(--text-2);margin:14px 0 0;min-height:22px}
 
 /* popups (gwern) */
-.pop{position:absolute;z-index:40;width:360px;max-width:calc(100vw - 24px);background:#fff;border:1px solid #333;box-shadow:0 8px 24px -14px rgba(0,0,0,.45);font:13px/1.45 var(--sans);color:#222;display:none}
+/* gwern.net popups: a 1px bordered box, no shadow, opened after a short hover */
+.pop{position:absolute;z-index:40;width:360px;max-width:calc(100vw - 24px);background:#fff;border:1px solid #333;font:13px/1.45 var(--sans);color:#222;display:none}
 .pop.on{display:block}
 .pop header{background:#ececea;border-bottom:1px solid #c9c9c6;padding:7px 12px;font-weight:700;font-size:12px;display:flex;justify-content:space-between;gap:10px}
 .pop header span{font-weight:400;color:#666}
@@ -252,11 +279,10 @@ mark.cur{background:#ffb13b}
 @media (max-width:980px){
   .ov{grid-template-columns:minmax(0,1fr)}
   .rail{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
-  .rail section{border-top:1px solid var(--rule)!important;padding-top:12px!important}
   .rail section.scr{grid-column:1/-1}
   .sheet{padding:50px 34px 70px 88px;margin:0 16px}
   .sheet .gut{width:60px}
-  .side{position:static;width:auto;margin:10px 0 0;border:1px solid #d6d6d2;border-left:3px solid #b9b9b4;padding:7px 10px 8px;background:#fafaf8}
+  .side{position:static;width:auto;margin:8px 0 2px;border:1px solid #c8c8c3;padding:6px 10px 7px}
   .runfoot{left:88px}
 }
 @media (max-width:640px){
@@ -267,22 +293,22 @@ mark.cur{background:#ffb13b}
   .mnav{display:none}
   .band select{min-width:0;width:108px;font-size:12px}
   h1{font-size:19px}
-  .box{padding:14px 14px 16px;border-width:2px}
-  .facts{grid-template-columns:minmax(0,1fr);gap:2px}
-  .facts dd{margin-bottom:9px}
+  .sec{padding:26px 16px 10px}
+  .box{padding:30px 15px 16px}
+  .facts{grid-template-columns:92px minmax(0,1fr);gap:10px 12px}
   .screen{padding:6px}.screen svg{border-radius:10px/8px}
   .pbar{padding:0 6px 6px;gap:6px}
   .pbar .lbl{display:none}
   .caption{font-size:15.5px;padding:12px 13px 14px;min-height:118px}
   .rail{grid-template-columns:1fr}
-  .cos{grid-template-columns:1fr 1fr}
-  td.d{width:auto;white-space:normal}
   .acts thead{display:none}
-  .acts tr{display:block;border-bottom:1px solid var(--rule);padding:10px 2px}
-  .acts td{display:block;border:0;padding:1px 0}
-  .acts td.d{font-weight:700;font-size:12.5px}
-  .acts td.ch{width:auto;font-size:12px}
-  .meas td{padding:9px 8px}
+  .acts tr{display:block;border-top:1px solid #ddd;padding:10px 4px}
+  .acts tbody tr:first-child{border-top:0}
+  .acts td{display:inline;border:0;padding:0}
+  .acts td.d{white-space:normal}
+  .acts td.ch:not(:empty)::before{content:" \00b7  "}
+  .acts td.a{display:block;margin-top:3px}
+  .meas th,.meas td{padding:10px 6px}
   .desk{padding:16px 0 40px}
   .sheet{margin:0 10px;padding:30px 14px 60px 40px;font-size:16px}
   .sheet .gut{width:30px}
@@ -292,7 +318,7 @@ mark.cur{background:#ffb13b}
   .g-abill{font-size:40px}
   .g-intro{font-size:14px}
   .digest{padding:10px 12px;font-size:14px;line-height:21px}
-  .lines h2{font-size:16px}.lines h3{font-size:15.5px;letter-spacing:.04em}
+  .lines h2{font-size:16px}.lines h3{font-size:15.5px}
   .lines ol li{padding-left:1.8em}
   .sign{grid-template-columns:1fr}
   .runfoot{left:40px}
@@ -309,7 +335,7 @@ mark.cur{background:#ffb13b}
 <header class="mast">
   <div class="in">
     <a class="mark" href="#top" aria-label="The Capitol, top of the record"><b>THE CAPITOL<i>.</i></b><span>Advocacy &amp; legislation</span></a>
-    <nav class="mnav" aria-label="This record"><a href="#actions">All Actions</a><a href="#measures">Measures</a><a href="#text">Text</a><a href="#sign">Sign</a></nav>
+    <nav class="mnav" aria-label="This record"><a href="#actions">Actions</a><a href="#measures">Related Bills</a><a href="#text">Text</a><a href="#sign">Sign</a></nav>
   </div>
   <div class="band"><div class="in">
     <form id="find" role="search" onsubmit="return false">
@@ -326,31 +352,31 @@ mark.cur{background:#ffb13b}
 <main id="top">
 <section class="top" aria-labelledby="h1">
   <div class="in">
-    <p class="crumb"><a href="#top">The Capitol</a> &gt; <a href="#actions">Advocacy and legislation</a> &gt; H.R.2026</p>
-    <h1 id="h1"><span class="num">H.R.2026</span> — Worked End to End Act</h1>
-    <p class="cong">To record five California bills, one House office, and the organizing that carried them, and for other purposes.</p>
+    <p class="crumb"><a href="#top">The Capitol</a> &gt; <a href="#actions">Legislation</a> &gt; <a href="#text">119th Congress</a> &gt; H.R.2026</p>
+    <h1 id="h1"><span class="num">H.R.2026</span> - Worked End to End Act</h1>
+    <p class="cong">119th Congress (2025-2026)</p>
 
-    <div class="ov">
+    <div class="ov" id="ov">
       <div>
-        <div class="tab-l">RECORD <small>2021–2025</small></div>
-        <div class="box">
+        <div class="tab-l"><h2 id="status">Bill</h2><button type="button" id="hideov" aria-expanded="true" aria-controls="ovbox"><span id="hideovt">Hide Overview</span> <svg viewBox="0 0 10 10" aria-hidden="true" id="hideovi"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="#fff" stroke-width="2.2"/></svg></button></div>
+        <div class="box" id="ovbox">
           <dl class="facts">
             <dt>Sponsor:</dt><dd>Mr. Sokar (Introduced 09/26/2026)</dd>
             <dt>Offices:</dt><dd>Assembly: Asm. Jim Patterson, through Legislative Director Ian Coolbear. Senate: Sen. Shannon Grove. U.S. House: Office of Kevin McCarthy, Clovis.</dd>
-            <dt>Latest Action:</dt><dd>02/2025 Managing Director, California High School Democrats, ends. (<a href="#actions">All Actions</a>)</dd>
+            <dt>Latest Action:</dt><dd id="latest">02/2025 Completed term as Managing Director, California High School Democrats, 1 of 9 directors. (<a href="#actions">All Actions</a>)</dd>
             <dt class="full">Tracker:</dt>
             <dd class="full">
               <ol class="tracker" id="tracker" aria-label="Scenes of the record">
-                <li><button type="button" data-s="0"><span>The steps</span></button></li>
-                <li><button type="button" data-s="1"><span>Upstairs</span></button></li>
-                <li><button type="button" data-s="2"><span>Five bills</span></button></li>
-                <li><button type="button" data-s="3"><span>The House</span></button></li>
-                <li><button type="button" data-s="4"><span>LegislativeLift</span></button></li>
-                <li><button type="button" data-s="5"><span>Nationwide</span></button></li>
-                <li><button type="button" data-s="6"><span>Civics</span></button></li>
-                <li><button type="button" data-s="7" class="sig"><span>Your signature</span></button></li>
-              </ol>
-              <p class="tr-note">Each stage is one of his steps. Press one to watch it.</p>
+                <li><button type="button" data-s="0">The steps</button></li>
+                <li><button type="button" data-s="1">Upstairs</button></li>
+                <li><button type="button" data-s="2">Five bills</button></li>
+                <li><button type="button" data-s="3">The House</button></li>
+                <li><button type="button" data-s="4">LegislativeLift</button></li>
+                <li><button type="button" data-s="5">Nationwide</button></li>
+                <li><button type="button" data-s="6">Civics</button></li>
+                <li class="sig"><button type="button" data-s="7">Your signature</button></li>
+                </ol>
+              <p class="tr-note">Each stage is one of his steps. Select one to watch it.</p>
             </dd>
           </dl>
 
@@ -375,35 +401,37 @@ mark.cur{background:#ffb13b}
         </div>
       </div>
 
-      <aside class="rail" aria-label="More on this record">
+      <aside class="rail" aria-label="More on this bill">
         <section>
-          <h2>More on This Record</h2>
+          <h2>More on This Bill</h2>
           <ul>
             <li><a href="#actions">All Actions (11)</a></li>
-            <li><a href="#measures">California Measures (5)</a></li>
+            <li><a href="#measures">Related Bills (5)</a></li>
             <li><a href="#text" id="textlink">Text</a></li>
           </ul>
         </section>
         <section>
-          <h2>Cosponsors, by count</h2>
-          <div class="cos">
-            <div><span class="big">5,000+</span>student organizers, Diversify Our Narrative</div>
-            <div><span class="big">800+</span>district chapters, Diversify Our Narrative</div>
-            <div><span class="big">11K+</span>members, LegislativeLift</div>
-            <div><span class="big">80+</span>volunteers, LegislativeLift</div>
-          </div>
+          <h2>Subject — Policy Area:</h2>
+          <p>Civil Rights and Liberties, Minority Issues</p>
         </section>
         <section>
-          <h2>Type of Measure</h2>
+          <h2>Cosponsors:</h2>
+          <ul>
+            <li>5,000+ student organizers and 800+ district chapters, Diversify Our Narrative</li>
+            <li>11K+ members and 80+ volunteers, LegislativeLift</li>
+          </ul>
+        </section>
+        <section>
+          <h2>Type of Measure:</h2>
           <ul>
             <li>Five California bills</li>
             <li>Two houses: Assembly and Senate</li>
             <li>One U.S. House district office</li>
-            <li>Selective: 1 of 5, 1 of 9, 1 of 50, 11%</li>
+            <li>Selected 1 of 5, 1 of 9, 1 of 50; admitted at 11%</li>
           </ul>
         </section>
         <section class="scr">
-          <h2>Script of the cartoon</h2>
+          <h2>Script of the cartoon:</h2>
           <ol class="script" id="script"></ol>
         </section>
       </aside>
@@ -411,43 +439,42 @@ mark.cur{background:#ffb13b}
   </div>
 </section>
 
-<nav class="tabs" aria-label="Sections of the record">
-  <div class="in">
-    <a href="#actions" data-t="actions">All Actions (11)</a>
-    <a href="#measures" data-t="measures">Measures (5)</a>
-    <a href="#text" data-t="text" id="texttab">Text</a>
-  </div>
+<nav class="tabs" aria-label="Bill details">
+  <ul class="in">
+    <li data-t="actions" class="selected"><a href="#actions" aria-current="true">Actions (11)</a></li>
+    <li data-t="measures"><a href="#measures">Related Bills (5)</a></li>
+    <li data-t="text"><a href="#text" id="texttab">Text</a></li>
+  </ul>
 </nav>
 
 <section class="sec in" id="actions" aria-labelledby="act-h">
-  <h2 class="sec-h" id="act-h"><em>All Actions:</em> H.R.2026 — Worked End to End Act</h2>
-  <p class="sec-sub">11 actions, newest first. Months are given where the record gives them.</p>
-  <p class="legend"><span><i class="dot a"></i>Assembly</span><span><i class="dot s"></i>Senate</span><span><i class="dot h"></i>U.S. House</span><span><i class="dot f"></i>Field</span><span><i class="dot c"></i>Civic education</span></p>
-  <table class="acts">
+  <h2 class="sec-h" id="act-h"><em>All Actions:</em> H.R.2026 — 119th Congress (2025-2026)</h2>
+  <p class="sec-sub"><b>11</b> results for All Actions, newest to oldest. Months are given where the record gives them.</p>
+  <table class="item acts">
     <thead><tr><th scope="col">Date</th><th scope="col">Chamber</th><th scope="col">All Actions</th></tr></thead>
-    <tbody>
-      <tr><td class="d">09/2024–10/2024</td><td class="ch"><i class="dot f"></i>Field</td><td>Election Fellow, <b>Voters of Tomorrow</b>: 1 of 50 paid fellows, phone banking and canvassing.</td></tr>
-      <tr><td class="d">07/2024–02/2025</td><td class="ch"><i class="dot f"></i>Field</td><td>Managing Director, <b>California High School Democrats</b>: 1 of 9 directors, managing all regions.</td></tr>
-      <tr><td class="d">06/2024–01/2025</td><td class="ch"><i class="dot f"></i>Field</td><td>Executive Director of Operations, <b>Diversify Our Narrative</b>: 1 of 5 executives of a national 501(c)(3), 5,000+ student organizers, 800+ district chapters.</td></tr>
-      <tr><td class="d">2023–2025</td><td class="ch"><i class="dot f"></i>Field</td><td><b>National Muslim Caucus</b>, High School Democrats of America.</td></tr>
-      <tr><td class="d">2023</td><td class="ch"><i class="dot c"></i>Civic education</td><td>Fellow, <b>Civics Unplugged</b> ’23 (11% acceptance).</td></tr>
-      <tr><td class="d">06/2022–12/2022</td><td class="ch"><i class="dot h"></i>U.S. House</td><td>Congressional Intern, <b>Office of Kevin McCarthy</b>, Clovis, California.</td></tr>
-      <tr><td class="d">04/2022–12/2022</td><td class="ch"><i class="dot f"></i>Field</td><td>Executive Director, <b>LegislativeLift</b> (earlier Outreach Director; before that, volunteer). 11K+ members, 80+ volunteers, events in Egypt, India, and the U.S.</td></tr>
-      <tr><td class="d">2022</td><td class="ch"><i class="dot c"></i>Civic education</td><td>Advocacy Fellow, <b>Encode Justice</b>.</td></tr>
-      <tr><td class="d">05/2021–05/2023</td><td class="ch"><i class="dot a"></i><i class="dot s"></i>Assembly, Senate</td><td>Advocated for <a class="bn" href="#m-ab1947" data-pop="ab1947">AB 1947</a>, <a class="bn" href="#m-sb1161" data-pop="sb1161">SB 1161</a>, <a class="bn" href="#m-ab2549" data-pop="ab2549">AB 2549</a> and <a class="bn" href="#m-sb1038" data-pop="sb1038">SB 1038</a>.</td></tr>
-      <tr><td class="d">05/2021–05/2023</td><td class="ch"><i class="dot a"></i><i class="dot s"></i>Assembly, Senate</td><td>Lead Advocate, <b>CAIR</b>, Sacramento: lead community advocate for <a class="bn" href="#m-ab1766" data-pop="ab1766">AB 1766</a>, with the offices of Asm. Jim Patterson and Sen. Shannon Grove.</td></tr>
-      <tr><td class="d">Undated</td><td class="ch"><i class="dot c"></i>Civic education</td><td>Delegate, <b>American Legion California Boys State</b>. <b>ACLU National Advocacy Institute</b>.</td></tr>
+    <tbody id="acts">
+      <tr><td class="d">09/2024–10/2024</td><td class="ch"></td><td class="a">Election Fellow, <b>Voters of Tomorrow</b>: 1 of 50 paid fellows, phone banking and canvassing.</td></tr>
+      <tr><td class="d">07/2024–02/2025</td><td class="ch"></td><td class="a">Managing Director, <b>California High School Democrats</b>: 1 of 9 directors, managing all regions.</td></tr>
+      <tr><td class="d">06/2024–01/2025</td><td class="ch"></td><td class="a">Executive Director of Operations, <b>Diversify Our Narrative</b>: 1 of 5 executives leading a national 501(c)(3) of 5,000+ student organizers and 800+ district chapters. Featured in TIME, Bloomberg, Vox, ABC Nightline and The Washington Post.</td></tr>
+      <tr><td class="d">2023–2025</td><td class="ch"></td><td class="a"><b>National Muslim Caucus</b>, High School Democrats of America.</td></tr>
+      <tr><td class="d">2023</td><td class="ch"></td><td class="a">Fellow, <b>Civics Unplugged</b> ’23, admitted at an 11% rate.</td></tr>
+      <tr><td class="d">06/2022–12/2022</td><td class="ch">House</td><td class="a">Congressional Intern, <b>Office of Kevin McCarthy</b>, U.S. House of Representatives, Clovis, California.</td></tr>
+      <tr><td class="d">04/2022–12/2022</td><td class="ch"></td><td class="a">Executive Director, <b>LegislativeLift</b>, a global Muslim civil-rights nonprofit of 11K+ members and 80+ volunteers, with events in Egypt, India and the U.S. Rose from volunteer to Outreach Director to Executive Director.</td></tr>
+      <tr><td class="d">2022</td><td class="ch"></td><td class="a">Advocacy Fellow, <b>Encode Justice</b>.</td></tr>
+      <tr><td class="d">05/2021–05/2023</td><td class="ch">Assembly, Senate</td><td class="a">Advocated for <a class="bn" href="#m-ab1947" data-pop="ab1947">AB 1947</a>, <a class="bn" href="#m-sb1161" data-pop="sb1161">SB 1161</a>, <a class="bn" href="#m-ab2549" data-pop="ab2549">AB 2549</a> and <a class="bn" href="#m-sb1038" data-pop="sb1038">SB 1038</a>.</td></tr>
+      <tr><td class="d">05/2021–05/2023</td><td class="ch">Assembly, Senate</td><td class="a">Lead Advocate, <b>CAIR</b>, Sacramento: lead community advocate for <a class="bn" href="#m-ab1766" data-pop="ab1766">AB 1766</a>, California IDs for All, with the offices of Asm. Jim Patterson and Sen. Shannon Grove. Five California bills worked end to end.</td></tr>
+      <tr><td class="d">Undated</td><td class="ch"></td><td class="a">Delegate, <b>American Legion California Boys State</b>. Participant, <b>ACLU National Advocacy Institute</b>.</td></tr>
     </tbody>
   </table>
 </section>
 
 <section class="sec in" id="measures" aria-labelledby="mea-h">
-  <h2 class="sec-h" id="mea-h"><em>Measures:</em> five California bills</h2>
-  <p class="sec-sub">Worked end to end as Lead Advocate for CAIR in Sacramento, May 2021 to May 2023.</p>
-  <table class="meas">
-    <thead><tr><th scope="col">Measure</th><th scope="col">Topic</th><th scope="col">His part</th></tr></thead>
+  <h2 class="sec-h" id="mea-h"><em>Related Bills:</em> H.R.2026 — 119th Congress (2025-2026)</h2>
+  <p class="sec-sub"><b>5</b> California bills, worked end to end as Lead Advocate for CAIR in Sacramento, May 2021 to May 2023.</p>
+  <table class="item meas">
+    <thead><tr><th scope="col">Bill</th><th scope="col">Latest Title</th><th scope="col">Relationship to H.R.2026</th></tr></thead>
     <tbody>
-      <tr id="m-ab1766"><td><a class="bn" href="#s102" data-pop="ab1766">AB 1766</a></td><td>California IDs for All</td><td>Lead community advocate; worked with Asm. Jim Patterson’s office (Legislative Director Ian Coolbear) and Sen. Shannon Grove’s office</td></tr>
+      <tr id="m-ab1766"><td><a class="bn" href="#s102" data-pop="ab1766">AB 1766</a></td><td>California IDs for All</td><td>Lead community advocate, with Asm. Jim Patterson’s office (Legislative Director Ian Coolbear) and Sen. Shannon Grove’s office</td></tr>
       <tr id="m-ab1947"><td><a class="bn" href="#s102" data-pop="ab1947">AB 1947</a></td><td>Freedom from Hate Crimes</td><td>Advocate</td></tr>
       <tr id="m-sb1161"><td><a class="bn" href="#s102" data-pop="sb1161">SB 1161</a></td><td>Transit Safety</td><td>Advocate</td></tr>
       <tr id="m-ab2549"><td><a class="bn" href="#s102" data-pop="ab2549">AB 2549</a></td><td>Ending Street Harassment</td><td>Advocate</td></tr>
@@ -459,7 +486,7 @@ mark.cur{background:#ffb13b}
 <section class="desk" id="text" aria-label="Text of the bill">
   <article class="sheet" id="sheet">
     <div class="gut" id="gut" aria-hidden="true"></div>
-    <div class="g-head"><span>119TH CONGRESS<br>2D SESSION</span><b>H. R. 2026</b></div>
+    <div class="g-head"><span>119th Congress<br>2d Session</span><b>H. R. 2026</b></div>
     <p class="g-purpose">To record five California bills, one House office, and the organizing that carried them, and for other purposes.</p>
     <p class="g-house">IN THE HOUSE OF REPRESENTATIVES</p>
     <p class="g-date">September 26, 2026</p>
@@ -503,12 +530,12 @@ mark.cur{background:#ffb13b}
 
       <h3>TITLE I—THE CALIFORNIA LEGISLATURE</h3>
 
-      <h2 id="s101">SEC. 101. LEAD ADVOCATE.</h2>
-      <aside class="side" data-for="s101"><span class="k">Sacramento</span><b>May 2021–May 2023.</b> Council on American-Islamic Relations (CAIR). Two years in the building.</aside>
-      <p>Mr. Sokar served as Lead Advocate for CAIR in Sacramento, California, from May 2021 to May 2023.</p>
+      <h2 id="s101">SEC. 101. LEAD ADVOCATE.<sup class="sn"><a href="#sn1" aria-label="Sidenote 1">1</a></sup></h2>
+      <aside class="side" data-for="s101" id="sn1"><span class="n">1</span><span class="k">Sacramento.</span> <b>May 2021–May 2023.</b> Two years in the building.</aside>
+      <p>Mr. Sokar served as Lead Advocate for the Council on American-Islamic Relations (CAIR) in Sacramento, California, from May 2021 to May 2023, and worked five California bills end to end.</p>
 
-      <h2 id="s102">SEC. 102. THE MEASURES.</h2>
-      <aside class="side" data-for="s102"><span class="k">Two houses</span><b>Assembly</b>: Asm. Jim Patterson’s office, through Legislative Director Ian Coolbear. <b>Senate</b>: Sen. Shannon Grove’s office.</aside>
+      <h2 id="s102">SEC. 102. THE MEASURES.<sup class="sn"><a href="#sn2" aria-label="Sidenote 2">2</a></sup></h2>
+      <aside class="side" data-for="s102" id="sn2"><span class="n">2</span><span class="k">Two houses.</span> <b>Assembly</b>: Asm. Jim Patterson’s office, through Legislative Director Ian Coolbear. <b>Senate</b>: Sen. Shannon Grove’s office.</aside>
       <p>(a) <span class="smc">Lead Measure</span>.—He was the lead community advocate for <a class="bn" href="#m-ab1766" data-pop="ab1766">AB 1766</a> (California IDs for All), working with the office of Assemblymember Jim Patterson, through Legislative Director Ian Coolbear, and with the office of Senator Shannon Grove.</p>
       <p>(b) <span class="smc">Further Measures</span>.—He also advocated for⁠—</p>
       <ol>
@@ -521,34 +548,34 @@ mark.cur{background:#ffb13b}
 
       <h3>TITLE II—THE HOUSE OF REPRESENTATIVES</h3>
 
-      <h2 id="s201">SEC. 201. DISTRICT OFFICE.</h2>
-      <aside class="side" data-for="s201"><span class="k">U.S. House</span><b>June–December 2022.</b> Clovis, California.</aside>
+      <h2 id="s201">SEC. 201. DISTRICT OFFICE.<sup class="sn"><a href="#sn3" aria-label="Sidenote 3">3</a></sup></h2>
+      <aside class="side" data-for="s201" id="sn3"><span class="n">3</span><span class="k">U.S. House.</span> <b>June–December 2022.</b> Clovis, California.</aside>
       <p>Mr. Sokar served as a Congressional Intern in the Office of Kevin McCarthy, United States House of Representatives, in Clovis, California.</p>
 
       <h3>TITLE III—ORGANIZING</h3>
 
-      <h2 id="s301">SEC. 301. LEGISLATIVELIFT.</h2>
-      <aside class="side" data-for="s301"><span class="k">As amended</span><b>April–December 2022.</b> Text struck through is the earlier title; italic is the title as amended.</aside>
+      <h2 id="s301">SEC. 301. LEGISLATIVELIFT.<sup class="sn"><a href="#sn4" aria-label="Sidenote 4">4</a></sup></h2>
+      <aside class="side" data-for="s301" id="sn4"><span class="n">4</span><span class="k">As amended.</span> <b>April–December 2022.</b> Text struck through is the earlier title; italic is the title as amended.</aside>
       <p>(a) <span class="smc">Office</span>.—Mr. Sokar served as <del>a volunteer</del> <del>Outreach Director</del> <ins>Executive Director</ins> of LegislativeLift, a global Muslim civil-rights nonprofit.</p>
-      <p>(b) <span class="smc">Record</span>.—LegislativeLift has more than 11,000 members and 80 volunteers, holds events in Egypt, India, and the United States, and runs scholar programs and legislative literacy.</p>
+      <p>(b) <span class="smc">Record</span>.—LegislativeLift has more than 11,000 members and more than 80 volunteers, holds events in Egypt, India, and the United States, and runs scholar programs and legislative literacy.</p>
 
-      <h2 id="s302">SEC. 302. DIVERSIFY OUR NARRATIVE.</h2>
-      <aside class="side" data-for="s302"><span class="k">1 of 5</span><b>June 2024–January 2025.</b> Featured in TIME, Bloomberg, Vox, ABC Nightline, and The Washington Post.</aside>
-      <p>As Executive Director of Operations, one of five executives, he helped lead Diversify Our Narrative, a national 501(c)(3) of more than 5,000 student organizers and more than 800 district chapters pushing curriculum equity reform.</p>
+      <h2 id="s302">SEC. 302. DIVERSIFY OUR NARRATIVE.<sup class="sn"><a href="#sn5" aria-label="Sidenote 5">5</a></sup></h2>
+      <aside class="side" data-for="s302" id="sn5"><span class="n">5</span><span class="k">1 of 5.</span> <b>June 2024–January 2025.</b> Featured in TIME, Bloomberg, Vox, ABC Nightline, and The Washington Post.</aside>
+      <p>As Executive Director of Operations, Mr. Sokar was one of five executives leading Diversify Our Narrative, a national 501(c)(3) of more than 5,000 student organizers and more than 800 district chapters pushing curriculum equity reform.</p>
 
-      <h2 id="s303">SEC. 303. CALIFORNIA HIGH SCHOOL DEMOCRATS.</h2>
-      <aside class="side" data-for="s303"><span class="k">1 of 9</span><b>July 2024–February 2025.</b> Also 2023–2025: the National Muslim Caucus, High School Democrats of America.</aside>
+      <h2 id="s303">SEC. 303. CALIFORNIA HIGH SCHOOL DEMOCRATS.<sup class="sn"><a href="#sn6" aria-label="Sidenote 6">6</a></sup></h2>
+      <aside class="side" data-for="s303" id="sn6"><span class="n">6</span><span class="k">1 of 9.</span> <b>July 2024–February 2025.</b> The caucus: 2023–2025.</aside>
       <p>(a) <span class="smc">Managing Director</span>.—He served as Managing Director of the California High School Democrats, one of nine directors managing all regions.</p>
       <p>(b) <span class="smc">National Muslim Caucus</span>.—From 2023 to 2025 he served with the National Muslim Caucus of the High School Democrats of America.</p>
 
-      <h2 id="s304">SEC. 304. VOTERS OF TOMORROW.</h2>
-      <aside class="side" data-for="s304"><span class="k">1 of 50</span><b>September–October 2024.</b> A paid fellowship.</aside>
-      <p>He was an Election Fellow of Voters of Tomorrow, one of 50 paid fellows, phone banking and canvassing.</p>
+      <h2 id="s304">SEC. 304. VOTERS OF TOMORROW.<sup class="sn"><a href="#sn7" aria-label="Sidenote 7">7</a></sup></h2>
+      <aside class="side" data-for="s304" id="sn7"><span class="n">7</span><span class="k">1 of 50.</span> <b>September–October 2024.</b> A paid fellowship.</aside>
+      <p>He was selected as one of 50 paid Election Fellows of Voters of Tomorrow, phone banking and canvassing.</p>
 
       <h3>TITLE IV—CIVIC EDUCATION</h3>
 
-      <h2 id="s401">SEC. 401. PROGRAMS.</h2>
-      <aside class="side" data-for="s401"><span class="k">11%</span>The acceptance rate of Civics Unplugged, class of ’23.</aside>
+      <h2 id="s401">SEC. 401. PROGRAMS.<sup class="sn"><a href="#sn8" aria-label="Sidenote 8">8</a></sup></h2>
+      <aside class="side" data-for="s401" id="sn8"><span class="n">8</span><span class="k">11%.</span> The acceptance rate of Civics Unplugged, class of ’23.</aside>
       <p>Mr. Sokar was⁠—</p>
       <ol>
         <li>(1) a delegate to American Legion California Boys State;</li>
@@ -818,9 +845,9 @@ var CAPS=[
  'Two doors upstairs. <b>Green is the Assembly</b>: Jim Patterson’s office, through Legislative Director Ian Coolbear. <b>Red is the Senate</b>: Shannon Grove’s office. Walk the bill down one hall, then up the other.',
  'It had company. <b>AB 1947</b>, Freedom from Hate Crimes. <b>SB 1161</b>, Transit Safety. <b>AB 2549</b>, Ending Street Harassment. <b>SB 1038</b>, limits on biometric surveillance by law enforcement. Five bills, worked end to end.',
  '<b>June to December 2022</b>, the federal side: Congressional Intern in the Office of Kevin McCarthy, U.S. House of Representatives, at the district office in Clovis.',
- 'Laws move when people know how they’re made. <b>LegislativeLift</b>, a global Muslim civil-rights nonprofit: 11K+ members, 80+ volunteers, events in Egypt, India and the U.S. Volunteer, then Outreach Director, then Executive Director.',
+ 'Laws move when people know how they’re made. <b>Executive Director of LegislativeLift</b>, a global Muslim civil-rights nonprofit: 11K+ members, 80+ volunteers, events in Egypt, India and the U.S. He started as a volunteer.',
  '<b>Diversify Our Narrative</b>: 1 of 5 executives, 5,000+ student organizers, 800+ chapters. <b>Voters of Tomorrow</b>: 1 of 50 election fellows, on the phones and at the doors. <b>California High School Democrats</b>: 1 of 9 directors, every region.',
- 'And the rooms where you learn the rules: <b>American Legion Boys State</b>, the <b>ACLU National Advocacy Institute</b>, <b>Civics Unplugged</b> (11% get in), and a fellowship with <b>Encode Justice</b>.',
+ 'And the rooms where you learn the rules: <b>American Legion Boys State</b>, the <b>ACLU National Advocacy Institute</b>, <b>Civics Unplugged</b> (11% get in), and <b>Encode Justice</b>, as an Advocacy Fellow.',
  'Every bill ends up on a desk, waiting for a signature. This one is waiting for yours: <a href="#sign">sign it at the foot of the text</a>.'
 ];
 var CAP_SIGNED='<b>Signed.</b> Enrolled, stamped, and into the record. Thanks for carrying it the last few steps.';
@@ -842,8 +869,8 @@ function show(i,user){
   void host.getBoundingClientRect();
   scenes[i].classList.add('play');
   cur=i;
-  tbtns.forEach(function(b,k){if(k===i)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
-  var tr=$('tracker'),tb=tbtns[i].parentNode;if(tr.scrollWidth>tr.clientWidth){var L=tb.offsetLeft-tr.offsetLeft,R=L+tb.offsetWidth;if(L<tr.scrollLeft||R>tr.scrollLeft+tr.clientWidth)tr.scrollLeft=Math.max(0,L-24);}
+  // congress.gov: steps already taken are 'passed', the current one 'selected', the rest stay grey
+  tbtns.forEach(function(b,k){var li=b.parentNode;li.classList.toggle('passed',k<i);li.classList.toggle('selected',k===i);if(k===i)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
   slis.forEach(function(l,k){l.classList.toggle('now',k===i);});
   $('where').textContent='Scene '+(i+1)+' of '+scenes.length+' · '+TITLES[i];
   $('caption').innerHTML='<span class="sc">'+TITLES[i]+'</span>'+(i===7&&signed?CAP_SIGNED:CAPS[i]);
@@ -899,7 +926,7 @@ function layout(){
   LINES=uniq;
   var out='';
   uniq.forEach(function(m,i){var ln=i%25+1,pg=Math.floor(i/25)+1;
-    if(ln===1&&pg>1) out+='<i style="top:'+(m-24).toFixed(1)+'px">'+pg+'</i>';
+    if(ln===1&&pg>1) out+='<i style="top:'+(m-7).toFixed(1)+'px" title="Page '+pg+'">'+pg+'</i>';
     out+='<span style="top:'+(m-7).toFixed(1)+'px">'+ln+'</span>';});
   gut.innerHTML=out;
   var lab='Text ('+uniq.length+' lines)';$('texttab').textContent=lab;$('textlink').textContent=lab;
@@ -931,7 +958,7 @@ function openPop(a){
 function closePop(){pop.classList.remove('on');popFor=null;}
 [].forEach.call(doc.querySelectorAll('a.bn[data-pop]'),function(a){
   a.setAttribute('aria-haspopup','dialog');
-  a.addEventListener('mouseenter',function(){if(coarse)return;clearTimeout(popT);popT=setTimeout(function(){openPop(a);},180);});
+  a.addEventListener('mouseenter',function(){if(coarse)return;clearTimeout(popT);popT=setTimeout(function(){openPop(a);},250);});
   a.addEventListener('mouseleave',function(){if(coarse)return;clearTimeout(popT);popT=setTimeout(closePop,260);});
   a.addEventListener('focus',function(){if(!coarse)openPop(a);});
   a.addEventListener('blur',function(){if(coarse)return;popT=setTimeout(closePop,200);});
@@ -981,9 +1008,16 @@ $('find').addEventListener('submit',function(e){e.preventDefault();nextMark();})
 /* =====================================================================
    Tabs follow the reader
    ===================================================================== */
-var tabs=[].slice.call(doc.querySelectorAll('.tabs a')),secs=tabs.map(function(a){return $(a.dataset.t);}),tick=false;
-function spy(){tick=false;var k=-1;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<=90)k=i;});tabs.forEach(function(a,i){a.setAttribute('aria-current',i===(k<0?0:k)?'true':'false');});}
+var tabs=[].slice.call(doc.querySelectorAll('.tabs li')),secs=tabs.map(function(l){return $(l.dataset.t);}),tick=false;
+function sel(k){tabs.forEach(function(l,i){l.classList.toggle('selected',i===k);var a=l.querySelector('a');if(i===k)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current');});}
+function spy(){tick=false;var k=0;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<=90)k=i;});sel(k);}
 addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(spy);}},{passive:true});spy();
+
+/* Hide Overview / Show Overview: the congress.gov toggle on the red label */
+$('hideov').addEventListener('click',function(){var ov=$('ov'),h=!ov.classList.contains('hid');ov.classList.toggle('hid',h);this.setAttribute('aria-expanded',!h);
+  $('hideovt').textContent=h?'Show Overview':'Hide Overview';
+  $('hideovi').innerHTML=h?'<path d="M1.5 3l3.5 4 3.5-4" fill="none" stroke="#fff" stroke-width="2"/>':'<path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="#fff" stroke-width="2.2"/>';
+  if(h){clearTimeout(timer);}else{schedule();}});
 
 /* =====================================================================
    The signature pad and the rubber stamp
@@ -998,17 +1032,20 @@ pad.addEventListener('pointerdown',function(e){e.preventDefault();try{pad.setPoi
 pad.addEventListener('pointermove',function(e){if(!curS)return;var p=pt(e),l=curS[curS.length-1];if(Math.hypot(p.x-l.x,p.y-l.y)<1.5)return;inked+=Math.hypot(p.x-l.x,p.y-l.y);curS.push(p);ctx.strokeStyle='#1c2f6e';ctx.lineCap='round';var n=curS.length;seg(curS[Math.max(0,n-3)],curS[n-2],curS[n-1]);});
 function up(){if(!curS)return;curS=null;if(inked>90)doSign();}
 pad.addEventListener('pointerup',up);pad.addEventListener('pointercancel',up);
+var LATEST=$('latest').innerHTML;
 function doSign(){
   if(signed)return;signed=true;
   sheet.classList.add('signed');
   $('after').textContent='Signed. Enrolled, stamped, and into the record.';
-  var sb=doc.querySelector('#tracker .sig');sb.classList.add('done');sb.querySelector('span').textContent='Signed';
+  var sb=doc.querySelector('#tracker .sig');sb.classList.add('done');sb.querySelector('button').textContent='Signed';
+  $('status').textContent='Law';$('latest').innerHTML='09/26/2026 Signed by the reader. Enrolled. (<a href="#actions">All Actions</a>)';
   $('toon').classList.add('signed-toon');
   if(cur===7) show(7);
 }
 function unSign(){
   signed=false;sheet.classList.remove('signed');$('after').textContent='';
-  var sb=doc.querySelector('#tracker .sig');sb.classList.remove('done');sb.querySelector('span').textContent='Your signature';
+  var sb=doc.querySelector('#tracker .sig');sb.classList.remove('done');sb.querySelector('button').textContent='Your signature';
+  $('status').textContent='Bill';$('latest').innerHTML=LATEST;
   $('toon').classList.remove('signed-toon');if(cur===7) show(7);
 }
 $('clear').onclick=function(){strokes=[];inked=0;redraw();unSign();};
