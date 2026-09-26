@@ -17,39 +17,39 @@ E = html.escape
 # pool / picked, straight from versions/CONTENT.md. approx=True where CONTENT gives "~" or a percentage.
 SPECS = [
     dict(id='qb-finalist', pool=25500, picked=7287, approx=False, art=art.school7, w=.9, lane=.3,
-         name='QuestBridge National College Match Finalist', fact='One of 7,287 finalists, out of 25,500.'),
+         name='QuestBridge National College Match Finalist', fact='7,287 finalists from 25,500.'),
     dict(id='qb-cps', pool=16000, picked=3911, approx=False, art=art.school4, w=.9, lane=.9,
-         name='QuestBridge College Prep Scholar', fact='One of 3,911 scholars, out of 16,000.'),
+         name='QuestBridge College Prep Scholar', fact='3,911 scholars from 16,000.'),
     dict(id='hsd', pool=700, picked=80, approx=True, art=art.dolphin, w=.95, lane=.1,
-         name='High School Diplomats Finalist', fact='One of about 80 finalists, out of 700+.'),
+         name='High School Diplomats Finalist', fact='About 80 finalists from 700+.'),
     dict(id='usc', pool=1800, picked=200, approx=True, art=art.pilotfish, w=.72, lane=.7,
-         name='USC Young Leaders Summit Scholar', fact='One of about 200 scholars, out of 1,800+.'),
+         name='USC Young Leaders Summit Scholar', fact='About 200 from 1,800+.'),
     dict(id='notre-dame', pool=1500, picked=90, approx=True, art=art.lionfish, w=.78, lane=1,
-         name='Notre Dame Leadership Seminars', fact='One of about 90, out of 1,500+.'),
+         name='Notre Dame Leadership Seminars', fact='About 90 from 1,500+.'),
     dict(id='jfk', pool=2800, picked=150, approx=True, art=art.swordfish, w=1, lane=.2,
-         name='JFK Profile in Courage Essay Contest', fact='Top 5%: one of about 150, out of 2,800+.'),
+         name='JFK Profile in Courage Essay Contest', fact='Top 5%: about 150 of 2,800+.'),
     dict(id='climate', n=20, approx=True, art=art.brain_coral, w=.72, lane=.75,
          name='International Climate Science Olympiad Semifinalist', fact='Top 5% of 55,000+.'),
     dict(id='tass', pool=2400, picked=72, approx=False, art=art.sea_turtle, w=.82, lane=.3,
-         name='Telluride Association Summer Seminar', fact='One of 72, out of 2,400+. A tuition-free seminar in Critical Black Studies, summer 2024, where he was elected house chair.'),
+         name='Telluride Association Summer Seminar', fact='72 from 2,400+. Tuition-free, six to seven weeks in Critical Black Studies, summer 2024. Elected house chair.'),
     dict(id='taco-bell', pool=14000, picked=400, approx=True, art=art.pufferfish, w=.6, lane=1,
-         name='Taco Bell Live Más Scholar', fact='A $10,000 scholarship. One of about 400, out of 14,000.'),
+         name='Taco Bell Live Más Scholar', fact='$10K. About 400 from 14,000.'),
     dict(id='quest-excellence', pool=3911, picked=100, approx=True, art=art.nautilus, w=.62, lane=.6,
-         name='QuestBridge Quest for Excellence Award, Humanities', fact='One of about 100, chosen from the 3,911 College Prep Scholars.',
-         note='They were already 1 in 4.1.'),
+         name='QuestBridge Quest for Excellence Award, Humanities', fact='About 100 from the 3,911 College Prep Scholars.',
+         note='The pool is scholars, not applicants.'),
     dict(id='coolidge', pool=4100, picked=100, approx=False, art=art.grouper, w=.86, lane=0,
-         name='Coolidge Scholarship Senator', fact='One of 100 Senators, out of 4,100+.'),
+         name='Coolidge Scholarship Senator', fact='100 from 4,100+.'),
     dict(id='elks', pool=21000, picked=500, approx=False, art=art.staghorn, w=.6, lane=.35,
-         name='Elks Most Valuable Student Semifinalist', fact='One of 500 semifinalists, out of 21,000+.'),
+         name='Elks Most Valuable Student Semifinalist', fact='500 from 21,000+.'),
     dict(id='gates', pool=48000, picked=750, approx=False, art=art.manta, w=1, lane=.4,
-         name='Gates Scholar', fact='One of 750 Gates Scholars, out of 48,000+.'),
+         name='Gates Scholar', fact='750 from 48,000+.'),
     dict(id='princeton-prize', pool=600, picked=3, approx=False, art=art.barreleye, w=.85, lane=.75,
-         name='Princeton Prize in Race Relations, San Francisco', fact='One of 3, out of 600+.'),
+         name='Princeton Prize in Race Relations, San Francisco', fact='3 from 600+.'),
     dict(id='coca-cola', pool=105000, picked=150, approx=False, art=art.red_jelly, w=.62, lane=.25,
-         name='Coca-Cola Scholar', fact='One of 150 Coca-Cola Scholars, out of 105,000+.'),
+         name='Coca-Cola Scholar', fact='150 from 105,000+.'),
 ]
 FLOOR = dict(id='nsda-soty', pool=140000, picked=86, approx=False,
-             name='NSDA Student of the Year', fact='One of 86, out of 140,000+.', note='The pool is every member of the National Speech & Debate Association.')
+             name='NSDA Student of the Year', fact='86 from 140,000+ members.', note='That pool is every member, not applicants.')
 
 for s in SPECS + [FLOOR]:
     if 'n' not in s:
@@ -82,10 +82,10 @@ NMAX = FLOOR['n']
 
 # ------------------------------------------------------------------ zones (ocean names, rarity bands)
 ZONES = [
-    ('sunlight', 1, 'The Sunlight Zone', ''),
-    ('twilight', 10, 'The Twilight Zone', 'Below 1 in 10, fewer than one in ten get picked.'),
-    ('midnight', 100, 'The Midnight Zone', 'Below 1 in 100, fewer than one in a hundred.'),
-    ('abyssal', 1000, 'The Abyssal Zone', 'Below 1 in 1,000, fewer than one in a thousand.'),
+    ('sunlight', 1, 'The Sunlight Zone', '1 in 1 to 1 in 10'),
+    ('twilight', 10, 'The Twilight Zone', '1 in 10 to 1 in 100'),
+    ('midnight', 100, 'The Midnight Zone', '1 in 100 to 1 in 1,000'),
+    ('abyssal', 1000, 'The Abyssal Zone', '1 in 1,000 and rarer'),
 ]
 CHALLENGER = ('deepest', 1590, 'The Deepest Point', 'On this page, anyway')
 
@@ -120,22 +120,22 @@ BLURBS = [
     (600, 2, .3, 'Almost there. For this one, anyway.'),
     (748, 2, .75, 'For every Coca-Cola Scholar, about 699 others weren’t picked.'),
     (830, 2, .2, 'One left. It’s 928 units further down.'),
-    (930, 3, .5, 'It gets very quiet from here.'),
+    (930, 3, .5, 'Below 1 in 1,000 it gets very quiet.'),
     (1070, 2, .6, 'You’ve scrolled about <span data-screens>seventy</span> screens to get here.'),
     (1160, 2, .2, 'Nothing lives here.'),
     (1260, 2, .7, 'Still nothing.'),
-    (1360, 2, .3, '1 in 1,000 is a long way up now.'),
+    (1360, 2, .3, 'You can skip to the bottom any time. It’s under Jump, top right.'),
     (1420, 2, .6, 'Something down here is glowing.'),
     (1565, 2, .3, 'Getting closer.'),
 ]
 
 # ------------------------------------------------------------------ the raft: honors with no published odds (CONTENT.md, Honors)
 RAFT = [
-    ('Benjamin A. Gilman Scholar', 'Scholar.', art.f_glass),
+    ('Benjamin A. Gilman Scholar', 'Scholarship.', art.f_glass),
     ('National African American Recognition Program', 'National recognition.', art.f_orange),
     ('International Geography Olympiad', 'Team USA qualifier: 7th nationally, with a perfect qualifying score.', art.f_globe),
-    ('National History Day', 'Valley Champion, twice.', art.f_bottle),
-    ('Summa Cum Laude', 'Clovis Community College. The highest Latin honor.', art.f_cap),
+    ('National History Day', '2× Valley Champion.', art.f_bottle),
+    ('Summa Cum Laude', 'The highest of the Latin honors.', art.f_cap),
 ]
 TOTAL = count_measured + len(RAFT)
 POOL_COUNT = {1: 'one', 15: 'fifteen'}.get(len([x for x in SPECS + [FLOOR] if x['id'] != 'quest-excellence']), str(len([x for x in SPECS + [FLOOR] if x['id'] != 'quest-excellence'])))
@@ -155,17 +155,14 @@ FISH_MARK = ('<svg viewBox="0 0 30 20" aria-hidden="true" focusable="false"><pat
 ARROW = '<svg viewBox="0 0 14 16" aria-hidden="true" focusable="false"><path d="M7,1 V14 M1.5,8.5 L7,14 L12.5,8.5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 
 
-def no_html(no):
-    return f'<span class="spec-no"><span class="sr-only">No. </span>{no}</span>'
-
-
 def spec_html(s):
     note = f'<span class="note">{E(s["note"])}</span>' if s.get('note') else ''
     return (f'<article class="spec" id="s-{s["id"]}" data-n="{s["n"]:.6f}" data-lane="{s["lane"]}" aria-labelledby="s-{s["id"]}-h">'
-            f'<div class="spec-art" style="--w:{s["w"]}">{s["art"](s["id"])}{no_html(s["no"])}</div>'
+            f'<div class="spec-art" style="--w:{s["w"]}">{s["art"](s["id"])}</div>'
+            f'<p class="spec-no">No. {s["no"]}</p>'
             f'<h3 class="spec-name" id="s-{s["id"]}-h">{E(s["name"])}</h3>'
             f'<p class="spec-fact">{E(s["fact"])}{note}</p>'
-            f'<p class="spec-odds"><span class="tether"></span><span>{odds_html(s)}</span></p>'
+            f'<p class="spec-odds"><span class="tether"></span>{odds_html(s)}</p>'
             '</article>')
 
 
@@ -176,17 +173,17 @@ def blurb_html(b):
 
 def zone_html(z):
     zid, n, title, rng = z
-    rng_html = f'<span class="zone-range">{E(rng)}</span>' if rng else ''
-    return f'<h2 class="zone-title" id="z-{zid}" data-kind="zone" data-n="{n}">{E(title)}{rng_html}</h2>'
+    return (f'<h2 class="zone-title" id="z-{zid}" data-kind="zone" data-n="{n}">{E(title)}'
+            f'<span class="zone-range">{E(rng)}</span></h2>')
 
 
 def floor_html():
     s = FLOOR
     return (f'<article class="spec spec-floor" id="s-{s["id"]}" data-kind="floor" data-n="{s["n"]:.6f}" aria-labelledby="s-{s["id"]}-h">'
-            f'<div class="spec-text"><h3 class="spec-name" id="s-{s["id"]}-h">{E(s["name"])}</h3>'
+            f'<div class="spec-text"><p class="spec-no">No. {s["no"]}</p><h3 class="spec-name" id="s-{s["id"]}-h">{E(s["name"])}</h3>'
             f'<p class="spec-fact">{E(s["fact"])}<span class="note">{E(s["note"])}</span></p></div>'
-            f'<div class="spec-art floor-angler">{art.anglerfish(s["id"])}{no_html(s["no"])}</div>'
-            f'<p class="spec-odds"><span>{odds_html(s)}</span></p>'
+            f'<div class="spec-art floor-angler">{art.anglerfish(s["id"])}</div>'
+            f'<p class="spec-odds">{odds_html(s)}</p>'
             '</article>')
 
 
@@ -208,7 +205,7 @@ def scale_html():
         head = zone_html(z) if zi else (
             '<header class="zone-head" data-kind="head" data-n="1">'
             + zone_html(z).replace(' data-kind="zone" data-n="1"', '')
-            + '<p class="blurb">From here down, depth is odds. An honor that picked 1 person in 64 sits at 1 in 64. '
+            + '<p class="blurb">From here down, depth is odds: an honor that picked 1 person in 64 sits at 1 in 64. '
               'Up here, you swim in schools.</p></header>')
         out.append(f'<section id="{z[0]}" aria-labelledby="z-{z[0]}">' + head + ''.join(inside) + '</section>')
     return '\n'.join(out)
@@ -217,12 +214,12 @@ def scale_html():
 def raft_html():
     lis = []
     for i, (name, note, fn) in enumerate(RAFT):
-        lis.append(f'<li class="float" id="f-{i + 1}"><div class="float-art" style="--d:{-(i * 0.73) % 5:.2f}s">{fn(f"raft{i}")}{no_html(i + 1)}</div>'
-                   f'<h3 class="float-name">{E(name)}</h3><p class="float-note">{E(note)}</p></li>')
+        lis.append(f'<li class="float" id="f-{i + 1}"><div class="float-art" style="--d:{-(i * 0.73) % 5:.2f}s">{fn(f"raft{i}")}</div>'
+                   f'<p class="spec-no">No. {i + 1}</p><h3 class="float-name">{E(name)}</h3><p class="float-note">{E(note)}</p></li>')
     return (
         '<section class="surface" id="surface" aria-labelledby="surface-title">'
-        '<h2 class="zone-title" id="surface-title">The Surface</h2>'
-        f'<p class="blurb">These {len(RAFT)} honors never published a pool size, so there’s nothing to weigh them down. They float.</p>'
+        '<h2 class="zone-title" id="surface-title">The Surface<span class="zone-range">No published odds</span></h2>'
+        f'<p class="blurb">These {len(RAFT)} honors never came with a pool size, so there’s nothing to weigh them down. They float.</p>'
         '<ul class="floats">' + ''.join(lis) + '</ul></section>'
     )
 
@@ -316,6 +313,14 @@ def jump_menu():
     return f'<ul class="menu" id="jumpMenu" hidden>{b}</ul>'
 
 
+def gauge_html():
+    segs = [('surface', 'The surface', '#8fe3f5'), ('sunlight', 'Sunlight: 1 in 1+', '#2cc3d6'), ('twilight', 'Twilight: 1 in 10+', '#1a8aa0'),
+            ('midnight', 'Midnight: 1 in 100+', '#2d5a86'), ('abyssal', 'Abyssal: 1 in 1,000+', '#5a5a96'),
+            ('bottom', 'The bottom', '#ede5ce'), ('collection', 'The collection', '#f7f1e3')]
+    b = ''.join(f'<button type="button" data-go="{k}" style="--c:{c}" aria-label="Jump to {E(t)}"><span aria-hidden="true">{E(t)}</span></button>' for k, t, c in segs)
+    return f'<nav class="gauge" id="gauge" aria-label="Depth gauge">{b}<span class="pip" id="gaugePip" aria-hidden="true"></span></nav>'
+
+
 def scene_html():
     return (
         '<svg class="scene" id="scene" viewBox="0 0 1440 340" aria-hidden="true" focusable="false">'
@@ -378,6 +383,7 @@ DOC = f'''<!doctype html>
   </div>
   <button class="ctl" id="sinkBtn" type="button" aria-pressed="false">Let go</button>
 </nav>
+{gauge_html()}
 
 <main>
 <section class="title-slide" id="top" aria-labelledby="page-title">
@@ -387,7 +393,8 @@ DOC = f'''<!doctype html>
     <h1 class="title" id="page-title">The Deep End</h1>
     <p class="title-credit">Husam Sokar’s honors, at the depth of their odds</p>
     <div class="title-actions">
-      <button class="text-btn" id="skipBottom" type="button">Skip to the bottom</button>
+      <button class="dive-btn" id="diveBtn" type="button">Dive {ARROW}</button>
+      <button class="text-btn" id="skipBottom" type="button">or skip to the bottom</button>
     </div>
   </div>
 </section>
@@ -409,8 +416,8 @@ DOC = f'''<!doctype html>
   {plate_html()}
   <div class="tally">
     <p class="tally-big">{POOLS:,}+</p>
-    <p class="tally-line">That’s the {POOL_COUNT} pools on this page, added up. He was picked out of every one.</p>
-    <p class="tally-note">Quest for Excellence chose from the College Prep Scholars, so that pool isn’t counted twice. Anyone in two pools is counted in both.</p>
+    <p class="tally-line">people in the {POOL_COUNT} separate pools on this page, added up. He was picked out of every one.</p>
+    <p class="tally-note">Quest for Excellence chose from the College Prep Scholars, so that pool isn’t counted twice.</p>
   </div>
   <button class="back-top" id="backTop" type="button">Back to the surface</button>
 </section>

@@ -36,11 +36,16 @@ button{font:inherit;color:inherit}
 .bc{font-family:"Barlow Condensed",sans-serif}
 .caps{text-transform:uppercase;letter-spacing:.06em}
 
-/* ---------- sound toggle (first in tab order) ---------- */
-.snd{position:fixed;top:12px;right:12px;z-index:60;display:flex;align-items:center;gap:8px;background:var(--ink);border:2px solid var(--stock);color:var(--stock);padding:7px 12px 6px;font:400 15px/1 Anton,sans-serif;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+/* ---------- scores bar: NCAA.com's ticker (cells, a paging arrow, a link cell at the far right).
+   The far-right cell holds the sound toggle, the way Josh Comeau's lives in his header:
+   first in tab order, and it scrolls away with the header instead of floating over content. ---------- */
+.scores{display:flex;align-items:stretch;background:#fff;color:#111;border-bottom:1px solid #ddd;position:relative;z-index:2;height:62px}
+.snd{order:3;flex:0 0 auto;display:flex;align-items:center;gap:8px;background:#fff;border:0;border-left:1px solid #ddd;color:var(--blue);padding:0 22px;font:600 15px/1 "Barlow Condensed",sans-serif;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
 .snd i{display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid currentColor}
-.snd[aria-pressed="true"]{background:var(--stock);color:var(--ink)}
+.snd:hover{background:#f4f4f4}
 .snd[aria-pressed="true"] i{background:var(--red);border-color:var(--red)}
+.tnext{order:2;flex:0 0 44px;background:#fff;border:0;border-left:1px solid #ddd;color:#333;font:400 26px/1 Barlow,sans-serif;cursor:pointer}
+.tnext:hover{background:#f4f4f4}
 
 /* ---------- intro: the timekeeper holds up the cards ---------- */
 .intro{position:fixed;inset:0;z-index:80;background:var(--ink);display:grid;place-items:center;transition:transform .8s cubic-bezier(.76,0,.24,1)}
@@ -49,24 +54,23 @@ button{font:inherit;color:inherit}
 .intro.lift{transform:translateY(-114%)}
 .intro.lift::after{height:0}
 .intro .stage{perspective:1000px;text-align:center}
-.intro .holder{font:600 13px Barlow;letter-spacing:.24em;color:var(--muted);text-transform:uppercase;margin-top:26px}
 .tcard{width:min(46vw,230px);aspect-ratio:3/4;background:var(--stock);color:var(--ink);display:grid;place-items:center;position:relative;transform-origin:50% 0;box-shadow:0 30px 40px -20px rgba(0,0,0,.6)}
 .tcard b{font:400 min(30vw,150px)/1 Anton,sans-serif}
-.tcard small{position:absolute;top:12px;left:0;right:0;font:600 12px Barlow;letter-spacing:.2em;text-transform:uppercase}
+.tcard small{position:absolute;top:12px;left:0;right:0;font:600 15px "Barlow Condensed"}
 .tcard.flip{animation:flip .32s cubic-bezier(.6,0,.4,1)}
 @keyframes flip{0%{transform:rotateX(0)}49%{transform:rotateX(-90deg)}51%{transform:rotateX(90deg)}100%{transform:rotateX(0)}}
 .tcard.stop{background:var(--red);color:var(--white)}
-.intro .skip{position:absolute;bottom:28px;right:24px;background:none;border:1px solid var(--muted);color:var(--white);padding:9px 16px;font:600 14px Barlow;cursor:pointer;border-radius:30px}
+.intro .skip{position:absolute;bottom:24px;right:24px;background:none;border:0;color:var(--white);padding:8px 4px;font:400 17px Barlow;cursor:pointer;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
 
 /* ---------- results ticker (NCAA-style) ---------- */
-.ticker{display:flex;background:#fff;color:#111;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid #ddd;position:relative;z-index:2}
-.ticker::-webkit-scrollbar{display:none}
-.ticker li{list-style:none;flex:0 0 auto;min-width:148px;padding:9px 14px 8px;border-right:1px solid #e4e4e4;font:500 12px/1.35 Barlow}
-.ticker li:first-child{padding-left:16px}
-.ticker{max-width:calc(100% - 176px)}
-@media (max-width:700px){.ticker{max-width:calc(100% - 118px)}}
-.ticker em{display:block;font:600 10px Barlow;font-style:normal;color:#9a9a9a;letter-spacing:.07em;text-transform:uppercase}
-.ticker strong{display:block;font:600 13px "Barlow Condensed";letter-spacing:.03em;text-transform:uppercase}
+.ticker{order:1;flex:1 1 auto;min-width:0;display:flex;overflow:hidden}
+.ticker li{list-style:none;flex:1 1 0;min-width:0;padding:9px 12px 8px 14px;border-right:1px solid #e4e4e4;font:500 12px/1.35 Barlow;white-space:nowrap}
+.ticker li[hidden]{display:none}
+.ticker li:last-child{border-right:0}
+.ticker li.in{animation:tin .45s var(--ease-out) both}
+@keyframes tin{from{opacity:0;transform:translateX(18px)}}
+.ticker em{display:block;font:600 10px Barlow;font-style:normal;color:#9a9a9a;letter-spacing:.04em;text-transform:uppercase}
+.ticker strong{display:block;font:600 13px "Barlow Condensed";letter-spacing:.02em;text-transform:uppercase}
 .ticker span{color:#555}
 
 /* ---------- hero: the poster on the wall ---------- */
@@ -83,31 +87,35 @@ button{font:inherit;color:inherit}
 .tape{position:absolute;width:110px;height:30px;background:rgba(236,230,214,.62);top:-12px;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .tape.l{left:-26px;transform:rotate(-32deg)}.tape.r{right:-26px;transform:rotate(30deg)}
 .poster>*{position:relative;text-align:center}
-.pband{display:block;background:var(--red);color:var(--stock);font:400 clamp(15px,2vw,21px)/1 Anton,sans-serif;letter-spacing:.14em;text-transform:uppercase;padding:9px 6px 8px}
-.fit{display:block;font-family:Anton,sans-serif;text-transform:uppercase;line-height:.9;white-space:nowrap;letter-spacing:.005em}
+/* Hatch's top line ("SELF-LOCK KING PRODUCTIONS PRESENTS") is set in italic caps across the head */
+.pband{display:block;background:var(--red);color:var(--stock);font:italic 800 clamp(16px,2.1vw,22px)/1 "Barlow Condensed",sans-serif;letter-spacing:.02em;text-transform:uppercase;padding:9px 6px 8px}
+/* wood type: every display line is caps and fitted to the measure (both Hatch fight bills do this) */
+.fit{display:block;font-family:Anton,sans-serif;text-transform:uppercase;line-height:1.02;white-space:nowrap;letter-spacing:.005em}
+/* a line reversed out of a solid block of ink, like BOXING on Hatch's 2009 Amateur Boxing Show bill */
+.fit.rev{background:var(--ink);color:var(--stock);padding:.1em 0 .06em;line-height:1;margin-top:14px}
 .slab{display:block;font-family:"Alfa Slab One",serif;text-transform:uppercase;line-height:1.02;white-space:nowrap}
 .mis{text-shadow:var(--mx) var(--my) 0 rgba(31,58,147,.5)}
 .mis-r{text-shadow:var(--mx) var(--my) 0 rgba(200,16,46,.45)}
-.orn{display:block;font:400 clamp(22px,3.4vw,34px)/1.1 Rye,serif;color:var(--red);margin:4px 0 2px}
+.orn{display:block;font:400 clamp(22px,3.4vw,34px)/1.1 Rye,serif;color:var(--red);margin:8px 0 8px}
 .prule{height:7px;background:var(--ink);margin:12px 0}
 .prule.thin{height:3px;margin:10px 0}
 .co{display:grid;grid-template-columns:auto 1fr;gap:0 14px;align-items:center;text-align:left!important}
-.co .tag{background:var(--blue);color:var(--stock);font:400 15px/1 Anton;letter-spacing:.1em;padding:8px 8px 7px;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg)}
+.co .tag{background:var(--blue);color:var(--stock);font:400 15px/1 Anton;letter-spacing:.03em;padding:8px 8px 7px;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg)}
 .co .fit{text-align:left}
-.co small{display:block;font:600 14px/1.3 Barlow;margin-top:4px}
+/* the small lines go mixed-case condensed, like Hatch's "2 Rounds of Sparring and Autograph Signing" */
+.co small{display:block;font:600 16px/1.25 "Barlow Condensed";margin-top:10px}
 .under{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;text-align:left!important;margin-top:4px}
 .under div{border-top:3px solid var(--ink);padding-top:6px}
-.under b{display:block;font:400 clamp(19px,2.3vw,25px)/1 Anton;text-transform:uppercase}
-.under span{display:block;font:600 13.5px/1.3 Barlow;margin-top:3px}
-.pfoot{display:flex;justify-content:space-between;gap:12px;font:400 13px/1.2 Anton;letter-spacing:.08em;text-transform:uppercase;border-top:3px solid var(--ink);padding-top:9px;margin-top:14px;text-align:left!important}
+.under b{display:block;font:400 clamp(19px,2.3vw,25px)/1.1 Anton;text-transform:uppercase}
+.under span{display:block;font:600 15px/1.25 "Barlow Condensed";margin-top:3px}
+.pfoot{display:flex;justify-content:space-between;gap:12px;font:600 15px/1.2 "Barlow Condensed";border-top:3px solid var(--ink);padding-top:9px;margin-top:14px;text-align:left!important}
 .pfoot span:last-child{text-align:right}
 .side{position:relative;z-index:1;padding-top:14vh;max-width:460px}
 .side .arr{display:block;font-size:26px;margin-bottom:36px;color:var(--stock)}
 .side p{font:500 clamp(22px,2.1vw,30px)/1.3 "Barlow Condensed";letter-spacing:.005em}
-.side p+p{margin-top:18px;font:400 17px/1.5 Barlow;color:var(--muted)}
-.mag{position:relative;display:grid;place-items:center;width:176px;height:176px;border-radius:50%;background:var(--red);color:var(--white);border:0;cursor:pointer;overflow:hidden;margin-top:48px;font:400 21px/1 Anton;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;will-change:transform}
+.mag{position:relative;display:grid;place-items:center;width:176px;height:176px;border-radius:50%;background:var(--red);color:var(--white);border:0;cursor:pointer;overflow:hidden;margin-top:48px;font:400 20px/1.15 Barlow;text-decoration:none;will-change:transform}
 .mag .fill{position:absolute;left:-25%;top:-50%;width:150%;height:200%;border-radius:50%;background:var(--blue);transform:translateY(76%);transition:transform .6s cubic-bezier(.45,0,.55,1)}
-.mag:hover .fill,.mag:focus-visible .fill{transform:translateY(0)}
+.mag:not(.js-fill):hover .fill,.mag:focus-visible .fill{transform:translateY(0)}
 .mag .tx{position:relative;text-align:center;will-change:transform}
 .mag.ring{animation:ring .5s}
 @keyframes ring{20%{rotate:-9deg}40%{rotate:8deg}60%{rotate:-5deg}80%{rotate:3deg}}
@@ -118,24 +126,23 @@ button{font:inherit;color:inherit}
 /* ---------- the broadcast ---------- */
 .live{position:relative;padding:12vh 0 0}
 .wrap{max-width:1240px;margin:0 auto;padding:0 44px}
-.onair{display:flex;align-items:center;gap:14px;font:600 14px Barlow;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-.onair b{background:var(--red);color:#fff;padding:5px 9px 4px;letter-spacing:.14em;font:800 15px "Barlow Condensed"}
+.onair{display:flex;align-items:center;gap:12px;font:500 19px "Barlow Condensed";color:var(--muted)}
+.onair b{background:var(--red);color:#fff;padding:5px 9px 4px;letter-spacing:.04em;font:800 15px "Barlow Condensed";text-transform:uppercase}
 .onair b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;margin-right:7px;vertical-align:1px;animation:blink 1.4s steps(2) infinite}
 @keyframes blink{50%{opacity:.2}}
 .seg{padding:16vh 0 4vh;position:relative}
-.slate{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin-bottom:5vh}
-.slate .no{font:800 16px "Barlow Condensed";letter-spacing:.14em;text-transform:uppercase;color:var(--stock)}
-.slate h2{font:800 italic clamp(46px,7.4vw,112px)/.9 "Barlow Condensed";text-transform:uppercase;letter-spacing:-.005em;width:100%}
+.slate{margin-bottom:5vh}
+.slate h2{font:800 italic clamp(46px,7.4vw,112px)/1 "Barlow Condensed";letter-spacing:-.01em}
 .slate h2 span{color:var(--stock)}
 
 /* lower third */
 .l3{--c:var(--red);display:inline-flex;flex-direction:column;max-width:100%;position:relative}
 .l3 .top{display:flex;flex-wrap:wrap}
-.l3 .chip{background:var(--c);color:#fff;padding:8px 14px 7px;font:800 17px/1.1 "Barlow Condensed";letter-spacing:.05em;text-transform:uppercase;position:relative;overflow:hidden}
-.l3 .nm{background:#fff;color:var(--ink);padding:8px 14px 7px;font:600 17px/1.1 "Barlow Condensed";letter-spacing:.05em;text-transform:uppercase}
+.l3 .chip{background:var(--c);color:#fff;padding:8px 14px 7px;font:800 18px/1.1 "Barlow Condensed";letter-spacing:.01em;position:relative;overflow:hidden}
+.l3 .nm{background:#fff;color:var(--ink);padding:8px 14px 7px;font:600 18px/1.1 "Barlow Condensed"}
 .l3 .res{background:var(--ink);padding:10px 16px 8px;overflow:hidden}
-.l3 .res strong{display:block;font:800 clamp(38px,5.6vw,84px)/.92 "Barlow Condensed";text-transform:uppercase}
-.l3 .as{background:var(--stock);color:var(--ink);padding:7px 14px 6px;font:800 16px/1.2 "Barlow Condensed";letter-spacing:.04em;text-transform:uppercase;transform-origin:top}
+.l3 .res strong{display:block;font:800 clamp(38px,5.6vw,84px)/1 "Barlow Condensed";letter-spacing:-.005em}
+.l3 .as{background:var(--stock);color:var(--ink);padding:7px 14px 6px;font:700 18px/1.25 "Barlow Condensed";transform-origin:top}
 .l3 .chip::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.65) 50%,transparent 70%);transform:translateX(-120%)}
 .l3.hit .chip::after{animation:sweep .7s var(--ease-out)}
 @keyframes sweep{to{transform:translateX(120%)}}
@@ -146,8 +153,8 @@ button{font:inherit;color:inherit}
 @keyframes wipe{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 @keyframes rise{from{transform:translateY(105%)}to{transform:none}}
 @keyframes drop{from{transform:scaleY(0)}to{transform:none}}
-.rp{margin-left:10px;align-self:flex-end;background:none;border:1px solid var(--line);color:var(--muted);padding:7px 12px;border-radius:30px;font:600 13px Barlow;cursor:pointer;white-space:nowrap}
-.rp:hover{color:#fff;border-color:var(--muted)}
+.rp{margin-left:6px;align-self:flex-end;background:none;border:0;color:var(--muted);padding:6px 2px;font:400 16px Barlow;cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+.rp:hover{color:#fff}
 .l3row{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px}
 
 /* nationals ladder (NCAA bracket look) */
@@ -177,34 +184,34 @@ button{font:inherit;color:inherit}
 .road{background:var(--paper);color:#111;padding:24px 26px 28px}
 .road .grid{display:grid;grid-template-columns:minmax(150px,1.3fr) repeat(4,1fr)}
 .road .hd{font:600 11px Barlow;letter-spacing:.08em;text-transform:uppercase;color:#555;padding:8px 6px 10px;border-top:6px solid #d8d3c8}
-.road .ev{padding:16px 10px 14px 0;font:800 18px/1.05 "Barlow Condensed";letter-spacing:.03em;text-transform:uppercase;border-bottom:1px solid #e0dcd3}
-.road .ev small{display:block;font:600 12px Barlow;letter-spacing:.02em;text-transform:none;color:#777;margin-top:3px}
+.road .ev{padding:16px 10px 14px 0;font:700 19px/1.05 "Barlow Condensed";border-bottom:1px solid #e0dcd3}
+.road .ev small{display:block;font:500 13px Barlow;color:#777;margin-top:3px}
 .road .cell{border-bottom:1px solid #e0dcd3;position:relative}
 .road .cell.hit::before{content:"";position:absolute;left:0;right:0;top:50%;height:5px;margin-top:-2px;background:var(--c);transform-origin:left;transition:transform .45s var(--ease-out)}
 .road.armed .cell.hit::before{transform:scaleX(0)}
 .road.armed.on .cell.hit::before{transform:scaleX(1)}
-.road .cell.end span{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:var(--c);color:#fff;font:800 13px/1 "Barlow Condensed";letter-spacing:.04em;padding:5px 8px 4px;text-transform:uppercase;z-index:1;white-space:nowrap}
+.road .cell.end span{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:var(--c);color:#fff;font:700 15px/1 "Barlow Condensed";padding:5px 8px 4px;z-index:1;white-space:nowrap}
 
 /* co-main: the MVP */
 .mvp{display:grid;grid-template-columns:auto 1fr;gap:3vw;align-items:end}
-.mvp .big{font:400 clamp(140px,24vw,340px)/.78 Anton,sans-serif;color:var(--stock);text-shadow:6px 5px 0 var(--red);letter-spacing:-.01em;transition:text-shadow .6s var(--ease-out)}
+.mvp .big{font:400 clamp(140px,24vw,340px)/1 Anton,sans-serif;color:var(--stock);text-shadow:6px 5px 0 var(--red);letter-spacing:-.01em;transition:text-shadow .6s var(--ease-out)}
 .mvp.hit .big{animation:slam .5s var(--ease-out)}
 @keyframes slam{0%{transform:scale(1.06)}100%{transform:none}}
 
 /* tale of the tape */
 .tott{background:#0F0E0D;border-top:8px solid var(--stock)}
 .tott .th{display:grid;grid-template-columns:1fr 1.2fr 1fr;text-align:center}
-.tott .th div{padding:14px 10px 12px;font:400 clamp(16px,2vw,22px)/1 Anton;letter-spacing:.1em;text-transform:uppercase}
+.tott .th div{padding:14px 10px 12px;font:400 clamp(17px,2vw,23px)/1 Anton}
 .tott .th .l{background:var(--red)}.tott .th .r{background:var(--blue)}
 .tott .th .m{background:var(--stock);color:var(--ink)}
 .tott ol{list-style:none}
 .tott li{display:grid;grid-template-columns:1fr 1.2fr 1fr;align-items:center;border-bottom:1px solid #2a2724;min-height:78px}
 .tott li:last-child{border-bottom:0}
 .tott .f{text-align:right;padding:10px 22px;font:400 clamp(26px,3.4vw,46px)/1 Anton;color:#CFC8BD}
-.tott .f small{display:block;font:600 12px Barlow;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:5px}
-.tott .e{text-align:center;padding:10px;font:800 clamp(15px,1.5vw,19px)/1.15 "Barlow Condensed";letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tott .f small{display:block;font:500 14px Barlow;color:var(--muted);margin-top:5px}
+.tott .e{text-align:center;padding:10px;font:600 clamp(17px,1.6vw,21px)/1.15 "Barlow Condensed";color:#CFC8BD}
 .tott .h{padding:10px 22px;font:400 clamp(26px,3.4vw,46px)/1 Anton;color:var(--stock)}
-.tott .h small{display:block;font:600 12px Barlow;color:#fff;letter-spacing:.06em;text-transform:uppercase;margin-top:5px}
+.tott .h small{display:block;font:500 14px Barlow;color:#fff;margin-top:5px}
 .tott li.hit .h{animation:slamx .45s var(--ease-out)}
 @keyframes slamx{0%{transform:translateX(-14px);color:#fff}100%{transform:none}}
 
@@ -216,8 +223,8 @@ button{font:inherit;color:inherit}
 .belt .plate:focus-visible{outline:none}
 .belt .plate:focus-visible rect,.belt .plate:focus-visible ellipse{stroke:#fff}
 .plates{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:22px;border-top:1px solid var(--line)}
-.plates li{list-style:none;padding:14px 16px 4px 0;font:800 clamp(20px,2.4vw,30px)/1 "Barlow Condensed";text-transform:uppercase;letter-spacing:.02em}
-.plates li small{display:block;font:600 13px Barlow;color:var(--muted);letter-spacing:.06em;margin-top:6px}
+.plates li{list-style:none;padding:14px 16px 4px 0;font:800 clamp(22px,2.4vw,32px)/1.05 "Barlow Condensed"}
+.plates li small{display:block;font:500 15px Barlow;color:var(--muted);margin-top:6px}
 .plates li.lit{color:var(--stock)}
 
 /* bronze */
@@ -237,8 +244,8 @@ button{font:inherit;color:inherit}
 .close{padding:22vh 0 28vh;text-align:center;position:relative}
 .close .stopcard{width:min(58vw,300px);margin:0 auto;aspect-ratio:3/4;background:var(--red);display:grid;place-items:center;position:relative;transform:rotate(-2deg);box-shadow:0 40px 60px -30px rgba(0,0,0,.8)}
 .close .stopcard b{font:400 clamp(74px,12vw,128px)/1 Anton}
-.close .stopcard small{position:absolute;top:14px;left:0;right:0;font:600 12px Barlow;letter-spacing:.2em;text-transform:uppercase}
-.close h2{font:800 italic clamp(54px,9vw,140px)/.9 "Barlow Condensed";text-transform:uppercase;margin:7vh 0 0}
+.close .stopcard small{position:absolute;top:14px;left:0;right:0;font:600 17px "Barlow Condensed"}
+.close h2{font:800 italic clamp(54px,9vw,140px)/1 "Barlow Condensed";margin:7vh 0 0}
 .close p{color:var(--muted);margin-top:14px}
 .close .mag{margin:44px auto 0;background:var(--stock);color:var(--ink)}
 .close .mag .fill{background:var(--ink)}
@@ -264,8 +271,9 @@ button{font:inherit;color:inherit}
 .bug .card span.stop{background:var(--red);color:#fff;font-size:12px;letter-spacing:.04em}
 .bug .card span.flip{animation:flip .32s cubic-bezier(.6,0,.4,1)}
 .bug .n{background:#2E2A26;font-weight:800;font-size:17px;letter-spacing:.05em}
-.bug .assist{height:0;overflow:hidden;background:var(--stock);color:var(--ink);font:800 15px/34px "Barlow Condensed";letter-spacing:.05em;text-transform:uppercase;padding:0 14px;transition:height .3s var(--ease-out);white-space:nowrap;text-overflow:ellipsis}
-.bug.assisting .assist{height:34px}
+/* NBC's "game assist": a stat row that slides out under the bug for a few seconds, then retracts */
+.bug .assist{width:0;min-width:100%;max-height:0;overflow:hidden;visibility:hidden;background:var(--stock);color:var(--ink);font:700 17px/1.25 "Barlow Condensed";padding:0 14px;transition:max-height .3s var(--ease-out),padding .3s var(--ease-out),visibility 0s .3s}
+.bug.assisting .assist{max-height:90px;padding:7px 14px 6px;visibility:visible;transition:max-height .3s var(--ease-out),padding .3s var(--ease-out)}
 
 @media (max-width:980px){
   .hero{grid-template-columns:minmax(0,1fr);padding:48px 20px 30vh;gap:0}
@@ -274,11 +282,14 @@ button{font:inherit;color:inherit}
 }
 @media (max-width:700px){
   body{font-size:16px}
-  .snd{top:8px;right:8px;padding:6px 9px 5px;font-size:13px}
+  .scores{height:58px}
+  .snd{padding:0 12px;font-size:14px}
+  .tnext{flex-basis:38px}
   .hero{padding:34px 16px 26vh}
   .poster{padding:16px 14px 16px;transform:rotate(-.5deg)}
   .tape{width:80px;height:24px}.tape.l{left:-14px}.tape.r{right:-14px}
-  .under{grid-template-columns:1fr}
+  .under{grid-template-columns:1fr;text-align:center!important}
+  .under div{padding-left:22px;padding-right:22px}
   .pfoot{flex-direction:column;gap:4px}.pfoot span:last-child{text-align:left}
   .wrap{padding:0 16px}
   .seg{padding:12vh 0 2vh}
@@ -309,15 +320,16 @@ button{font:inherit;color:inherit}
   .bronze{grid-template-columns:1fr}
   .duo{grid-template-columns:1fr}
   .rp{margin-left:0}
-  .bug{left:84px;right:10px;bottom:12px;transform:translateY(160%)}
+  .bug{left:78px;right:8px;bottom:12px;transform:translateY(160%)}
   .bug.in{transform:none}
   .bug .net,.bug .rd{display:none}
   .bug .row{height:46px}
-  .bug .seg-c{min-width:0;flex:1;font-size:16px;padding:0 10px;overflow:hidden}
+  .bug .seg-c{min-width:0;flex:1;font-size:15px;letter-spacing:.01em;padding:0 8px;overflow:hidden}
   .bug .clk{font-size:22px;min-width:62px;padding:0 8px}
   .bug .card{padding:4px 5px!important}.bug .card span{width:36px;height:36px;font-size:18px}
-  .bug .n{font-size:14px;padding:0 9px}
-  .bug .assist{font-size:13px;padding:0 10px}
+  .bug .n{display:none}
+  .bug .assist{font-size:15px;padding:0 10px}
+  .bug.assisting .assist{padding:6px 10px 5px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;transition:none!important}
@@ -326,67 +338,69 @@ button{font:inherit;color:inherit}
 </style>
 </head>
 <body>
-<button class="snd" id="snd" aria-pressed="false" type="button"><i aria-hidden="true"></i><span>Sound off</span></button>
 
 <div class="intro" id="intro" aria-hidden="true" hidden>
   <div class="stage">
     <div class="tcard" id="icard"><small>Minutes</small><b>3</b></div>
-    <p class="holder">Timekeeper</p>
   </div>
-  <button class="skip" id="skip" type="button">Straight to the card ›</button>
+  <button class="skip" id="skip" type="button">Straight to the card</button>
 </div>
 
-<ul class="ticker" aria-label="Results ticker">
-  <li><em>Final</em><strong>NSDA Nationals</strong><span>Congress · Finalist</span></li>
+<div class="scores">
+<button class="snd" id="snd" aria-pressed="false" type="button"><i aria-hidden="true"></i><span>Sound off</span></button>
+<button class="tnext" id="tnext" type="button" aria-label="More results" aria-controls="ticker">›</button>
+<ul class="ticker" id="ticker" aria-label="Results">
+  <li><em>Final</em><strong>NSDA Nationals</strong><span>Congress · 1 of 20</span></li>
   <li><em>Semifinal</em><strong>NSDA Nationals</strong><span>Congress · Semifinalist</span></li>
-  <li><em>Finals</em><strong>CA Mock Trial</strong><span>MVP</span></li>
+  <li><em>Finals</em><strong>CA Mock Trial</strong><span>MVP · 1 of 128</span></li>
   <li><em>Champion ×3</em><strong>UOP Invitational</strong><span>Parli · Interp · Speaker</span></li>
-  <li><em>3rd place</em><strong>Berkeley Nat'l Congress</strong><span>Congress</span></li>
+  <li><em>3rd place</em><strong>Berkeley</strong><span>National Congress</span></li>
   <li><em>Semifinal</em><strong>CHSSA</strong><span>Congress · Top 15</span></li>
   <li><em>Quarterfinal</em><strong>Ethics Bowl, CA</strong><span>Top 8</span></li>
   <li><em>Octofinal</em><strong>CHSSA</strong><span>Public Forum</span></li>
 </ul>
+</div>
 
 <header class="hero" id="top">
   <article class="poster" id="poster" aria-labelledby="h1">
     <span class="tape l" aria-hidden="true"></span><span class="tape r" aria-hidden="true"></span>
-    <span class="pband">The Chamber presents · one night · every format</span>
+    <span class="pband">The Chamber presents</span>
     <h1 id="h1">
-      <span class="fit mis" data-max="84" style="margin-top:14px">Main event</span>
-      <span class="fit" data-max="140" style="color:var(--red)">Congressional</span>
-      <span class="fit mis" data-max="230">Debate</span>
+      <span class="fit rev" data-max="84">Main event</span>
+      <span class="fit mis-r" data-max="140" style="color:var(--red);margin-top:10px">Congressional</span>
+      <span class="fit mis" data-max="230" style="margin-top:14px">Debate</span>
     </h1>
-    <span class="orn">~ for the ~</span>
+    <span class="orn">~ at the ~</span>
     <span class="slab mis-r fit-s" data-max="60" style="color:var(--blue)">NSDA National Final</span>
-    <span class="fit" data-max="80" style="margin-top:8px">1 of 20 · from 50,000+</span>
+    <span class="fit" data-max="80" style="margin-top:12px">1 of 20 · from 50,000+</span>
     <div class="prule"></div>
-    <span class="slab fit-s" data-max="30">National semifinalist · 4× qualifier</span>
+    <span class="slab fit-s" data-max="30">National semifinalist · 4× national qualifier</span>
     <span class="slab fit-s" data-max="30" style="margin-top:4px">National legislation author</span>
     <div class="prule"></div>
     <div class="co">
       <span class="tag">Co-main</span>
-      <div><span class="fit mis" data-max="96" style="color:var(--red)">Mock Trial MVP</span><small>California Mock Trial Finals · 1 of 128 from 5,000+ competitors</small></div>
+      <div><span class="fit mis" data-max="96" style="color:var(--red)">Mock Trial MVP</span><small>California Mock Trial Finals: 1 of 128 from 5,000+ competitors</small></div>
     </div>
     <div class="prule thin"></div>
     <div class="under" aria-label="Undercard">
-      <div><b style="color:var(--blue)">UOP Invitational · 3× Champ</b><span>Parliamentary Debate · Oral Interpretation · Best Speaker</span></div>
+      <div><b style="color:var(--blue)">UOP Invitational · 3× Champ</b><span>Parliamentary Debate, Oral Interpretation and Best Speaker</span></div>
       <div><b>Berkeley · 3rd place</b><span>Berkeley National Congress Tournament</span></div>
-      <div><b>CHSSA Congress · Semis</b><span>Semifinalist, top 15 in California</span></div>
-      <div><b style="color:var(--red)">Ethics Bowl · Quarters</b><span>California state quarterfinalist, top 8</span></div>
-      <div><b>CHSSA Public Forum · Octos</b><span>Octofinalist</span></div>
+      <div><b>CHSSA Congress · Semis</b><span>State semifinalist, top 15 in California</span></div>
+      <div><b style="color:var(--red)">Ethics Bowl · Quarters</b><span>State quarterfinalist, top 8 in California</span></div>
+      <div><b>CHSSA Public Forum · Octos</b><span>State octofinalist, California</span></div>
       <div><b>In his corner</b><span>TED Student Talks mentee, 2023</span></div>
     </div>
-    <div class="pfoot"><span>At the commission table: NSDA Student Leadership Council</span><span>Three-minute speeches · questions to follow</span></div>
+    <div class="pfoot"><span>Ringside: NSDA Student Leadership Council, 1 of 23 students for 140,000+ members</span><span>Three-minute speeches ★ Questions to follow</span></div>
   </article>
 
   <div class="side">
     <span class="arr" aria-hidden="true">↘</span>
     <p>Speech, debate and Mock Trial, billed like a prize fight. Every bout on this card is a result.</p>
-    <p>Ring the bell and the night goes to the broadcast: one segment per bout, a scorebug keeping the three minutes.</p>
     <a class="mag" id="bell" href="#live" data-strength="100" data-strength-text="50"><span class="fill"></span><span class="tx">Ring the<br>bell</span></a>
   </div>
 
-  <div class="roll" id="roll" aria-hidden="true"><span>National Finalist <i>—</i> Congressional Debate <i>—</i></span><span>National Finalist <i>—</i> Congressional Debate <i>—</i></span></div>
+  <!-- data-qa-ignore: Dennis Snellenberg's rolling name marquee, which runs past both edges of the screen by design -->
+  <div class="roll" id="roll" aria-hidden="true" data-qa-ignore><span>National Finalist <i>—</i> Congressional Debate <i>—</i></span><span>National Finalist <i>—</i> Congressional Debate <i>—</i></span></div>
 </header>
 
 <main class="live" id="live">
@@ -394,8 +408,8 @@ button{font:inherit;color:inherit}
     <p class="onair"><b>Live</b> from the Chamber</p>
 
     <!-- 1. MAIN EVENT -->
-    <section class="seg" id="s1" data-n="Bout 1" data-seg="Main event" data-rd="Congress · Nationals" data-c="#C8102E" data-assist="Main event · Congressional Debate · NSDA National Tournament">
-      <div class="slate"><span class="no">Bout 1 · Main event</span><h2>Congressional <span>Debate</span></h2></div>
+    <section class="seg" id="s1" data-n="Bout 1" data-seg="Main event" data-rd="Congress · Nationals" data-c="#C8102E" data-assist="NSDA Nationals: national finalist, 1 of 20 from 50,000+">
+      <div class="slate"><h2>Congressional <span>Debate</span></h2></div>
       <div class="ladder armed" id="ladder" aria-label="NSDA National Tournament, Congressional Debate, how far he went">
         <div class="rh"><div>Qualified<small>four times</small></div><div>Semifinal<small>national semifinalist</small></div><div>Final<small>national finalist</small></div></div>
         <div class="cols">
@@ -410,45 +424,45 @@ button{font:inherit;color:inherit}
         </div>
       </div>
       <div class="l3row">
-        <div class="l3" style="--c:var(--red)"><div class="top"><span class="chip">NSDA National Tournament</span><span class="nm">Congressional Debate</span></div><div class="res"><strong>National Finalist</strong></div><div class="as">Also: national semifinalist · four-time national qualifier</div></div>
-        <button class="rp" type="button">Replay ↻</button>
+        <div class="l3" style="--c:var(--red)"><div class="top"><span class="chip">NSDA National Tournament</span><span class="nm">Congressional Debate</span></div><div class="res"><strong>National Finalist</strong></div><div class="as">1 of 20 from 50,000+. Also a national semifinalist and a four-time national qualifier</div></div>
+        <button class="rp" type="button">Replay</button>
       </div>
       <div class="l3row" style="margin-top:28px">
-        <div class="l3" style="--c:var(--blue)"><div class="top"><span class="chip">NSDA National Tournament</span><span class="nm">The docket</span></div><div class="res"><strong>Legislation Author</strong></div></div>
-        <button class="rp" type="button">Replay ↻</button>
+        <div class="l3" style="--c:var(--blue)"><div class="top"><span class="chip">NSDA National Tournament</span><span class="nm">The docket</span></div><div class="res"><strong>National Legislation Author</strong></div><div class="as">1 of 41 from 500+</div></div>
+        <button class="rp" type="button">Replay</button>
       </div>
     </section>
 
     <!-- 2. CO-MAIN -->
-    <section class="seg" id="s2" data-n="Bout 2" data-seg="Co-main" data-rd="Mock Trial · Finals" data-c="#1F3A93" data-assist="Co-main event · California Mock Trial Finals">
-      <div class="slate"><span class="no">Bout 2 · Co-main event</span><h2>Mock <span>Trial</span></h2></div>
+    <section class="seg" id="s2" data-n="Bout 2" data-seg="Co-main" data-rd="Mock Trial · Finals" data-c="#1F3A93" data-assist="California Mock Trial Finals: MVP, 1 of 128 from 5,000+ competitors">
+      <div class="slate"><h2>Mock <span>Trial</span></h2></div>
       <div class="mvp" id="mvp">
         <div class="big" aria-hidden="true">MVP</div>
         <div class="l3row">
           <div class="l3" style="--c:var(--blue)"><div class="top"><span class="chip">California Mock Trial Finals</span><span class="nm">The courtroom</span></div><div class="res"><strong>MVP</strong></div><div class="as">1 of 128 from 5,000+ competitors</div></div>
-          <button class="rp" type="button">Replay ↻</button>
+          <button class="rp" type="button">Replay</button>
         </div>
       </div>
     </section>
 
     <!-- 3. TALE OF THE TAPE -->
-    <section class="seg" id="s3" data-n="Tape" data-seg="Tale of the tape" data-rd="Field vs. finish" data-c="#8A6A12" data-assist="Tale of the tape · how big the field was, where he finished">
-      <div class="slate"><span class="no">Between bouts</span><h2>Tale of <span>the tape</span></h2></div>
+    <section class="seg" id="s3" data-n="Tape" data-seg="Tale of the tape" data-rd="Field vs. finish" data-c="#8A6A12" data-assist="How big the field was, and where he finished">
+      <div class="slate"><h2>Tale of the <span>tape</span></h2></div>
       <div class="tott" role="table" aria-label="Tale of the tape: field size and finish">
         <div class="th" role="row"><div class="l" role="columnheader">The field</div><div class="m" role="columnheader">Event</div><div class="r" role="columnheader">His finish</div></div>
         <ol>
-          <li role="row"><div class="f" role="cell">50,000+<small>competitors</small></div><div class="e" role="cell">NSDA Nationals · Congressional Debate</div><div class="h" role="cell">1 of 20<small>Finalist</small></div></li>
+          <li role="row"><div class="f" role="cell">50,000+<small>in the field</small></div><div class="e" role="cell">NSDA Nationals, Congressional Debate</div><div class="h" role="cell">1 of 20<small>Finalist</small></div></li>
           <li role="row"><div class="f" role="cell">5,000+<small>competitors</small></div><div class="e" role="cell">California Mock Trial Finals</div><div class="h" role="cell">1 of 128<small>MVP</small></div></li>
-          <li role="row"><div class="f" role="cell">500+<small>entries</small></div><div class="e" role="cell">NSDA national legislation</div><div class="h" role="cell">1 of 41<small>Author</small></div></li>
-          <li role="row"><div class="f" role="cell">California<small>the state</small></div><div class="e" role="cell">CHSSA · Congressional Debate</div><div class="h" role="cell">Top 15<small>Semifinalist</small></div></li>
-          <li role="row"><div class="f" role="cell">California<small>the state</small></div><div class="e" role="cell">Ethics Bowl</div><div class="h" role="cell">Top 8<small>Quarterfinalist</small></div></li>
+          <li role="row"><div class="f" role="cell">500+<small>in the field</small></div><div class="e" role="cell">NSDA National Legislation</div><div class="h" role="cell">1 of 41<small>Author</small></div></li>
+          <li role="row"><div class="f" role="cell">California<small>statewide</small></div><div class="e" role="cell">CHSSA state, Congressional Debate</div><div class="h" role="cell">Top 15<small>Semifinalist</small></div></li>
+          <li role="row"><div class="f" role="cell">California<small>statewide</small></div><div class="e" role="cell">Ethics Bowl, California state</div><div class="h" role="cell">Top 8<small>Quarterfinalist</small></div></li>
         </ol>
       </div>
     </section>
 
     <!-- 4. UNDERCARD: THE BELT -->
-    <section class="seg" id="s4" data-n="Bout 3" data-seg="Undercard" data-rd="UOP Invitational" data-c="#C8102E" data-assist="Undercard · UOP Invitational · three titles">
-      <div class="slate"><span class="no">Bout 3 · Undercard</span><h2>Three <span>titles</span>, one tournament</h2></div>
+    <section class="seg" id="s4" data-n="Bout 3" data-seg="Undercard" data-rd="UOP Invitational" data-c="#C8102E" data-assist="UOP Invitational: three titles at one tournament">
+      <div class="slate"><h2>Three <span>titles</span>, one tournament</h2></div>
       <div class="belt" id="belt">
         <svg viewBox="0 0 1000 300" role="img" aria-labelledby="beltT">
           <title id="beltT">A championship belt for the UOP Invitational, with three plates: Parliamentary Debate, Oral Interpretation, Best Speaker</title>
@@ -477,16 +491,16 @@ button{font:inherit;color:inherit}
           </g>
         </svg>
         <ul class="plates" id="plates">
-          <li>Parliamentary Debate<small>Champion · UOP Invitational</small></li>
-          <li>Oral Interpretation<small>Champion · UOP Invitational</small></li>
-          <li>Best Speaker<small>Champion · UOP Invitational</small></li>
+          <li>Parliamentary Debate<small>Champion, UOP Invitational</small></li>
+          <li>Oral Interpretation<small>Champion, UOP Invitational</small></li>
+          <li>Best Speaker<small>Champion, UOP Invitational</small></li>
         </ul>
       </div>
     </section>
 
     <!-- 5. UNDERCARD: ROUND BY ROUND -->
-    <section class="seg" id="s5" data-n="Bouts 4–6" data-seg="Undercard" data-rd="Elimination rounds" data-c="#1F3A93" data-assist="Undercard · how deep into elimination rounds">
-      <div class="slate"><span class="no">Bouts 4–6 · Undercard</span><h2>Round <span>by round</span></h2></div>
+    <section class="seg" id="s5" data-n="Bouts 4–6" data-seg="Undercard" data-rd="Elimination rounds" data-c="#1F3A93" data-assist="California: how deep into elimination rounds">
+      <div class="slate"><h2>Round <span>by round</span></h2></div>
       <div class="road armed" id="road" role="table" aria-label="How far into the elimination rounds">
         <div class="grid">
           <div class="hd" role="columnheader">Event</div><div class="hd" role="columnheader">Octofinal</div><div class="hd" role="columnheader">Quarterfinal</div><div class="hd" role="columnheader">Semifinal</div><div class="hd" role="columnheader">Final</div>
@@ -501,8 +515,8 @@ button{font:inherit;color:inherit}
     </section>
 
     <!-- 6. BRONZE -->
-    <section class="seg" id="s6" data-n="Bout 7" data-seg="Podium" data-rd="Berkeley · Congress" data-c="#A8662F" data-assist="Berkeley National Congress Tournament · 3rd place">
-      <div class="slate"><span class="no">Bout 7 · Undercard</span><h2>Berkeley <span>Congress</span></h2></div>
+    <section class="seg" id="s6" data-n="Bout 7" data-seg="Podium" data-rd="Berkeley · Congress" data-c="#A8662F" data-assist="Berkeley National Congress Tournament: 3rd place">
+      <div class="slate"><h2>Berkeley <span>Congress</span></h2></div>
       <div class="bronze" id="bronze">
         <div class="medal" aria-hidden="true">
           <svg viewBox="0 0 200 270">
@@ -514,17 +528,17 @@ button{font:inherit;color:inherit}
         </div>
         <div class="l3row">
           <div class="l3" style="--c:var(--bronze)"><div class="top"><span class="chip">Berkeley National Congress Tournament</span><span class="nm">Congress</span></div><div class="res"><strong>3rd Place</strong></div></div>
-          <button class="rp" type="button">Replay ↻</button>
+          <button class="rp" type="button">Replay</button>
         </div>
       </div>
     </section>
 
     <!-- 7. CORNER + COMMISSION -->
-    <section class="seg" id="s7" data-n="Ringside" data-seg="Ringside" data-rd="Council · TED" data-c="#5B544C" data-assist="Ringside · the commission table and his corner">
-      <div class="slate"><span class="no">Ringside</span><h2>The table <span>&amp; the corner</span></h2></div>
+    <section class="seg" id="s7" data-n="Ringside" data-seg="Ringside" data-rd="Council · TED" data-c="#5B544C" data-assist="NSDA Student Leadership Council: 1 of 23 students nationwide">
+      <div class="slate"><h2>The table <span>&amp; the corner</span></h2></div>
       <div class="duo">
-        <div class="l3" style="--c:var(--red)"><div class="top"><span class="chip">NSDA · 2024–25</span><span class="nm">At the commission table</span></div><div class="res"><strong>Student Leadership Council</strong></div><div class="as">1 of 23 students representing 140,000+ members to the national board</div></div>
-        <div class="l3" style="--c:#5B544C"><div class="top"><span class="chip">2023</span><span class="nm">In his corner</span></div><div class="res"><strong>TED Student Talks</strong></div><div class="as">Mentee</div></div>
+        <div class="l3" style="--c:var(--red)"><div class="top"><span class="chip">NSDA · 2024–25</span><span class="nm">At the commission table</span></div><div class="res"><strong>Student Leadership Council</strong></div><div class="as">1 of 23 students nationwide, representing 140,000+ members to the national board</div></div>
+        <div class="l3" style="--c:#5B544C"><div class="top"><span class="chip">TED</span><span class="nm">In his corner</span></div><div class="res"><strong>TED Student Talks</strong></div><div class="as">Mentee, 2023</div></div>
       </div>
     </section>
   </div>
@@ -573,6 +587,19 @@ var SFX={
 function play(name,a){ if(!soundOn||!ctx()) return; try{ SFX[name](a); }catch(e){} }
 sndBtn.addEventListener('click',function(){ soundOn=!soundOn; sndBtn.setAttribute('aria-pressed',soundOn); sndBtn.lastElementChild.textContent=soundOn?'Sound on':'Sound off'; if(soundOn){ ctx(); play('tick',1.2); } });
 
+/* ================= scores bar: NCAA.com pages whole cells with its arrow; nothing is ever cut off ================= */
+var tk=$('#ticker'), tcells=$$('#ticker li'), tnext=$('#tnext'), tpage=0, tper=tcells.length;
+function tickerLayout(anim){
+  tcells.forEach(function(c){ c.hidden=false; });
+  tper=Math.max(1,Math.min(tcells.length,Math.floor(tk.clientWidth/170)));
+  var pages=Math.ceil(tcells.length/tper); if(tpage>=pages) tpage=0;
+  tnext.hidden=pages<2;
+  tcells.forEach(function(c,i){ var on=i>=tpage*tper&&i<(tpage+1)*tper; c.hidden=!on; c.style.flex='0 0 '+(100/tper)+'%'; c.classList.remove('in'); if(on&&anim&&!RM){ c.style.animationDelay=((i-tpage*tper)*.05)+'s'; void c.offsetWidth; c.classList.add('in'); } });
+}
+tnext.addEventListener('click',function(){ tpage++; if(tpage*tper>=tcells.length) tpage=0; tickerLayout(true); play('tick',1.1); });
+tickerLayout(false);
+addEventListener('resize',function(){ tickerLayout(false); });
+
 /* ================= intro: 3 · 2 · 1 · TIME ================= */
 var intro=$('#intro');
 var skipIntro=RM || /^#from-/.test(location.hash);
@@ -588,7 +615,7 @@ if(!skipIntro){
   },420);
   $('#skip').addEventListener('click',endIntro);
   addEventListener('keydown',function e(ev){ if(ev.key==='Escape'){ endIntro(); removeEventListener('keydown',e);} });
-  setTimeout(function(){ $('#skip').focus({preventScroll:true}); },50);
+  setTimeout(function(){ $('#skip').focus({preventScroll:true,focusVisible:false}); },50);
 }
 if(/^#from-/.test(location.hash)) scrollTo(0,0);
 
@@ -617,6 +644,14 @@ if(FINE&&innerWidth>540&&!RM) $$('.mag').forEach(function(m){
   m.addEventListener('mousemove',function(e){ var r=m.getBoundingClientRect(), dx=(e.clientX-r.left)/r.width-.5, dy=(e.clientY-r.top)/r.height-.5, s=+m.dataset.strength, st=+m.dataset.strengthText;
     m.style.transition=tx.style.transition='transform 1.5s var(--power4)'; m.style.transform='translate('+dx*s+'px,'+dy*s+'px)'; tx.style.transform='translate('+dx*st+'px,'+dy*st+'px)'; });
   m.addEventListener('mouseleave',function(){ m.style.transition=tx.style.transition='transform 1.5s var(--elastic)'; m.style.transform=''; tx.style.transform=''; });
+});
+
+/* Dennis's fill: rises from below on enter (76% to 0) and keeps going out the top on leave (to -76%), 0.6s ease-in-out */
+if(FINE&&!RM) $$('.mag').forEach(function(m){
+  var f=$('.fill',m), T='transform .6s cubic-bezier(.45,0,.55,1)';
+  m.classList.add('js-fill');
+  m.addEventListener('mouseenter',function(){ f.style.transition='none'; f.style.transform='translateY(76%)'; void f.offsetWidth; f.style.transition=T; f.style.transform='translateY(0)'; });
+  m.addEventListener('mouseleave',function(){ f.style.transition=T; f.style.transform='translateY(-76%)'; });
 });
 
 /* bell: ring, then go to the broadcast */

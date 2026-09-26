@@ -15,7 +15,8 @@
   --paper:#fbfaf6;--land:#efe6d3;--ink:#111;--muted:#55524a;
   --navy:#1c2a6e;--cream:#f6e7a1;--tomato:#d8412f;--oxblood:#7e1a12;--sun:#f08a24;--leaf:#3d6b3a;--sierra:#6c5aa8;
   --F:#ff6319;--S:#00933c;--M:#0039a6;--C:#b933ad;--T:#fccc0a;
-  --hi:rgba(214,255,20,.7);--pen:#1f3a9e;
+  --hi:rgba(255,140,30,.58);--hi-ink:#ff8c1e;--pen:#1f3a9e;
+  --cur:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Cg transform='rotate(40 16 16)'%3E%3Cpath d='M13,2 h6 v3 l2,1 v14 h-10 v-14 l2,-1z' fill='%23ff8c1e' stroke='%23111' stroke-width='1'/%3E%3Cpath d='M11,20 h10 v4 h-10z' fill='%23222'/%3E%3Cpath d='M12.5,24 h7 l-1.5,5 h-4z' fill='%23ffb35c' stroke='%23111' stroke-width='1'/%3E%3C/g%3E%3C/svg%3E") 5 28;
   --sans:"Helvetica Neue",Helvetica,Arial,"Liberation Sans",sans-serif;
   --slab:"Ultra","Rockwell Extra Bold","Georgia",serif;
   --cond:"Anton","Impact","Arial Narrow",sans-serif;
@@ -53,16 +54,16 @@ a{color:var(--M)}
 .keystrip{display:grid;grid-template-columns:1.25fr 1fr 1.6fr;border-bottom:1px solid #111}
 .keystrip>div{padding:16px 18px 18px;border-right:1px solid #111}
 .keystrip>div:last-child{border-right:0}
-.kicker{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin:0 0 8px;border-bottom:3px solid #111;padding-bottom:4px}
+.kicker{font-size:16px;font-weight:700;line-height:1.2;margin:0 0 8px;border-top:6px solid #111;padding-top:7px}
 h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0 0 10px}
 .intro{margin:0;font-size:16px;max-width:36ch}
 .howto{margin:0;font-size:15px}
 .howto+.howto{margin-top:8px}
 .routes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
-.rbtn{all:unset;box-sizing:border-box;display:flex;gap:10px;align-items:center;cursor:pointer;font-size:14px;line-height:1.2;padding:5px 6px 5px 0;border-radius:3px;width:100%}
+.rbtn{all:unset;box-sizing:border-box;display:flex;gap:10px;align-items:center;cursor:var(--cur),pointer;font-size:14px;line-height:1.2;padding:5px 6px 5px 0;border-radius:3px;width:100%}
 .rbtn:hover .bul{transform:scale(1.08)}
 .rbtn:focus-visible{outline:3px solid var(--pen);outline-offset:1px}
-.rbtn[aria-pressed="true"]{background:linear-gradient(transparent 12%,var(--hi) 12%,var(--hi) 88%,transparent 88%)}
+.rbtn[aria-pressed="true"] .rname b{background:linear-gradient(transparent 8%,var(--hi) 8%,var(--hi) 92%,transparent 92%);-webkit-box-decoration-break:clone;box-decoration-break:clone;padding:0 3px;margin:0 -3px}
 .bul{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--c);color:#fff;font:700 17px/1 var(--sans);flex:none;transition:transform .15s}
 .bul.dark{color:#111}
 .rname b{display:block;font-weight:700}
@@ -74,7 +75,7 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 .system .tall{display:none}
 @media (max-width:720px){.system .wide{display:none}.system .tall{display:block}}
 .ln{fill:none;stroke-width:10;stroke-linejoin:miter;stroke-linecap:butt;transition:opacity .3s}
-.lg{cursor:pointer;outline:none}
+.lg{cursor:var(--cur),pointer;outline:none}
 .lg .hit{fill:none;stroke:transparent;stroke-width:34;stroke-linejoin:round}
 .lg:focus-visible .ring{opacity:1}
 .ring{fill:none;stroke:var(--pen);stroke-width:3;opacity:0}
@@ -82,16 +83,15 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 .stn-w{fill:#fff}
 .t-st{font:700 15px var(--sans);fill:#111}
 .t-sub{font:400 13px var(--sans);fill:#3d3a33}
-.t-svc{font:700 11px var(--sans);letter-spacing:.08em;fill:#fff}
+.t-svc{font:700 12px var(--sans);fill:#fff}
 .t-home{font:700 24px var(--sans);fill:#111;letter-spacing:.01em}
-.t-boro{font:700 34px var(--sans);fill:#c9b891;letter-spacing:.02em}
+.t-boro{font:700 34px var(--sans);fill:#c9b891;letter-spacing:-.01em}
 .t-grid{font:400 11px var(--sans);fill:#7a705c}
 .t-bul{font:700 16px var(--sans);fill:#fff}
 .tall .t-st{font-size:13px}.tall .t-sub{font-size:11.5px}.tall .t-home{font-size:19px}.tall .t-bul{font-size:13px}
-.hl{fill:none;stroke:var(--hi);stroke-width:30;stroke-linecap:round;stroke-linejoin:round;mix-blend-mode:multiply;stroke-dasharray:1 1;stroke-dashoffset:1;pointer-events:none}
-.hl.go{transition:stroke-dashoffset 1.5s cubic-bezier(.55,.05,.25,1)}
+.hl{fill:none;stroke:var(--hi-ink);stroke-opacity:.62;stroke-width:26;stroke-linecap:butt;stroke-linejoin:bevel;mix-blend-mode:multiply;stroke-dasharray:1 1;stroke-dashoffset:1;pointer-events:none}
 .hl.on{stroke-dashoffset:0}
-.dimmed .lg:not(.hot) .ln,.dimmed .lg:not(.hot) .stn,.dimmed .lg:not(.hot) text,.dimmed .lg:not(.hot) .bulc{opacity:.22}
+.dimmed .lg:not(.hot) .ln,.dimmed .lg:not(.hot) .stn,.dimmed .lg:not(.hot) text,.dimmed .lg:not(.hot) rect,.dimmed .lg:not(.hot) .bulc{opacity:.22}
 .pen{font-family:var(--hand);fill:var(--pen);font-size:24px}
 .pen-line{fill:none;stroke:var(--pen);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 
@@ -110,27 +110,34 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 .sanborn .ed{font-family:Georgia,"Times New Roman",serif;font-style:italic}
 .notes{font-size:15px}
 .notes p{margin:0 0 10px;max-width:58ch}
-.notes .tag{display:inline-block;background:#111;color:#fff;font:700 11px var(--sans);letter-spacing:.1em;text-transform:uppercase;padding:3px 7px 2px;margin-right:6px}
+.notes b{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-weight:400}
+.notes h3{margin:0 0 10px;font:400 22px/1 var(--slab);border-bottom:1.5px solid #111;padding-bottom:6px;max-width:58ch}
 
 /* ---------- strip maps ---------- */
-.strips-head{margin:46px 0 14px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-.strips-head h2{margin:0;font:400 clamp(30px,4vw,46px)/1 var(--cond);letter-spacing:.02em;color:var(--cream);text-transform:uppercase;
-  text-shadow:1px 1px 0 var(--oxblood),2px 2px 0 var(--oxblood),3px 3px 0 var(--oxblood),4px 4px 0 var(--oxblood),5px 5px 0 #111}
-.strips-head p{margin:0;font-size:15px;color:#2b1a09;font-weight:700;background:rgba(251,250,246,.8);padding:2px 8px}
-.line{background:var(--paper);border:1px solid #111;margin:0 0 22px;box-shadow:0 14px 24px -16px rgba(40,22,6,.75);scroll-margin-top:16px}
-.sign{background:#111;color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 18px 11px;border-top:6px solid #111;box-shadow:inset 0 1px 0 #444}
+.strips-head{margin:46px 0 26px;display:flex;align-items:baseline;gap:6px 16px;flex-wrap:wrap;background:var(--paper);border:1px solid #111;border-top:6px solid #111;padding:12px 18px 13px;box-shadow:0 14px 24px -16px rgba(40,22,6,.75)}
+.strips-head h2{margin:0;font:700 clamp(24px,2.6vw,30px)/1.1 var(--sans);letter-spacing:-.01em}
+.strips-head p{margin:0;font-size:15px;color:var(--muted)}
+.line{position:relative;background:var(--paper);border:1px solid #111;margin:0 0 26px 14px;box-shadow:0 14px 24px -16px rgba(40,22,6,.75);scroll-margin-top:16px}
+/* spiral binding: punched holes plus a black plastic coil, on the strip's short edge (left on desktop, top on phones) */
+.coil{position:absolute;z-index:2;pointer-events:none;left:-15px;top:10px;bottom:10px;width:40px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='18'%3E%3Crect x='22' y='5' width='8' height='8' rx='2' fill='%234a3219'/%3E%3Crect x='22' y='5' width='8' height='2.2' rx='1' fill='%23261809'/%3E%3Cpath d='M27,7.5 C18,0.5 5,1.5 3.5,8 C2.5,13 10,15.5 26,11' fill='none' stroke='%23000' stroke-opacity='.25' stroke-width='3.6' transform='translate(1.5 1.5)'/%3E%3Cpath d='M27,7.5 C18,0.5 5,1.5 3.5,8 C2.5,13 10,15.5 26,11' fill='none' stroke='%23151515' stroke-width='3.4' stroke-linecap='round'/%3E%3Cpath d='M20,4 C13,1.8 7,2.4 5,6' fill='none' stroke='%23fff' stroke-opacity='.45' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E") 0 0/40px 18px repeat-y}
+.sign{background:#111;color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:12px 18px 11px 40px;border-top:6px solid #111;box-shadow:inset 0 1px 0 #444}
 .sign .bul{width:44px;height:44px;font-size:24px}
+button.bul{all:unset;box-sizing:border-box;display:inline-grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--c);color:#fff;font:700 24px/1 var(--sans);flex:none;cursor:var(--cur),pointer;transition:transform .15s}
+button.bul.dark{color:#111}
+button.bul:hover{transform:scale(1.08)}
+button.bul:active{transform:scale(.96)}
+button.bul:focus-visible{outline:3px solid #fff;outline-offset:3px}
 .sign h3{margin:0;font:700 clamp(20px,2.2vw,26px)/1.1 var(--sans);letter-spacing:-.005em;flex:1 1 280px}
 .svc{display:flex;flex-wrap:wrap;gap:6px}
-.svc span{border:1.5px solid #fff;font:700 12px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;padding:6px 8px 5px}
+.svc span{border:1.5px solid #fff;font:700 14px/1 var(--sans);padding:6px 8px 5px}
 .svc span.solid{background:#fff;color:#111}
-.markbtn{all:unset;cursor:pointer;font:700 12px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:#111;background:var(--hi);padding:7px 10px 6px;border-radius:2px}
-.markbtn:focus-visible{outline:3px solid #fff;outline-offset:2px}
-.body{padding:24px 26px 22px;position:relative}
+.body{padding:24px 26px 22px 40px;position:relative}
 .track{position:relative;list-style:none;margin:0;padding:0;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:18px}
 .track::before{content:"";position:absolute;left:0;right:0;top:15px;height:10px;background:var(--c)}
-.track .hlbar{position:absolute;left:-10px;right:-10px;top:5px;height:30px;background:var(--hi);mix-blend-mode:multiply;transform:scaleX(0);transform-origin:left center;border-radius:14px;pointer-events:none}
-.line.marked .hlbar{transform:scaleX(1);transition:transform 1.4s cubic-bezier(.55,.05,.25,1)}
+.hlsvg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.hlsvg path{fill:none;stroke:var(--hi-ink);stroke-opacity:.62;stroke-width:28;stroke-linecap:butt;stroke-linejoin:bevel;mix-blend-mode:multiply;stroke-dasharray:1 1;stroke-dashoffset:1}
+.hlsvg path.on{stroke-dashoffset:0}
 .stop{position:relative;padding-top:44px;min-width:0}
 .stop::before{content:"";position:absolute;top:9px;left:0;width:22px;height:22px;border-radius:50%;background:#111;box-shadow:inset 0 0 0 6px #111,inset 0 0 0 11px #fff}
 .stop.home::before{width:50px;border-radius:11px;background:#111;box-shadow:inset 0 0 0 5px #111,inset 0 0 0 11px #fff}
@@ -143,12 +150,12 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 .line.short .track{display:flex;align-items:flex-start;gap:18px}
 .line.short .stop.home{flex:0 0 190px}
 .run{flex:1 1 auto;text-align:center;padding-top:9px;min-width:0}
-.run span{display:inline-block;background:#111;color:#fff;font:700 12px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;padding:5px 10px 4px;position:relative;z-index:1}
+.run span{display:inline-block;background:#111;color:#fff;font:700 14px/1 var(--sans);padding:5px 10px 4px;position:relative;z-index:2}
 .line.short .stop.term{flex:0 1 400px;text-align:right}
 .line.short .stop.term::before{left:auto;right:0}
 .line.short .stop.term .hand{justify-content:flex-end}
 .forkspace{height:64px}
-.forksvg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.forksvg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:0}
 .forksvg path{fill:none;stroke:var(--M);stroke-width:10;stroke-linejoin:miter;stroke-linecap:butt}
 .track.open::before{right:-10px}
 .ends{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
@@ -163,7 +170,7 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 /* the one bulletin-board notice */
 .notice{position:relative;background:#fff3a0;padding:24px 14px 0;transform:rotate(-1.6deg);box-shadow:0 2px 0 rgba(0,0,0,.06),0 12px 16px -10px rgba(0,0,0,.5);margin-top:-6px}
 .notice::before{content:"";position:absolute;top:7px;left:50%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff9a8a,#c0271a 62%);box-shadow:2px 3px 2px rgba(0,0,0,.35)}
-.notice h4{margin:0 0 6px;font:400 26px/1 var(--cond);text-transform:uppercase;letter-spacing:.02em}
+.notice h4{margin:0 0 6px;font:400 28px/1 var(--cond)}
 .notice p{font-size:15px}
 .tabs{display:flex;margin:12px -14px 0;border-top:1.5px dashed #6b5d2a}
 .tab{all:unset;box-sizing:border-box;flex:1;min-width:0;height:108px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-left:1.5px dashed #6b5d2a;background:#fff3a0;
@@ -189,11 +196,10 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   .wrap{padding:16px 16px 110px}
   .routes{grid-template-columns:1fr}
   .body{padding:18px 16px 16px}
+  .strips-head{margin:40px 0 30px}
   .track,.line.short .track{grid-auto-flow:row;grid-template-columns:1fr;gap:26px;padding-left:44px}
   .track::before{left:6px;right:auto;top:0;bottom:0;width:10px;height:auto}
   .track.open::before{bottom:-16px;right:auto}
-  .track .hlbar{left:-4px;right:auto;top:-8px;bottom:-8px;width:30px;height:auto;transform:scaleY(0);transform-origin:center top}
-  .line.marked .hlbar{transform:scaleY(1)}
   .stop{padding-top:0}
   .stop::before{left:-44px;top:1px}
   .stop.home::before{width:22px;height:50px;top:-4px}
@@ -208,20 +214,33 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   .end{padding-top:0}
   .end::before{left:-44px;top:10px}
   .end::after{content:"";position:absolute;left:-28px;top:16px;width:22px;height:10px;background:var(--M)}
-  .sign{padding:10px 14px 10px}
-  .sign .bul{width:38px;height:38px;font-size:21px}
+  .line{margin:0 0 30px}
+  .coil{left:10px;right:10px;top:-15px;bottom:auto;width:auto;height:40px;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='40'%3E%3Crect x='5' y='22' width='8' height='8' rx='2' fill='%234a3219'/%3E%3Crect x='5' y='22' width='2.2' height='8' rx='1' fill='%23261809'/%3E%3Cpath d='M7.5,27 C0.5,18 1.5,5 8,3.5 C13,2.5 15.5,10 11,26' fill='none' stroke='%23000' stroke-opacity='.25' stroke-width='3.6' transform='translate(1.5 1.5)'/%3E%3Cpath d='M7.5,27 C0.5,18 1.5,5 8,3.5 C13,2.5 15.5,10 11,26' fill='none' stroke='%23151515' stroke-width='3.4' stroke-linecap='round'/%3E%3Cpath d='M4,20 C1.8,13 2.4,7 6,5' fill='none' stroke='%23fff' stroke-opacity='.45' stroke-width='1' stroke-linecap='round'/%3E%3C/svg%3E") 0 0/18px 40px repeat-x}
+  .sign{padding:30px 14px 10px}
+  .sign .bul,button.bul{width:38px;height:38px;font-size:21px}
   .sanborn{margin:22px 4px 6px;padding:32px 12px 10px}
   .sanborn li{grid-template-columns:52px 1fr;font-size:14px}
   .sanborn svg{width:52px}
   .notice{transform:rotate(-1deg)}
 }
 @media (prefers-reduced-motion:reduce){
-  .hl.go,.line.marked .hlbar,.tab,.ln,.bul{transition:none!important}
+  .hl,.hlsvg path,.tab,.ln,.bul,button.bul{transition:none!important}
 }
 </style>
 </head>
 <body>
 <a class="skip" href="#lines">Skip to the strip maps</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <!-- highlighter ink: streaks run along the stroke, the edges are ragged, the ink is uneven -->
+  <filter id="hlTex" filterUnits="userSpaceOnUse" x="-200" y="-200" width="4000" height="9000" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency=".35 .35" numOctaves="2" seed="7" result="edge"/>
+    <feDisplacementMap in="SourceGraphic" in2="edge" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="ragged"/>
+    <feTurbulence type="fractalNoise" baseFrequency=".05 .05" numOctaves="3" seed="3" result="streak"/>
+    <feColorMatrix in="streak" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  .6 0 0 0 .62" result="alpha"/>
+    <feComposite in="ragged" in2="alpha" operator="in"/>
+  </filter>
+</svg>
 <main class="wrap">
 
 <!-- The masthead is a Central Valley grape-lug label. Wide for desktop, redrawn tall for phones. -->
@@ -317,21 +336,21 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   <div class="keystrip">
     <div>
       <h1 id="title">Home Lines of Fresno &amp; Clovis</h1>
-      <p class="intro">Home was Fresno and Clovis, in the Central Valley, from 2015 to 2025. Five lines leave from there, one for each commitment. Every stop is a fact.</p>
+      <p class="intro">Home was Fresno and Clovis, in California’s Central Valley, from 2015 to 2025. Five lines leave from there, one for each commitment. The longest, line M, ends at 150+ community events, $240K+ raised and a $500K pledge for Fresno’s first Muslim women’s transitional home.</p>
     </div>
     <div>
-      <p class="kicker">How to use this map</p>
-      <p class="howto">Tap a route bullet to run the highlighter along its line. The strip maps below give every stop.</p>
+      <h2 class="kicker">How to use this map</h2>
+      <p class="howto">Tap a route bullet to run the highlighter along its line, the way a travel counselor marked a route. The strip maps below give every stop.</p>
       <p class="howto">Days and years are service notes, the way a subway guide prints “rush hours only”.</p>
     </div>
     <div>
-      <p class="kicker">Routes</p>
+      <h2 class="kicker">Routes</h2>
       <ul class="routes">
-        <li><button class="rbtn" data-r="F" aria-pressed="false"><span class="bul" style="--c:var(--F)" aria-hidden="true">F</span><span class="rname"><b>Food Bank</b><span>Sundays · 2015–2021</span></span></button></li>
-        <li><button class="rbtn" data-r="S" aria-pressed="false"><span class="bul" style="--c:var(--S)" aria-hidden="true">S</span><span class="rname"><b>Saturday School</b><span>Saturdays · 2018–2021</span></span></button></li>
-        <li><button class="rbtn" data-r="M" aria-pressed="false"><span class="bul" style="--c:var(--M)" aria-hidden="true">M</span><span class="rname"><b>Muslim Community Association</b><span>Sep 2021 – Dec 2025</span></span></button></li>
-        <li><button class="rbtn" data-r="C" aria-pressed="false"><span class="bul" style="--c:var(--C)" aria-hidden="true">C</span><span class="rname"><b>MSA on campus</b><span>2022</span></span></button></li>
-        <li><button class="rbtn" data-r="T" aria-pressed="false"><span class="bul dark" style="--c:var(--T)" aria-hidden="true">T</span><span class="rname"><b>Tutoring</b><span>2023</span></span></button></li>
+        <li><button class="rbtn" data-r="F" aria-pressed="false"><span class="bul" style="--c:var(--F)" aria-hidden="true">F</span><span class="rname"><b>Central California Food Bank</b><span>Sundays · 2015–2021</span></span></button></li>
+        <li><button class="rbtn" data-r="S" aria-pressed="false"><span class="bul" style="--c:var(--S)" aria-hidden="true">S</span><span class="rname"><b>Masjid Fresno Saturday School</b><span>Saturdays · 2018–2021</span></span></button></li>
+        <li><button class="rbtn" data-r="M" aria-pressed="false"><span class="bul" style="--c:var(--M)" aria-hidden="true">M</span><span class="rname"><b>Muslim Community Association of Fresno</b><span>Sep 2021 – Dec 2025</span></span></button></li>
+        <li><button class="rbtn" data-r="C" aria-pressed="false"><span class="bul" style="--c:var(--C)" aria-hidden="true">C</span><span class="rname"><b>Muslim Student Association</b><span>Clovis Community College · 2022</span></span></button></li>
+        <li><button class="rbtn" data-r="T" aria-pressed="false"><span class="bul dark" style="--c:var(--T)" aria-hidden="true">T</span><span class="rname"><b>Instilt Educate</b><span>Tutor · 2023</span></span></button></li>
       </ul>
     </div>
   </div>
@@ -350,15 +369,16 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
         <li><svg viewBox="0 0 62 26" aria-hidden="true"><rect x="0" y="8" width="62" height="10" fill="#0039a6"/><circle cx="54" cy="13" r="9" fill="#111"/></svg><span>Terminal. Where a line ends.</span></li>
         <li><svg viewBox="0 0 62 26" aria-hidden="true"><rect x="6" y="6" width="50" height="14" rx="7" fill="#111"/><circle cx="16" cy="13" r="4" fill="#fff"/><circle cx="31" cy="13" r="4" fill="#fff"/><circle cx="46" cy="13" r="4" fill="#fff"/></svg><span>Transfer station. Home: every line starts here.</span></li>
         <li><svg viewBox="0 0 62 26" aria-hidden="true"><path d="M0,19 H26 L40,5 H62 M26,19 H62" fill="none" stroke="#0039a6" stroke-width="6"/></svg><span>Branch. The ends of a branch are not in any order.</span></li>
-        <li><svg viewBox="0 0 62 26" aria-hidden="true"><rect x="2" y="5" width="58" height="16" fill="#111"/><text x="31" y="17" text-anchor="middle" font-family="Helvetica,Arial" font-weight="700" font-size="9" fill="#fff" letter-spacing="1">SUNDAYS</text></svg><span>Service note: when the line ran.</span></li>
-        <li><svg viewBox="0 0 62 26" aria-hidden="true"><path d="M3,13 H59" stroke="rgba(214,255,20,.85)" stroke-width="16" stroke-linecap="round"/><path d="M3,13 H59" stroke="#ff6319" stroke-width="5"/></svg><span>Highlighter. Marked by hand.</span></li>
+        <li><svg viewBox="0 0 62 26" aria-hidden="true"><rect x="2" y="5" width="58" height="16" fill="#111"/><text x="31" y="17" text-anchor="middle" font-family="Helvetica,Arial" font-weight="700" font-size="10" fill="#fff">Sundays</text></svg><span>Service note: when the line ran.</span></li>
+        <li><svg viewBox="0 0 62 26" aria-hidden="true"><path d="M4,13 H58" stroke="#ff8c1e" stroke-opacity=".62" stroke-width="15" filter="url(#hlTex)" style="mix-blend-mode:multiply"/><path d="M3,13 H59" stroke="#0039a6" stroke-width="5"/></svg><span>Highlighter. The route, marked by hand in fluorescent orange.</span></li>
         <li><svg viewBox="0 0 62 26" aria-hidden="true"><path d="M4,18 C12,6 20,22 28,12 S44,6 58,14" fill="none" stroke="#1f3a9e" stroke-width="2" stroke-linecap="round"/></svg><span>Pen. The counselor’s note.</span></li>
       </ul>
     </div>
     <div class="notes">
-      <p><span class="tag">Schematic</span>Not to scale. No streets are drawn and no place is located; lines show what connects, not where anything is.</p>
-      <p><span class="tag">Transfer</span>The Food Bank and Saturday School lines end in 2021, the year the M line opens.</p>
-      <p><span class="tag">Branches</span>The M line forks at VP &amp; Executive Director into four ends. They happened on that line; the map doesn’t rank them.</p>
+      <h3>Reference</h3>
+      <p><b>Schematic.</b> Not to scale. No streets are drawn and no place is located; lines show what connects, not where anything is.</p>
+      <p><b>Transfer.</b> The Food Bank and Saturday School lines end in 2021, the year the M line opens.</p>
+      <p><b>Branches.</b> The M line forks at VP &amp; Executive Director into four ends: 150+ events, $240K+ raised, a $500K pledge, and the drives and mentoring groups. All four happened on that line; the map doesn’t rank them.</p>
     </div>
   </div>
 </section>
@@ -366,14 +386,15 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 <!-- Strip maps: one per line, in the order the lines opened -->
 <div class="strips-head" id="lines">
   <h2>Strip maps</h2>
-  <p>One strip per line, in the order the lines opened.</p>
+  <p>One strip per line, bound in the order the lines opened.</p>
 </div>
 
 <article class="line short" id="line-F" data-r="F" style="--c:var(--F)" aria-labelledby="hF">
-  <div class="sign"><span class="bul" style="--c:var(--F)" aria-hidden="true">F</span><h3 id="hF">Central California Food Bank</h3>
-    <div class="svc"><span class="solid">Sundays</span><span>2015–2021</span></div><button class="markbtn" data-r="F">Mark line F</button></div>
+  <span class="coil" aria-hidden="true"></span>
+  <div class="sign"><button class="bul" style="--c:var(--F)" data-r="F" aria-label="Run the highlighter along line F">F</button><h3 id="hF">Central California Food Bank</h3>
+    <div class="svc"><span class="solid">Sundays</span><span>2015–2021</span></div></div>
   <div class="body">
-    <ol class="track"><span class="hlbar" aria-hidden="true"></span>
+    <ol class="track">
       <li class="stop home"><b>Home</b><span>Fresno &amp; Clovis</span></li>
       <li class="run" aria-hidden="true"><span>Volunteer · Sundays</span></li>
       <li class="stop term"><b>Central California Food Bank</b><span>Volunteer, most Sundays, 2015 to 2021.</span>
@@ -383,10 +404,11 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 </article>
 
 <article class="line short" id="line-S" data-r="S" style="--c:var(--S)" aria-labelledby="hS">
-  <div class="sign"><span class="bul" style="--c:var(--S)" aria-hidden="true">S</span><h3 id="hS">Masjid Fresno Saturday School</h3>
-    <div class="svc"><span class="solid">Saturdays</span><span>2018–2021</span></div><button class="markbtn" data-r="S">Mark line S</button></div>
+  <span class="coil" aria-hidden="true"></span>
+  <div class="sign"><button class="bul" style="--c:var(--S)" data-r="S" aria-label="Run the highlighter along line S">S</button><h3 id="hS">Masjid Fresno Saturday School</h3>
+    <div class="svc"><span class="solid">Saturdays</span><span>2018–2021</span></div></div>
   <div class="body">
-    <ol class="track"><span class="hlbar" aria-hidden="true"></span>
+    <ol class="track">
       <li class="stop home"><b>Home</b><span>Fresno &amp; Clovis</span></li>
       <li class="run" aria-hidden="true"><span>Volunteer · Saturdays</span></li>
       <li class="stop term"><b>Masjid Fresno Saturday School</b><span>Volunteer, most Saturdays, 2018 to 2021.</span>
@@ -396,10 +418,11 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 </article>
 
 <article class="line" id="line-M" data-r="M" style="--c:var(--M)" aria-labelledby="hM">
-  <div class="sign"><span class="bul" style="--c:var(--M)" aria-hidden="true">M</span><h3 id="hM">Muslim Community Association of Fresno</h3>
-    <div class="svc"><span class="solid">Sep 2021 – Dec 2025</span><span>Youth-driven nonprofit</span></div><button class="markbtn" data-r="M">Mark line M</button></div>
+  <span class="coil" aria-hidden="true"></span>
+  <div class="sign"><button class="bul" style="--c:var(--M)" data-r="M" aria-label="Run the highlighter along line M">M</button><h3 id="hM">Muslim Community Association of Fresno</h3>
+    <div class="svc"><span class="solid">Sep 2021 – Dec 2025</span><span>Youth-driven nonprofit</span></div></div>
   <div class="body">
-    <ol class="track open"><span class="hlbar" aria-hidden="true"></span>
+    <ol class="track open">
       <li class="stop home"><b>Home</b><span>Fresno &amp; Clovis</span></li>
       <li class="stop"><b>Earlier roles</b><span>Board member from Sep 2021</span><span>Director of Outreach</span><span>Director of Relations</span><span>Director of External Relations</span></li>
       <li class="stop"><b>VP &amp; Executive Director</b><span>May 2022 to Dec 2025</span>
@@ -412,7 +435,7 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
       <li class="end"><span class="big">$500K</span><p>pledge secured for Fresno’s first Muslim women’s transitional home, addressing homelessness and domestic abuse.</p><p class="hand">Fresno’s first</p></li>
       <li class="end">
         <div class="notice">
-          <h4>Drives &amp; mentoring</h4>
+          <h4>Drives &amp; Mentoring</h4>
           <p>Clothing and food drives. Mentoring groups at local mosques and Islamic schools.</p>
           <div class="tabs" role="group" aria-label="Tear-off tabs">
             <button class="tab" style="--dx:-10px;--rot:-26deg"><span>Clothing drives</span></button>
@@ -428,10 +451,11 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 </article>
 
 <article class="line short" id="line-C" data-r="C" style="--c:var(--C)" aria-labelledby="hC">
-  <div class="sign"><span class="bul" style="--c:var(--C)" aria-hidden="true">C</span><h3 id="hC">MSA, Clovis Community College</h3>
-    <div class="svc"><span class="solid">2022</span></div><button class="markbtn" data-r="C">Mark line C</button></div>
+  <span class="coil" aria-hidden="true"></span>
+  <div class="sign"><button class="bul" style="--c:var(--C)" data-r="C" aria-label="Run the highlighter along line C">C</button><h3 id="hC">MSA, Clovis Community College</h3>
+    <div class="svc"><span class="solid">2022</span></div></div>
   <div class="body">
-    <ol class="track"><span class="hlbar" aria-hidden="true"></span>
+    <ol class="track">
       <li class="stop home"><b>Home</b><span>Fresno &amp; Clovis</span></li>
       <li class="run" aria-hidden="true"><span>Director of Community Relations</span></li>
       <li class="stop term"><b>Muslim Student Association</b><span>Director of Community Relations, Clovis Community College, 2022.</span>
@@ -441,10 +465,11 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 </article>
 
 <article class="line short" id="line-T" data-r="T" style="--c:var(--T)" aria-labelledby="hT">
-  <div class="sign"><span class="bul dark" style="--c:var(--T)" aria-hidden="true">T</span><h3 id="hT">Instilt Educate</h3>
-    <div class="svc"><span class="solid">2023</span></div><button class="markbtn" data-r="T">Mark line T</button></div>
+  <span class="coil" aria-hidden="true"></span>
+  <div class="sign"><button class="bul dark" style="--c:var(--T)" data-r="T" aria-label="Run the highlighter along line T">T</button><h3 id="hT">Instilt Educate</h3>
+    <div class="svc"><span class="solid">2023</span></div></div>
   <div class="body">
-    <ol class="track"><span class="hlbar" aria-hidden="true"></span>
+    <ol class="track">
       <li class="stop home"><b>Home</b><span>Fresno &amp; Clovis</span></li>
       <li class="run" aria-hidden="true"><span>Tutor</span></li>
       <li class="stop term"><b>Instilt Educate</b><span>Tutor, 2023.</span>
@@ -453,7 +478,7 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   </div>
 </article>
 
-<p class="colophon"><b>Printed in the Map Room.</b> A pocket guide in the manner of the 1972 New York subway diagram, with a key after the Sanborn fire-insurance atlases, under a label in the style of the Central Valley’s grape-lug crates.</p>
+<p class="colophon"><b>Printed in the Map Room.</b> A pocket guide in the manner of the 1972 New York subway diagram, strips bound like an AAA TripTik and marked the way its travel counselors marked them, a key after the Sanborn fire-insurance atlases, and a label in the style of the Central Valley’s grape-lug crates.</p>
 </main>
 
 <script>
@@ -467,21 +492,21 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
     home:{bar:[508,312,152,16],dots:{F:520,C:548,S:576,T:604,M:648},y:320,label:[590,282],sub:[590,299],labelAnchor:'start'},
     lines:{
       F:{d:'M520,320 H138', st:[[180,320,'t']], bul:[138,320],
-         labels:[[180,294,'Central California Food Bank','t-st','start'],[180,352,'SUNDAYS · 2015–2021','svc','start']]},
+         labels:[[180,294,'Central California Food Bank','t-st','start'],[180,352,'Sundays · 2015–2021','svc','start']]},
       C:{d:'M548,320 V204 L508,164 H232', st:[[272,164,'t']], bul:[232,164],
          labels:[[272,138,'MSA, Clovis Community College','t-st','start'],[272,196,'2022 · Director of Community Relations','t-sub','start']]},
       S:{d:'M576,320 V400 L496,480 H232', st:[[272,480,'t']], bul:[232,480],
-         labels:[[272,454,'Masjid Fresno Saturday School','t-st','start'],[272,512,'SATURDAYS · 2018–2021','svc','start']]},
+         labels:[[272,454,'Masjid Fresno Saturday School','t-st','start'],[272,512,'Saturdays · 2018–2021','svc','start']]},
       T:{d:'M604,320 V560 H846', st:[[806,560,'t']], bul:[846,560],
          labels:[[632,540,'Instilt Educate','t-st','start'],[632,592,'2023 · Tutor','t-sub','start']]},
-      M:{d:'M648,320 H940 L1040,220 M940,320 L980,280 H1040 M940,320 L980,360 H1040 M940,320 L1040,420', st:[[744,320,'s'],[852,320,'s'],[1040,220,'t'],[1040,280,'t'],[1040,360,'t'],[1040,420,'t']], bul:[694,320],
-         labels:[[744,294,'Earlier roles','t-st','middle'],[852,352,'VP & Executive Director','t-st','middle'],[852,370,'May 2022 – Dec 2025','t-sub','middle'],
-                 [1056,225,'150+ events','t-st','start'],[1056,285,'$240K+ raised','t-st','start'],[1056,365,'$500K pledge','t-st','start'],[1056,425,'Drives & mentoring','t-st','start']]}
+      M:{d:'M648,320 H916 L1016,220 M916,320 L956,280 H1016 M916,320 L956,360 H1016 M916,320 L1016,420', st:[[744,320,'s'],[830,320,'s'],[1016,220,'t'],[1016,280,'t'],[1016,360,'t'],[1016,420,'t']], bul:[694,320],
+         labels:[[744,294,'Earlier roles','t-st','middle'],[830,352,'VP & Executive Director','t-st','middle'],[830,370,'May 2022 – Dec 2025','t-sub','middle'],
+                 [1032,225,'150+ events','t-st','start'],[1032,285,'$240K+ raised','t-st','start'],[1032,365,'$500K pledge','t-st','start'],[1032,425,'Drives & mentoring','t-st','start']]}
     },
-    boro:[[40,610,'CENTRAL VALLEY'],[40,76,'FRESNO · CLOVIS']],
+    boro:[[40,610,'Central Valley'],[40,76,'Fresno · Clovis']],
     pen:[
       {t:'most Sundays',x:372,y:378,path:'M366,370 C392,352 414,344 430,332 M430,332 L420,334 M430,332 L428,342',r:-4},
-      {t:'the line forks here',x:792,y:250,path:'M912,258 C926,272 934,288 936,304 M936,304 L930,296 M936,304 L941,295',r:-3},
+      {t:'the line forks here',x:768,y:250,path:'M888,258 C902,272 910,288 912,304 M912,304 L906,296 M912,304 L917,295',r:-3},
       {t:'most Saturdays',x:458,y:536,path:'M470,512 C468,504 470,496 474,488 M474,488 L468,495 M474,488 L479,496',r:-3}
     ],
     grid:{w:1200,h:640,cols:10,rows:6}
@@ -490,18 +515,18 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
     home:{bar:[127,292,136,16],dots:{F:138,C:168,S:198,T:228,M:252},y:300,label:[56,334],sub:[56,351],labelAnchor:'start'},
     lines:{
       F:{d:'M138,300 H44 V412', st:[[44,408,'t']], bul:[92,300],
-         labels:[[30,436,'Central California','t-st','start'],[30,452,'Food Bank','t-st','start'],[30,470,'SUNDAYS','svcs','start']]},
+         labels:[[30,436,'Central California','t-st','start'],[30,452,'Food Bank','t-st','start'],[30,470,'Sundays','svcs','start']]},
       C:{d:'M168,300 V200 L128,160 V100', st:[[128,104,'t']], bul:[168,250],
          labels:[[144,84,'MSA, Clovis','t-st','start'],[144,100,'Community College','t-st','start'],[144,116,'2022','t-sub','start']]},
       S:{d:'M198,300 V420 L130,488 V548', st:[[130,544,'t']], bul:[198,382],
-         labels:[[146,532,'Masjid Fresno','t-st','start'],[146,548,'Saturday School','t-st','start'],[146,566,'SATURDAYS','svcs','start']]},
+         labels:[[146,532,'Masjid Fresno','t-st','start'],[146,548,'Saturday School','t-st','start'],[146,566,'Saturdays','svcs','start']]},
       T:{d:'M228,300 V436 L270,478 V548', st:[[270,544,'t']], bul:[228,382],
          labels:[[286,532,'Instilt','t-st','start'],[286,548,'Educate','t-st','start'],[286,564,'2023','t-sub','start']]},
       M:{d:'M252,300 H340 V220 L260,140 M340,220 L300,180 V140 M340,220 V140 M340,220 L372,188 V140', st:[[340,276,'s'],[340,248,'s'],[260,140,'t'],[300,140,'t'],[340,140,'t'],[372,140,'t']], bul:[296,300],
          labels:[[328,281,'Earlier roles','t-sub','end'],[328,253,'VP & Exec. Director','t-sub','end'],
-                 [260,124,'drives','t-sub','middle'],[300,110,'150+','t-st','middle'],[340,124,'$240K+','t-st','middle'],[368,110,'$500K','t-st','middle']]}
+                 [260,124,'Drives','t-sub','middle'],[300,110,'150+','t-st','middle'],[340,124,'$240K+','t-st','middle'],[368,110,'$500K','t-st','middle']]}
     },
-    boro:[[16,40,'CENTRAL VALLEY']],
+    boro:[[16,40,'Central Valley']],
     pen:[],
     grid:{w:390,h:600,cols:0,rows:0}
   };
@@ -540,7 +565,7 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
       el('circle',{'class':'ring',cx:ln.bul[0],cy:ln.bul[1],r:tall?17:22},g);
       ln.labels.forEach(function(lb){
         if (lb[3]==='svc' || lb[3]==='svcs'){
-          var w = lb[2].length*8.3+14;
+          var w = lb[2].length*6.9+14;
           var x0 = lb[4]==='start'?lb[0]:lb[0]-w/2;
           el('rect',{x:x0,y:lb[1]-13,width:w,height:18,fill:'#111'},g);
           el('text',{x:x0+7,y:lb[1],'class':'t-svc'},g,lb[2]);
@@ -548,13 +573,13 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
           el('text',{x:lb[0],y:lb[1],'class':lb[3],'text-anchor':lb[4]},g,lb[2]);
         }
       });
-      var hl = el('path',{'class':'hl',d:ln.d,pathLength:1,'data-r':r},hlG);
+      el('path',{'class':'hl',d:ln.d,pathLength:1,'data-r':r,filter:'url(#hlTex)'},hlG);
     });
     // home transfer station
     var h = L.home, hg = el('g',{},svg);
     el('rect',{x:h.bar[0],y:h.bar[1],width:h.bar[2],height:h.bar[3],rx:h.bar[3]/2,fill:'#111'},hg);
     for (var k in h.dots){ el('circle',{cx:h.dots[k],cy:h.y,r:tall?4:5,fill:'#fff'},hg); }
-    el('text',{x:h.label[0],y:h.label[1],'class':'t-home','text-anchor':h.labelAnchor},hg,'HOME');
+    el('text',{x:h.label[0],y:h.label[1],'class':'t-home','text-anchor':h.labelAnchor},hg,'Home');
     el('text',{x:h.sub[0],y:h.sub[1],'class':'t-sub','text-anchor':h.labelAnchor},hg,'Fresno & Clovis');
     // the counselor's pen
     L.pen.forEach(function(p){
@@ -566,8 +591,22 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   draw(document.getElementById('mapW'), W, false);
   draw(document.getElementById('mapT'), T, true);
 
-  /* ---------- the highlighter ---------- */
+  /* ---------- the highlighter ----------
+     A counselor's chisel-tip marker: flat square ends, ink that streaks along the stroke,
+     ragged edges, and a darker pool where the tip first touches the paper. The wipe runs at
+     a hand's speed, so a long route takes longer than a short one. */
   var current = '';
+  function speed(len){ return Math.max(.55, Math.min(1.9, len / 820)); }
+  function wipe(p, delay){
+    p.classList.remove('on'); p.style.transition = 'none';
+    if (reduce){ p.classList.add('on'); return; }
+    var len = 600; try { len = p.getTotalLength(); } catch(e){}
+    void p.getBoundingClientRect();
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      p.style.transition = 'stroke-dashoffset ' + speed(len).toFixed(2) + 's cubic-bezier(.3,.08,.25,1) ' + (delay || 0) + 's';
+      p.classList.add('on');
+    }); });
+  }
   function mark(r, fromUser){
     var same = (r === current);
     current = same && fromUser ? '' : r;
@@ -575,19 +614,11 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
       svg.classList.toggle('dimmed', !!current);
       svg.querySelectorAll('.lg').forEach(function(g){ g.classList.toggle('hot', g.getAttribute('data-r') === current); });
       svg.querySelectorAll('.hl').forEach(function(p){
-        var on = p.getAttribute('data-r') === current;
-        p.classList.remove('go','on');
-        if (on){
-          if (reduce){ p.classList.add('on'); }
-          else { void p.getBoundingClientRect(); p.classList.add('go'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ p.classList.add('on'); }); }); }
-        }
+        if (p.getAttribute('data-r') === current) wipe(p); else { p.style.transition = 'none'; p.classList.remove('on'); }
       });
     });
     document.querySelectorAll('.rbtn').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-r') === current)); });
-    if (current){
-      var line = document.getElementById('line-' + current);
-      if (line){ line.classList.remove('marked'); void line.offsetWidth; line.classList.add('marked'); }
-    }
+    if (current) markStrip(document.getElementById('line-' + current));
   }
   document.querySelectorAll('.rbtn').forEach(function(b){ b.addEventListener('click', function(){
     mark(b.getAttribute('data-r'), true);
@@ -598,43 +629,80 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
     g.addEventListener('click', function(){ mark(g.getAttribute('data-r'), true); });
     g.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); mark(g.getAttribute('data-r'), true); } });
   });
-  document.querySelectorAll('.markbtn').forEach(function(b){
-    b.addEventListener('click', function(){
-      var r = b.getAttribute('data-r'), line = document.getElementById('line-' + r);
-      line.classList.remove('marked'); void line.offsetWidth; line.classList.add('marked');
-      mark(r, false);
-    });
+  // the route bullet on each strip's sign re-marks that strip (and the system map above)
+  document.querySelectorAll('.sign button.bul').forEach(function(b){
+    b.addEventListener('click', function(){ mark(b.getAttribute('data-r'), false); });
   });
+
+  /* ---------- strips: the line, the M fork, and the highlighter, drawn to real positions ---------- */
+  var wide = matchMedia('(min-width: 721px)');
+  function stripGeometry(line){
+    var body = line.querySelector('.body'), track = body.querySelector('.track');
+    var B = body.getBoundingClientRect(), tr = track.getBoundingClientRect();
+    var W = body.clientWidth, H = body.clientHeight;
+    var ends = body.querySelectorAll('.end'), fork = '', hl = '';
+    if (wide.matches){
+      var y = tr.top - B.top + 20, xa = tr.left - B.left - 12;
+      if (!ends.length){
+        hl = 'M' + xa + ',' + y + ' H' + (tr.right - B.left + 12);
+      } else {
+        var x0 = W - 21, e0 = ends[0].getBoundingClientRect();
+        var dotY = e0.top - B.top + 11, barY = dotY - 44, xl = e0.left - B.left + 11;
+        fork = 'M' + (x0 - 6) + ',' + y + ' H' + x0 + ' V' + barY + ' H' + (xl - 5);
+        hl = 'M' + xa + ',' + y + ' H' + x0 + ' V' + barY + ' H' + xl;
+        ends.forEach(function(e){
+          var x = e.getBoundingClientRect().left - B.left + 11;
+          fork += ' M' + x + ',' + (barY - 5) + ' V' + dotY;
+          hl += ' M' + x + ',' + (barY - 4) + ' V' + (dotY + 8);
+        });
+      }
+    } else {
+      var x = tr.left - B.left + 11, ya = tr.top - B.top - 10, yb = tr.bottom - B.top + 10;
+      if (ends.length){ var last = ends[ends.length - 1].getBoundingClientRect(); yb = last.top - B.top + 36; }
+      hl = 'M' + x + ',' + ya + ' V' + yb;
+    }
+    return {body:body, W:W, H:H, fork:fork, hl:hl};
+  }
+  function drawStrip(line){
+    var g = stripGeometry(line);
+    g.body.querySelectorAll('.forksvg,.hlsvg').forEach(function(n){ n.remove(); });
+    var box = {width:g.W, height:g.H, viewBox:'0 0 ' + g.W + ' ' + g.H, 'aria-hidden':'true'};
+    if (g.fork){ box['class'] = 'forksvg'; var fs = el('svg', box, null); el('path', {d:g.fork}, fs); g.body.insertBefore(fs, g.body.firstChild); }
+    box['class'] = 'hlsvg';
+    var hs = el('svg', box, null);
+    var p = el('path', {d:g.hl, pathLength:1, filter:'url(#hlTex)'}, hs);
+    if (line.classList.contains('marked')){ p.style.transition = 'none'; p.classList.add('on'); }
+    g.body.insertBefore(hs, g.body.firstChild); // under the printed line, as on the system map
+  }
+  function markStrip(line){
+    if (!line) return;
+    line.classList.add('marked');
+    var p = line.querySelector('.hlsvg path'); if (p) wipe(p, .1);
+  }
+  function drawAll(){ document.querySelectorAll('.line').forEach(drawStrip); }
+  drawAll();
+  var ft, lastW = innerWidth;
+  addEventListener('resize', function(){ if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(ft); ft = setTimeout(drawAll, 80); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  // late fonts or a wrapping note change a strip's height: redraw that strip to its real positions
+  if ('ResizeObserver' in window){
+    var seenH = new WeakMap();
+    var ro = new ResizeObserver(function(es){ es.forEach(function(e){
+      var h = Math.round(e.contentRect.height); if (seenH.get(e.target) === h) return; seenH.set(e.target, h);
+      drawStrip(e.target.closest('.line'));
+    }); });
+    document.querySelectorAll('.line .body').forEach(function(b){ ro.observe(b); });
+  }
+
   // strips get marked as they come into view (the mark is decoration; the text is already there)
   if ('IntersectionObserver' in window){
     var io = new IntersectionObserver(function(es){
-      es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('marked'); io.unobserve(e.target); } });
+      es.forEach(function(e){ if (e.isIntersecting){ markStrip(e.target); io.unobserve(e.target); } });
     }, {threshold: .55});
     document.querySelectorAll('.line').forEach(function(l){ io.observe(l); });
   } else {
-    document.querySelectorAll('.line').forEach(function(l){ l.classList.add('marked'); });
+    document.querySelectorAll('.line').forEach(markStrip);
   }
-
-  /* ---------- the M line's fork, drawn to the real positions of its ends ---------- */
-  var mBody = document.querySelector('#line-M .body');
-  function drawFork(){
-    var old = mBody.querySelector('.forksvg'); if (old) old.remove();
-    if (!matchMedia('(min-width: 721px)').matches) return;
-    var track = mBody.querySelector('.track'), ends = mBody.querySelectorAll('.end');
-    var W = mBody.clientWidth, H = mBody.clientHeight, B = mBody.getBoundingClientRect();
-    var tr = track.getBoundingClientRect(), e0 = ends[0].getBoundingClientRect();
-    var lineY = tr.top - B.top + 20, x0 = W - 21;
-    var dotY = e0.top - B.top + 11;
-    var barY = dotY - 44;
-    var d = 'M' + (x0 - 6) + ',' + lineY + ' H' + x0 + ' V' + barY + ' H' + (e0.left - B.left + 11 - 5);
-    ends.forEach(function(e){ var x = e.getBoundingClientRect().left - B.left + 11; d += ' M' + x + ',' + (barY - 5) + ' V' + dotY; });
-    var svg = el('svg', {'class':'forksvg', width:W, height:H, viewBox:'0 0 ' + W + ' ' + H, 'aria-hidden':'true'}, null);
-    el('path', {d:d}, svg);
-    mBody.insertBefore(svg, mBody.firstChild);
-  }
-  drawFork();
-  var ft; addEventListener('resize', function(){ clearTimeout(ft); ft = setTimeout(drawFork, 80); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawFork);
 
   /* ---------- tear-off tabs ---------- */
   var tabs = document.querySelectorAll('.tab'), note = document.querySelector('.tornnote'), torn = 0;

@@ -8,13 +8,14 @@
 <meta name="description" content="The Polling Station: a working paper on his research, with an answer sheet, a draw-the-line figure and the numbers his record actually has.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400;0,500;0,600;1,400&family=Libre+Franklin:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Archivo:wdth,wght@62..125,400..800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Libre+Franklin:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Archivo:wdth,wght@62..125,400..800&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* ============ tokens ============ */
 :root{
   color-scheme: light;
   --paper:#ffffff;
-  --text:rgba(0,0,0,.82);
+  --text:#4e4e4e;          /* pudding.cool body + headline colour */
+  --ink:#333333;
   --text-2:rgba(0,0,0,.6);
   --muted:rgba(0,0,0,.5);
   --rule:rgba(0,0,0,.1);
@@ -43,7 +44,7 @@
 html{font:14px/1.6 var(--sans);-webkit-text-size-adjust:100%;background:var(--paper)}
 @media (min-width:768px){html{font-size:16px}}
 body{margin:0;background:var(--paper);color:var(--text)}
-a{color:var(--link);text-underline-offset:2px;text-decoration-thickness:1px}
+a{color:inherit;text-underline-offset:3px;text-decoration-thickness:1px}
 a:hover{text-decoration-thickness:2px}
 :focus-visible{outline:2px solid var(--link);outline-offset:3px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -67,38 +68,48 @@ a:hover{text-decoration-thickness:2px}
 
 /* ============ masthead ============ */
 .mast{border-bottom:1px solid var(--rule);background:var(--paper)}
-.mast .in{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:15px 0;font:600 13px/1.3 var(--sans);letter-spacing:.01em}
+.mast .in{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:15px 0;font:600 13px/1.3 var(--sans)}
 .mast .in span{font-weight:400;color:var(--muted)}
 .mast .mark{display:inline-flex;align-items:center;gap:9px;color:rgba(0,0,0,.85)}
 .mast svg{width:18px;height:18px}
 
 /* ============ title ============ */
 .title{padding-top:56px}
-.kicker{font:600 15px/1.3 var(--sans);color:var(--muted);margin:0 0 12px}
-h1{font:400 clamp(38px,5.4vw,58px)/1.08 var(--serif);color:rgba(0,0,0,.86);margin:0 0 18px;letter-spacing:-.005em;max-width:15ch}
-.lede{font:400 clamp(19px,2vw,22px)/1.5 var(--serif);color:var(--text-2);margin:0 0 32px;max-width:36em}
+h1{font:700 clamp(40px,5.6vw,64px)/1.06 var(--serif);color:var(--text);margin:0 0 20px;letter-spacing:-.012em;max-width:17ch;text-wrap:balance}
+.lede{font:400 clamp(19px,2vw,22px)/1.5 var(--serif);color:var(--text);margin:0 0 32px;max-width:36em}
+.lede b{font-weight:700}
 .byline{display:grid;grid-template-columns:repeat(4,auto);justify-content:start;column-gap:0;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:14px 0;margin-bottom:44px;font:400 13px/1.45 var(--sans);color:var(--text)}
 .byline > div{padding:0 22px;border-left:1px solid var(--rule)}
 .byline > div:first-child{padding-left:0;border-left:0}
-.byline h3{font:600 10px/1.2 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 5px}
+.down{display:none;position:absolute;left:50%;bottom:26px;transform:translateX(-50%);width:44px;height:44px;line-height:44px;text-align:center;font:400 22px/44px var(--sans);color:var(--text);text-decoration:none}
+.byline .k{display:block;font:400 12px/1.2 var(--sans);color:var(--muted);margin:0 0 4px}
 @media (max-width:640px){
   .title{padding-top:36px}
+  /* phone opening after pudding.cool's story openers: the title owns the first screen, a centred ↓ below it */
+  .title{min-height:calc(100svh - 49px);align-content:start;position:relative;padding-bottom:96px}
+  .title .byline{margin-bottom:0}
+  .down{display:block!important}
   .byline{grid-template-columns:1fr 1fr;row-gap:12px}
   .byline > div{padding:0 12px 0 0;border-left:0}
 }
 
 /* ============ prose ============ */
-.prose > p, p.prose{font:400 19px/1.66 var(--serif);color:var(--text);margin:0 0 1em}
+.prose > p, p.prose{font:400 20px/1.55 var(--serif);color:var(--text);margin:0 0 1.2em}
 @media (max-width:640px){.prose > p, p.prose{font-size:18px}}
-h2{font:500 27px/1.25 var(--serif);color:rgba(0,0,0,.86);margin:56px 0 16px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
-h2 .when{font:500 14px/1 var(--sans);color:var(--muted);margin-left:10px;letter-spacing:.02em;white-space:nowrap}
-.prose strong{font-weight:600;color:rgba(0,0,0,.9)}
+h2{font:700 clamp(28px,3.4vw,38px)/1.15 var(--serif);color:var(--text);margin:64px 0 20px;letter-spacing:-.01em;text-wrap:balance}
+.prose strong{font-weight:700;color:var(--text)}
 .ref{font:500 .8em/1 var(--sans);color:var(--link);text-decoration:none;white-space:nowrap}
 
 /* ============ figures ============ */
 figure{margin:28px 0 48px;position:relative}
 figcaption, .figcaption{font:400 13px/1.55 var(--sans);color:var(--text-2);margin-top:12px;max-width:44em}
 figcaption b{font-weight:600;color:rgba(0,0,0,.9)}
+/* notes under page-width figures sit on the text column, as on pudding.cool */
+:root{--textw:100%}
+@media (min-width:768px){:root{--textw:472px}}
+@media (min-width:1000px){:root{--textw:512px}}
+@media (min-width:1180px){:root{--textw:704px}}
+figure.l-page > figcaption{max-width:var(--textw);margin-left:auto;margin-right:auto}
 .fig-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
 .fig-title{font:600 17px/1.3 var(--sans);color:rgba(0,0,0,.88);margin:0}
 .fig-sub{font:400 14px/1.45 var(--sans);color:var(--text-2);margin:2px 0 0}
@@ -107,7 +118,7 @@ figcaption b{font-weight:600;color:rgba(0,0,0,.9)}
 .btn:disabled{opacity:.45;cursor:default}
 .btn.primary{background:rgba(0,0,0,.85);border-color:rgba(0,0,0,.85);color:#fff}
 .btn.primary:hover:not(:disabled){background:#000}
-.linkbtn{font:500 14px/1 var(--sans);color:var(--link);background:none;border:0;padding:10px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;min-height:40px}
+.linkbtn{font:500 14px/1 var(--sans);color:var(--ink);background:none;border:0;padding:10px 4px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;min-height:40px}
 .source{font:400 12px/1.5 var(--sans);color:var(--muted);margin-top:10px}
 
 /* ============ Instrument 1: the answer sheet ============ */
@@ -120,7 +131,7 @@ figcaption b{font-weight:600;color:rgba(0,0,0,.9)}
 
 .reader{position:relative}
 .slot{height:30px;background:#1c1c1e;border-radius:6px 6px 0 0;position:relative;box-shadow:inset 0 -7px 0 #050505;z-index:3;
-  display:flex;align-items:center;justify-content:space-between;padding:0 14px 6px;color:#8d8d8d;font:600 9.5px/1 var(--form);font-stretch:100%;letter-spacing:.2em;text-transform:uppercase}
+  display:flex;align-items:center;justify-content:space-between;padding:0 14px 6px;color:#9a9a9a;font:600 11px/1 var(--form);font-stretch:100%}
 .slot i{display:inline-block;width:7px;height:7px;border-radius:50%;background:#3b3b3b;margin-left:6px;vertical-align:middle;transition:background .2s}
 .reader.busy .slot i{background:#44c46a;box-shadow:0 0 6px #44c46a}
 .throat{overflow:hidden;position:relative;margin:0 10px;padding:0 0 30px}
@@ -132,19 +143,21 @@ figcaption b{font-weight:600;color:rgba(0,0,0,.9)}
 .scanline{position:absolute;left:0;right:0;top:0;height:2px;background:#ff2a2a;box-shadow:0 0 10px 2px rgba(255,42,42,.55);opacity:0;pointer-events:none;z-index:2}
 .s-hdr{display:grid;grid-template-columns:1fr auto;border:2px solid var(--dropout);color:var(--dropout)}
 .s-hdr h3{margin:0;padding:8px 10px 7px;font:800 25px/1 var(--form);font-stretch:68%;letter-spacing:.015em;text-transform:uppercase}
-.s-hdr .formno{padding:7px 10px;border-left:2px solid var(--dropout);font:700 10.5px/1.25 var(--form);font-stretch:90%;text-align:right;text-transform:uppercase;letter-spacing:.04em}
+.s-hdr .formno{padding:7px 10px;border-left:2px solid var(--dropout);font:700 10.5px/1.25 var(--form);font-stretch:90%;text-align:right;text-transform:uppercase;letter-spacing:.02em}
 .s-fields{display:grid;grid-template-columns:1.2fr 1fr 1fr;border:2px solid var(--dropout);border-top:0;color:var(--dropout)}
-.s-fields div{padding:4px 8px 5px;border-left:1px solid var(--dropout);font:700 9.5px/1.2 var(--form);font-stretch:95%;letter-spacing:.08em;text-transform:uppercase}
+.s-fields div{padding:4px 8px 5px;border-left:1px solid var(--dropout);font:700 9.5px/1.2 var(--form);font-stretch:95%;letter-spacing:.03em;text-transform:uppercase}
 .s-fields div:first-child{border-left:0}
 .s-fields b{display:block;font:400 15px/1.3 var(--mono);color:#1a1a1a;letter-spacing:0;text-transform:none;margin-top:2px}
-.s-band{background:var(--dropout);color:var(--sheet);font:800 11.5px/1 var(--form);font-stretch:110%;letter-spacing:.2em;text-align:center;padding:5px 6px;text-transform:uppercase;margin:9px 0}
-.s-ex{display:flex;gap:6px 18px;flex-wrap:wrap;align-items:center;border:1px solid var(--dropout);color:var(--dropout);padding:6px 10px;font:700 10.5px/1.3 var(--form);font-stretch:95%;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.s-band{background:var(--dropout);color:var(--sheet);font:800 12px/1 var(--form);font-stretch:100%;letter-spacing:.05em;text-align:center;padding:5px 6px;text-transform:uppercase;margin:9px 0}
+.s-ex{display:flex;gap:6px 18px;flex-wrap:wrap;align-items:center;border:1px solid var(--dropout);color:var(--dropout);padding:6px 10px;font:700 10.5px/1.3 var(--form);font-stretch:95%;text-transform:uppercase;letter-spacing:.02em;margin-bottom:6px}
 .s-ex .o{display:inline-block;width:20px;height:13px;border:1.4px solid var(--dropout);border-radius:50%;vertical-align:-2px;margin-left:4px;position:relative}
 .s-ex .o.f{background:var(--lead);border-color:var(--lead)}
 .s-ex .o.x::after{content:"✓";position:absolute;inset:-4px 0 0;text-align:center;color:var(--lead);font-size:12px}
 .s-ex .note{text-transform:none;letter-spacing:0;font-weight:600;font-size:12px;color:var(--dropout)}
 .srow{display:grid;grid-template-columns:30px auto minmax(0,1fr) 52px;gap:4px 12px;align-items:start;padding:11px 0 10px;border-bottom:1px dotted var(--dropout-l);position:relative}
-.srow::before{content:"";position:absolute;left:-46px;top:15px;width:24px;height:10px;background:var(--timing)}
+.srow::before{content:"";position:absolute;left:-46px;top:15px;width:24px;height:10px;background:var(--timing);transition:box-shadow .5s ease-out}
+/* the reader keys each row off its timing mark: it flashes as the head passes */
+.srow.hit::before{box-shadow:0 0 0 2px rgba(255,42,42,.9),0 0 10px 2px rgba(255,42,42,.6);transition:none}
 .snum{font:800 20px/1 var(--form);font-stretch:75%;color:var(--dropout);text-align:right;padding-top:3px}
 .ovals{display:flex;gap:6px;padding-top:1px}
 .ov{width:32px;height:21px;border-radius:50%;border:1.5px solid var(--dropout);background:transparent;color:var(--dropout);font:700 10px/1 var(--form);font-stretch:100%;cursor:pointer;padding:0;position:relative;flex:none}
@@ -155,8 +168,10 @@ figcaption b{font-weight:600;color:rgba(0,0,0,.9)}
 .ov[aria-pressed="true"]{color:transparent}
 .ov:disabled{cursor:default}
 .qtxt{font:500 15px/1.35 var(--form);font-stretch:90%;color:#161616}
-.route{display:block;font:700 9.5px/1.2 var(--form);font-stretch:100%;letter-spacing:.1em;text-transform:uppercase;color:var(--dropout);margin-bottom:3px}
-.opts{display:block;margin-top:4px;font:700 10.5px/1.45 var(--form);font-stretch:92%;letter-spacing:.05em;text-transform:uppercase;color:var(--dropout)}
+.route{display:block;font:700 10.5px/1.2 var(--form);font-stretch:95%;color:var(--dropout);margin-bottom:3px}
+.opts{display:block;margin-top:5px;font:600 13px/1.45 var(--form);font-stretch:90%;color:var(--dropout)}
+.opts em{font-style:normal;font-weight:800}
+.qid{font-weight:800;color:var(--dropout);margin-right:2px}
 .opts span{white-space:nowrap}
 .opts span + span::before{content:" · ";white-space:normal}
 .printed{grid-column:3 / 5;font:400 13.5px/1.45 var(--mono);color:var(--printer);margin:4px 0 0;display:none}
@@ -164,7 +179,7 @@ figcaption b{font-weight:600;color:rgba(0,0,0,.9)}
 .graded .printed{display:block}
 .pmark{font:700 15px/1 var(--mono);color:var(--printer);text-align:right;padding-top:4px;opacity:0;white-space:nowrap}
 .graded .pmark.on{opacity:1}
-.s-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px;font:700 10px/1.3 var(--form);font-stretch:95%;letter-spacing:.08em;text-transform:uppercase;color:var(--dropout)}
+.s-foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px;font:700 10px/1.3 var(--form);font-stretch:95%;letter-spacing:.03em;text-transform:uppercase;color:var(--dropout)}
 .s-score{display:none;margin-top:14px;padding-top:10px;border-top:1px dashed var(--printer);font:700 16px/1.4 var(--mono);color:var(--printer)}
 .graded .s-score{display:block}
 @media (max-width:640px){
@@ -183,8 +198,14 @@ figcaption b{font-weight:600;color:rgba(0,0,0,.9)}
 }
 
 /* ============ Figure 1: You Draw It ============ */
-.card{border:1px solid #e3e3e3;padding:18px 18px 14px;background:#fff}
-@media (max-width:640px){.card{padding:14px 10px 12px;margin:0 -4px}}
+.card{padding:8px 0 4px;background:#fff}
+/* chart heads after pudding.cool: centred over the plot, series named by coloured words instead of a legend */
+.chead{text-align:center;max-width:40em;margin:0 auto 14px}
+.ctitle{font:600 18px/1.35 var(--sans);color:var(--ink);margin:0;text-wrap:balance}
+.csub{font:400 14px/1.45 var(--sans);color:var(--text-2);margin:4px 0 0;text-wrap:balance}
+.w-you{color:var(--you);font-weight:700}
+.w-rec{color:var(--record);font-weight:700}
+.ydi-wrap{margin:0 auto}
 .ydi-wrap{position:relative;max-width:860px}
 #ydi{display:block;width:100%;height:auto;touch-action:none;user-select:none;-webkit-user-select:none;cursor:crosshair}
 #ydi:focus{outline:none}
@@ -201,8 +222,12 @@ figcaption b{font-weight:600;color:rgba(0,0,0,.9)}
 #ydi .rec{fill:none;stroke:var(--record);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
 #ydi .lab{font:600 12.5px var(--sans);fill:rgba(0,0,0,.82)}
 #ydi .lab.m{font-weight:400;fill:rgba(0,0,0,.58)}
+#ydi .note{font:700 13px var(--sans);fill:var(--record);paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
+#ydi .note.y{fill:var(--band-ink)}
 #ydi .cursor{stroke:var(--you);stroke-width:1;stroke-dasharray:0}
-.ydi-ctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-top:12px}
+.ydi-ctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:center;margin-top:12px}
+#fig1 .verdict,#fig3 .verdict{max-width:36em;margin-left:auto;margin-right:auto}
+#fig1 .source{text-align:center}
 .legend{display:flex;gap:16px;flex-wrap:wrap;font:500 12.5px/1.2 var(--sans);color:rgba(0,0,0,.7);margin:0 0 6px}
 .legend i{display:inline-block;width:16px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
 .verdict{font:400 18px/1.55 var(--serif);color:var(--text);margin:14px 0 0;min-height:1.6em}
@@ -214,13 +239,13 @@ figcaption b{font-weight:600;color:rgba(0,0,0,.9)}
 table.t1{border-collapse:collapse;width:100%;font:400 14px/1.45 var(--sans);margin:6px 0 0}
 .t1 caption{text-align:left;font:400 13px/1.55 var(--sans);color:var(--text-2);caption-side:bottom;padding-top:10px}
 .t1 caption b{color:rgba(0,0,0,.9);font-weight:600}
-.t1 th{font:600 11px/1.3 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 10px 8px 0;border-bottom:1px solid var(--rule-2)}
+.t1 th{font:600 13px/1.3 var(--sans);color:var(--text-2);text-align:left;padding:0 10px 8px 0;border-bottom:1px solid var(--rule-2)}
 .t1 td{padding:9px 10px 9px 0;border-bottom:1px solid var(--rule);vertical-align:top}
 .t1 .n{text-align:right;font-variant-numeric:tabular-nums;width:4.2em}
 .t1 td.yr{font-weight:600;width:4em}
 .t1 ul{margin:0;padding:0;list-style:none}
 .t1 li{margin:0 0 3px}
-.t1 li span{color:var(--muted)}
+.t1 li span{color:var(--muted);white-space:nowrap}
 @media (max-width:640px){.t1 th.hide,.t1 td.hide{display:none}}
 
 /* ============ Figure 2: the paper ============ */
@@ -236,14 +261,14 @@ table.t1{border-collapse:collapse;width:100%;font:400 14px/1.45 var(--sans);marg
 @media (max-width:640px){.paper{padding:30px 20px 24px}.paper .ptitle{font-size:21px}}
 
 /* ============ Figure 3: intake ============ */
-.slider-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:4px 0 14px}
+.slider-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 18px;margin:4px auto 16px;max-width:760px}
 .slider-row label{font:600 13px/1.2 var(--sans);color:rgba(0,0,0,.8)}
 .slider{display:flex;flex-direction:column;gap:3px;min-width:220px;flex:1 1 260px;max-width:420px}
 .slider input{width:100%;accent-color:var(--you);height:28px;margin:0}
 .slider .ticks{display:flex;justify-content:space-between;font:400 11px var(--sans);color:var(--muted)}
 .guessval{font:700 26px/1 var(--sans);color:rgba(0,0,0,.88);min-width:3ch}
 .guessval small{font:400 13px var(--sans);color:var(--muted);margin-left:4px}
-.waffle{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));gap:3px;max-width:760px}
+.waffle{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));gap:3px;max-width:760px;margin:0 auto}
 @media (max-width:640px){.waffle{grid-template-columns:repeat(15,minmax(0,1fr))}}
 .waffle i{aspect-ratio:1;background:#ececec;border-radius:2px;transition:background .25s,box-shadow .25s}
 .waffle i.g{background:var(--you)}
@@ -265,7 +290,7 @@ table.t1{border-collapse:collapse;width:100%;font:400 14px/1.45 var(--sans);marg
 #bip.hl .edge.on{opacity:1;stroke:var(--record);stroke-width:2.5}
 #bip.hl .node.on rect{fill:#e6eef8;stroke:var(--record)}
 #bip .ring{fill:none;stroke:var(--record);stroke-width:1.5}
-#bip .team-lbl{font:600 10px var(--sans);letter-spacing:.12em;fill:rgba(0,0,0,.45);text-transform:uppercase}
+#bip .team-lbl{font:600 13px var(--sans);fill:rgba(0,0,0,.55)}
 
 /* ============ appendix ============ */
 .appx{background:var(--wash);border-top:1px solid var(--rule);margin-top:72px;padding:40px 0 120px}
@@ -287,21 +312,21 @@ table.t1{border-collapse:collapse;width:100%;font:400 14px/1.45 var(--sans);marg
 <header class="mast g">
   <div class="l-page in">
     <span class="mark"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="8" width="15" height="10" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="6" y="2" width="8" height="8.5" fill="#fff" stroke="currentColor" stroke-width="1.4"/><path d="M7.5 6.2l1.6 1.6 3.4-3.4" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 11.5h9" stroke="currentColor" stroke-width="1.4"/></svg>The Polling Station</span>
-    <span>Research, data, analysis</span>
+    <span>by Husam Sokar</span>
   </div>
 </header>
 
 <main id="top">
 <section class="g title">
-  <p class="kicker">Working paper</p>
-  <h1>Four Years Inside Other People’s Questions</h1>
-  <p class="lede">His research record, 2022 to 2026: polling, econometrics and consulting. Told with the only numbers the record actually has, and a test before you read it.</p>
+  <h1>Four years inside other people’s questions</h1>
+  <p class="lede">An analyst on the <b>Harvard Youth Poll</b>, America’s largest poll of 18–29-year-olds. Associate to <b>Ambassador Katherine Tai</b>. Consulting for <b>UNICEF</b>, the <b>WHO</b>, the <b>UN</b>, the <b>Red Cross</b> and the <b>Urban Institute</b>. Here is his research record. You take the test first.</p>
   <div class="byline">
-    <div><h3>Author</h3>Husam Sokar</div>
-    <div><h3>Last affiliation</h3>Institute of Politics</div>
-    <div><h3>Covers</h3>Jul 2022 – May 2026</div>
-    <div><h3>Instruments</h3>1 answer sheet, 4 figures, 1 table</div>
+    <div><span class="k">Author</span>Husam Sokar</div>
+    <div><span class="k">Affiliation</span>Institute of Politics, Harvard Kennedy School</div>
+    <div><span class="k">Covers</span>Jul 2022 – May 2026</div>
+    <div><span class="k">Record</span>11 posts, 8 institutions</div>
   </div>
+  <a class="down" href="#instrument" aria-label="Down to the answer sheet">↓</a>
 </section>
 
 <!-- ============ Instrument 1 ============ -->
@@ -312,7 +337,7 @@ table.t1{border-collapse:collapse;width:100%;font:400 14px/1.45 var(--sans);marg
     <div class="throat">
       <div class="scanline" id="scanline" aria-hidden="true"></div>
       <form class="sheet" id="sheet" onsubmit="return false" aria-describedby="inst-help">
-        <div class="s-hdr"><h3>The Polling Station · Answer Sheet</h3><div class="formno">Form P-1<br>Research</div></div>
+        <div class="s-hdr"><h3>Research answer sheet</h3><div class="formno">Form P-1<br>Side 1</div></div>
         <div class="s-fields">
           <div>Respondent<b>You</b></div>
           <div>Subject<b>His research</b></div>
@@ -327,9 +352,9 @@ table.t1{border-collapse:collapse;width:100%;font:400 14px/1.45 var(--sans);marg
     </div>
   </div>
   <div class="inst-side">
-    <p class="fig-title" id="inst-title">Instrument 1. Answer before you read</p>
-    <p id="inst-help">Researchers write down what they expect before they look at the data. Do the same: seven questions about the work in this paper. Tap an oval to fill it, tap again to erase.</p>
-    <p>Then feed the sheet to the reader. It prints the key beside every row.</p>
+    <p class="fig-title" id="inst-title">Answer before you read.</p>
+    <p id="inst-help">Good researchers write down what they expect before they look at the data. Do the same: seven questions about the work in this paper. Tap an oval to fill it, tap it again to erase.</p>
+    <p>Then feed the sheet to the reader. It prints the key beside every row, in red.</p>
     <div class="actions">
       <button class="btn primary" id="feed" type="button">Feed sheet to reader</button>
       <button class="linkbtn" id="clear" type="button">Erase all</button>
@@ -341,18 +366,15 @@ table.t1{border-collapse:collapse;width:100%;font:400 14px/1.45 var(--sans);marg
 
 <!-- ============ body ============ -->
 <article class="g prose" id="paper">
-  <p>This paper covers the research side of his work: eleven posts across four years, from econometrics at three universities to an analyst’s seat on America’s largest poll of 18–29-year-olds. The numbers on this page are counts and dates from his own record. Where the record has no number, there is no chart.</p>
-  <p>Start with its shape. Before you see it, draw it.</p>
+  <p>Eleven research posts in four years. Econometrics at three universities. A Ballotpedia fellowship that took 12 of more than 90 applicants. Then an analyst’s seat on <strong>America’s largest poll of 18–29-year-olds</strong>. Every number on this page is a count or a date from his record; where the record has no number, there is no chart.</p>
+  <p>So how fast did those posts pile up? Before you see it, draw it.</p>
 
   <figure class="l-page" id="fig1" aria-labelledby="fig1-title">
     <div class="card">
-      <div class="fig-head">
-        <div>
-          <p class="fig-title" id="fig1-title">Figure 1. Research posts started, cumulative, 2022–2025</p>
-          <p class="fig-sub" id="fig1-sub">2022 is filled in: two posts. Draw the rest of the line, then see how you did.</p>
-        </div>
+      <div class="chead">
+        <p class="ctitle" id="fig1-title">Research posts he had started by each year: <span class="w-you">your guess</span> vs. <span class="w-rec">his record</span></p>
+        <p class="csub" id="fig1-sub">2022 is filled in: two posts. Draw the rest of the line, then see how you did.</p>
       </div>
-      <div class="legend" aria-hidden="true"><span><i style="background:var(--you)"></i>Your guess</span><span><i style="background:var(--record)"></i>His record</span></div>
       <div class="ydi-wrap" id="ydiwrap">
         <svg id="ydi" viewBox="0 0 700 360" role="application" tabindex="0" aria-labelledby="fig1-title" aria-describedby="fig1-kb"></svg>
         <div class="tip" id="tip" role="status"></div>
@@ -369,19 +391,19 @@ table.t1{border-collapse:collapse;width:100%;font:400 14px/1.45 var(--sans);marg
   </figure>
 
   <table class="t1 l-page" id="table1">
-    <caption><b>Table 1.</b> The data behind Figure 1: every research post, by the year it began.</caption>
-    <thead><tr><th>Year</th><th class="n">New</th><th class="n">Total</th><th>Posts that began</th></tr></thead>
+    <caption><b>Table 1.</b> The data behind the line: every research post, by the year it began.</caption>
+    <thead><tr><th>Year</th><th class="n hide">New</th><th class="n">Total</th><th>Posts that began</th></tr></thead>
     <tbody>
-      <tr><td class="yr">2022</td><td class="n">2</td><td class="n">2</td><td><ul><li>Econometrics research, Chapman University <span>Jul–Oct 2022</span></li><li>Econometrics research, University of Nevada, Reno, under Prof. Mark Pingle <span>Oct 2022 – Apr 2023</span></li></ul></td></tr>
-      <tr><td class="yr">2023</td><td class="n">3</td><td class="n">5</td><td><ul><li>Econometrics research, University of Houston <span>Jan–Mar 2023</span></li><li>Researcher, The World in Us <span>2023–2024</span></li><li>Public Health Policy Analyst, Institute for Youth in Policy <span>2023</span></li></ul></td></tr>
-      <tr><td class="yr">2024</td><td class="n">1</td><td class="n">6</td><td><ul><li>Research Fellow, Ballotpedia <span>Jan–Mar 2024</span></li></ul></td></tr>
-      <tr><td class="yr">2025</td><td class="n">5</td><td class="n">11</td><td><ul><li>Fellow, Policy Program in Economics, Institute of Politics <span>Summer 2025</span></li><li>Analyst, Harvard Youth Poll <span>Sep 2025 – May 2026</span></li><li>Associate to Ambassador Katherine Tai <span>Sep 2025 – May 2026</span></li><li>Consultant for the Red Cross and the United Nations <span>Sep 2025 – May 2026</span></li><li>Senior Associate, Harvard Global Research and Consulting Group <span>Sep 2025 – Feb 2026</span></li></ul></td></tr>
+      <tr><td class="yr">2022</td><td class="n hide">2</td><td class="n">2</td><td><ul><li>Econometrics research, Chapman University <span>Jul–Oct 2022</span></li><li>Econometrics research, University of Nevada, Reno, under Prof. Mark Pingle <span>Oct 2022 – Apr 2023</span></li></ul></td></tr>
+      <tr><td class="yr">2023</td><td class="n hide">3</td><td class="n">5</td><td><ul><li>Econometrics research, University of Houston <span>Jan–Mar 2023</span></li><li>Researcher, The World in Us <span>2023–2024</span></li><li>Public Health Policy Analyst, Institute for Youth in Policy <span>2023</span></li></ul></td></tr>
+      <tr><td class="yr">2024</td><td class="n hide">1</td><td class="n">6</td><td><ul><li>Research Fellow, Ballotpedia <span>Jan–Mar 2024</span></li></ul></td></tr>
+      <tr><td class="yr">2025</td><td class="n hide">5</td><td class="n">11</td><td><ul><li>Fellow, Policy Program in Economics, Institute of Politics <span>Summer 2025</span></li><li>Analyst, Harvard Youth Poll <span>Sep 2025 – May 2026</span></li><li>Associate to Ambassador Katherine Tai <span>Sep 2025 – May 2026</span></li><li>Consultant for the Red Cross and the United Nations <span>Sep 2025 – May 2026</span></li><li>Senior Associate, Harvard Global Research and Consulting Group <span>Sep 2025 – Feb 2026</span></li></ul></td></tr>
     </tbody>
   </table>
 
-  <h2>Econometrics <span class="when">2022–2023</span></h2>
-  <p>The first research was economics, and it came in a cluster: econometrics at <strong>Chapman University</strong> from July to October 2022, at the <strong>University of Nevada, Reno</strong> from October 2022 to April 2023, and at the <strong>University of Houston</strong> from January to March 2023. Three universities in ten months, with the Reno and Houston work running at the same time.</p>
-  <p>At Reno he worked under <strong>Prof. Mark Pingle</strong> on a paper whose title is a whole research question.</p>
+  <h2>Econometrics at three universities in ten months</h2>
+  <p>His research started in economics, and it started fast: econometrics at Chapman University from July 2022, at the University of Nevada, Reno from that October, and at the University of Houston from January to March 2023, <strong>while the Reno work was still running</strong>.</p>
+  <p>At Reno he researched under <strong>Prof. Mark Pingle</strong>, on a paper that asks its question in the title.</p>
 
   <figure id="fig2" aria-labelledby="fig2-cap">
     <div class="paper">
@@ -392,43 +414,47 @@ table.t1{border-collapse:collapse;width:100%;font:400 14px/1.45 var(--sans);marg
       <p class="paff">University of Nevada, Reno</p>
       <p class="pdate">October 2022 – April 2023</p>
     </div>
-    <figcaption id="fig2-cap"><b>Figure 2.</b> The paper’s title page, set from its title, adviser, institution and dates. The paper’s text and findings are not in his record, so they aren’t reproduced here.</figcaption>
+    <figcaption id="fig2-cap">The paper’s title page, set from its title, adviser, institution and dates. The paper’s text and findings are not in his record, so they aren’t reproduced here.</figcaption>
   </figure>
 
-  <h2>Policy research <span class="when">2023–2024</span></h2>
-  <p>Then the questions moved from markets to policy. In 2023 he was a <strong>Public Health Policy Analyst</strong> for the <strong>Institute for Youth in Policy</strong>, and a <strong>Researcher</strong> for <strong>The World in Us</strong> from 2023 into 2024.</p>
-  <p>In January 2024 he became a <strong>Research Fellow at Ballotpedia</strong>, one of 12 fellows chosen from more than 90 applicants, through March. Guess how hard that was before you look.</p>
+  <h2>One of 12 fellows, from more than 90 applicants</h2>
+  <p>Then he moved from markets to policy: <strong>Public Health Policy Analyst</strong> at the Institute for Youth in Policy in 2023, and Researcher at The World in Us from 2023 into 2024.</p>
+  <p>In January 2024 Ballotpedia named him a <strong>Research Fellow</strong>, one of 12 chosen from more than 90 applicants, through March. How selective is that? Guess before you look.</p>
 
   <figure class="l-page" id="fig3" aria-labelledby="fig3-title">
     <div class="card">
-      <p class="fig-title" id="fig3-title">Figure 3. Ballotpedia research fellowship, early 2024: how many of 90+ applicants got in?</p>
-      <p class="fig-sub">One square per applicant. Slide to your guess, then check it.</p>
+      <div class="chead">
+        <p class="ctitle" id="fig3-title">Ballotpedia’s 2024 research fellowship: how many of 90+ applicants got in?</p>
+        <p class="csub">One square per applicant. Slide to <span class="w-you">your guess</span>, then check it against <span class="w-rec">the fellows chosen</span>.</p>
+      </div>
       <div class="slider-row">
         <div class="slider"><label for="guess">Your guess, in fellows</label><input type="range" id="guess" min="1" max="90" value="30" aria-describedby="guessout"><div class="ticks" aria-hidden="true"><span>1</span><span>45</span><span>90</span></div></div>
         <output class="guessval" id="guessout" for="guess">30<small>of 90</small></output>
         <button class="btn primary" id="check" type="button">Check my guess</button>
       </div>
       <div class="waffle" id="waffle" role="img" aria-label="Ninety squares, one per applicant; twelve were chosen."></div>
-      <div class="wlegend" aria-hidden="true"><span><i style="background:var(--you)"></i>Your guess</span><span><i style="background:var(--record)"></i>Chosen: 12</span><span><i style="background:#ececec"></i>Not chosen</span></div>
       <p class="verdict" id="verdict3" aria-live="polite"></p>
     </div>
-    <figcaption><b>Figure 3.</b> 12 fellows from 90+ applicants. The grid draws 90 squares because “90+” means at least 90, so the true odds were 12 in 90 or longer: at most about 13 percent got in. He was one of the 12.</figcaption>
+    <figcaption>12 fellows from 90+ applicants. The grid draws 90 squares because “90+” means at least 90, so the true odds were 12 in 90 or longer: at most about 13 percent got in. He was one of the 12.</figcaption>
   </figure>
 
-  <h2>Institute of Politics and consulting <span class="when">2025–2026</span></h2>
-  <p>In the summer of 2025 he was a <strong>Fellow in the Policy Program in Economics</strong> at the Institute of Politics, researching the impact of <strong>international students</strong> on Harvard and U.S. universities.</p>
-  <p>From September 2025 to May 2026 the Institute of Politics at Harvard Kennedy School had him in three roles at once. He was an <strong>analyst on the Harvard Youth Poll</strong>, America’s largest poll of 18–29-year-olds. He was an <strong>associate to Ambassador Katherine Tai</strong>, the 19th U.S. Trade Representative. And he consulted for the <strong>Red Cross</strong> and the <strong>United Nations</strong>.</p>
-  <p>The same September he became a <strong>Senior Associate</strong> at the <strong>Harvard Global Research and Consulting Group</strong>, through February 2026, consulting for <strong>UNICEF</strong> and the <strong>Urban Institute</strong>, with work for the <strong>WHO</strong> and the <strong>UN</strong> as well.</p>
+  <h2>Three roles at once at the Institute of Politics</h2>
+  <p>In the summer of 2025 the Institute of Politics named him a <strong>Fellow in its Policy Program in Economics</strong>, researching the impact of international students on Harvard and U.S. universities.</p>
+  <p>That September the Institute of Politics at Harvard Kennedy School put him in three roles at once, through May 2026. He was an <strong>analyst on the Harvard Youth Poll</strong>, America’s largest poll of 18–29-year-olds. He was <strong>associate to Ambassador Katherine Tai</strong>, the 19th U.S. Trade Representative. And he consulted for the Red Cross and the United Nations.</p>
+  <p>At the same time he was a <strong>Senior Associate</strong> at the Harvard Global Research and Consulting Group, through February 2026, consulting for UNICEF and the Urban Institute, with work for the WHO and the UN as well.</p>
 
   <figure class="l-page" id="fig4" aria-labelledby="fig4-cap">
     <div class="card">
-      <p class="fig-title">Figure 4. Who the consulting work was for, 2025–2026</p>
-      <p class="fig-sub">Hover, tap or tab to a team to trace its clients.</p>
+      <div class="chead">
+        <p class="ctitle">Who the consulting work was for, 2025–2026</p>
+        <p class="csub">Hover, tap or tab to a team to trace its clients.</p>
+      </div>
       <svg id="bip" role="img" aria-labelledby="fig4-cap"></svg>
     </div>
-    <figcaption id="fig4-cap"><b>Figure 4.</b> Institute of Politics: the Red Cross and the United Nations. Harvard Global Research and Consulting Group: UNICEF, the Urban Institute, the WHO and the United Nations. Five clients, two teams, and one overlap: the UN is the only client both worked for.</figcaption>
+    <figcaption id="fig4-cap">Institute of Politics: the Red Cross and the United Nations. Harvard Global Research and Consulting Group: UNICEF, the Urban Institute, the WHO and the United Nations. Five clients, two teams, and one overlap: the UN is the only client both worked for.</figcaption>
   </figure>
 
+  <h2>So what does the record add up to?</h2>
   <p>Read back through it and one pattern holds, from an economics department in Reno to a national youth poll: he learns how a place asks its questions first, then does the asking himself.</p>
 </article>
 
@@ -442,8 +468,8 @@ table.t1{border-collapse:collapse;width:100%;font:400 14px/1.45 var(--sans);marg
       <p><b>What isn’t here.</b> No results from the Harvard Youth Poll appear on this page, and no findings from any paper. They aren’t part of his record, so nothing was charted from them.</p>
     </div>
     <div>
-      <h3>The answer sheet</h3>
-      <p>Instrument 1 is scored by the page, in your browser. Nothing you mark is sent or saved; reload and it’s blank.</p>
+      <h3>Scoring</h3>
+      <p>The answer sheet is scored by the page, in your browser. Nothing you mark is sent or saved; reload and it’s blank.</p>
       <h3>Data</h3>
       <p>All counts and dates: Table 1. Selection figures: 12 fellows, 90+ applicants (Ballotpedia, 2024). Nothing on this page is estimated.</p>
       <h3>Citation</h3>
@@ -482,7 +508,7 @@ var Q = [
   { id:'RES6', route:'Ask all', q:'In 2023 he was a Public Health Policy Analyst. For which organization?',
     o:['Ballotpedia','The World in Us','Institute for Youth in Policy','Univ. of Houston'], a:[2],
     key:'<b>C.</b> Institute for Youth in Policy, 2023. (He was a Researcher at The World in Us, 2023–2024.)' },
-  { id:'RES7', route:'Ask all · [Mark all that apply]', q:'Which of these have his consulting teams worked for?',
+  { id:'RES7', route:'Ask all', q:'Which of these have his consulting teams worked for? [Mark all that apply]',
     o:['Red Cross','United Nations','UNICEF','Urban Institute','WHO'], a:[0,1,2,3,4], multi:true,
     key:'<b>All five.</b> Red Cross and UN through the Institute of Politics; UNICEF, Urban Institute, WHO and UN through the Harvard Global Research and Consulting Group.' }
 ];
@@ -501,8 +527,8 @@ Q.forEach(function(q, i){
   r.innerHTML =
     '<div class="snum" aria-hidden="true">' + (i+1) + '</div>' +
     '<div class="ovals">' + ov + '</div>' +
-    '<div class="qtxt" id="q' + i + '"><span class="route">' + q.id + '. ' + q.route + '</span>' + q.q +
-      '<span class="opts">' + q.o.map(function(o,j){ return '<span>' + L[j] + ' ' + o + '</span>'; }).join('') + '</span></div>' +
+    '<div class="qtxt" id="q' + i + '"><span class="route">' + q.route.toUpperCase() + ':</span><b class="qid">' + q.id + '.</b> ' + q.q +
+      '<span class="opts">' + q.o.map(function(o,j){ return '<span><em>' + L[j] + '</em> ' + o + '</span>'; }).join('') + '</span></div>' +
     '<div class="pmark" aria-hidden="true"></div>' +
     '<p class="printed">' + q.key + '</p>';
   var btns = r.querySelectorAll('.ov');
@@ -524,16 +550,16 @@ function score(){
     var picked = Array.prototype.map.call(r.querySelectorAll('.ov'), function(b){ return b.getAttribute('aria-pressed') === 'true'; });
     var any = picked.some(Boolean);
     var ok = picked.every(function(p, j){ return p === (q.a.indexOf(j) > -1); });
-    var m = r.querySelector('.pmark');
-    if (!any){ blank++; m.textContent = '— ' + q.a.map(function(j){return L[j];}).join(''); }
+    var m = r.querySelector('.pmark'), keyL = q.a.length === q.o.length ? 'all' : q.a.map(function(j){return L[j];}).join('');
+    if (!any){ blank++; m.textContent = '— ' + keyL; }
     else if (ok){ n++; m.textContent = 'OK'; }
-    else { m.textContent = 'X ' + q.a.map(function(j){return L[j];}).join(''); }
+    else { m.textContent = 'X ' + keyL; }
     r.dataset.ok = ok ? '1' : '0';
   });
-  var s = 'SCORE ' + n + '/' + Q.length;
-  if (blank === Q.length) s += ' · SHEET BLANK. THE KEY IS PRINTED ANYWAY.';
-  else if (n === Q.length) s += ' · PERFECT. YOU COULD HAVE WRITTEN THIS PAPER.';
-  else s += ' · ' + (blank ? blank + ' LEFT BLANK · ' : '') + 'THE PAPER BELOW HAS EVERY ANSWER.';
+  var s = 'Score ' + n + '/' + Q.length + ' (' + Math.round(n / Q.length * 100) + '%)';
+  if (blank === Q.length) s += ' · Sheet blank. The key is printed anyway.';
+  else if (n === Q.length) s += ' · Perfect. You could have written this paper.';
+  else s += ' · ' + (blank ? blank + ' left blank · ' : '') + 'The paper below has every answer.';
   $('score').textContent = s;
 }
 
@@ -546,7 +572,7 @@ function showMarks(instant){
     if (t0 === null) t0 = ts;
     var p = Math.min(1, (ts - t0) / dur), y = p * H;
     line.style.transform = 'translateY(' + y + 'px)';
-    rows.forEach(function(r){ if (r.offsetTop + 12 < y) r.querySelector('.pmark').classList.add('on'); });
+    rows.forEach(function(r){ if (r.offsetTop + 12 < y && !r.querySelector('.pmark').classList.contains('on')){ r.querySelector('.pmark').classList.add('on'); r.classList.add('hit'); setTimeout(function(){ r.classList.remove('hit'); }, 90); } });
     if (p < 1) requestAnimationFrame(f); else { line.style.opacity = '0'; rows.forEach(function(r){ r.querySelector('.pmark').classList.add('on'); }); }
   }
   requestAnimationFrame(f);
@@ -694,6 +720,9 @@ function reveal(withGuess){
 function finish(withGuess){
   REC.forEach(function(v, i){ if (i) el('circle', { cx: X(i), cy: Yv(v), r: 5, fill: 'var(--record)', stroke: '#fff', 'stroke-width': 2 }, recDots); });
   labels.innerHTML = '';
+  var nx = X(2) + (X(3) - X(2)) * .35 - 8, ny = Yv(9.6);
+  var an = el('text', { x: nx, y: ny, 'text-anchor': 'end', 'class': 'note' }, labels); an.textContent = '+5 in 2025';
+  var an2 = el('text', { x: nx, y: ny + 16, 'text-anchor': 'end', 'class': 'note', style: 'font-weight:400;font-size:12px' }, labels); an2.textContent = 'the most in any year';
   var gy = withGuess ? Yv(guess[3]) : null, ry = Yv(11);
   var rl = el('text', { x: X(3) + 12, y: ry + 4, 'class': 'lab' }, labels); rl.textContent = (NARROW ? 'Record: ' : 'His record: ') + '11';
   if (withGuess){

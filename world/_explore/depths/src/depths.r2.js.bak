@@ -209,7 +209,7 @@
     var d = $('descender');
     if (d) {
       var fl = scale.querySelector('[data-kind="floor"]'), dTop = (1000 - 1) * K;
-      var dEnd = fl ? parseFloat(fl.style.top) - W.innerHeight * 0.5 : (NMAX - 1) * K; // leaves before the floor, so it never sits under the controls at the bottom
+      var dEnd = fl ? parseFloat(fl.style.top) - 24 : (NMAX - 1) * K;
       d.style.top = dTop + 'px'; d.style.height = Math.max(0, dEnd - dTop) + 'px'; d.style.left = '0'; d.style.width = '100%';
     }
     measure();
@@ -376,11 +376,12 @@
   function go(key) { var y = targetY(key); if (y != null) jumpTo(y); }
 
   /* ------------------------------------------------ counter + page state */
-  var lastTxt = '';
+  var lastTxt = '', gaugePip = $('gaugePip'), gauge = $('gauge'), gaugeOn = false;
+  function checkGauge() { gaugeOn = !!gauge && getComputedStyle(gauge).display !== 'none'; }
   function fmtN(n) {
     if (n < 1.05) return '1';
     if (n < 9.95) return n.toFixed(1);
-    return String(Math.round(n));
+    return Math.round(n).toLocaleString('en-US');
   }
   var state = { sy: 0, vh: 800, nTop: 0, dark: 0, surf: .222, depth: 0, frac: 0 };
   function update() {
@@ -399,10 +400,19 @@
     H.classList.toggle('sand', floorSec.getBoundingClientRect().top < 70);
     var nTop = 1 + (sy - scaleTop) / K;
     state.nTop = nTop;
-    state.dark = sy / vh;
+    state.dark = nTop <= 1 ? 0 : (nTop - 1) / 11;
     state.surf = 1 - (surfacePageY() - sy) / vh;
     state.depth = sy / vh;
     state.frac = n < 1 ? 0 : Math.min(1, Math.log(nc) / Math.log(NMAX));
+    if (gauge && gaugePip && gaugeOn) {
+      var mid = sy + vh * 0.5, fy = floorY();
+      var bps = [0, surfaceSec.getBoundingClientRect().top + sy, nToY(1), nToY(10), nToY(100), nToY(1000), fy, H.scrollHeight];
+      var seg = 0;
+      for (var i = 0; i < bps.length - 1; i++) if (mid >= bps[i]) seg = i;
+      seg = Math.min(seg, 6);
+      var f = Math.max(0, Math.min(1, (mid - bps[seg]) / Math.max(1, bps[seg + 1] - bps[seg])));
+      gaugePip.style.top = (((seg + f) / 7) * 100).toFixed(2) + '%';
+    }
   }
 
   /* ------------------------------------------------ the water (WebGL port of Neal's shader) */
@@ -619,7 +629,7 @@
     requestAnimationFrame(function (now) { pending = false; update(); if (glOK) drawGL(); else paintFallback(); drawPool(now); });
   }
 
-  /* ------------------------------------------------ jump menu and buttons */
+  /* ------------------------------------------------ jump menu, gauge, buttons */
   var jumpBtn = $('jumpBtn'), jumpMenu = $('jumpMenu');
   function closeMenu(focusBtn) { jumpMenu.hidden = true; jumpBtn.setAttribute('aria-expanded', 'false'); if (focusBtn) jumpBtn.focus(); }
   jumpBtn.addEventListener('click', function () {
@@ -638,6 +648,8 @@
     else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
   });
   D.addEventListener('click', function (e) { if (!jumpMenu.hidden && !e.target.closest('.controls')) closeMenu(false); });
+  if (gauge) gauge.addEventListener('click', function (e) { var b = e.target.closest('[data-go]'); if (b) { skipIntro(); go(b.getAttribute('data-go')); } });
+  $('diveBtn').addEventListener('click', function () { skipIntro(); go('surface'); });
   $('skipBottom').addEventListener('click', function () { skipIntro(); go('bottom'); });
   $('backTop').addEventListener('click', function () { go('top'); });
   $('skipIntro').addEventListener('click', function () { skipIntro(); });
@@ -716,9 +728,10 @@
   }
 
   /* ------------------------------------------------ boot */
-  function relayout() { layout(); placeScene(); sizeCanvas(); if (!running) renderOnce(); }
+  function relayout() { layout(); placeScene(); sizeCanvas(); checkGauge(); if (!running) renderOnce(); }
   layout();
   placeScene();
+  checkGauge();
   glOK = initGL();
   if (!glOK && canvas) canvas.style.display = 'none';
   sizeCanvas();

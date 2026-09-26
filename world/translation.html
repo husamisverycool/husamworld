@@ -18,7 +18,7 @@
   --lat:"Source Serif 4","Iowan Old Style","Palatino Linotype",Georgia,serif;
   --ara:"Amiri","Noto Naskh Arabic","Geeza Pro","Traditional Arabic",serif;
   --cond:"Barlow Condensed","Arial Narrow",sans-serif;
-  --gut:88px; --p:.5;
+  --gut:88px; --p:.5; --pad:60px; --pad-c:24px;
   --en-size:1.15rem; --en-ink:var(--ink);
   --ar-size:1.42rem; --ar-ink:#26324B;
 }
@@ -33,25 +33,31 @@ a:hover{color:var(--sky-ink)}
 button{font:inherit;color:inherit}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-/* ---------- the cover: navy cloth, sky band (Library of Arabic Literature livery) ---------- */
-.cover{background:var(--navy);color:#fff;min-height:86vh;min-height:86svh;position:relative;display:grid;place-items:center;padding:72px 16px 140px;overflow:hidden}
+/* ---------- the opening spread: half-title and title page on the navy cloth (the book opened on its case).
+   Conventions from the Library of Arabic Literature volumes: title, subtitle, author, imprint at the foot,
+   all in upper- and lowercase text type; Arabic title page facing the English one. ---------- */
+.cover{background:var(--navy);position:relative;padding:22px var(--pad-c) 26px}
 .cover::before{content:"";position:absolute;inset:0;background:
   repeating-linear-gradient(90deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px),
   repeating-linear-gradient(0deg,rgba(0,0,0,.05) 0 1px,transparent 1px 4px);pointer-events:none}
-.cover .t{position:relative;text-align:center}
-.cover .ar-t{display:block;font:700 clamp(92px,17vw,230px)/1.05 var(--ara);color:var(--sky);margin:0}
-.cover .en-t{display:block;font:400 clamp(15px,1.7vw,21px)/1.3 var(--lat);letter-spacing:.42em;text-transform:uppercase;margin:18px 0 0;padding-left:.42em}
-.cover .sub{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:22px;font-size:15px;color:#C9D6EA;font-style:italic}
-.cover .sub [lang=ar]{font-style:normal;font-size:19px}
-.band{position:absolute;left:0;right:0;bottom:64px;height:34px;background:var(--sky);color:var(--navy);display:flex;align-items:center;justify-content:center;gap:28px;font-size:11px;letter-spacing:.55em;text-transform:uppercase;white-space:nowrap}
-.band [lang=ar]{letter-spacing:0;font-size:17px;font-weight:700}
-.open{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);color:#C9D6EA;font-size:13px;letter-spacing:.2em;text-transform:uppercase;text-decoration:none}
-.open:hover{color:#fff}
+.spread{position:relative;max-width:1176px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;background:var(--paper)}
+.spread::after{content:"";position:absolute;top:0;bottom:0;left:50%;width:1px;background:var(--rule)}
+.tp{min-height:min(74vh,660px);display:flex;flex-direction:column;align-items:center;text-align:center;padding:clamp(56px,11vh,112px) 28px 40px}
+.tp h1,.tp .h1{margin:0;font-weight:400;color:var(--ink)}
+.tp.en h1{font:400 clamp(30px,3.3vw,44px)/1.15 var(--lat);letter-spacing:-.005em;font-variation-settings:"opsz" 48}
+.tp.ar .h1{font:400 clamp(38px,4vw,54px)/1.45 var(--ara)}
+.tp .st{margin:14px 0 0;color:var(--grey)}
+.tp.en .st{font:italic 400 clamp(17px,1.5vw,20px)/1.4 var(--lat)}
+.tp.ar .st{font:400 clamp(21px,1.8vw,25px)/1.6 var(--ara)}
+.tp .au{margin:clamp(40px,8vh,72px) 0 0;font-size:clamp(18px,1.5vw,21px);color:var(--ink)}
+.tp.ar .au{font-size:clamp(20px,1.7vw,24px);color:var(--grey)}
+.tp .imp{margin-top:auto;padding-top:40px;font-size:15px;color:var(--grey)}
+.tp.ar .imp{font-size:18px}
 .scr{display:inline-block;min-width:1ch}
 
 /* ---------- the book ---------- */
-.book{position:relative;max-width:1240px;margin:0 auto;padding:0 32px}
-.seam{position:absolute;top:0;bottom:0;width:1px;background:var(--rule);left:calc(32px + (100% - 64px - var(--gut)) * var(--p) + var(--gut) / 2);z-index:1;pointer-events:none}
+.book{position:relative;max-width:1240px;margin:0 auto;padding:0 var(--pad)}
+.seam{position:absolute;top:0;bottom:0;width:1px;background:var(--rule);left:calc(var(--pad) + (100% - 2 * var(--pad) - var(--gut)) * var(--p) + var(--gut) / 2);z-index:1;pointer-events:none}
 .grip{position:sticky;top:calc(50vh - 26px);margin-left:-15px;width:30px;height:52px;display:grid;place-items:center;background:var(--paper);border:1px solid var(--navy);color:var(--navy);cursor:ew-resize;pointer-events:auto;touch-action:none;padding:0}
 .grip svg{width:14px;height:22px}
 .grip:hover,.dragging .grip{background:var(--navy);color:var(--paper)}
@@ -73,29 +79,34 @@ button{font:inherit;color:inherit}
 }
 @keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 
-/* running heads and folios (one opening = one unit, after the Loeb) */
-.rh{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--grey);margin:0 0 30px;padding-bottom:8px;border-bottom:1px solid var(--rule)}
-.rh span:first-child{white-space:nowrap}
-.rh span:last-child{text-align:end}
-.pg.ar .rh{letter-spacing:0;text-transform:none;font-size:16px}
-.folio{margin-top:auto;padding-top:26px;font-size:13px;color:var(--grey);font-variant-numeric:oldstyle-nums}
-.pg.en .folio{text-align:left}
-.pg.ar .folio{text-align:start;font-size:16px}
-.pg.en .folio::before{content:"— "}
-.pg.ar .folio::before{content:"— "}
+/* running heads and folios (one opening = one unit, after the Loeb). LAL sets its running heads in upper- and
+   lowercase ("Table of Contents", "Foreword"), and the two facing pages carry the SAME folio, each in its own numerals. */
+.rh{text-align:center;font:italic 400 14.5px/1.3 var(--lat);color:var(--grey);margin:0 0 34px}
+.pg.ar .rh{font:400 17px/1.4 var(--ara)}
+.folio{margin-top:auto;padding-top:28px;text-align:center;font-size:14px;color:var(--grey);font-variant-numeric:oldstyle-nums}
+.pg.ar .folio{font-size:17px}
 
-h2.ch{margin:0 0 22px;font-weight:400;color:var(--navy)}
-.pg.en h2.ch{font-size:13.5px;letter-spacing:.3em;text-transform:uppercase}
-.pg.en h2.ch b{display:block;font:italic 400 clamp(30px,3.4vw,46px)/1.08 var(--lat);letter-spacing:-.01em;text-transform:none;color:var(--ink);margin-top:8px}
-.pg.ar h2.ch{font-size:19px}
-.pg.ar h2.ch b{display:block;font:700 clamp(34px,3.8vw,52px)/1.35 var(--ara);color:var(--ink);margin-top:2px}
+/* section openings: the number on its own line, then the title in text type (LAL: "1 / Ḥammādah bint ʿĪsā") */
+h2.ch{margin:0 0 30px;font-weight:400;text-align:center;color:var(--ink)}
+h2.ch .num{display:block;font-size:18px;line-height:1.2;color:var(--navy);margin-bottom:10px;font-variant-numeric:oldstyle-nums}
+.pg.en h2.ch b{display:block;font:400 clamp(25px,2.4vw,32px)/1.2 var(--lat);letter-spacing:-.005em}
+.pg.ar h2.ch .num{font-size:22px;margin-bottom:2px}
+.pg.ar h2.ch b{display:block;font:700 clamp(29px,2.8vw,38px)/1.45 var(--ara)}
 
 /* paragraphs */
 .pg.en p.x{font-size:var(--en-size);color:var(--en-ink);margin:0 0 1.1em;line-height:1.58;transition:color .3s,font-size .3s}
 .pg.ar p.x{font-size:var(--ar-size);color:var(--ar-ink);margin:0 0 .9em;line-height:1.9;transition:color .3s,font-size .3s}
-.sec{display:inline-block;border:0;background:none;padding:0 .1em;margin-inline-end:.45em;cursor:pointer;font-weight:700;color:var(--navy);font-size:.82em;letter-spacing:.02em;font-variant-numeric:lining-nums}
-.pg.ar .sec{font-size:.86em}
-.sec:hover{color:var(--sky-ink)}
+/* paragraph numbers hang in the outer margin, as in the LAL volumes (1.1 beside the English, ١،١ beside the Arabic) */
+p.x,.clip .by{position:relative}
+.sec{position:absolute;inset-inline-start:calc(-1 * var(--pad) + 6px);width:calc(var(--pad) - 20px);text-align:end;border:0;background:none;padding:0;cursor:pointer;font:400 14px/1 var(--lat);color:var(--navy);font-variant-numeric:lining-nums}
+.pg.en p.x>.sec{line-height:calc(var(--en-size) * 1.58)}
+.pg.en p.piece>.sec{line-height:calc(var(--en-size) * 1.512)}
+.pg.ar .sec{font:400 17px/1 var(--ara)}
+.pg.ar p.x>.sec{line-height:calc(var(--ar-size) * 1.9)}
+.pg.ar p.piece>.sec{line-height:calc(var(--ar-size) * 1.836)}
+.clip .by .sec{font-size:13px;letter-spacing:0;line-height:1.3}
+.pg.ar .clip .by .sec{font-size:16px;line-height:1.4}
+.sec:hover,.on>.sec,.on .by .sec{color:var(--sky-ink)}
 p.x.on{background:linear-gradient(to right,var(--sky-wash),var(--sky-wash)) no-repeat;background-size:100% 100%;box-shadow:0 0 0 6px var(--sky-wash)}
 
 /* ---------- title page: two tiles and the particulars (Typotheque's script table) ---------- */
@@ -106,9 +117,9 @@ p.x.on{background:linear-gradient(to right,var(--sky-wash),var(--sky-wash)) no-r
 .pg.ar .tile-cap{font-size:17px}
 table.part{border-collapse:collapse;width:100%}
 table.part th,table.part td{border-bottom:1px solid var(--rule);padding:10px 0;vertical-align:top;text-align:start}
-table.part th{font-weight:400;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--grey);width:36%;padding-inline-end:12px}
+table.part th{font-weight:400;font-size:13px;color:var(--grey);width:36%;padding-inline-end:12px}
 table.part td{font-size:16px}
-.pg.ar table.part th{letter-spacing:0;text-transform:none;font-size:16px}
+.pg.ar table.part th{font-size:16px}
 .pg.ar table.part td{font-size:19px;line-height:1.7}
 .digits{letter-spacing:.12em}
 
@@ -116,10 +127,10 @@ table.part td{font-size:16px}
 ol.toc{list-style:none;margin:0;padding:0}
 ol.toc li{margin:0 0 14px}
 ol.toc a{display:flex;align-items:baseline;gap:10px;text-decoration:none;color:var(--ink)}
-ol.toc a .n{min-width:2.2em;color:var(--navy);font-weight:600}
+ol.toc a .n{min-width:1.6em;color:var(--navy)}
 ol.toc a .ld{flex:1;border-bottom:1.5px dotted var(--grey);transform:translateY(-.3em);transition:border-color .2s}
 ol.toc a .pgno{color:var(--grey);font-variant-numeric:oldstyle-nums}
-.pg.en ol.toc a{font-size:19px;font-variant:small-caps;letter-spacing:.04em}
+.pg.en ol.toc a{font-size:19px}
 .pg.ar ol.toc a{font-size:23px}
 ol.toc li.on a .ld{border-bottom:1.5px solid var(--sky-ink)}
 ol.toc li.on a{color:var(--navy)}
@@ -157,7 +168,7 @@ ol.toc li.on a{color:var(--navy)}
 .pop{position:absolute;z-index:5;min-width:200px;max-width:280px;background:var(--paper);border:1px solid var(--navy);box-shadow:4px 4px 0 var(--sky);padding:12px 14px 12px;opacity:0;transform:translateY(-4px);transition:opacity .18s,transform .18s;pointer-events:none}
 .pop.show{opacity:1;transform:none}
 .pop .used{direction:rtl;font:700 30px/1.3 var(--ara);color:var(--ink)}
-.pop .lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);margin:6px 0 2px}
+.pop .lbl{font:italic 400 13.5px/1.3 var(--lat);color:var(--grey);margin:6px 0 2px}
 .pop ul{list-style:none;margin:0;padding:0}
 .pop li{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--rule);padding:4px 0;font-size:14px;color:var(--grey)}
 .pop li [lang=ar]{font-size:19px;color:var(--ink)}
@@ -165,8 +176,8 @@ ol.toc li.on a{color:var(--navy)}
 
 /* glossary (always visible: the popover never holds the only copy) */
 table.gl{border-collapse:collapse;width:100%;margin:6px 0 10px}
-table.gl caption{text-align:start;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--grey);padding-bottom:8px}
-.pg.ar table.gl caption{letter-spacing:0;font-size:16px;text-transform:none}
+table.gl caption{text-align:start;font:italic 400 15px/1.3 var(--lat);color:var(--grey);padding-bottom:8px}
+.pg.ar table.gl caption{font:400 18px/1.4 var(--ara)}
 table.gl th,table.gl td{border-top:1px solid var(--rule);padding:6px 0;text-align:start;vertical-align:baseline;font-weight:400}
 .pg.en table.gl th{font-size:15px;font-style:italic;width:32%}
 .pg.en table.gl td{font-size:15px;color:var(--grey)}
@@ -178,6 +189,7 @@ table.gl tr.on th,table.gl tr.on td{background:var(--sky-wash)}
 
 /* ---------- press clippings in each paper's own dialect ---------- */
 .clip{margin:0 0 26px;padding:16px 0 0;border-top:1px solid var(--wsj)}
+/* caps only where the papers use them: the WSJ's boxed kicker ("EXCLUSIVE" on its front page) and The Nation's red section kicker and byline ("SOCIETY / STUDENTS", "MARIUM ZAHRA") */
 .clip .kick{display:inline-block;font:600 12px/1.2 var(--cond);letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid var(--wsj);color:var(--wsj);margin-bottom:9px}
 .clip .kick [lang=ar]{letter-spacing:0;font:700 14px/1.2 var(--ara)}
 .clip .hd{display:block;text-decoration:none;color:var(--wsj);margin:0 0 8px}
@@ -187,7 +199,8 @@ table.gl tr.on th,table.gl tr.on td{background:var(--sky-wash)}
 .clip.nation .kick{border:0;padding:0;color:var(--nation);font-size:13px}
 .clip.nation .hd{font:300 clamp(28px,3vw,40px)/1.08 var(--lat);letter-spacing:-.01em;font-variation-settings:"opsz" 60}
 .clip .hd:hover{color:var(--wsj-link)}
-.clip .by{font:500 13px/1.3 var(--cond);letter-spacing:.08em;text-transform:uppercase;color:#6A6A6A}
+.clip .by{font:500 15px/1.3 var(--cond);color:#6A6A6A}
+.clip.nation .by{font-size:13px;letter-spacing:.06em;text-transform:uppercase}
 .pg.ar .clip .hd{font-family:var(--ara) !important;font-stretch:normal;letter-spacing:0}
 .pg.ar .clip.wsj .hd{font-weight:700;font-size:clamp(24px,2.4vw,31px);line-height:1.5}
 .pg.ar .clip.nation .hd{font-weight:400;font-size:clamp(27px,2.8vw,36px);line-height:1.45}
@@ -196,15 +209,18 @@ table.gl tr.on th,table.gl tr.on td{background:var(--sky-wash)}
 .roles{list-style:none;margin:6px 0 0;padding:0}
 .roles li{padding:10px 0;border-top:1px solid var(--rule)}
 
-/* colophon */
-.colo{max-width:36em;margin:0 auto;text-align:center;font-size:14px;color:var(--grey);line-height:1.6}
-.pg.ar .colo{font-size:17px}
-.colo .orn{display:block;font:700 30px/1 var(--ara);color:var(--sky);margin-bottom:10px}
 .end{height:90px}
 
 /* ---------- phone: pairs interleave; each pair gets its own short thread ---------- */
 @media (max-width:760px){
-  .book{padding:0 18px}
+  :root{--pad:18px;--pad-c:10px}
+  .sec{position:static;width:auto;display:inline;margin:0;margin-inline-end:.5em;font-size:.8em}
+  .pg.ar .sec{font-size:.85em}
+  .clip .by .sec{font-size:inherit}
+  .spread{grid-template-columns:1fr}
+  .spread::after{display:none}
+  .tp{min-height:0;padding:44px 20px 28px}
+  .tp.ar{border-top:1px solid var(--rule)}
   .seam{display:none}
   .opening{display:flex;flex-direction:column;padding:28px 0 22px}
   .pg{display:contents}
@@ -213,15 +229,14 @@ table.gl tr.on th,table.gl tr.on td{background:var(--sky-wash)}
   .pg.en .rh{order:0;margin-bottom:6px}
   .pg.ar .rh{order:1;margin-bottom:22px}
   .folio{display:none}
-  .pg.en h2.ch{order:2;margin-bottom:4px}
+  .pg.en h2.ch{order:2;margin-bottom:18px}
+  .pg.ar>.tile{align-self:flex-end}
   .pg.ar h2.ch{order:3;margin-bottom:22px}
   .pg.ar p.x,.pg.ar .piece,.pg.ar .clip,.pg.ar ul.roles,.pg.ar .tile-cap,.pg.ar table,.pg.ar ol.toc,.pg.ar .swap,.pg.ar .note,.pg.ar .credit{margin-bottom:34px}
   .pg.en p.x,.pg.en .piece{margin-bottom:.9em}
   .tile{max-width:150px}
   .pg.en .tile{font-size:80px}
   .pg.ar .tile{font-size:94px}
-  .band{gap:14px;letter-spacing:.32em;font-size:10px}
-  .cover{padding-bottom:130px}
   .lock{padding:18px 20px}
 }
 @media (prefers-reduced-motion:reduce){
@@ -237,13 +252,20 @@ if(!location.hash) window.scrollTo(0,0);
 </script>
 
 <header class="cover" id="top">
-  <h1 class="t">
-    <span class="ar-t" lang="ar" dir="rtl"><span class="scr" id="tAr">الجسر</span></span>
-    <span class="en-t"><span class="scr" id="tEn">The Bridge</span></span>
-  </h1>
-  <p class="sub t"><span>English and Arabic, on facing pages</span><span lang="ar" dir="rtl">الإنجليزية والعربية، على صفحتين متقابلتين</span></p>
-  <div class="band" aria-hidden="true"><span>Language · Writing · Press</span><span lang="ar" dir="rtl">اللغة · الكتابة · الصحافة</span></div>
-  <a class="open" href="#title">Open ↓</a>
+  <div class="spread">
+    <div class="tp en" lang="en">
+      <h1><span class="scr" id="tEn">English and Arabic</span></h1>
+      <p class="st">Translation, writing, and the press</p>
+      <p class="au">Husam Sokar</p>
+      <p class="imp">The Bridge · husam.world</p>
+    </div>
+    <div class="tp ar" lang="ar" dir="rtl">
+      <p class="h1" aria-hidden="true"><span class="scr" id="tAr">العربية والإنجليزية</span></p>
+      <p class="st">الترجمة والكتابة والصحافة</p>
+      <p class="au">النص الإنجليزي وترجمته العربية على صفحتين متقابلتين</p>
+      <p class="imp">الجسر</p>
+    </div>
+  </div>
 </header>
 
 <main class="book" id="book">
@@ -253,8 +275,8 @@ if(!location.hash) window.scrollTo(0,0);
   <section class="opening" id="title" aria-labelledby="h-title">
     <svg class="threads" aria-hidden="true"></svg>
     <div class="pg en" lang="en">
-      <div class="rh"><span>The Bridge</span><span>Title page</span></div>
-      <h2 class="ch" id="h-title">Particulars <b>Two scripts, one writer</b></h2>
+      <div class="rh">English and Arabic</div>
+      <h2 class="ch" id="h-title"><b>Note on the Two Scripts</b></h2>
       <div class="tile" aria-hidden="true" style="--o:4">Aa</div>
       <p class="tile-cap" style="--o:6">Latin has capitals and small letters. Arabic has no case: its letters change shape with their place in the word. Arabic is also called the language of the <i>ḍād</i>, the letter on the facing page.</p>
       <table class="part" style="--o:8">
@@ -268,19 +290,19 @@ if(!location.hash) window.scrollTo(0,0);
       <div class="folio">i</div>
     </div>
     <div class="pg ar" lang="ar" dir="rtl">
-      <div class="rh"><span>الجسر</span><span>صفحة العنوان</span></div>
-      <h2 class="ch">بيانات <b>خطّان، وكاتب واحد</b></h2>
+      <div class="rh">العربية والإنجليزية</div>
+      <h2 class="ch"><b>كلمة عن الخطّين</b></h2>
       <div class="tile" aria-hidden="true" style="--o:5">ض</div>
       <p class="tile-cap" style="--o:7">لا تعرف العربية الحروف الكبيرة والصغيرة، وإنما يتغيّر شكل الحرف بحسب موضعه في الكلمة. وتُسمّى العربية أيضاً «لغة الضاد»، نسبةً إلى هذا الحرف.</p>
       <table class="part" style="--o:9">
         <tr data-k="t1"><th scope="row">اللغات</th><td>الإنجليزية والعربية</td></tr>
         <tr data-k="t2"><th scope="row">الاتجاه</th><td>من اليسار إلى اليمين، ومن اليمين إلى اليسار</td></tr>
         <tr data-k="t3"><th scope="row">العمل</th><td>ترجمة احترافية بين العربية والإنجليزية</td></tr>
-        <tr data-k="t4"><th scope="row">الاعتماد</th><td>ختم ولاية كاليفورنيا لثنائية اللغة، في العربية</td></tr>
+        <tr data-k="t4"><th scope="row">الاعتماد</th><td>ختم ولاية كاليفورنيا لثنائية اللغة في العربية</td></tr>
         <tr data-k="t5"><th scope="row">الأرقام</th><td class="digits">٠ ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩</td></tr>
         <tr data-k="t6"><th scope="row">علامات التنصيص</th><td>« »</td></tr>
       </table>
-      <div class="folio">ii</div>
+      <div class="folio">أ</div>
     </div>
   </section>
 
@@ -288,33 +310,35 @@ if(!location.hash) window.scrollTo(0,0);
   <section class="opening" id="contents" aria-labelledby="h-contents">
     <svg class="threads" aria-hidden="true"></svg>
     <div class="pg en" lang="en">
-      <div class="rh"><span>The Bridge</span><span>Contents</span></div>
-      <h2 class="ch" id="h-contents">Contents <b>Four chapters and a colophon</b></h2>
+      <div class="rh">English and Arabic</div>
+      <h2 class="ch" id="h-contents"><b>Contents</b></h2>
       <ol class="toc" style="--o:4">
-        <li data-k="c1"><a href="#ch1"><span class="n">I</span><span>Two languages</span><span class="ld"></span><span class="pgno">1</span></a></li>
-        <li data-k="c2"><a href="#ch2"><span class="n">II</span><span>White House in Arabic</span><span class="ld"></span><span class="pgno">3</span></a></li>
-        <li data-k="c3"><a href="#ch3"><span class="n">III</span><span>Six pieces</span><span class="ld"></span><span class="pgno">5</span></a></li>
-        <li data-k="c4"><a href="#ch4"><span class="n">IV</span><span>In print</span><span class="ld"></span><span class="pgno">7</span></a></li>
-        <li data-k="c5"><a href="#colophon"><span class="n">·</span><span>Colophon</span><span class="ld"></span><span class="pgno">9</span></a></li>
+        <li data-k="c0"><a href="#title"><span class="n"></span><span>Note on the Two Scripts</span><span class="ld"></span><span class="pgno">i</span></a></li>
+        <li data-k="c1"><a href="#ch1"><span class="n">1.</span><span>Two Languages</span><span class="ld"></span><span class="pgno">1</span></a></li>
+        <li data-k="c2"><a href="#ch2"><span class="n">2.</span><span>White House in Arabic</span><span class="ld"></span><span class="pgno">2</span></a></li>
+        <li data-k="c3"><a href="#ch3"><span class="n">3.</span><span>Six Pieces</span><span class="ld"></span><span class="pgno">3</span></a></li>
+        <li data-k="c4"><a href="#ch4"><span class="n">4.</span><span>In Print</span><span class="ld"></span><span class="pgno">4</span></a></li>
+        <li data-k="c5"><a href="#colophon"><span class="n"></span><span>About the Typefaces</span><span class="ld"></span><span class="pgno">5</span></a></li>
       </ol>
       <div class="swap" style="--o:6">
         <button class="swapbtn" id="swap" type="button" aria-pressed="false"><span class="scr" data-a="English leads" data-b="Arabic leads">English leads</span><span class="ic" aria-hidden="true">⇄</span><span lang="ar" class="scr" data-a="الإنجليزية أولاً" data-b="العربية أولاً">الإنجليزية أولاً</span></button>
         <p>Swap which language leads: it takes the full ink and the larger size.</p>
       </div>
-      <div class="folio">iii</div>
+      <div class="folio">ii</div>
     </div>
     <div class="pg ar" lang="ar" dir="rtl">
-      <div class="rh"><span>الجسر</span><span>المحتويات</span></div>
-      <h2 class="ch">المحتويات <b>أربعة فصول وحرد المتن</b></h2>
+      <div class="rh">العربية والإنجليزية</div>
+      <h2 class="ch"><b>المحتويات</b></h2>
       <ol class="toc" style="--o:5">
-        <li data-k="c1"><a href="#ch1"><span class="n">١</span><span>لغتان</span><span class="ld"></span><span class="pgno">٢</span></a></li>
-        <li data-k="c2"><a href="#ch2"><span class="n">٢</span><span>البيت الأبيض بالعربية</span><span class="ld"></span><span class="pgno">٤</span></a></li>
-        <li data-k="c3"><a href="#ch3"><span class="n">٣</span><span>ست مقالات</span><span class="ld"></span><span class="pgno">٦</span></a></li>
-        <li data-k="c4"><a href="#ch4"><span class="n">٤</span><span>في الصحافة</span><span class="ld"></span><span class="pgno">٨</span></a></li>
-        <li data-k="c5"><a href="#colophon"><span class="n">·</span><span>حرد المتن</span><span class="ld"></span><span class="pgno">١٠</span></a></li>
+        <li data-k="c0"><a href="#title"><span class="n"></span><span>كلمة عن الخطّين</span><span class="ld"></span><span class="pgno">أ</span></a></li>
+        <li data-k="c1"><a href="#ch1"><span class="n">١.</span><span>لغتان</span><span class="ld"></span><span class="pgno">١</span></a></li>
+        <li data-k="c2"><a href="#ch2"><span class="n">٢.</span><span>البيت الأبيض بالعربية</span><span class="ld"></span><span class="pgno">٢</span></a></li>
+        <li data-k="c3"><a href="#ch3"><span class="n">٣.</span><span>ست مقالات</span><span class="ld"></span><span class="pgno">٣</span></a></li>
+        <li data-k="c4"><a href="#ch4"><span class="n">٤.</span><span>في الصحافة</span><span class="ld"></span><span class="pgno">٤</span></a></li>
+        <li data-k="c5"><a href="#colophon"><span class="n"></span><span>عن الحروف الطباعية</span><span class="ld"></span><span class="pgno">٥</span></a></li>
       </ol>
       <div class="swap" style="--o:7"><p>بدّل اللغة المتقدّمة: تأخذ الحبر الكامل والحجم الأكبر.</p></div>
-      <div class="folio">iv</div>
+      <div class="folio">ب</div>
     </div>
   </section>
 
@@ -322,19 +346,19 @@ if(!location.hash) window.scrollTo(0,0);
   <section class="opening" id="ch1" aria-labelledby="h-ch1">
     <svg class="threads" aria-hidden="true"></svg>
     <div class="pg en" lang="en">
-      <div class="rh"><span>The Bridge</span><span>I · Two languages</span></div>
-      <h2 class="ch" id="h-ch1">Chapter I <b>Two languages</b></h2>
-      <p class="x" data-k="1.1" style="--o:4"><button class="sec" type="button" aria-label="Show the Arabic of 1.1">§1.1</button>I read, write and work in two languages, English and Arabic, and I translate between them professionally.</p>
-      <p class="x" data-k="1.2" style="--o:6"><button class="sec" type="button" aria-label="Show the Arabic of 1.2">§1.2</button>The Arabic is certified: California awarded me the State Seal of Biliteracy in Arabic.</p>
-      <div class="lock" aria-hidden="true" style="--o:8"><span class="l">BI–<br>LIT–<br>ER–<br>ACY</span><span class="v" lang="ar">لغتان</span></div>
+      <div class="rh">English and Arabic</div>
+      <h2 class="ch" id="h-ch1"><span class="num">1</span><b>Two Languages</b></h2>
+      <p class="x" data-k="1.1" style="--o:4"><button class="sec" type="button" aria-label="Show the Arabic of 1.1">1.1</button>I read, write and work in two languages, English and Arabic, and I translate between them professionally.</p>
+      <p class="x" data-k="1.2" style="--o:6"><button class="sec" type="button" aria-label="Show the Arabic of 1.2">1.2</button>My Arabic is certified: California awarded me the State Seal of Biliteracy in Arabic.</p>
+      <div class="lock" aria-hidden="true" style="--o:8"><span class="l">BI—<br>LIT<br>ER<br>—ACY</span><span class="v" lang="ar">لغتان</span></div>
       <div class="folio">1</div>
     </div>
     <div class="pg ar" lang="ar" dir="rtl">
-      <div class="rh"><span>الجسر</span><span>١ · لغتان</span></div>
-      <h2 class="ch">الفصل الأول <b>لغتان</b></h2>
-      <p class="x" data-k="1.1" style="--o:5"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ١٫١">١٫١</button>أقرأ وأكتب وأعمل بلغتين، الإنجليزية والعربية، وأترجم بينهما ترجمةً احترافية.</p>
-      <p class="x" data-k="1.2" style="--o:7"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ١٫٢">١٫٢</button>وعربيّتي معتمدة رسمياً: فقد منحتني ولاية كاليفورنيا ختمَ الولاية لثنائية اللغة في العربية.</p>
-      <div class="folio">٢</div>
+      <div class="rh">العربية والإنجليزية</div>
+      <h2 class="ch"><span class="num">١</span><b>لغتان</b></h2>
+      <p class="x" data-k="1.1" style="--o:5"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ١،١">١،١</button>أقرأ وأكتب وأعمل بلغتين، الإنجليزية والعربية، وأترجم بينهما ترجمةً احترافية.</p>
+      <p class="x" data-k="1.2" style="--o:7"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ١،٢">١،٢</button>وعربيّتي معتمدة رسمياً: فقد منحتني ولاية كاليفورنيا ختمَ الولاية لثنائية اللغة في العربية.</p>
+      <div class="folio">١</div>
     </div>
   </section>
 
@@ -342,22 +366,20 @@ if(!location.hash) window.scrollTo(0,0);
   <section class="opening" id="ch2" aria-labelledby="h-ch2">
     <svg class="threads" aria-hidden="true"></svg>
     <div class="pg en" lang="en">
-      <div class="rh"><span>The Bridge</span><span>II · White House in Arabic</span></div>
-      <h2 class="ch" id="h-ch2">Chapter II <b>White House in Arabic</b></h2>
-      <p class="x" data-k="2.1" style="--o:4"><button class="sec" type="button" aria-label="Show the Arabic of 2.1">§2.1</button>From July 2022 to April 2024 I was Senior English Writer / Intern at White House in Arabic.</p>
-      <p class="x" data-k="2.2" style="--o:6"><button class="sec" type="button" aria-label="Show the Arabic of 2.2">§2.2</button>The job was to edit and translate between Arabic and English: press briefings, op-eds and documentary scripts.</p>
-      <p class="x" data-k="2.3" style="--o:8"><button class="sec" type="button" aria-label="Show the Arabic of 2.3">§2.3</button>I worked under Marah Bukai, Washington Bureau Chief of Al-Arab Media Organization.</p>
-      <p class="x" data-k="2.4" style="--o:10"><button class="sec" type="button" aria-label="Show the Arabic of 2.4">§2.4</button>The work reached more than 350,000 people: 150,000+ readers and 200,000+ viewers.</p>
-      <div class="folio">3</div>
+      <div class="rh">English and Arabic</div>
+      <h2 class="ch" id="h-ch2"><span class="num">2</span><b>White House in Arabic</b></h2>
+      <p class="x" data-k="2.1" style="--o:4"><button class="sec" type="button" aria-label="Show the Arabic of 2.1">2.1</button>At White House in Arabic I edited and translated between Arabic and English for an audience of more than 350,000: 150,000+ readers and 200,000+ viewers.</p>
+      <p class="x" data-k="2.2" style="--o:6"><button class="sec" type="button" aria-label="Show the Arabic of 2.2">2.2</button>Press briefings, op-eds and documentary scripts, from July 2022 to April 2024, as Senior English Writer / Intern.</p>
+      <p class="x" data-k="2.3" style="--o:8"><button class="sec" type="button" aria-label="Show the Arabic of 2.3">2.3</button>I worked under Marah Bukai, Washington Bureau Chief of Al-Arab Media Organization.</p>
+      <div class="folio">2</div>
     </div>
     <div class="pg ar" lang="ar" dir="rtl">
-      <div class="rh"><span>الجسر</span><span>٢ · البيت الأبيض بالعربية</span></div>
-      <h2 class="ch">الفصل الثاني <b>البيت الأبيض بالعربية</b></h2>
-      <p class="x" data-k="2.1" style="--o:5"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٢٫١">٢٫١</button>من يوليو ٢٠٢٢ إلى أبريل ٢٠٢٤ عملتُ في «البيت الأبيض بالعربية» كاتباً أول باللغة الإنجليزية ومتدرّباً.</p>
-      <p class="x" data-k="2.2" style="--o:7"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٢٫٢">٢٫٢</button>وكان عملي تحريرَ النصوص وترجمتَها بين العربية والإنجليزية: الإحاطات الصحفية، ومقالات الرأي، ونصوص الأفلام الوثائقية.</p>
-      <p class="x" data-k="2.3" style="--o:9"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٢٫٣">٢٫٣</button>وعملتُ تحت إشراف مرح البقاعي، مديرة مكتب واشنطن في مؤسسة العرب الإعلامية.</p>
-      <p class="x" data-k="2.4" style="--o:11"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٢٫٤">٢٫٤</button>وقد بلغ هذا العمل أكثر من ٣٥٠ ألف شخص: أكثر من ١٥٠ ألف قارئ، وأكثر من ٢٠٠ ألف مشاهد.</p>
-      <div class="folio">٤</div>
+      <div class="rh">العربية والإنجليزية</div>
+      <h2 class="ch"><span class="num">٢</span><b>البيت الأبيض بالعربية</b></h2>
+      <p class="x" data-k="2.1" style="--o:5"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٢،١">٢،١</button>في «البيت الأبيض بالعربية» حرّرتُ النصوص وترجمتُها بين العربية والإنجليزية لجمهور تجاوز ٣٥٠ ألفاً: أكثر من ١٥٠ ألف قارئ، وأكثر من ٢٠٠ ألف مشاهد.</p>
+      <p class="x" data-k="2.2" style="--o:7"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٢،٢">٢،٢</button>إحاطاتٌ صحفية، ومقالات رأي، ونصوص أفلام وثائقية، من يوليو ٢٠٢٢ إلى أبريل ٢٠٢٤، بصفتي كاتباً أول باللغة الإنجليزية ومتدرّباً.</p>
+      <p class="x" data-k="2.3" style="--o:9"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٢،٣">٢،٣</button>وعملتُ تحت إشراف مرح البقاعي، مديرة مكتب واشنطن في مؤسسة العرب الإعلامية.</p>
+      <div class="folio">٢</div>
     </div>
   </section>
 
@@ -365,15 +387,15 @@ if(!location.hash) window.scrollTo(0,0);
   <section class="opening" id="ch3" aria-labelledby="h-ch3">
     <svg class="threads" aria-hidden="true"></svg>
     <div class="pg en" lang="en">
-      <div class="rh"><span>The Bridge</span><span>III · Six pieces</span></div>
-      <h2 class="ch" id="h-ch3">Chapter III <b>Six pieces I edited and translated</b></h2>
+      <div class="rh">English and Arabic</div>
+      <h2 class="ch" id="h-ch3"><span class="num">3</span><b>Six Pieces, Edited and Translated</b></h2>
       <p class="note" style="--o:3">Tap a dotted word to see where it went in the Arabic, and what else it could have been.</p>
-      <p class="x piece" data-k="3.1" style="--o:4"><button class="sec" type="button" aria-label="Show the Arabic of 3.1">§3.1</button>Mustafa Al-Kazemi’s <button class="g" type="button" data-g="crucial">Crucial</button> Role in the MENA Region <a class="read" href="https://whia.us/en/5461/" target="_blank" rel="noopener">Read ↗</a></p>
-      <p class="x piece" data-k="3.2" style="--o:6"><button class="sec" type="button" aria-label="Show the Arabic of 3.2">§3.2</button>The Sadrist <button class="g" type="button" data-g="movement">Movement’s</button> <button class="g" type="button" data-g="sitin">Sit-In</button> Sends Iraq into Political <button class="g" type="button" data-g="turmoil">Turmoil</button> <a class="read" href="https://whia.us/en/6115/" target="_blank" rel="noopener">Read ↗</a></p>
-      <p class="x piece" data-k="3.3" style="--o:8"><button class="sec" type="button" aria-label="Show the Arabic of 3.3">§3.3</button>MalikiLeaks: When <button class="g" type="button" data-g="sect">Sectarianism</button> Rules Iraq <a class="read" href="https://whia.us/en/5276/" target="_blank" rel="noopener">Read ↗</a></p>
-      <p class="x piece" data-k="3.4" style="--o:10"><button class="sec" type="button" aria-label="Show the Arabic of 3.4">§3.4</button>Iraq to Play a <button class="g" type="button" data-g="major">Major</button> Role at Jeddah Summit <a class="read" href="https://whia.us/en/5028/" target="_blank" rel="noopener">Read ↗</a></p>
-      <p class="x piece" data-k="3.5" style="--o:12"><button class="sec" type="button" aria-label="Show the Arabic of 3.5">§3.5</button>The Possible <button class="g" type="button" data-g="outcomes">Outcomes</button> of the Iraqi Political Crisis <a class="read" href="https://whia.us/en/6215/" target="_blank" rel="noopener">Read ↗</a></p>
-      <p class="x piece" data-k="3.6" style="--o:14"><button class="sec" type="button" aria-label="Show the Arabic of 3.6">§3.6</button>Biden in Palestine: Is Health a Path to <button class="g" type="button" data-g="statehood">Statehood</button>? <a class="read" href="https://whia.us/en/5047/" target="_blank" rel="noopener">Read ↗</a></p>
+      <p class="x piece" data-k="3.1" style="--o:4"><button class="sec" type="button" aria-label="Show the Arabic of 3.1">3.1</button>Mustafa Al-Kazemi’s <button class="g" type="button" data-g="crucial">Crucial</button> Role in the MENA Region <a class="read" href="https://whia.us/en/5461/" target="_blank" rel="noopener">Read ↗</a></p>
+      <p class="x piece" data-k="3.2" style="--o:6"><button class="sec" type="button" aria-label="Show the Arabic of 3.2">3.2</button>The Sadrist <button class="g" type="button" data-g="movement">Movement’s</button> <button class="g" type="button" data-g="sitin">Sit-In</button> Sends Iraq into Political <button class="g" type="button" data-g="turmoil">Turmoil</button> <a class="read" href="https://whia.us/en/6115/" target="_blank" rel="noopener">Read ↗</a></p>
+      <p class="x piece" data-k="3.3" style="--o:8"><button class="sec" type="button" aria-label="Show the Arabic of 3.3">3.3</button>MalikiLeaks: When <button class="g" type="button" data-g="sect">Sectarianism</button> Rules Iraq <a class="read" href="https://whia.us/en/5276/" target="_blank" rel="noopener">Read ↗</a></p>
+      <p class="x piece" data-k="3.4" style="--o:10"><button class="sec" type="button" aria-label="Show the Arabic of 3.4">3.4</button>Iraq to Play a <button class="g" type="button" data-g="major">Major</button> Role at Jeddah Summit <a class="read" href="https://whia.us/en/5028/" target="_blank" rel="noopener">Read ↗</a></p>
+      <p class="x piece" data-k="3.5" style="--o:12"><button class="sec" type="button" aria-label="Show the Arabic of 3.5">3.5</button>The Possible <button class="g" type="button" data-g="outcomes">Outcomes</button> of the Iraqi Political Crisis <a class="read" href="https://whia.us/en/6215/" target="_blank" rel="noopener">Read ↗</a></p>
+      <p class="x piece" data-k="3.6" style="--o:14"><button class="sec" type="button" aria-label="Show the Arabic of 3.6">3.6</button>Biden in Palestine: Is Health a Path to <button class="g" type="button" data-g="statehood">Statehood</button>? <a class="read" href="https://whia.us/en/5047/" target="_blank" rel="noopener">Read ↗</a></p>
       <p class="credit" style="--o:16">Edited and translated for White House in Arabic.</p>
       <table class="gl" style="--o:18">
         <caption>Glossary: the dotted words</caption>
@@ -386,18 +408,18 @@ if(!location.hash) window.scrollTo(0,0);
         <tr data-g="outcomes"><th scope="row">outcomes</th><td><span lang="ar">المآلات</span> · also <span lang="ar">النتائج</span>, <span lang="ar">السيناريوهات</span></td></tr>
         <tr data-g="statehood"><th scope="row">statehood</th><td><span lang="ar">إقامة الدولة</span> · also <span lang="ar">قيام الدولة</span>, <span lang="ar">الدولة</span></td></tr>
       </table>
-      <div class="folio">5</div>
+      <div class="folio">3</div>
     </div>
     <div class="pg ar" lang="ar" dir="rtl">
-      <div class="rh"><span>الجسر</span><span>٣ · ست مقالات</span></div>
-      <h2 class="ch">الفصل الثالث <b>ست مقالات حرّرتُها وترجمتُها</b></h2>
+      <div class="rh">العربية والإنجليزية</div>
+      <h2 class="ch"><span class="num">٣</span><b>ست مقالات حرّرتُها وترجمتُها</b></h2>
       <p class="note" style="--o:3">العناوين العربية هنا من ترجمة هذه الصفحة، وليست العناوين المنشورة.</p>
-      <p class="x piece" data-k="3.1" style="--o:5"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣٫١">٣٫١</button>الدور <span class="gw" data-g="crucial">المحوري</span> لمصطفى الكاظمي في منطقة الشرق الأوسط وشمال أفريقيا</p>
-      <p class="x piece" data-k="3.2" style="--o:7"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣٫٢">٣٫٢</button><span class="gw" data-g="sitin">اعتصام</span> <span class="gw" data-g="movement">التيار</span> الصدري يُدخل العراق في <span class="gw" data-g="turmoil">اضطراب</span> سياسي</p>
-      <p class="x piece" data-k="3.3" style="--o:9"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣٫٣">٣٫٣</button>تسريبات المالكي: حين تحكم <span class="gw" data-g="sect">الطائفيةُ</span> العراق</p>
-      <p class="x piece" data-k="3.4" style="--o:11"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣٫٤">٣٫٤</button>العراق سيؤدّي دوراً <span class="gw" data-g="major">رئيسياً</span> في قمة جدة</p>
-      <p class="x piece" data-k="3.5" style="--o:13"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣٫٥">٣٫٥</button><span class="gw" data-g="outcomes">المآلات</span> المحتملة للأزمة السياسية العراقية</p>
-      <p class="x piece" data-k="3.6" style="--o:15"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣٫٦">٣٫٦</button>بايدن في فلسطين: هل تكون الصحة طريقاً إلى <span class="gw" data-g="statehood">إقامة الدولة</span>؟</p>
+      <p class="x piece" data-k="3.1" style="--o:5"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣،١">٣،١</button>الدور <span class="gw" data-g="crucial">المحوري</span> لمصطفى الكاظمي في منطقة الشرق الأوسط وشمال أفريقيا</p>
+      <p class="x piece" data-k="3.2" style="--o:7"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣،٢">٣،٢</button><span class="gw" data-g="sitin">اعتصام</span> <span class="gw" data-g="movement">التيار</span> الصدري يُدخل العراق في <span class="gw" data-g="turmoil">اضطراب</span> سياسي</p>
+      <p class="x piece" data-k="3.3" style="--o:9"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣،٣">٣،٣</button>تسريبات المالكي: حين تحكم <span class="gw" data-g="sect">الطائفيةُ</span> العراق</p>
+      <p class="x piece" data-k="3.4" style="--o:11"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣،٤">٣،٤</button>العراق سيؤدّي دوراً <span class="gw" data-g="major">رئيسياً</span> في قمة جدة</p>
+      <p class="x piece" data-k="3.5" style="--o:13"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣،٥">٣،٥</button><span class="gw" data-g="outcomes">المآلات</span> المحتملة للأزمة السياسية العراقية</p>
+      <p class="x piece" data-k="3.6" style="--o:15"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٣،٦">٣،٦</button>بايدن في فلسطين: هل تكون الصحة طريقاً إلى <span class="gw" data-g="statehood">إقامة الدولة</span>؟</p>
       <p class="credit" style="--o:17">تحرير وترجمة لموقع «البيت الأبيض بالعربية».</p>
       <table class="gl" style="--o:19">
         <caption>مسرد الكلمات المنقّطة</caption>
@@ -410,7 +432,7 @@ if(!location.hash) window.scrollTo(0,0);
         <tr data-g="outcomes"><th scope="row">المآلات</th><td><i>outcomes</i>: ما تنتهي إليه الأمور</td></tr>
         <tr data-g="statehood"><th scope="row">إقامة الدولة</th><td><i>statehood</i></td></tr>
       </table>
-      <div class="folio">٦</div>
+      <div class="folio">٣</div>
     </div>
   </section>
 
@@ -418,39 +440,41 @@ if(!location.hash) window.scrollTo(0,0);
   <section class="opening" id="ch4" aria-labelledby="h-ch4">
     <svg class="threads" aria-hidden="true"></svg>
     <div class="pg en" lang="en">
-      <div class="rh"><span>The Bridge</span><span>IV · In print</span></div>
-      <h2 class="ch" id="h-ch4">Chapter IV <b>In print, and on the press desk</b></h2>
-      <div class="x clip wsj" data-k="4.1" style="--o:4"><span class="kick">Contributor</span><a class="hd" href="https://www.wsj.com/us-news/education/harvard-bound-students-stand-firm-while-some-columbia-prospects-think-twice-013d9afa" target="_blank" rel="noopener">Harvard-Bound Students Stand Firm While Some Columbia Prospects Think Twice</a><div class="by"><button class="sec" type="button" aria-label="Show the Arabic of 4.1">§4.1</button>The Wall Street Journal · April 16, 2025</div></div>
-      <div class="x clip nation" data-k="4.2" style="--o:6"><span class="kick">Contributor</span><a class="hd" href="https://www.thenation.com/article/society/artificial-intelligence-chatgpt-college-applications/" target="_blank" rel="noopener">AI Is Taking Over College Admissions</a><div class="by"><button class="sec" type="button" aria-label="Show the Arabic of 4.2">§4.2</button>The Nation · October 11, 2024</div></div>
-      <p class="x" data-k="4.3" style="--o:8"><button class="sec" type="button" aria-label="Show the Arabic of 4.3">§4.3</button>Finalist, Princeton Summer Journalism Program: about 60 chosen from more than 900 applicants.</p>
-      <p class="x" data-k="4.4" style="--o:10"><button class="sec" type="button" aria-label="Show the Arabic of 4.4">§4.4</button>Press Officer, Youth Climate Action Team, 2023–2024.</p>
-      <div class="folio">7</div>
+      <div class="rh">English and Arabic</div>
+      <h2 class="ch" id="h-ch4"><span class="num">4</span><b>In Print, and on the Press Desk</b></h2>
+      <div class="x clip wsj" data-k="4.1" style="--o:4"><span class="kick">Contributor</span><a class="hd" href="https://www.wsj.com/us-news/education/harvard-bound-students-stand-firm-while-some-columbia-prospects-think-twice-013d9afa" target="_blank" rel="noopener">Harvard-Bound Students Stand Firm While Some Columbia Prospects Think Twice</a><div class="by"><button class="sec" type="button" aria-label="Show the Arabic of 4.1">4.1</button>The Wall Street Journal · April 16, 2025</div></div>
+      <div class="x clip nation" data-k="4.2" style="--o:6"><span class="kick">Society / Students</span><a class="hd" href="https://www.thenation.com/article/society/artificial-intelligence-chatgpt-college-applications/" target="_blank" rel="noopener">AI Is Taking Over College Admissions</a><div class="by"><button class="sec" type="button" aria-label="Show the Arabic of 4.2">4.2</button>Contributor · The Nation · October 11, 2024</div></div>
+      <p class="x" data-k="4.3" style="--o:8"><button class="sec" type="button" aria-label="Show the Arabic of 4.3">4.3</button>Finalist, Princeton Summer Journalism Program: about 60 chosen from more than 900 applicants.</p>
+      <p class="x" data-k="4.4" style="--o:10"><button class="sec" type="button" aria-label="Show the Arabic of 4.4">4.4</button>Press Officer, Youth Climate Action Team, 2023–2024.</p>
+      <div class="folio">4</div>
     </div>
     <div class="pg ar" lang="ar" dir="rtl">
-      <div class="rh"><span>الجسر</span><span>٤ · في الصحافة</span></div>
-      <h2 class="ch">الفصل الرابع <b>في الصحافة، وعلى مكتبها</b></h2>
-      <div class="x clip wsj" data-k="4.1" style="--o:5"><span class="kick"><span lang="ar">مساهم</span></span><span class="hd">الطلاب المتّجهون إلى هارفارد يتمسّكون بقرارهم، فيما يتردّد بعض المرشّحين للالتحاق بكولومبيا</span><div class="by"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٤٫١">٤٫١</button>صحيفة وول ستريت جورنال · ١٦ أبريل ٢٠٢٥</div></div>
-      <div class="x clip nation" data-k="4.2" style="--o:7"><span class="kick"><span lang="ar">مساهم</span></span><span class="hd">الذكاء الاصطناعي يستحوذ على القبول الجامعي</span><div class="by"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٤٫٢">٤٫٢</button>مجلة ذا نيشن · ١١ أكتوبر ٢٠٢٤</div></div>
-      <p class="x" data-k="4.3" style="--o:9"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٤٫٣">٤٫٣</button>من المتأهّلين النهائيين في برنامج برينستون الصيفي للصحافة: نحو ٦٠ اختيروا من بين أكثر من ٩٠٠ متقدّم.</p>
-      <p class="x" data-k="4.4" style="--o:11"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٤٫٤">٤٫٤</button>مسؤول إعلامي في فريق العمل المناخي الشبابي (<bdi lang="en" dir="ltr" style="font-family:var(--lat);font-size:.8em">Youth Climate Action Team</bdi>)، ٢٠٢٣–٢٠٢٤.</p>
-      <div class="folio">٨</div>
+      <div class="rh">العربية والإنجليزية</div>
+      <h2 class="ch"><span class="num">٤</span><b>في الصحافة، وعلى مكتبها</b></h2>
+      <div class="x clip wsj" data-k="4.1" style="--o:5"><span class="kick"><span lang="ar">مساهم</span></span><span class="hd">الطلاب المتّجهون إلى هارفارد يتمسّكون بقرارهم، فيما يتردّد بعض المرشّحين للالتحاق بكولومبيا</span><div class="by"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٤،١">٤،١</button>صحيفة وول ستريت جورنال · ١٦ أبريل ٢٠٢٥</div></div>
+      <div class="x clip nation" data-k="4.2" style="--o:7"><span class="kick"><span lang="ar">مجتمع / طلاب</span></span><span class="hd">الذكاء الاصطناعي يستحوذ على القبول الجامعي</span><div class="by"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٤،٢">٤،٢</button>مساهم · مجلة ذا نيشن · ١١ أكتوبر ٢٠٢٤</div></div>
+      <p class="x" data-k="4.3" style="--o:9"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٤،٣">٤،٣</button>من المتأهّلين النهائيين في برنامج برينستون الصيفي للصحافة: نحو ٦٠ اختيروا من بين أكثر من ٩٠٠ متقدّم.</p>
+      <p class="x" data-k="4.4" style="--o:11"><button class="sec" type="button" aria-label="أظهر الإنجليزية للفقرة ٤،٤">٤،٤</button>مسؤول إعلامي في فريق العمل المناخي الشبابي (<bdi lang="en" dir="ltr" style="font-family:var(--lat);font-size:.8em;white-space:nowrap">Youth Climate Action Team</bdi>)، ٢٠٢٣–٢٠٢٤.</p>
+      <div class="folio">٤</div>
     </div>
   </section>
 
-  <!-- ===== Colophon ===== -->
+  <!-- ===== About the Typefaces (the LAL volumes close with this page) ===== -->
   <section class="opening" id="colophon" aria-labelledby="h-colo">
     <svg class="threads" aria-hidden="true"></svg>
     <div class="pg en" lang="en">
-      <div class="rh"><span>The Bridge</span><span>Colophon</span></div>
-      <div class="colo" style="--o:4"><span class="orn" aria-hidden="true">۞</span><h2 class="sr" id="h-colo">Colophon</h2>
-        <p class="x" data-k="k1">This edition sets English in Source Serif and Arabic in Amiri, after the facing-page books of the Library of Arabic Literature: the two pages keep their own line spacing and meet again at every numbered paragraph. The Arabic is this page’s own translation.</p></div>
-      <div class="folio">9</div>
+      <div class="rh">English and Arabic</div>
+      <h2 class="ch" id="h-colo"><b>About the Typefaces</b></h2>
+      <p class="x" data-k="k1" style="--o:4"><button class="sec" type="button" aria-label="Show the Arabic of this paragraph">5.1</button>The English is set in Source Serif; the Arabic in Amiri, a revival of the naskh first cut in the early twentieth century at the Bulaq Press in Cairo, also called the Amiria Press.</p>
+      <p class="x" data-k="k2" style="--o:6"><button class="sec" type="button" aria-label="Show the Arabic of this paragraph">5.2</button>The layout follows the facing-page volumes of the Library of Arabic Literature: each page keeps its own line spacing, and the two meet again at every numbered paragraph. The Arabic is this edition’s own translation.</p>
+      <div class="folio">5</div>
     </div>
     <div class="pg ar" lang="ar" dir="rtl">
-      <div class="rh"><span>الجسر</span><span>حرد المتن</span></div>
-      <div class="colo" style="--o:5"><span class="orn" aria-hidden="true">۞</span>
-        <p class="x" data-k="k1">جُمعت الإنجليزية في هذه الطبعة بحرف «سورس سيريف» والعربية بحرف «أميري»، على غرار الكتب ذات الصفحات المتقابلة في «مكتبة الأدب العربي»: تحتفظ كل صفحة بتباعد أسطرها، وتلتقي الصفحتان عند كل فقرة مرقّمة. والنص العربي ترجمةُ هذه الصفحة.</p></div>
-      <div class="folio">١٠</div>
+      <div class="rh">العربية والإنجليزية</div>
+      <h2 class="ch"><b>عن الحروف الطباعية</b></h2>
+      <p class="x" data-k="k1" style="--o:5"><button class="sec" type="button" aria-label="أظهر الإنجليزية لهذه الفقرة">٥،١</button>جُمع النص الإنجليزي بحرف «سورس سيريف»، والعربي بحرف «أميري»، وهو إحياءٌ لحرف النسخ الذي صُبّ أول مرة في مطبعة بولاق بالقاهرة، المعروفة أيضاً بالمطبعة الأميرية، في مطلع القرن العشرين.</p>
+      <p class="x" data-k="k2" style="--o:7"><button class="sec" type="button" aria-label="أظهر الإنجليزية لهذه الفقرة">٥،٢</button>ويتبع الإخراجُ مجلداتِ «المكتبة العربية» ذات الصفحات المتقابلة: تحتفظ كل صفحة بتباعد أسطرها، وتلتقي الصفحتان عند كل فقرة مرقّمة. والنص العربي ترجمةُ هذه الطبعة.</p>
+      <div class="folio">٥</div>
     </div>
   </section>
   <div class="end"></div>
@@ -489,7 +513,7 @@ if(!location.hash) window.scrollTo(0,0);
   (function(){
     if(RM.matches || /^#from-/.test(location.hash) || location.hash) return;
     var en=document.getElementById('tEn'), ar=document.getElementById('tAr');
-    var s1=scramble(en,'The Bridge',1100), s2=scramble(ar,'الجسر',900);
+    var s1=scramble(en,'English and Arabic',1100), s2=scramble(ar,'العربية والإنجليزية',1000);
     function skip(){ s1(); s2(); ['pointerdown','keydown','wheel','touchstart'].forEach(function(t){ removeEventListener(t,skip); }); }
     ['pointerdown','keydown','wheel','touchstart'].forEach(function(t){ addEventListener(t,skip,{passive:true}); });
     setTimeout(skip,1300);
@@ -522,7 +546,7 @@ if(!location.hash) window.scrollTo(0,0);
         d='M'+x1+','+ya+' C'+(x1+m*.55)+','+ya+' '+(x2-m*.55)+','+yb+' '+x2+','+yb;
         svg.appendChild(pathEl(d,'',k)); svg.appendChild(dot(x1,ya,k)); svg.appendChild(dot(x2,yb,k));
       } else {
-        // stacked: a short thread from the English § (left) down to the Arabic § (right), through the gap between them
+        // stacked: a short thread from the English paragraph number (left) down to the Arabic one (right), through the gap between them
         var sa=a.querySelector('.sec'), sb=b.querySelector('.sec');
         if(!sa||!sb) return;
         var SA=box(sa,o), SB=box(sb,o);
@@ -586,7 +610,7 @@ if(!location.hash) window.scrollTo(0,0);
     if(k&&k.indexOf('g:')===0) showPop(k.slice(2));
   });
 
-  /* taps/clicks on § and glossed words pin the pair (DeepL: click a word, see alternatives) */
+  /* taps/clicks on paragraph numbers and glossed words pin the pair (DeepL: click a word, see alternatives) */
   var pinned=null;
   book.addEventListener('click',function(e){
     var b=e.target.closest('.sec,.g'); if(!b) { if(pinned&&!e.target.closest('.pop')){ pinned=null; activate(null); hidePop(); } return; }
@@ -640,7 +664,7 @@ if(!location.hash) window.scrollTo(0,0);
   /* ---- the draggable seam ---- */
   var grip=document.getElementById('grip'), P=.5, dragging=false, raf=0;
   function setP(p){ P=Math.max(.3,Math.min(.7,p)); root.style.setProperty('--p',P.toFixed(4)); grip.setAttribute('aria-valuenow',Math.round(P*100)); schedule(); }
-  function fromX(x){ var r=book.getBoundingClientRect(), gut=88, inner=r.width-64-gut; return (x-r.left-32-gut/2)/inner; }
+  function fromX(x){ var r=book.getBoundingClientRect(), pad=parseFloat(getComputedStyle(book).paddingLeft)||0, gut=88, inner=r.width-2*pad-gut; return (x-r.left-pad-gut/2)/inner; }
   grip.addEventListener('pointerdown',function(e){ dragging=true; grip.setPointerCapture(e.pointerId); root.classList.add('dragging'); e.preventDefault(); });
   grip.addEventListener('pointermove',function(e){ if(dragging) setP(fromX(e.clientX)); });
   function end(){ if(!dragging) return; dragging=false; root.classList.remove('dragging'); }

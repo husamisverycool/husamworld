@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cabin:wdth,wght@75..100,500..700&family=Fira+Code:wght@300;500;700&display=swap" rel="stylesheet">
 <!--
 	Press 'f' to toggle fullscreen.
 	Everything on the globe is drawn one character cell at a time,
@@ -29,14 +29,19 @@
   --fra-white:#ecece6;
   --fs:16px;
   --lh:19px;
-  --font:"Fira Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  /* Gysin sets everything in LL Simple Console Light (play.core run.js loads SimpleConsole-Light.woff).
+     Fira Code is the only Google monospace with a Light cut that also ships U+2500-259F. */
+  --font:"Fira Code",ui-monospace,"SFMono-Regular",Menlo,Consolas,"Liberation Mono",monospace;
+  /* Solari C.E. Flap Unit, technical description (1984): "style of characters: Gill Sans Bold".
+     Cabin is Google's Gill/Johnston humanist sans; its width axis stands in for narrow-painted flaps. */
+  --flap:"Cabin","Gill Sans","Gill Sans MT",sans-serif;
   color-scheme:dark;
 }
 @media (max-width:899px){:root{--fs:15px;--lh:18px}}
 @media (max-width:479px){:root{--fs:13.5px;--lh:17px}}
 *{box-sizing:border-box}
 html{background:#000}
-body{margin:0;background:#000;color:var(--fg);font:400 var(--fs)/var(--lh) var(--font);-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;font-variant-ligatures:none}
+body{margin:0;background:#000;color:var(--fg);font:300 var(--fs)/var(--lh) var(--font);-webkit-text-size-adjust:100%;text-size-adjust:100%;overflow-x:clip;font-variant-ligatures:none}
 p,ul,ol,h1,h2,h3,figure{margin:0;padding:0}
 ul,ol{list-style:none}
 h1,h2,h3{font:inherit}
@@ -78,7 +83,7 @@ button{font:inherit;color:inherit}
 .hero .gap{margin-top:var(--lh)}
 .codes li{white-space:nowrap}
 .codes button{background:none;border:0;padding:0;margin:0;cursor:pointer;color:var(--fg);text-align:left}
-.codes button b{font-weight:400;color:var(--hi)}
+.codes button b{font-weight:inherit;color:var(--hi)}
 .codes button:hover,.codes button[aria-pressed="true"]{background:var(--hi);color:#000}
 .codes button:hover b,.codes button[aria-pressed="true"] b{color:#000}
 .hint{position:absolute;z-index:2;right:2ch;bottom:calc(var(--lh) * 1.5);max-width:44ch;text-align:right;color:var(--mid);background:#000}
@@ -96,17 +101,20 @@ button{font:inherit;color:inherit}
 .sect h2{color:var(--hi)}
 
 /* ---- the Solari board --------------------------------------------------- */
-.board,.info{--fw:15px;--fh:30px;--ffs:17px;--fgap:2px;--pitch:calc(var(--fw) + var(--fgap));--cg:10px;--ft:70ms;--fc:#ededed;--ft1:#202020;--fb1:#181818}
+.board,.info{--fw:15px;--fh:30px;--ffs:17px;--fgap:2px;--pitch:calc(var(--fw) + var(--fgap));--cg:10px;--ft:80ms;--ftw:120ms;--fc:#ededed;--ft1:#202020;--fb1:#181818}
 @media (max-width:699px){.board,.info{--fw:12px;--fh:26px;--ffs:14px;--cg:6px}}
 .board{margin:0 2ch;background:#070707;border:1px solid #2c2c2c;padding:14px 16px 12px}
-.plate{display:flex;align-items:center;justify-content:space-between;gap:2ch;padding:0 4px 10px;margin:0 -4px 10px;border-bottom:1px solid #2c2c2c;font:700 13px/1 var(--font);letter-spacing:.12em;color:var(--hi);text-transform:uppercase}
-.plate .sub{font-weight:400;color:var(--mid);letter-spacing:.06em}
+/* the top line of a Solari board carries "covering tablets ... silk-screen processed with the standing writings such as:
+   type of board, meaning of the pieces of information" (Solari Series 90 Boards, 1984, 1-2; fig. 1 shows "DEPARTURES"
+   spaced out in capitals). So these caps are the board's own lettering, set in the flap face, not a label style. */
+.plate{display:flex;align-items:center;justify-content:space-between;gap:2ch;padding:0 4px 10px;margin:0 -4px 10px;border-bottom:1px solid #2c2c2c;font:700 15px/1 var(--flap);letter-spacing:.22em;color:var(--hi);text-transform:uppercase}
+.plate .sub{font-weight:500;color:var(--mid);letter-spacing:.12em}
 .plate .right{display:flex;align-items:center;gap:1.5ch}
 /* column tracks: code | picto | destination | program | as | remarks */
 .bh,.row{display:grid;grid-template-columns:var(--cols);column-gap:var(--cg);align-items:center}
 .board[data-board="dep"]{--cols:calc(4 * var(--pitch)) var(--fh) minmax(0,1.05fr) minmax(0,1.5fr) minmax(0,1.05fr) minmax(0,1fr)}
 .board[data-board="gates"]{--cols:calc(4 * var(--pitch)) var(--fh) minmax(0,1.75fr) minmax(0,1.3fr) minmax(0,1fr)}
-.bh{padding:0 4px 6px;font:400 11px/1.2 var(--font);letter-spacing:.06em;color:var(--mid);text-transform:uppercase}
+.bh{padding:0 4px 6px;font:500 12px/1.2 var(--flap);letter-spacing:.12em;color:var(--mid);text-transform:uppercase}
 .bh span{min-width:0;overflow:hidden;white-space:nowrap}
 .rows{margin:0;padding:0}
 .rows li+li{margin-top:3px}
@@ -116,11 +124,11 @@ button{font:inherit;color:inherit}
 .row[aria-current="true"]{background:#141414;box-shadow:inset 3px 0 0 var(--hi)}
 .row[aria-current="true"] .fl,.row[aria-current="true"] .wf{--fc:#fff;--ft1:#2c2c2c;--fb1:#232323}
 /* letter flaps (codes, the information board) */
-.grp{display:flex;gap:var(--fgap);overflow:hidden;white-space:pre;font:700 var(--ffs)/var(--fh) var(--font);color:var(--fc);text-transform:uppercase}
-.fl{flex:none;display:block;position:relative;width:var(--fw);height:var(--fh);font:700 var(--ffs)/var(--fh) var(--font);text-align:center;color:var(--fc);border-radius:1.5px;
+.grp{display:flex;gap:var(--fgap);overflow:hidden;white-space:pre;font:700 var(--ffs)/var(--fh) var(--flap);color:var(--fc);text-transform:uppercase}
+.fl{flex:none;display:block;position:relative;width:var(--fw);height:var(--fh);font:700 var(--ffs)/var(--fh) var(--flap);font-stretch:88%;text-align:center;color:var(--fc);border-radius:1.5px;
   background:linear-gradient(to bottom,var(--ft1) 0,var(--ft1) calc(50% - .5px),#000 calc(50% - .5px),#000 calc(50% + .5px),var(--fb1) calc(50% + .5px),var(--fb1) 100%)}
 /* word flaps: one painted flap per destination or program (as on the Frankfurt Hbf board) */
-.wf{position:relative;display:block;min-width:0;height:var(--fh);padding:0 .6ch;font:700 var(--ffs)/var(--fh) var(--font);letter-spacing:.06em;color:var(--fc);text-transform:uppercase;white-space:pre;overflow:hidden;border-radius:1.5px;
+.wf{--ft:var(--ftw);position:relative;display:block;min-width:0;height:var(--fh);padding:0 .6ch;font:700 var(--ffs)/var(--fh) var(--flap);letter-spacing:.03em;color:var(--fc);text-transform:uppercase;white-space:pre;overflow:hidden;border-radius:1.5px;
   background:linear-gradient(to bottom,var(--ft1) 0,var(--ft1) calc(50% - .5px),#000 calc(50% - .5px),#000 calc(50% + .5px),var(--fb1) calc(50% + .5px),var(--fb1) 100%)}
 .wf::after,.fl::after{content:none}
 /* the hinge pins at each end of the split */
@@ -130,11 +138,11 @@ button{font:inherit;color:inherit}
 .fl.s::before,.fl.s::after,.wf.s::before,.wf.s::after{position:absolute;left:0;width:100%;height:50%;overflow:hidden;display:flex;line-height:var(--fh);color:var(--fc);will-change:transform}
 .fl.s::before,.fl.s::after{justify-content:center}
 .wf.s::before,.wf.s::after{justify-content:flex-start;padding:0 .6ch;box-sizing:border-box}
-.fl.s::before,.wf.s::before{content:attr(data-o);content:attr(data-o) / "";top:0;align-items:flex-start;border-radius:1.5px 1.5px 0 0;background:linear-gradient(to bottom,var(--ft1),#111);transform-origin:50% 100%;animation:flapTop var(--ft) linear infinite}
-.fl.s::after,.wf.s::after{content:attr(data-c);content:attr(data-c) / "";top:50%;align-items:flex-end;border-radius:0 0 1.5px 1.5px;background:linear-gradient(to bottom,#0d0d0d,var(--fb1) 60%);transform-origin:50% 0;animation:flapBot var(--ft) linear infinite}
+.fl.s::before,.wf.s::before{content:attr(data-o);content:attr(data-o) / "";top:0;align-items:flex-start;border-radius:1.5px 1.5px 0 0;background:linear-gradient(to bottom,var(--ft1),#111);transform-origin:50% 100%;animation:flapTop var(--ft) infinite}
+.fl.s::after,.wf.s::after{content:attr(data-c);content:attr(data-c) / "";top:50%;align-items:flex-end;border-radius:0 0 1.5px 1.5px;background:linear-gradient(to bottom,#0d0d0d,var(--fb1) 60%);transform-origin:50% 0;animation:flapBot var(--ft) infinite}
 html.flap-lite .fl.s::before,html.flap-lite .fl.s::after,html.flap-lite .wf.s::before,html.flap-lite .wf.s::after{display:none}
-@keyframes flapTop{0%{transform:scaleY(1)}50%,100%{transform:scaleY(0)}}
-@keyframes flapBot{0%,50%{transform:scaleY(0)}100%{transform:scaleY(1)}}
+@keyframes flapTop{0%{transform:scaleY(1);animation-timing-function:cubic-bezier(.55,0,1,.45)}50%,100%{transform:scaleY(0)}}
+@keyframes flapBot{0%,50%{transform:scaleY(0);animation-timing-function:cubic-bezier(0,.55,.45,1)}88%{transform:scaleY(1.05)}100%{transform:scaleY(1)}}
 /* pictogram flaps: Aicher's signs, enamelled in Frankfurt's colours, split like every other flap */
 .pf{position:relative;display:block;width:var(--fh);height:var(--fh);border-radius:1.5px;overflow:hidden;color:#fff;background:var(--fra-blue)}
 .pf[data-k="g"]{background:var(--fra-green)}
@@ -145,10 +153,10 @@ html.flap-lite .fl.s::before,html.flap-lite .fl.s::after,html.flap-lite .wf.s::b
 @keyframes pfFlip{0%{clip-path:inset(0 0 50% 0)}100%{clip-path:inset(0)}}
 .clock{--w:5}
 .info{display:block;margin:var(--lh) 2ch 0;background:#070707;border:1px solid #2c2c2c;padding:12px 14px}
-.info .ihead{font:400 11px/1.2 var(--font);letter-spacing:.06em;color:var(--mid);text-transform:uppercase;padding-bottom:6px}
+.info .ihead{font:500 12px/1.2 var(--flap);letter-spacing:.12em;color:var(--mid);text-transform:uppercase;padding-bottom:6px}
 .info{--fh:24px;--ffs:15px;--fw:14px}
 @media (max-width:699px){.info{--fw:11px;--fh:20px;--ffs:12px}}
-.info .itext{font:700 var(--ffs)/calc(var(--fh) + 3px) var(--font);color:var(--fc);text-transform:uppercase;letter-spacing:.04em}
+.info .itext{font:700 var(--ffs)/calc(var(--fh) + 3px) var(--flap);color:var(--fc);text-transform:uppercase;letter-spacing:.04em}
 .info .ln{display:flex;gap:var(--fgap)}
 .info .ln+.ln{margin-top:3px}
 .info[data-pages]{cursor:pointer}
@@ -175,7 +183,7 @@ html.flap-lite .fl.s::before,html.flap-lite .fl.s::after,html.flap-lite .wf.s::b
 .manifest{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,36ch),1fr));gap:var(--lh) 2ch;padding:0 2ch;margin-top:calc(var(--lh) * 2)}
 .mi{border-left:1px solid var(--fg);padding-left:1ch}
 .mi .code{color:var(--mid)}
-.mi b{font-weight:400;color:var(--hi)}
+.mi b{font-weight:inherit;color:var(--hi)}
 
 /* ---- the sign sheet (after Aicher's Munich pictogram poster) ------------ */
 .sheet{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:2ch;padding:0 2ch}
@@ -189,7 +197,7 @@ html.flap-lite .fl.s::before,html.flap-lite .fl.s::after,html.flap-lite .wf.s::b
   linear-gradient(to bottom,rgba(127,127,127,.18) 1px,transparent 1px) 0 0/12.5% 12.5%;opacity:0;transition:opacity .25s}
 .sheet li:hover .sq::before{opacity:1}
 .sheet p{margin-top:calc(var(--lh) * .5)}
-.sheet p b{font-weight:400;color:var(--hi)}
+.sheet p b{font-weight:inherit;color:var(--hi)}
 .keyrow{display:flex;flex-wrap:wrap;gap:var(--lh) 4ch;padding:0 2ch;margin-bottom:calc(var(--lh) * 2)}
 .keyrow li{display:flex;gap:1ch;align-items:flex-start;max-width:38ch}
 .keyrow i{flex:none;width:calc(var(--lh) * 2);height:calc(var(--lh) * 2);border-radius:2px;background:var(--fra-blue)}
@@ -223,13 +231,12 @@ html.intro .skip{display:block}
   <canvas id="globe" tabindex="0" role="img" aria-label="A globe drawn in text characters, lit by the real position of the sun. Lines run from Cambridge to South Korea, Lithuania, Poland, Hungary, Puerto Rico and Europe. It turns to whichever code is showing. Drag or use the arrow keys to turn it."></canvas>
   <div class="cols hcols">
     <div>
-      <h1>The Airport:</h1>
+      <h1>The Airport</h1>
       <p>Harvard and abroad.</p>
     </div>
     <div class="w2">
-      <p>Harvard College, sophomore.</p>
-      <p>Applied Math in Government and Economics.</p>
-      <p class="gap">Every flight here leaves from Cambridge. The big word is a code; the globe goes where it says.</p>
+      <p>Harvard College, sophomore,<br>Applied Math in Government and Economics.<br>Chair of Harvard Model Congress,<br>North America's largest congressional simulation.<br>Project Team Lead, The Harvard Crimson Business Board.</p>
+      <p class="gap">Every line here starts in Cambridge. The big word is a code; the globe goes where it says.</p>
     </div>
     <div>
       <p>Now showing:</p>
@@ -273,34 +280,34 @@ html.intro .skip{display:block}
 <section class="sect" id="departures" aria-labelledby="dep-h">
   <div class="cols">
     <div><h2 id="dep-h">Departures:</h2></div>
-    <div class="w2"><p>Four Harvard programs that came with a ticket. Choose a row and the information board flips to it.</p></div>
-    <div><p>Blue:</p><p>Frankfurt's colour for air traffic. The sign on each flap is the program's.</p></div>
+    <div class="w2"><p>Four Harvard programs that reach abroad: three trips and a conference of 20+ countries. Choose a row and the information board flips to it.</p></div>
+    <div><p>Blue:</p><p>Frankfurt's colour for air traffic. Each pictogram flap is the program's sign.</p></div>
   </div>
   <div class="board" data-board="dep">
     <div class="plate"><span>Departures <span class="sub">· from Cambridge</span></span><span class="right"><span class="sub">Cambridge time</span><span class="grp clock" aria-hidden="true">00:00</span></span></div>
     <div class="bh" aria-hidden="true"><span>Flight</span><span></span><span>Destination</span><span>Program</span><span>As</span><span class="c-rm">Remarks</span></div>
     <ul class="rows">
-      <li><button class="row" type="button" data-code="THC · South Korea" data-say="The Harvard Crimson. South Korea. Workshop lead and mentor." data-info="The Harvard Crimson, Global Programs Associate from Oct 2025. Traveled to South Korea to mentor students and lead two weeks of workshops on writing, leadership and journalism. Moderated and judged international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.">
+      <li><button class="row" type="button" data-code="THC · South Korea" data-say="The Harvard Crimson. South Korea. Workshop lead and mentor." data-info="Traveled to South Korea for The Harvard Crimson to mentor students and lead two weeks of workshops on writing, leadership and journalism. As Global Programs Associate from Oct 2025, also moderated and judged the international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.">
         <span class="grp c-cd" data-w="4">THC</span><span class="pf" data-p="paper" data-k="b"></span><span class="wf c-ds">South Korea</span><span class="wf c-pg">The Harvard Crimson</span><span class="wf c-as" data-cycle="Workshop lead|Mentor">Workshop lead</span><span class="wf c-rm" data-cycle="Two weeks|Writing|Leadership|Journalism">Two weeks</span></button></li>
       <li><button class="row" type="button" data-code="HIL · Lithuania, Poland, Hungary" data-say="Harvard Hillel Travel Program. Lithuania, Poland, Hungary. Fellow. Research tour." data-info="Harvard Hillel Travel Program Fellow: a research tour of Lithuania, Poland and Hungary. One of the Harvard Service, Ethics, and Leadership Fellowships.">
         <span class="grp c-cd" data-w="4">HIL</span><span class="pf" data-p="tour" data-k="b"></span><span class="wf c-ds" data-cycle="Lithuania|Poland|Hungary">Lithuania</span><span class="wf c-pg">Hillel Travel Program</span><span class="wf c-as">Fellow</span><span class="wf c-rm">Research tour</span></button></li>
       <li><button class="row" type="button" data-code="CAT · Puerto Rico" data-say="Catalyst Sustainability. Puerto Rico. Scholar. Service-learning." data-info="Catalyst Sustainability Scholar: a service-learning trip to Puerto Rico. Also one of the Harvard Service, Ethics, and Leadership Fellowships.">
         <span class="grp c-cd" data-w="4">CAT</span><span class="pf" data-p="sun" data-k="b"></span><span class="wf c-ds">Puerto Rico</span><span class="wf c-pg">Catalyst Sustainability</span><span class="wf c-as">Scholar</span><span class="wf c-rm">Service-learning</span></button></li>
-      <li><button class="row" type="button" data-code="HMCE · Europe" data-say="Harvard Model Congress Europe. Europe. Staff. 500+ delegates from 20+ countries." data-info="On staff for Harvard Model Congress Europe: 500+ delegates from 20+ countries. The globe shades the whole continent rather than pinning a city.">
-        <span class="grp c-cd" data-w="4">HMCE</span><span class="pf" data-p="ring" data-k="b"></span><span class="wf c-ds">Europe</span><span class="wf c-pg">HMC Europe</span><span class="wf c-as">Staff</span><span class="wf c-rm" data-cycle="500+ delegates|20+ countries">500+ delegates</span></button></li>
+      <li><button class="row" type="button" data-code="HMCE · Europe" data-say="Harvard Model Congress Europe. Europe. Staff. 500+ delegates from 20+ countries." data-info="Staff, Harvard Model Congress Europe: 500+ delegates from 20+ countries. The globe shades the whole continent rather than pinning a city.">
+        <span class="grp c-cd" data-w="4">HMCE</span><span class="pf" data-p="ring" data-k="b"></span><span class="wf c-ds">Europe</span><span class="wf c-pg">HMC Europe</span><span class="wf c-as">Staff</span><span class="wf c-rm" data-cycle="500+ delegates|20+ countries|Since Sep 2025">500+ delegates</span></button></li>
     </ul>
   </div>
   <div class="info" data-for="dep" role="region" aria-label="Information board for the selected departure">
     <p class="ihead">Information · <span class="icode">THC · South Korea</span></p>
-    <p class="itext">The Harvard Crimson, Global Programs Associate from Oct 2025. Traveled to South Korea to mentor students and lead two weeks of workshops on writing, leadership and journalism. Moderated and judged international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.</p>
+    <p class="itext">Traveled to South Korea for The Harvard Crimson to mentor students and lead two weeks of workshops on writing, leadership and journalism. As Global Programs Associate from Oct 2025, also moderated and judged the international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.</p>
     <p class="sr ilive" aria-live="polite"></p>
   </div>
   <h3 class="sr">Departures, written out</h3>
   <div class="manifest">
-    <div class="mi"><p class="code">THC · KOR</p><p><b>The Harvard Crimson, to South Korea.</b> As a Global Programs Associate (from October 2025) he mentored students and led two weeks of workshops on writing, leadership and journalism. He also moderated and judged the international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.</p></div>
+    <div class="mi"><p class="code">THC · KOR</p><p><b>The Harvard Crimson, to South Korea.</b> He led two weeks of workshops there on writing, leadership and journalism, and mentored the students. As Global Programs Associate (from October 2025) he also moderated and judged the international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl.</p></div>
     <div class="mi"><p class="code">HIL · LTU · POL · HUN</p><p><b>Harvard Hillel Travel Program Fellow.</b> A research tour of Lithuania, Poland and Hungary.</p></div>
     <div class="mi"><p class="code">CAT · PRI</p><p><b>Catalyst Sustainability Scholar.</b> A service-learning trip to Puerto Rico.</p></div>
-    <div class="mi"><p class="code">HMCE · EUR</p><p><b>Harvard Model Congress Europe.</b> On staff: 500+ delegates from 20+ countries.</p></div>
+    <div class="mi"><p class="code">HMCE · EUR</p><p><b>Harvard Model Congress Europe.</b> Staff for a conference of 500+ delegates from 20+ countries, alongside his chairmanship of the Boston conference.</p></div>
   </div>
 </section>
 
@@ -314,14 +321,14 @@ html.intro .skip{display:block}
     <div class="plate"><span>Gates <span class="sub">· Cambridge, MA</span></span><span class="right"><span class="sub">10 open</span></span></div>
     <div class="bh" aria-hidden="true"><span>Gate</span><span></span><span>Institution</span><span>Role</span><span class="c-rm">Remarks</span></div>
     <ul class="rows">
-      <li><button class="row" type="button" data-code="HMC · Harvard Model Congress" data-say="Harvard Model Congress, Boston. Chair, senior staff. 1,500+ delegates from 100+ schools." data-info="Chair (Senior Staff) since Jan 2026, on staff since Sep 2025. Directing the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools.">
-        <span class="grp c-cd" data-w="4">HMC</span><span class="pf" data-p="chamber" data-k="w"></span><span class="wf c-ds">Harvard Model Congress</span><span class="wf c-pg">Chair (Senior Staff)</span><span class="wf c-rm" data-cycle="1,500+ delegates|100+ schools|Since Jan 2026">1,500+ delegates</span></button></li>
-      <li><button class="row" type="button" data-code="THCB · Crimson Business Board" data-say="The Harvard Crimson Business Board. Project Team Lead, TPR/AlgoEd, since December 2025." data-info="Project Team Lead, TPR/AlgoEd, on The Harvard Crimson Business Board since Dec 2025. Leads international writing and leadership camps with The Princeton Review and AlgoEd for the oldest daily college newspaper in the country, est. 1873, a $1M+ media enterprise.">
-        <span class="grp c-cd" data-w="4">THCB</span><span class="pf" data-p="paper" data-k="w"></span><span class="wf c-ds">Crimson Business Board</span><span class="wf c-pg">Project Team Lead</span><span class="wf c-rm" data-cycle="TPR / AlgoEd|Since Dec 2025">TPR / AlgoEd</span></button></li>
+      <li><button class="row" type="button" data-code="HMC · Harvard Model Congress" data-say="Harvard Model Congress, Boston. Chair, senior staff, directing North America's largest congressional simulation: 1,500+ delegates from 100+ schools." data-info="Directs the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools. Chair (Senior Staff) since Jan 2026; on staff since Sep 2025.">
+        <span class="grp c-cd" data-w="4">HMC</span><span class="pf" data-p="chamber" data-k="w"></span><span class="wf c-ds">Harvard Model Congress</span><span class="wf c-pg">Chair (Senior Staff)</span><span class="wf c-rm" data-cycle="1,500+ delegates|100+ schools|N. America's largest|Since Jan 2026">1,500+ delegates</span></button></li>
+      <li><button class="row" type="button" data-code="THCB · Crimson Business Board" data-say="The Harvard Crimson Business Board. Project Team Lead, TPR/AlgoEd, since December 2025." data-info="Leads international writing and leadership camps with The Princeton Review and AlgoEd for The Harvard Crimson, the nation's oldest daily college newspaper (est. 1873) and a $1M+ media enterprise. Project Team Lead, TPR/AlgoEd, since Dec 2025.">
+        <span class="grp c-cd" data-w="4">THCB</span><span class="pf" data-p="paper" data-k="w"></span><span class="wf c-ds">Crimson Business Board</span><span class="wf c-pg">Project Team Lead</span><span class="wf c-rm" data-cycle="TPR / AlgoEd|Est. 1873|$1M+ enterprise|Since Dec 2025">TPR / AlgoEd</span></button></li>
       <li><button class="row" type="button" data-code="RAD · Radcliffe Emerging Leaders" data-say="Emerging Leaders Program, Harvard Radcliffe Institute. Mentor, October 2025 to April 2026." data-info="Mentor, Emerging Leaders Program, Harvard Radcliffe Institute, Oct 2025 to Apr 2026: Boston high-school sophomores, on leadership and social activism.">
         <span class="grp c-cd" data-w="4">RAD</span><span class="pf" data-p="mentor" data-k="w"></span><span class="wf c-ds">Radcliffe Emerging Leaders</span><span class="wf c-pg">Mentor</span><span class="wf c-rm" data-cycle="Oct 2025 - Apr 2026|Boston sophomores">Oct 2025 - Apr 2026</span></button></li>
       <li><button class="row" type="button" data-code="HCCF · China Forum" data-say="Harvard College China Forum. Operations." data-info="Operations for the Harvard College China Forum, America's largest conference on US-China relations.">
-        <span class="grp c-cd" data-w="4">HCCF</span><span class="pf" data-p="table" data-k="w"></span><span class="wf c-ds">Harvard College China Forum</span><span class="wf c-pg">Operations</span><span class="wf c-rm">US-China relations</span></button></li>
+        <span class="grp c-cd" data-w="4">HCCF</span><span class="pf" data-p="table" data-k="w"></span><span class="wf c-ds">Harvard College China Forum</span><span class="wf c-pg">Operations</span><span class="wf c-rm" data-cycle="US-China relations|America's largest">US-China relations</span></button></li>
       <li><button class="row" type="button" data-code="HIRC · International Relations Council" data-say="Harvard International Relations Council. Assistant Director of Operations. Harvard Model UN and Harvard National Model UN." data-info="Assistant Director of Operations, Harvard International Relations Council: Harvard Model UN and Harvard National Model UN.">
         <span class="grp c-cd" data-w="4">HIRC</span><span class="pf" data-p="flags" data-k="w"></span><span class="wf c-ds">Intl Relations Council</span><span class="wf c-pg">Asst Dir of Operations</span><span class="wf c-rm">HMUN · HNMUN</span></button></li>
       <li><button class="row" type="button" data-code="LIHC · Leadership Institute" data-say="Leadership Institute at Harvard College. Associate. Youth Lead the Change." data-info="Associate, Leadership Institute at Harvard College, for the Youth Lead the Change conferences.">
@@ -338,13 +345,13 @@ html.intro .skip{display:block}
   </div>
   <div class="info" data-for="gates" role="region" aria-label="Information board for the selected gate">
     <p class="ihead">Information · <span class="icode">HMC · Harvard Model Congress</span></p>
-    <p class="itext">Chair (Senior Staff) since Jan 2026, on staff since Sep 2025. Directing the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools.</p>
+    <p class="itext">Directs the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools. Chair (Senior Staff) since Jan 2026; on staff since Sep 2025.</p>
     <p class="sr ilive" aria-live="polite"></p>
   </div>
   <h3 class="sr">Gates, written out</h3>
   <div class="manifest">
-    <div class="mi"><p class="code">HMC</p><p><b>Harvard Model Congress.</b> Chair (Senior Staff) since January 2026, on staff since September 2025. He is directing the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools.</p></div>
-    <div class="mi"><p class="code">THCB</p><p><b>The Harvard Crimson Business Board.</b> Project Team Lead, TPR/AlgoEd, since December 2025: international writing and leadership camps with The Princeton Review and AlgoEd, for the oldest daily college newspaper in the country (est. 1873, a $1M+ media enterprise).</p></div>
+    <div class="mi"><p class="code">HMC</p><p><b>Harvard Model Congress.</b> He directs the Boston conference, North America's largest congressional simulation: 1,500+ delegates from 100+ schools. Chair (Senior Staff) since January 2026, on staff since September 2025.</p></div>
+    <div class="mi"><p class="code">THCB</p><p><b>The Harvard Crimson Business Board.</b> He leads international writing and leadership camps with The Princeton Review and AlgoEd for the nation's oldest daily college newspaper (est. 1873), a $1M+ media enterprise. Project Team Lead, TPR/AlgoEd, since December 2025.</p></div>
     <div class="mi"><p class="code">RAD</p><p><b>Emerging Leaders Program, Harvard Radcliffe Institute.</b> Mentor, October 2025 to April 2026, working with Boston high-school sophomores on leadership and social activism.</p></div>
     <div class="mi"><p class="code">HCCF</p><p><b>Harvard College China Forum.</b> Operations for America's largest conference on US-China relations.</p></div>
     <div class="mi"><p class="code">HIRC</p><p><b>Harvard International Relations Council.</b> Assistant Director of Operations for Harvard Model UN and Harvard National Model UN.</p></div>
@@ -359,7 +366,7 @@ html.intro .skip{display:block}
     <div class="w2"><p>Every program has a sign, drawn on a square grid with lines at 0°, 45° and 90°, the way Otl Aicher drew the Munich and Frankfurt pictograms in 1972. The colour says what kind of thing it is.</p></div>
   </div>
   <ul class="keyrow">
-    <li><i></i><p><span class="hi">Blue:</span> air traffic. The programs that flew somewhere.</p></li>
+    <li><i></i><p><span class="hi">Blue:</span> air traffic. The programs that reach abroad.</p></li>
     <li><i data-k="g"></i><p><span class="hi">Green:</span> services. The public-service and campus fellowships.</p></li>
     <li><i data-k="w"></i><p><span class="hi">White:</span> everything else. The institutions he works inside.</p></li>
   </ul>
@@ -384,7 +391,7 @@ html.intro .skip{display:block}
 </main>
 
 <footer class="colophon">
-  <p>Set in Fira Mono. The globe and the code are computed one character cell at a time, after Andreas Gysin's ASCII playground (<a href="https://play.ertdfgcvb.xyz/" target="_blank" rel="noopener">play.ertdfgcvb.xyz</a>); the code changes letter by letter, the way his home page changes its words. The boards turn whole-word flaps, as the Solari boards did. The signs follow Otl Aicher's grid and his Frankfurt Airport colours. The land comes from Natural Earth; the shading follows the sun right now. The three-letter codes are country codes, not airports.</p>
+  <p>Set in Fira Code Light; the boards in Cabin, standing in for the Gill Sans Bold Solari silk-screened on its flaps. The globe and the code are computed one character cell at a time, after Andreas Gysin's ASCII playground (<a href="https://play.ertdfgcvb.xyz/" target="_blank" rel="noopener">play.ertdfgcvb.xyz</a>); the code changes letter by letter, the way his home page changes its words. The boards turn whole-word flaps, as the Solari boards did. The signs follow Otl Aicher's grid and his Frankfurt Airport colours. The land comes from Natural Earth; the shading follows the sun right now. The three-letter codes are country codes, not airports.</p>
   <p>Press f for fullscreen, i for the info box.</p>
 </footer>
 
@@ -521,7 +528,7 @@ try { history.scrollRestoration = 'manual'; } catch (e) {}
   if (!t) window.scrollTo(0, 0);
 })();
 
-var FONT = '"Fira Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace';
+var FONT = '"Fira Code", ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace';
 var TAU = Math.PI * 2, D2R = Math.PI / 180;
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
 function lerp(a, b, t) { return a + (b - a) * t; }
@@ -548,7 +555,7 @@ var noise2 = (function () {
   };
 })();
 
-/* the decode charset of ertdfgcvb.xyz (minus glyphs Fira Mono lacks) */
+/* the decode charset of ertdfgcvb.xyz (minus glyphs Fira Code lacks) */
 var NOISE = ' .,·-•─~+:;=*’“”┐┌┘└┼├┤┴┬│╗╔╝╚╬╠╣╩╦║░▒▓█▄▀▌▐!?&#$@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%()';
 var NOISE_N = NOISE.length;
 function rchar() { return NOISE.charAt(1 + ((Math.random() * (NOISE_N - 1)) | 0)); }
@@ -560,7 +567,7 @@ function measure() {
   var fs = parseFloat(cs.getPropertyValue('--fs')) || 16;
   var lh = parseFloat(cs.getPropertyValue('--lh')) || 19;
   var c = doc.createElement('canvas').getContext('2d');
-  c.font = '400 ' + fs + 'px ' + FONT;
+  c.font = '300 ' + fs + 'px ' + FONT;
   var cw = c.measureText('XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX').width / 50;
   return { fs: fs, lh: lh, cw: cw, aspect: cw / lh };
 }
@@ -581,10 +588,12 @@ function sortRamp(chars, ascending) {
   out.sort(function (a, b) { return ascending ? (a.s - b.s || a.i - b.i) : (b.s - a.s || a.i - b.i); });
   return out.map(function (o) { return o.ch; }).join('');
 }
-var LAND = '+=*oacxsz0123456789XZSAKHNM#%&@W';
-var PORT = ' .,-_=+:;cba!?0123456789$W#@Ñ';
+/* land: the upper part of play.core's standard ramp ('Ñ@#W$9876543210?!abc;:+=-,._ ', basics/coordinates_xy.js),
+   re-sorted by measured ink in this font at load, as his sort.js does */
+var LAND = '+:;cba!?0123456789$W#@Ñ';
 var BLOCKS = '░▒▓█';
-var FR_A = ' .·:-=+*', FR_B = ' ·.~-+:*';
+/* the two checkerboard ramps of the ertdfgcvb.xyz home field, and the pairs that replace their last glyph */
+var FR_A = ' .·•-+=:;*ABC0123!*', FR_B = ' ·-•~+:*abcXYZ*', FR_FILL = ['+ ', ' .', '· ', ': ', '• '];
 
 /* ----------------------------------------------------------- the grid */
 /* palette: 1 hi 250, 2 fg 190, 3 154, 4 mid 120, 5 dim 90, 6 62, 7 40, 8 black */
@@ -601,7 +610,7 @@ Grid.prototype.resize = function (w, h, m) {
   this.ch = new Array(n); this.ch.fill(' ');
   this.fc = new Uint8Array(n); this.bg = new Uint8Array(n); this.bd = new Uint8Array(n);
   this.ord = new Int32Array(n);
-  this.fonts = ['400 ' + m.fs + 'px ' + FONT, '700 ' + m.fs + 'px ' + FONT];
+  this.fonts = ['300 ' + m.fs + 'px ' + FONT, '500 ' + m.fs + 'px ' + FONT];
 };
 Grid.prototype.clear = function () { this.ch.fill(' '); this.fc.fill(0); this.bg.fill(0); this.bd.fill(0); };
 Grid.prototype.put = function (x, y, c, f, bold, bg) {
@@ -653,7 +662,8 @@ function drawBox(g, x, y, lines, st) {
   for (k = 0; k < lines.length; k++) { var LL = lines[k]; w = Math.max(w, (LL && typeof LL === 'object' ? LL.t : LL).length); }
   w += px * 2 + 2; var h = lines.length + py * 2 + 2;
   var top = st.top || 0;
-  x = clamp(x, 0, Math.max(0, g.cols - w)); y = clamp(y, top, Math.max(top, g.rows - h));
+  var vc = Math.floor(g.w / g.m.cw); /* whole visible columns only: a box never runs off the right edge */
+  x = clamp(x, 1, Math.max(1, vc - w - 1)); y = clamp(y, top, Math.max(top, g.rows - h));
   for (var yy = 0; yy < h; yy++) for (var xx = 0; xx < w; xx++) {
     var c = ' ';
     if (yy === 0) c = xx === 0 ? '╭' : xx === w - 1 ? '╮' : '─';
@@ -919,8 +929,8 @@ function fieldFrame(now) {
     }
   }
   var mask = F.mask, scr = F.scr, half = F.half;
-  /* a lens under the cursor magnifies the name (sample closer to the pointer) */
-  var lensR = 7, lens = !still && C.in && U && C.x > U.x0 - lensR / M.aspect && C.x < U.x1 + lensR / M.aspect && C.y > U.y0 - lensR && C.y < U.y1 + lensR;
+  if (!F.val || F.val.length !== cols * rows) F.val = new Float32Array(cols * rows);
+  var val = F.val, fill = F.fill || FR_FILL[0], nA = FR_A.length - 1, nB = FR_B.length - 1;
   var t = now * 0.001;
   for (var yy = 0; yy < rows; yy++) {
     for (var xx = 0; xx < cols; xx++) {
@@ -928,24 +938,20 @@ function fieldFrame(now) {
       if (mask[i]) continue;
       var c = ' ', f = 0;
       if (U && xx >= U.x0 - 3 && xx <= U.x1 + 3 && yy >= U.y0 - 3 && yy <= U.y1 + 3) {
-        var sx = xx + 0.5, shT = yy * 2 + 0.5, shB = yy * 2 + 1.5;
-        if (lens) {
-          var ddx = (xx + 0.5 - C.x) * M.aspect, ddy = yy + 0.5 - C.y, dd = Math.sqrt(ddx * ddx + ddy * ddy);
-          if (dd < lensR) { var k = 1 - 0.42 * Math.pow(1 - dd / lensR, 2); sx = C.x + (xx + 0.5 - C.x) * k; shT = C.y * 2 + (shT - C.y * 2) * k; shB = C.y * 2 + (shB - C.y * 2) * k; }
+        /* the home program: sample the word, let noise modulate it, keep a trail (v = max(v, prev * .95)),
+           then read one of two ramps on a checkerboard; full cells show the ramp's swapped-in pair */
+        var sx = xx + 0.5;
+        if (!still) sx += 0.35 * (noise2(yy * 0.23, t * 0.35) - 0.5);
+        var v = (sampleHalf(sx - 0.5, yy * 2) + sampleHalf(sx - 0.5, yy * 2 + 1)) * 0.5;
+        if (v > 0) v *= still ? 0.9 : 0.72 + 0.34 * noise2(xx * 0.09 - t * 0.25, yy * 0.21 + t * 0.07);
+        if (!still) { var pv = val[i] * 0.95; if (pv > v) v = pv; }
+        val[i] = v;
+        if (v > 0.04) {
+          if (v >= 0.99) { c = fill.charAt(xx & 1); f = 1; }
+          else if ((xx + yy) & 1) { c = FR_A.charAt(Math.min(nA - 1, 1 + ((v * nA) | 0))); f = v > 0.5 ? 2 : v > 0.25 ? 4 : 5; }
+          else { c = FR_B.charAt(Math.min(nB - 1, 1 + ((v * nB) | 0))); f = v > 0.5 ? 2 : v > 0.25 ? 4 : 5; }
         }
-        if (!still) { var wob = 0.35 * (noise2(yy * 0.23, t * 0.35) - 0.5); sx += wob; }
-        var vT = sampleHalf(sx - 0.5, shT - 0.5), vB = sampleHalf(sx - 0.5, shB - 0.5);
-        var bT = vT > 0.5, bB = vB > 0.5, tone = still ? 2 : (noise2(xx * 0.07 - t * 0.22, yy * 0.16 + t * 0.05) > 0.64 ? 3 : 2);
-        if (bT && bB) { c = '█'; f = tone; }
-        else if (bT) { c = '▀'; f = tone; }
-        else if (bB) { c = '▄'; f = tone; }
-        else if (vT + vB > 0.22) { c = (xx + yy) & 1 ? '·' : ':'; f = 5; }
-        else {
-          /* drawbox.js shadow: ░ one cell down and right of the letter */
-          var sT = sampleHalf(sx - 1.5, shT - 2.5), sB = sampleHalf(sx - 1.5, shB - 2.5);
-          if (sT > 0.5 || sB > 0.5) { c = '░'; f = 6; }
-        }
-      }
+      } else if (val) val[i] = 0;
       if (scr[i] > 0) { scr[i]--; c = rchar(); f = 4; }
       if (intro && el < trCell(xx, yy)) { var tk = (now / 70) | 0; c = NOISE.charAt(1 + ((hash2(xx * 7 + tk, yy) * (NOISE_N - 1)) | 0)); f = 4 + ((hash2(xx, yy + (tk >> 2)) * 3) | 0); }
       if (c !== ' ') { g.ch[i] = c; g.fc[i] = f; }
@@ -984,6 +990,7 @@ var WF = { cur: ['B', 'O', 'S'], tgt: ['B', 'O', 'S'], t0: 0, next: 0 };
 F.word = 'BOS';
 function flapWord(w) {
   WF.tgt = w.split(''); WF.t0 = WF.next = performance.now();
+  F.fill = FR_FILL[(Math.random() * FR_FILL.length) | 0];
   if (REDUCED) { WF.cur = WF.tgt.slice(); F.word = w; buildLetters(); F.dirty = true; }
 }
 function wordTick(now) {
@@ -995,7 +1002,7 @@ function wordTick(now) {
     if (now - WF.t0 < k * 100 || WF.cur[k] === WF.tgt[k]) continue;
     WF.cur[k] = LDRUM.charAt((LDRUM.indexOf(WF.cur[k]) + 1) % LDRUM.length); ch = true;
   }
-  if (ch) { F.word = WF.cur.join(''); buildLetters(); F.dirty = true; }
+  if (ch) { F.word = WF.cur.join(''); buildLetters(); F.dirty = true; clack(3); }
 }
 
 /* ---------------------------------------------------------------- globe */
@@ -1012,7 +1019,7 @@ function heroLayout(W, H) {
     var cx = W - R - 5 * cw, cy = hb + lh * 0.25 + avail / 2;
     return { cx: cx, cy: cy, R: R };
   }
-  var top = (F.box ? (F.box.y1 + 1.2) * lh : hb + lh * 10);
+  var top = (F.box ? (F.box.y1 + 2.2) * lh : hb + lh * 10);
   var R2 = Math.max(110, Math.min(W / 2 - 2 * cw, 210));
   return { cx: W / 2, cy: top + R2 + lh * 1.6, R: R2 };
 }
@@ -1020,7 +1027,7 @@ function globeUpdate(now, dt) {
   var hl = G.hero;
   if (hl.cx !== G.cx || hl.cy !== G.cy || hl.R !== G.R) G.dirty = true;
   G.cx = hl.cx; G.cy = hl.cy; G.R = hl.R;
-  G.topPx = F.wide || !F.box ? F.hb + M.lh * 0.5 : (F.box.y1 + 1) * M.lh;
+  G.topPx = F.wide || !F.box ? F.hb + M.lh * 0.5 : (F.box.y1 + 2) * M.lh;
   var act = G.code;
   /* motion */
   var coasting = Math.abs(G.vlon) + Math.abs(G.vlat) > 0.0004;
@@ -1077,7 +1084,7 @@ function setCode(i, manual) {
     if (manual) nowLive.textContent = E.code + ': ' + E.name + ', ' + E.what + '.';
   }
 }
-codeBtns.forEach(function (b, bi) { b.addEventListener('click', function () { if (INTRO.active) endIntro(); setCode(bi, true); }); });
+codeBtns.forEach(function (b, bi) { b.addEventListener('click', function () { if (INTRO.active) endIntro(); clackArm(); setCode(bi, true); }); });
 setInterval(function () {
   var now = performance.now();
   if (REDUCED || INTRO.active || doc.hidden || !VIS.hero || G.dragging || G.hover || !G.heroArcsDone) { CYC.last = Math.max(CYC.last, now - 4000); return; }
@@ -1202,16 +1209,18 @@ function globeFrame(now) {
     }
   });
   list.reverse();
-  var topRow = Math.ceil(G.topPx / lh);
+  var topRow = Math.ceil(G.topPx / lh), vcols = Math.floor(g.w / cw) - 1;
   list.forEach(function (p) {
     var label = p.on ? p.name.toUpperCase() : p.name, L = label.length + 2, d = p.on ? 2 : 1;
     var tries = p.region ? [[-(L >> 1), 0], [-(L >> 1), -1], [-(L >> 1), 1]] : [[d + 1, 0], [-L - d, 0], [d, -1 - (p.on ? 1 : 0)], [d, 1 + (p.on ? 1 : 0)], [-L - d + 1, -1], [-L - d + 1, 1]];
     for (var t = 0; t < tries.length; t++) {
-      var lx = p.gx + tries[t][0], ly = p.gy + tries[t][1], ok = ly >= topRow && ly < rows && lx >= 0 && lx + L <= cols;
+      var lx = p.gx + tries[t][0], ly = p.gy + tries[t][1], ok = ly >= topRow && ly < rows && lx >= 1 && lx + L <= vcols;
       for (var k = 0; ok && k < L; k++) { var ii = ly * cols + lx + k; if (OCC[ii] || inCorner(lx + k, ly, g)) ok = false; }
       if (!ok) continue;
       for (k = 0; k < L; k++) { var jj = ly * cols + lx + k; OCC[jj] = 1; g.ch[jj] = ' '; g.bg[jj] = 1; }
       g.text(lx + 1, ly, label, p.on ? 1 : p.region ? 3 : 2, 1, p.on ? 1 : 0);
+      if (ly === p.gy && !p.region) { var ca = lx > p.gx ? p.gx + 1 : lx + L, cb = lx > p.gx ? lx : p.gx;
+        for (k = ca; k < cb; k++) { var kk = ly * cols + k; if (!OCC[kk]) { g.ch[kk] = ' '; g.bg[kk] = 1; OCC[kk] = 1; } } }
       break;
     }
   });
@@ -1281,6 +1290,7 @@ function endDrag(e, cancelled) {
     if (h) {
       G.sel = h; G.selTouch = DRAG.type !== 'mouse';
       if (INTRO.active) endIntro();
+      clackArm();
       setCode(h.entry, true);
     } else { G.sel = null; }
     G.dirty = true;
@@ -1326,7 +1336,9 @@ function tickClocks() {
 
 /* ----------------------------------------------------------- split-flap */
 /* a Solari drum: every unit steps forward through a fixed order, one flap per tick */
-var DRUM = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,:-+&'/()·$?█";
+/* Solari units carry 40 or 60 flaps (C.E. Flap Unit, 1984, 1-1). The 40-flap order is blank, A-Z, 0-9, . , '
+   (the legacy set in scottbez1/splitflap config.h); a 60-flap unit adds the rest. There is no lower case on the drum. */
+var DRUM = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,'-:+/&()$";
 var DN = DRUM.length, DI = {};
 for (var di = 0; di < DN; di++) DI[DRUM.charAt(di)] = di;
 var NB = ' ';
@@ -1334,7 +1346,32 @@ function norm(c) {
   c = c.toUpperCase(); if (c === '–' || c === '—') c = '-'; if (c === '’' || c === '‘') c = "'";
   return DI[c] != null ? c : ' ';
 }
-var FLAP = { period: 65, active: [], timer: 0 };
+/* the clatter: a short filtered-noise click per step, synthesized (no audio file). It only ever follows a
+   click or tap on a code, a row or the information board: the board answers the person who asked it.
+   No autoplay, no toggle; set CLACK_ON to false to silence the page entirely. */
+var CLACK_ON = true, SND = { ctx: null, buf: null, until: 0, last: 0 };
+function clackArm() {
+  if (!CLACK_ON || REDUCED) return;
+  SND.until = performance.now() + 2600;
+  if (SND.ctx) { if (SND.ctx.state === 'suspended') SND.ctx.resume(); return; }
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+    var ctx = new AC(), sr = ctx.sampleRate, n = Math.floor(sr * 0.035), b = ctx.createBuffer(1, n, sr), d = b.getChannelData(0);
+    for (var i = 0; i < n; i++) { var tt = i / sr; d[i] = (Math.random() * 2 - 1) * Math.exp(-tt * 160) + 0.6 * Math.sin(TAU * 1450 * tt) * Math.exp(-tt * 420); }
+    SND.ctx = ctx; SND.buf = b;
+  } catch (e) { SND.ctx = null; }
+}
+function clack(count) {
+  if (!SND.ctx || !SND.buf || performance.now() > SND.until || REDUCED) return;
+  var ctx = SND.ctx, t = ctx.currentTime; if (t - SND.last < 0.03) return; SND.last = t;
+  var src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), gn = ctx.createGain();
+  src.buffer = SND.buf; src.playbackRate.value = 0.8 + Math.random() * 0.35;
+  bp.type = 'bandpass'; bp.frequency.value = 1800 + Math.random() * 1400; bp.Q.value = 0.8;
+  gn.gain.value = Math.min(0.11, 0.035 * Math.sqrt(count));
+  src.connect(bp); bp.connect(gn); gn.connect(ctx.destination); src.start(t);
+}
+/* one step per drive pulse: 60-120 ms by unit type (C.E. Flap Unit, 4-1) */
+var FLAP = { period: 80, active: [], timer: 0 };
 function makeField(el, w, text) {
   el.textContent = '';
   var cells = [];
@@ -1381,6 +1418,7 @@ function flapTick() {
     flips++; keep.push(c);
   }
   FLAP.active = keep;
+  if (flips) clack(flips);
   if (!keep.length) { clearInterval(FLAP.timer); FLAP.timer = 0; FLAP.lastT = 0; }
 }
 /* scramble a field so it looks like the board just changed, then settle on its text */
@@ -1413,7 +1451,7 @@ function Info(el) {
   this.text = this.src.textContent.trim(); this.code = this.head.textContent;
   this.lines = []; this.page = 0; this.pages = [[]]; this.timer = 0; this.cols = 0; this.nl = 0;
   var self = this;
-  el.addEventListener('click', function () { if (self.pages.length > 1) self.showPage((self.page + 1) % self.pages.length, false); });
+  el.addEventListener('click', function () { if (self.pages.length > 1) { clackArm(); self.showPage((self.page + 1) % self.pages.length, false); } });
 }
 Info.prototype.build = function () {
   var m = readFlapMetrics(this.el), inner = this.el.clientWidth - 30;
@@ -1450,7 +1488,7 @@ Info.prototype.showPage = function (p, instant) {
 };
 /* word flaps: one painted flap per value; a column's flaps sit on one drum in a fixed order,
    so going from one value to another shows every value in between, one clack each */
-var WFL = { active: [], timer: 0, period: 110 };
+var WFL = { active: [], timer: 0, period: 120 };
 function WordFlap(el, drum, text) {
   this.el = el; this.drum = drum; this.cur = 0; this.tgt = 0; this.wait = 0; this.on = false; this.spin = false;
   el.textContent = ''; el.setAttribute('aria-hidden', 'true');
@@ -1478,6 +1516,7 @@ function wordFlapTick() {
     keep.push(w);
   }
   WFL.active = keep;
+  if (keep.length) clack(keep.length * 2);
   if (!keep.length) { clearInterval(WFL.timer); WFL.timer = 0; }
 }
 function buildBoards() {
@@ -1506,6 +1545,7 @@ function buildBoards() {
       btn.setAttribute('aria-label', btn.getAttribute('data-say') + ' Show details on the information board.');
       var row = { btn: btn, grps: grps, ri: ri, pf: pf };
       btn.addEventListener('click', function () {
+        clackArm();
         rows.forEach(function (r) { r.btn.removeAttribute('aria-current'); });
         btn.setAttribute('aria-current', 'true');
         var txt = btn.getAttribute('data-info');
@@ -1524,7 +1564,8 @@ function buildBoards() {
   /* the sign sheet */
   $$('.sheet .sq').forEach(function (el) { el.innerHTML = pictoSVG(el.getAttribute('data-p')); });
 }
-/* long names are painted narrower, as sign painters did on real flaps */
+/* long names are painted narrower, as sign painters did on real flaps: first a narrower cut of the face
+   (Cabin's width axis, 100% down to 75%), then, only if that is not enough, a smaller size */
 var fitCanvas = null;
 function fitFlaps() {
   fitCanvas = fitCanvas || doc.createElement('canvas').getContext('2d');
@@ -1532,14 +1573,25 @@ function fitFlaps() {
     BOARDS[k].rows.forEach(function (r) {
       r.grps.forEach(function (g) {
         if (g.letter) return;
-        var el = g.f.el; el.style.fontSize = '';
+        var el = g.f.el; el.style.fontSize = ''; el.style.fontStretch = '';
         var cs = getComputedStyle(el), fs = parseFloat(cs.fontSize), ls = parseFloat(cs.letterSpacing) || 0;
         var avail = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 4;
         if (avail <= 0) return;
-        fitCanvas.font = '700 ' + fs + 'px ' + FONT;
+        fitCanvas.font = '700 ' + fs + 'px ' + cs.fontFamily;
         var need = 0;
         g.vals.forEach(function (v) { v = v.toUpperCase(); need = Math.max(need, fitCanvas.measureText(v).width + ls * v.length); });
-        if (need > avail) el.style.fontSize = Math.max(fs * 0.7, fs * avail / need).toFixed(2) + 'px';
+        if (need <= avail) return;
+        var ratio = avail / need;
+        el.style.fontStretch = Math.max(75, Math.floor(ratio * 100)) + '%';
+        if (ratio < 0.75) el.style.fontSize = Math.max(fs * 0.7, fs * ratio / 0.75).toFixed(2) + 'px';
+        /* check with the real glyphs: the widest value must fit, or step the size down */
+        var sp = g.f.span, keep = sp.textContent, longest = '';
+        g.vals.forEach(function (v) { if (v.length > longest.length) longest = v; });
+        sp.textContent = longest;
+        for (var n = 0, size = parseFloat(getComputedStyle(el).fontSize); n < 12 && sp.getBoundingClientRect().width > avail + 2 && size > fs * 0.62; n++) {
+          size *= 0.96; el.style.fontSize = size.toFixed(2) + 'px';
+        }
+        sp.textContent = keep;
       });
     });
   });
@@ -1585,7 +1637,7 @@ function layoutAll() {
   var PH = null;
   if (!F.wide) {
     PH = { bh: 9, R: Math.max(110, Math.min(W / 2 - 2 * M.cw, 210)) };
-    hpad.style.height = Math.round((PH.bh + 2) * M.lh + 2 * PH.R + 3.5 * M.lh) + 'px';
+    hpad.style.height = Math.round((PH.bh + 3) * M.lh + 2 * PH.R + 3.5 * M.lh) + 'px';
   } else hpad.style.height = '0px';
   var hr = hero.getBoundingClientRect(), H = hr.height;
   FG.resize(hr.width, H, M);
@@ -1599,7 +1651,7 @@ function layoutAll() {
     F.gx = x1 + 4;
     F.box = { x0: 2, x1: Math.min(x1, 2 + 62), y0: hbRow + 2, y1: rows - 4 };
   } else {
-    F.box = { x0: 2, x1: cols - 3, y0: hbRow + 1, y1: hbRow + PH.bh };
+    F.box = { x0: 2, x1: Math.floor(W / M.cw) - 3, y0: hbRow + 1, y1: hbRow + PH.bh };
     F.info = null;
   }
   buildLetters();
@@ -1658,7 +1710,7 @@ var rzT = 0;
 window.addEventListener('resize', function () { clearTimeout(rzT); rzT = setTimeout(layoutAll, 140); });
 function afterFonts() {
   if (afterFonts.done) return; afterFonts.done = 1;
-  LAND = sortRamp(LAND, true); PORT = ' ' + sortRamp(PORT.trim(), true);
+  LAND = sortRamp(LAND, true);
   layoutAll();
   INTRO.waiting = false; INTRO.t0 = performance.now();
   if (!INTRO.active && !G.arcT0) G.arcT0 = performance.now() + 150;
@@ -1666,8 +1718,10 @@ function afterFonts() {
 if (doc.fonts && doc.fonts.load) {
   Promise.race([
     Promise.all([
-      doc.fonts.load('400 16px "Fira Mono"', 'Aa0·•─│╱╲╭╮╰╯█▓▒░┌┐└┘'),
-      doc.fonts.load('700 16px "Fira Mono"', 'AZ09█')
+      doc.fonts.load('300 16px "Fira Code"', 'Aa0·•─│╱╲╭╮╰╯█▓▒░┌┐└┘Ñ'),
+      doc.fonts.load('500 16px "Fira Code"', 'AZ09'),
+      doc.fonts.load('700 16px "Fira Code"', 'AZ09'),
+      doc.fonts.load('700 16px "Cabin"', 'AZ09')
     ]),
     new Promise(function (r) { setTimeout(r, 2500); })
   ]).then(afterFonts, afterFonts);
