@@ -109,7 +109,7 @@ button{font:inherit;color:inherit}
 /* ---- split-flap -------------------------------------------------------- */
 .bwrap{overflow-x:auto;overflow-y:hidden;max-width:100%;padding:0 2ch 10px;overscroll-behavior-x:contain;scrollbar-color:#3a3a3a #000;scrollbar-width:thin}
 .bwrap:focus-visible{outline-offset:-2px}
-.board,.info{--fw:14px;--fh:22px;--ffs:15px;--fgap:2px;--pitch:calc(var(--fw) + var(--fgap));--cg:12px;--ft:70ms;--fc:#ededed;--ft1:#1f1f1f;--fb1:#171717}
+.board,.info{--fw:14px;--fh:22px;--ffs:15px;--fgap:2px;--pitch:calc(var(--fw) + var(--fgap));--cg:12px;--ft:65ms;--fc:#ededed;--ft1:#1f1f1f;--fb1:#171717}
 @media (max-width:699px){.board,.info{--fw:11px;--fh:18px;--ffs:12px;--cg:8px}}
 .board{display:inline-block;vertical-align:top;background:#070707;border:1px solid #2c2c2c;padding:12px 14px 12px}
 .plate{display:flex;align-items:center;justify-content:space-between;gap:2ch;padding:0 4px 10px;margin:0 -4px 10px;border-bottom:1px solid #2c2c2c;font:700 13px/1 var(--font);letter-spacing:.12em;color:var(--hi);text-transform:uppercase}
@@ -124,12 +124,17 @@ button{font:inherit;color:inherit}
 .grp{flex:none;display:flex;gap:var(--fgap);width:calc(var(--w) * var(--pitch) - var(--fgap));overflow:hidden;white-space:pre;font:700 var(--ffs)/var(--fh) var(--font);color:var(--fc);text-transform:uppercase}
 .fl{flex:none;display:block;position:relative;width:var(--fw);height:var(--fh);font:700 var(--ffs)/var(--fh) var(--font);text-align:center;color:var(--fc);border-radius:1.5px;
   background:linear-gradient(to bottom,var(--ft1) 0,var(--ft1) calc(50% - .5px),#000 calc(50% - .5px),#000 calc(50% + .5px),var(--fb1) calc(50% + .5px),var(--fb1) 100%)}
-.row[aria-current="true"] .fl,.row[aria-current="true"] .grp{--fc:#050505;--ft1:#f1f1f1;--fb1:#e2e2e2}
-.fl.s::before,.fl.s::after{position:absolute;left:0;top:0;width:100%;height:100%;line-height:var(--fh);border-radius:1.5px;color:var(--fc);backface-visibility:hidden}
-.fl.s::before{content:attr(data-o);content:attr(data-o) / "";background:var(--ft1);clip-path:inset(0 0 50% 0);transform-origin:50% 50%;animation:flapTop var(--ft) linear infinite}
-.fl.s::after{content:attr(data-c);content:attr(data-c) / "";background:var(--fb1);clip-path:inset(50% 0 0 0);transform-origin:50% 50%;animation:flapBot var(--ft) linear infinite}
-@keyframes flapTop{0%{transform:perspective(70px) rotateX(0deg);filter:brightness(1)}50%,100%{transform:perspective(70px) rotateX(-90deg);filter:brightness(.55)}}
-@keyframes flapBot{0%,50%{transform:perspective(70px) rotateX(90deg);filter:brightness(.6)}100%{transform:perspective(70px) rotateX(0deg);filter:brightness(1)}}
+.row[aria-current="true"]{background:#141414;box-shadow:inset 3px 0 0 var(--hi)}
+.row[aria-current="true"] .fl,.row[aria-current="true"] .grp{--fc:#fff;--ft1:#2c2c2c;--fb1:#232323}
+/* a flap: the old top half falls onto the split line, the new bottom half lands under it.
+   transform-only (scaleY about the split), so hundreds can run at once on the compositor */
+.fl.s::before,.fl.s::after{position:absolute;left:0;width:100%;height:50%;overflow:hidden;display:flex;justify-content:center;line-height:var(--fh);color:var(--fc);will-change:transform}
+.fl.s::before{content:attr(data-o);content:attr(data-o) / "";top:0;align-items:flex-start;border-radius:1.5px 1.5px 0 0;background:linear-gradient(to bottom,var(--ft1),#111);transform-origin:50% 100%;animation:flapTop var(--ft) linear infinite}
+.fl.s::after{content:attr(data-c);content:attr(data-c) / "";top:50%;align-items:flex-end;border-radius:0 0 1.5px 1.5px;background:linear-gradient(to bottom,#0d0d0d,var(--fb1) 60%);transform-origin:50% 0;animation:flapBot var(--ft) linear infinite}
+html.flap-lite .fl.s::before,html.flap-lite .fl.s::after{display:none}
+html.flap-lite .fl.s{background:linear-gradient(to bottom,#161616 0,#161616 calc(50% - .5px),#000 calc(50% - .5px),#000 calc(50% + .5px),var(--fb1) calc(50% + .5px))}
+@keyframes flapTop{0%{transform:scaleY(1)}50%,100%{transform:scaleY(0)}}
+@keyframes flapBot{0%,50%{transform:scaleY(0)}100%{transform:scaleY(1)}}
 .clock{--w:5}
 .snd{background:none;border:1px solid #3a3a3a;color:var(--fg);font:400 11px/1 var(--font);letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;cursor:pointer;border-radius:2px}
 .snd[aria-pressed="true"]{background:var(--hi);color:#000;border-color:var(--hi)}
@@ -936,7 +941,7 @@ function heroLayout(W, H) {
 }
 function routeLayout(W, H) {
   if (W >= 900) return { cx: W * 0.69, cy: H * 0.5, R: Math.min(H * 0.39, W * 0.25) };
-  return { cx: W / 2, cy: H * 0.46, R: Math.min(W * 0.44, H * 0.3) };
+  return { cx: W / 2, cy: H * 0.3, R: Math.min(W * 0.42, H * 0.25) };
 }
 function globeUpdate(now, dt) {
   var H = GG.h, sy = window.scrollY;
@@ -1178,7 +1183,7 @@ function hitPlace(x, y) {
 }
 function goEntry(i) {
   var el = entryEls[i]; if (!el) return;
-  var top = el.getBoundingClientRect().top + window.scrollY - GG.h * 0.3;
+  var top = el.getBoundingClientRect().top + window.scrollY - GG.h * (window.innerWidth < 900 ? 0.58 : 0.3);
   window.scrollTo({ top: Math.max(0, top), behavior: REDUCED ? 'auto' : 'smooth' });
 }
 var DRAG = null;
@@ -1274,7 +1279,7 @@ function norm(c) {
   c = c.toUpperCase(); if (c === '–' || c === '—') c = '-'; if (c === '’' || c === '‘') c = "'";
   return DI[c] != null ? c : ' ';
 }
-var FLAP = { period: 70, active: [], timer: 0 };
+var FLAP = { period: 65, active: [], timer: 0 };
 function makeField(el, w, text) {
   el.textContent = '';
   var cells = [];
@@ -1300,6 +1305,11 @@ function setField(Fd, text, instant, waitBase) {
   if (!FLAP.timer && FLAP.active.length) FLAP.timer = setInterval(flapTick, FLAP.period);
 }
 function flapTick() {
+  FLAP.ticks = (FLAP.ticks || 0) + 1;
+  /* if this device can't keep the cadence with falling flaps, drop to plain character swaps */
+  var tn = performance.now();
+  if (FLAP.lastT) { var late = tn - FLAP.lastT; FLAP.avg = FLAP.avg ? FLAP.avg * 0.85 + late * 0.15 : late; if (FLAP.avg > FLAP.period * 2.2 && !FLAP.lite && FLAP.ticks > 12) { FLAP.lite = true; root.classList.add('flap-lite'); } }
+  FLAP.lastT = tn;
   var flips = 0, keep = [];
   for (var i = 0; i < FLAP.active.length; i++) {
     var c = FLAP.active[i];
@@ -1317,12 +1327,12 @@ function flapTick() {
   }
   FLAP.active = keep;
   if (flips) Sound.flaps(flips);
-  if (!keep.length) { clearInterval(FLAP.timer); FLAP.timer = 0; }
+  if (!keep.length) { clearInterval(FLAP.timer); FLAP.timer = 0; FLAP.lastT = 0; }
 }
 /* scramble a field so it looks like the board just changed, then settle on its text */
 function arriveField(Fd, waitBase) {
   for (var k = 0; k < Fd.w; k++) {
-    var c = Fd.cells[k], ti = DI[c.tgt] || 0, back = 3 + ((Math.random() * 16) | 0);
+    var c = Fd.cells[k], ti = DI[c.tgt] || 0, back = 3 + ((Math.random() * 10) | 0);
     if (c.tgt === ' ' && Math.random() < 0.55) continue;
     c.cur = DRUM.charAt((ti - back + DN * 4) % DN); showCell(c);
   }
@@ -1367,7 +1377,7 @@ sndBtn.addEventListener('click', function () {
 });
 
 /* boards */
-var BOARDS = {}, BOARDS_SEEN = {}, FLAPCLOCK = null;
+var BOARDS = {}, BOARDS_SEEN = {}, BOARDS_VIS = {}, FLAPCLOCK = null;
 function readFlapMetrics(el) {
   var cs = getComputedStyle(el);
   return { fw: parseFloat(cs.getPropertyValue('--fw')) || 14, gap: parseFloat(cs.getPropertyValue('--fgap')) || 2 };
@@ -1455,16 +1465,16 @@ function layoutBoards() { Object.keys(BOARDS).forEach(function (k) { BOARDS[k].i
 function arriveBoard(key) {
   var B = BOARDS[key]; if (!B || BOARDS_SEEN[key]) return; BOARDS_SEEN[key] = 1;
   if (REDUCED) return;
-  B.rows.forEach(function (r, ri) { r.grps.forEach(function (g) { arriveField(g.f, ri * 3); }); });
+  B.rows.forEach(function (r, ri) { r.grps.forEach(function (g) { arriveField(g.f, ri * 2); }); });
   if (key === 'dep' && FLAPCLOCK) arriveField(FLAPCLOCK, 0);
-  B.info.lines.forEach(function (l, i) { arriveField(l, B.rows.length * 3 + i * 2); });
+  B.info.lines.forEach(function (l, i) { arriveField(l, 4 + i * 2); });
 }
 var cycleN = 0;
 function cycleBoards() {
   if (REDUCED) return;
   cycleN++;
   Object.keys(BOARDS).forEach(function (k) {
-    if (!BOARDS_SEEN[k]) return;
+    if (!BOARDS_SEEN[k] || !BOARDS_VIS[k]) return;
     BOARDS[k].rows.forEach(function (r, ri) {
       r.grps.forEach(function (g) {
         if (g.vals.length < 2) return;
@@ -1517,19 +1527,49 @@ function portraitLayout() {
   PT.g.resize(w, h, M);
   var sc = doc.createElement('canvas'); sc.width = cols; sc.height = rows;
   var sx = sc.getContext('2d', { willReadFrequently: true }); sx.imageSmoothingQuality = 'high';
-  sx.drawImage(PT.gray, 0, 0, cols, rows);
-  var d = sx.getImageData(0, 0, cols, rows).data, n = cols * rows, L = new Float32Array(n), arr = [];
-  for (var i = 0; i < n; i++) { L[i] = d[i * 4] / 255; arr.push(L[i]); }
-  arr.sort(function (a, b) { return a - b; });
-  var lo = arr[Math.floor(n * 0.02)], hi = arr[Math.floor(n * 0.985)];
-  for (i = 0; i < n; i++) {
-    var y = (i / cols) | 0, x = i - y * cols;
-    var v = clamp((L[i] - lo) / (hi - lo || 1), 0, 1);
-    var dx = (x + 0.5) / cols - 0.5, dy = (y + 0.5) / rows - 0.48, r = Math.sqrt(dx * dx + dy * dy) * 2;
-    v *= 1 - smooth(0.78, 1.18, r) * 0.9;
-    L[i] = Math.pow(v, 1.12);
+  var iw = PT.img.naturalWidth, ih = PT.img.naturalHeight, CR = PT.crop = { x: iw * 0.1, y: ih * 0.03, w: iw * 0.8, h: ih * 0.8 };
+  sx.drawImage(PT.img, CR.x, CR.y, CR.w, CR.h, 0, 0, cols, rows);
+  var d = sx.getImageData(0, 0, cols, rows).data, n = cols * rows, L = new Float32Array(n), cand = new Uint8Array(n), bg = new Uint8Array(n);
+  for (var i = 0; i < n; i++) {
+    var r = d[i * 4] / 255, gg = d[i * 4 + 1] / 255, b = d[i * 4 + 2] / 255;
+    L[i] = 0.2126 * r + 0.7152 * gg + 0.0722 * b;
+    var mx = Math.max(r, gg, b), mn = Math.min(r, gg, b), sat = (mx - mn) / (mx || 1);
+    cand[i] = L[i] > 0.7 || (L[i] > 0.6 && sat < 0.18) ? 1 : 0;
   }
-  PT.lum = L; PT.k = 1000 / (cols / 3 + 2 * rows); PT.dirty = true;
+  /* the pale backdrop (and the white collar) touch the frame: flood-fill them away from the border */
+  var stack = [];
+  for (var x = 0; x < cols; x++) { stack.push(x, (rows - 1) * cols + x); }
+  for (var y = 0; y < rows; y++) { stack.push(y * cols, y * cols + cols - 1); }
+  while (stack.length) {
+    var q = stack.pop(); if (bg[q] || !cand[q]) continue; bg[q] = 1;
+    var qy = (q / cols) | 0, qx = q - qy * cols;
+    if (qx > 0) stack.push(q - 1); if (qx < cols - 1) stack.push(q + 1);
+    if (qy > 0) stack.push(q - cols); if (qy < rows - 1) stack.push(q + cols);
+  }
+  /* bright specks between curls: backdrop seen through the hair */
+  for (var pass = 0; pass < 2; pass++) for (i = 0; i < n; i++) {
+    if (bg[i] || !cand[i]) continue;
+    var iy = (i / cols) | 0, ix = i - iy * cols, nb = 0;
+    if (ix > 0 && bg[i - 1]) nb++; if (ix < cols - 1 && bg[i + 1]) nb++; if (iy > 0 && bg[i - cols]) nb++; if (iy < rows - 1 && bg[i + cols]) nb++;
+    if (nb >= 2 && iy < rows * 0.45) bg[i] = 1;
+  }
+  var arr = [];
+  for (i = 0; i < n; i++) if (!bg[i]) arr.push(L[i]);
+  arr.sort(function (a, b) { return a - b; });
+  var lo = arr[Math.floor(arr.length * 0.02)] || 0, hi = arr[Math.floor(arr.length * 0.985)] || 1;
+  var V = new Float32Array(n), N0 = new Float32Array(n);
+  for (i = 0; i < n; i++) N0[i] = bg[i] ? -1 : clamp((L[i] - lo) / (hi - lo || 1), 0, 1);
+  /* unsharp mask at cell level so eyes, brows and the smile separate from the skin */
+  for (i = 0; i < n; i++) {
+    if (N0[i] < 0) { V[i] = -1; continue; }
+    var yy0 = (i / cols) | 0, xx0 = i - yy0 * cols, sum = 0, cnt = 0;
+    for (var oy = -1; oy <= 1; oy++) for (var ox = -1; ox <= 1; ox++) {
+      var xx1 = xx0 + ox, yy1 = yy0 + oy; if (xx1 < 0 || yy1 < 0 || xx1 >= cols || yy1 >= rows) continue;
+      var v1 = N0[yy1 * cols + xx1]; if (v1 < 0) continue; sum += v1; cnt++;
+    }
+    V[i] = Math.pow(clamp(N0[i] + (N0[i] - sum / cnt) * 1.1, 0, 1), 0.95);
+  }
+  PT.lum = V; PT.k = 1000 / (cols / 3 + 2 * rows); PT.dirty = true;
 }
 function portraitFrame(now) {
   var g = PT.g, cols = g.cols, rows = g.rows, L = PT.lum; if (!L) return;
@@ -1544,8 +1584,9 @@ function portraitFrame(now) {
   for (var i = 0; i < cols * rows; i++) {
     var y = (i / cols) | 0, x = i - y * cols, v = L[i];
     if (decoding && el < 120 + (x / 3 + 2 * y) * PT.k + hash2(x, y) * 200) { g.ch[i] = NOISE.charAt(1 + ((hash2(x * 7 + (now / 80 | 0), y) * (NOISE_N - 1)) | 0)); g.fc[i] = 5; continue; }
-    var q = (v * nP + 0.5) | 0; if (!q) continue;
-    g.ch[i] = PORT.charAt(q); g.fc[i] = v > 0.82 ? 1 : v > 0.62 ? 2 : v > 0.42 ? 3 : v > 0.24 ? 4 : 5;
+    if (v < 0) { if (BAYER[(y & 3) * 4 + (x & 3)] < 0.14) { g.ch[i] = '·'; g.fc[i] = 7; } continue; }
+    var q = ((0.3 + 0.7 * v) * nP + 0.5) | 0;
+    g.ch[i] = PORT.charAt(q); g.fc[i] = v > 0.86 ? 1 : v > 0.7 ? 2 : v > 0.54 ? 3 : v > 0.38 ? 4 : v > 0.22 ? 5 : 6;
   }
   g.render();
   if (lens.r > 0.5 && PT.gray) {
@@ -1554,7 +1595,7 @@ function portraitFrame(now) {
       var cx = (xx + 0.5) * cw, cy = (yy + 0.5) * lh;
       if (Math.hypot(cx - lens.x, cy - lens.y) < lens.r) { path.rect(xx * cw, yy * lh, cw + 0.5, lh + 0.5); any = true; }
     }
-    if (any) { ctx.save(); ctx.clip(path); ctx.drawImage(PT.gray, 0, 0, g.w, g.h); ctx.restore(); }
+    if (any) { var cr = PT.crop; ctx.save(); ctx.clip(path); ctx.drawImage(PT.gray, cr.x, cr.y, cr.w, cr.h, 0, 0, g.w, g.h); ctx.restore(); }
   }
   PT.dirty = false;
 }
@@ -1628,10 +1669,10 @@ if ('IntersectionObserver' in window) {
     es.forEach(function (e) { VIS.portrait = e.isIntersecting; if (e.isIntersecting && !PT.seen) PT.seen = performance.now(); PT.dirty = true; });
   }, { threshold: 0.15 }).observe(PT.cv);
   var bio = new IntersectionObserver(function (es) {
-    es.forEach(function (e) { if (e.isIntersecting) { arriveBoard(e.target.getAttribute('data-board')); bio.unobserve(e.target); } });
+    es.forEach(function (e) { var k = e.target.getAttribute('data-board'); BOARDS_VIS[k] = e.isIntersecting; if (e.isIntersecting) arriveBoard(k); });
   }, { threshold: 0.25 });
   $$('.board').forEach(function (b) { bio.observe(b); });
-} else { VIS.portrait = true; }
+} else { VIS.portrait = true; BOARDS_VIS.dep = BOARDS_VIS.gates = true; }
 
 /* ---------------------------------------------------------------- loop */
 var lastT = performance.now(), lastScroll = -1;
@@ -1649,7 +1690,7 @@ function loop(now) {
   if (VIS.portrait) portraitFrame(now);
 }
 
-window.__ev = { G: G, F: F, ENTRIES: ENTRIES };
+window.__ev = { G: G, F: F, ENTRIES: ENTRIES, FLAP: FLAP };
 /* ------------------------------------------------------------- startup */
 buildBoards();
 layoutAll();

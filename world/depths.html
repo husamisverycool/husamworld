@@ -56,6 +56,7 @@ a{color:inherit}
 .text-btn:hover{color:var(--navy)}
 .title-slide :focus-visible{outline-color:var(--navy)}
 
+html:not(.js) .scene,html:not(.js) .controls,html:not(.js) .gauge,html:not(.js) .skip-link{display:none}
 .scene{position:absolute;left:0;top:calc(var(--vh)*77.8 - 240px);width:100%;height:340px;overflow:visible;pointer-events:none;z-index:3}
 .scene #raft-bob{animation:raftBob 4.6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:50% 100%}
 @keyframes raftBob{from{transform:translateY(-1px) rotate(-1.4deg)}to{transform:translateY(3px) rotate(1.4deg)}}
@@ -237,7 +238,7 @@ html.list-open{overflow:hidden}
 @media (max-width:500px){
   .title{font-size:48px;line-height:1.05}
   .title-credit{font-size:18px;margin-top:10px}
-  .mark{left:14px;top:12px;font-size:27px}
+  .mark{left:14px;top:12px;font-size:24px}
   .mark svg{width:12px;height:8px;margin-top:12px}
   .controls{top:8px;right:6px}
   .ctl{font-size:15.5px;padding:8px 7px}
@@ -555,7 +556,7 @@ html.list-open{overflow:hidden}
   }
   function setBoard(angle) { gBoard.setAttribute('transform', 'rotate(' + angle.toFixed(2) + ' 296 -100)'); }
 
-  var introRunning = false, introStart = 0, splashed = false, parts = [], introRaf = 0;
+  var introRunning = false, introStart = 0, introLast = 0, splashed = false, parts = [], introRaf = 0;
   function ns(tag, attrs, parent) {
     var e = D.createElementNS('http://www.w3.org/2000/svg', tag);
     for (var k in attrs) e.setAttribute(k, attrs[k]);
@@ -602,7 +603,7 @@ html.list-open{overflow:hidden}
     }
   }
   function introFrame(now) {
-    var t = now - introStart, dt = 1 / 60;
+    var t = now - introStart, dt = Math.min(.05, Math.max(0, (now - (introLast || now)) / 1000)); introLast = now;
     var x = tipX, y = tipY, rot = 0, board = 0;
     if (t < 450) {
       rot = Math.sin(t / 140) * 1.5;
@@ -699,7 +700,8 @@ html.list-open{overflow:hidden}
     var r = depthLine.getBoundingClientRect();
     var lineY = r.bottom + sy;
     var n = 1 + (lineY - scaleTop) / K;
-    var on = n >= 1 && !introRunning;
+    var on = n >= 1;
+    if (introRunning && sy > vhH * 0.6) endIntro(true);
     var nc = Math.min(NMAX, Math.max(1, n));
     var txt = '1 IN ' + fmtN(nc);
     if (txt !== lastTxt) { depthText.textContent = txt; lastTxt = txt; }

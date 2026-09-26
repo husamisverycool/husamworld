@@ -106,8 +106,8 @@ html.touch .keys{display:none}
 .keys span{white-space:nowrap}
 
 /* toast */
-.toast{position:fixed;left:50%;top:max(18px,env(safe-area-inset-top));z-index:50;transform:translate(-50%,-160%);background:var(--ink);color:#fff;font:700 15px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;padding:11px 14px 10px;border-radius:8px;transition:transform .5s var(--spring);pointer-events:none;max-width:calc(100vw - 180px);text-align:center}
-.toast.show{transform:translate(-50%,0)}
+.toast{position:fixed;left:50%;top:max(18px,env(safe-area-inset-top));z-index:50;transform:translate(-50%,calc(-100% - 40px));visibility:hidden;background:var(--ink);color:#fff;font:700 15px/1 var(--display);letter-spacing:.06em;text-transform:uppercase;padding:11px 14px 10px;border-radius:8px;transition:transform .5s var(--spring);pointer-events:none;max-width:calc(100vw - 180px);text-align:center}
+.toast.show{transform:translate(-50%,0);visibility:visible}
 
 /* touch controls (after the 2019 folio: white rings, no fill) */
 .touch{display:none}
@@ -551,6 +551,7 @@ WR.w = WR.x1 - WR.x0; WR.h = WR.y1 - WR.y0;
 
 var renderer, scene, camera, cannonWorld, canvas = $('gl');
 var isWebGL2 = false;
+function LUMF() { return isWebGL2 ? THREE.RedFormat : THREE.LuminanceFormat; }
 
 // shared uniforms: time of day, reveal, shadows
 var SU = {};
@@ -571,9 +572,12 @@ function initUniforms() {
   SU.uGround = { value: null };
   SU.uDynShadow = { value: new THREE.Color('#8a4f22') };
   SU.uDynShadowAlpha = { value: 0 };
+  SU.uNightMix = { value: 0 };
+  SU.uNightTint = { value: new THREE.Color(0.5, 0.62, 1.12) };
 }
 
 // ---------------------------------------------------------------- GLSL
+var GLSL_NIGHT = 'uniform float uNightMix; uniform vec3 uNightTint;\nvec3 nightify(vec3 c){ float l = dot(c, vec3(0.3, 0.59, 0.11)); return mix(c, l * uNightTint, uNightMix); }\n';
 var GLSL_HASH = 'float hash21(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }\n';
 var GLSL_REVEAL_VS = [
   '#if !defined(NO_REVEAL) && !defined(REVEALED)',
@@ -611,6 +615,7 @@ var FS_MATCAP = [
   'uniform sampler2D uShadowTex; uniform float uShadowStrength; uniform vec3 uShadowColor; uniform vec4 uRect;',
   'varying vec3 vN; varying vec3 vWN; varying vec3 vW; varying vec3 vV;',
   '#ifdef USE_INSTANCING_COLOR', 'varying vec3 vIC;', '#endif',
+  GLSL_NIGHT,
   'void main(){',
   GLSL_REVEAL_FS,
   '  vec3 n = normalize(vN);',
@@ -642,7 +647,7 @@ var FS_MATCAP = [
   '  float sh = texture2D(uShadowTex, suv).r * uShadowStrength * clamp(1.0 - vW.z * 2.5, 0.0, 1.0);',
   '  col = mix(col, col * uShadowColor, sh);',
   '#endif',
-  '  col *= uTint;',
+  '  col = nightify(col * uTint);',
   '  col += uEmissive * mix(1.0, uLights, uNight);',
   '  gl_FragColor = vec4(col, 1.0);',
   '}'
@@ -653,12 +658,13 @@ var VS_WORLD = 'varying vec3 vW; varying vec2 vUv;\nvoid main(){ vUv = uv; vec4 
 var FS_GROUND = [
   'uniform sampler2D uGround; uniform sampler2D uShadowTex; uniform vec4 uRect; uniform vec3 uGroundTint; uniform float uShadowStrength; uniform vec3 uShadowColor;',
   'varying vec3 vW;',
+  GLSL_NIGHT,
   'void main(){',
   '  vec2 uv = (vW.xy - uRect.xy) / uRect.zw;',
   '  vec3 c = texture2D(uGround, uv).rgb;',
   '  float sh = texture2D(uShadowTex, uv).r * uShadowStrength;',
   '  c = mix(c, c * uShadowColor, sh);',
-  '  gl_FragColor = vec4(c * uGroundTint, 1.0);',
+  '  gl_FragColor = vec4(nightify(c * uGroundTint), 1.0);',
   '}'
 ].join('\n');
 
@@ -667,6 +673,7 @@ var FS_PAINT = [
   'uniform sampler2D uMap; uniform vec3 uColor; uniform float uOpacity; uniform float uPaint;',
   'uniform sampler2D uShadowTex; uniform vec4 uRect; uniform vec3 uGroundTint; uniform float uShadowStrength; uniform vec3 uShadowColor;',
   'varying vec3 vW; varying vec2 vUv;',
+  GLSL_NIGHT,
   'void main(){',
   '#ifdef USE_MAP', '  float a = texture2D(uMap, vUv).r;', '#else', '  float a = 1.0;', '#endif',
   '  a *= uOpacity * uPaint;',
@@ -675,7 +682,7 @@ var FS_PAINT = [
   '  vec2 uv = (vW.xy - uRect.xy) / uRect.zw;',
   '  float sh = texture2D(uShadowTex, uv).r * uShadowStrength;',
   '  c = mix(c, c * uShadowColor, sh);',
-  '  gl_FragColor = vec4(c * uGroundTint, a);',
+  '  gl_FragColor = vec4(nightify(c * uGroundTint), a);',
   '}'
 ].join('\n');
 
@@ -684,7 +691,7 @@ var FS_ASPHALT = [
   'uniform vec3 uColor; uniform float uPaint; uniform float uGrain;',
   'uniform sampler2D uShadowTex; uniform vec4 uRect; uniform vec3 uGroundTint; uniform float uShadowStrength; uniform vec3 uShadowColor;',
   'varying vec3 vW; varying vec2 vUv;',
-  GLSL_HASH,
+  GLSL_HASH, GLSL_NIGHT,
   'void main(){',
   '  if (hash21(floor(gl_FragCoord.xy)) > uPaint) discard;',
   '  vec3 c = uColor;',
@@ -693,7 +700,7 @@ var FS_ASPHALT = [
   '  vec2 uv = (vW.xy - uRect.xy) / uRect.zw;',
   '  float sh = texture2D(uShadowTex, uv).r * uShadowStrength;',
   '  c = mix(c, c * uShadowColor, sh);',
-  '  gl_FragColor = vec4(c * uGroundTint, 1.0);',
+  '  gl_FragColor = vec4(nightify(c * uGroundTint), 1.0);',
   '}'
 ].join('\n');
 
@@ -701,7 +708,7 @@ var FS_WATER = [
   'uniform vec3 uDeep; uniform vec3 uShallow; uniform float uTime; uniform vec2 uFlow; uniform vec4 uBox; uniform float uDark; uniform float uPaint;',
   'uniform vec3 uGroundTint; uniform float uLights;',
   'varying vec3 vW; varying vec2 vUv;',
-  GLSL_HASH,
+  GLSL_HASH, GLSL_NIGHT,
   'void main(){',
   '  if (hash21(floor(gl_FragCoord.xy)) > uPaint) discard;',
   '  vec2 p = vW.xy;',
@@ -713,7 +720,7 @@ var FS_WATER = [
   '  float glint = smoothstep(0.72, 0.98, w) * (1.0 - uDark * 0.75);',
   '  c += glint * 0.16;',
   '  c += smoothstep(0.45, 0.0, edge) * 0.10 * (1.0 - uDark);',
-  '  c *= uGroundTint;',
+  '  c = nightify(c * uGroundTint);',
   '  c += glint * uLights * 0.10 * vec3(1.0, 0.8, 0.5);',
   '  gl_FragColor = vec4(c, 1.0);',
   '}'
@@ -778,11 +785,12 @@ var VS_SIGN = [
 var FS_SIGN = [
   'uniform sampler2D uMap; uniform vec3 uTint; uniform float uLights; uniform float uGlow; uniform float uSelf;',
   'varying vec2 vUv; varying vec3 vW;',
+  GLSL_NIGHT,
   'void main(){',
   GLSL_REVEAL_FS,
   '  vec4 t = texture2D(uMap, vUv);',
   '  if (t.a < 0.02) discard;',
-  '  vec3 c = mix(t.rgb * uTint + t.rgb * uGlow * uLights, t.rgb, uSelf);',
+  '  vec3 c = mix(nightify(t.rgb * uTint) + t.rgb * uGlow * uLights, t.rgb, uSelf);',
   '  gl_FragColor = vec4(c, t.a);',
   '}'
 ].join('\n');
@@ -862,7 +870,8 @@ function mat(color, o) {
       uNight: { value: o.night ? 1 : 0 },
       uTint: SU.uTint, uIndirect: SU.uIndirect, uIndirectStrength: SU.uIndirectStrength,
       uReveal: SU.uReveal, uRevealCenter: SU.uRevealCenter, uLights: SU.uLights,
-      uShadowTex: SU.uShadowTex, uShadowStrength: SU.uShadowStrength, uShadowColor: SU.uShadowColor, uRect: SU.uRect
+      uShadowTex: SU.uShadowTex, uShadowStrength: SU.uShadowStrength, uShadowColor: SU.uShadowColor, uRect: SU.uRect,
+      uNightMix: SU.uNightMix, uNightTint: SU.uNightTint
     },
     vertexShader: VS_MATCAP,
     fragmentShader: FS_MATCAP
@@ -887,7 +896,7 @@ function worldMat(frag, uniforms, o) {
   o = o || {};
   var u = {
     uShadowTex: SU.uShadowTex, uRect: SU.uRect, uGroundTint: SU.uGroundTint, uShadowStrength: SU.uShadowStrength,
-    uShadowColor: SU.uShadowColor, uPaint: SU.uPaint, uLights: SU.uLights, uTime: SU.uTime
+    uShadowColor: SU.uShadowColor, uPaint: SU.uPaint, uLights: SU.uLights, uTime: SU.uTime, uNightMix: SU.uNightMix, uNightTint: SU.uNightTint
   };
   for (var k in uniforms) u[k] = uniforms[k];
   var m = new THREE.ShaderMaterial({ uniforms: u, vertexShader: VS_WORLD, fragmentShader: frag, transparent: !!o.transparent, depthWrite: o.depthWrite !== false });
@@ -913,7 +922,7 @@ function glowMat(color, opacity, always, beam) {
 function signMat(tex, o) {
   o = o || {};
   var m = new THREE.ShaderMaterial({
-    uniforms: { uMap: { value: tex }, uTint: SU.uTint, uLights: SU.uLights, uGlow: { value: o.glow || 0 }, uSelf: { value: o.self || 0 }, uReveal: SU.uReveal, uRevealCenter: SU.uRevealCenter },
+    uniforms: { uMap: { value: tex }, uTint: SU.uTint, uLights: SU.uLights, uGlow: { value: o.glow || 0 }, uSelf: { value: o.self || 0 }, uReveal: SU.uReveal, uRevealCenter: SU.uRevealCenter, uNightMix: SU.uNightMix, uNightTint: SU.uNightTint },
     vertexShader: VS_SIGN, fragmentShader: FS_SIGN, transparent: !!o.transparent, side: o.double ? THREE.DoubleSide : THREE.FrontSide
   });
   if (o.reveal === false) m.defines.NO_REVEAL = '';
@@ -945,16 +954,16 @@ function initGeo() {
 
 // ---------------------------------------------------------------- time of day (the visitor's clock)
 var TOD = [
-  { h: 0,    top: '#0b1230', bot: '#1c2752', tint: [.34, .38, .60], gnd: [.30, .34, .55], ind: '#1b2044', sh: .30, lights: 1,   stars: 1 },
-  { h: 5,    top: '#131a3c', bot: '#353d6c', tint: [.40, .43, .64], gnd: [.36, .38, .58], ind: '#282a55', sh: .30, lights: 1,   stars: .8 },
-  { h: 6.3,  top: '#6d78ae', bot: '#f2ad98', tint: [.95, .80, .82], gnd: [.95, .80, .80], ind: '#c67767', sh: .42, lights: .45, stars: .1 },
-  { h: 7.8,  top: '#9ec7e3', bot: '#f6e6d2', tint: [1.0, .97, .94], gnd: [1.0, .97, .93], ind: '#c98a3a', sh: .55, lights: 0,   stars: 0 },
-  { h: 12.5, top: '#8cc0e6', bot: '#e9f2f4', tint: [1.03, 1.01, .98], gnd: [1.02, 1.0, .97], ind: '#c98a3a', sh: .6, lights: 0,  stars: 0 },
-  { h: 16.4, top: '#8ab6dc', bot: '#f5e5c8', tint: [1.04, .98, .91], gnd: [1.04, .97, .90], ind: '#cf7f2e', sh: .6, lights: 0,  stars: 0 },
-  { h: 18.3, top: '#5d6aa6', bot: '#f59b5c', tint: [1.10, .86, .70], gnd: [1.10, .84, .66], ind: '#d4561c', sh: .55, lights: .45, stars: 0 },
-  { h: 19.7, top: '#2a2f63', bot: '#b86579', tint: [.66, .56, .68], gnd: [.62, .52, .62], ind: '#6b3050', sh: .38, lights: .9, stars: .4 },
-  { h: 21,   top: '#0d1433', bot: '#232d5c', tint: [.36, .40, .63], gnd: [.32, .35, .56], ind: '#1b2044', sh: .30, lights: 1,   stars: 1 },
-  { h: 24,   top: '#0b1230', bot: '#1c2752', tint: [.34, .38, .60], gnd: [.30, .34, .55], ind: '#1b2044', sh: .30, lights: 1,   stars: 1 }
+  { h: 0,    top: '#0a1130', bot: '#1b2a5c', tint: [.62, .64, .78], gnd: [.60, .62, .76], ind: '#1d2550', sh: .32, lights: 1,   stars: 1,  nm: .78 },
+  { h: 5,    top: '#121a40', bot: '#343f72', tint: [.66, .66, .78], gnd: [.64, .64, .76], ind: '#2a2d5c', sh: .32, lights: 1,   stars: .8, nm: .66 },
+  { h: 6.3,  top: '#6d78ae', bot: '#f2ad98', tint: [.97, .84, .86], gnd: [.96, .83, .84], ind: '#c67767', sh: .42, lights: .45, stars: .1, nm: .12 },
+  { h: 7.8,  top: '#9ec7e3', bot: '#f6e6d2', tint: [1.0, .97, .94], gnd: [1.0, .97, .93], ind: '#c98a3a', sh: .55, lights: 0,   stars: 0,  nm: 0 },
+  { h: 12.5, top: '#8cc0e6', bot: '#e9f2f4', tint: [1.03, 1.01, .98], gnd: [1.02, 1.0, .97], ind: '#c98a3a', sh: .6, lights: 0,  stars: 0,  nm: 0 },
+  { h: 16.4, top: '#8ab6dc', bot: '#f5e5c8', tint: [1.04, .98, .91], gnd: [1.04, .97, .90], ind: '#cf7f2e', sh: .6, lights: 0,  stars: 0,  nm: 0 },
+  { h: 18.3, top: '#5d6aa6', bot: '#f59b5c', tint: [1.10, .86, .70], gnd: [1.10, .84, .66], ind: '#d4561c', sh: .55, lights: .45, stars: 0, nm: 0 },
+  { h: 19.7, top: '#2a2f63', bot: '#b86579', tint: [.80, .66, .74], gnd: [.78, .64, .70], ind: '#6b3050', sh: .38, lights: .9, stars: .4, nm: .38 },
+  { h: 21,   top: '#0c1434', bot: '#222d5e', tint: [.62, .64, .78], gnd: [.60, .62, .76], ind: '#1d2550', sh: .32, lights: 1,   stars: 1,  nm: .78 },
+  { h: 24,   top: '#0a1130', bot: '#1b2a5c', tint: [.62, .64, .78], gnd: [.60, .62, .76], ind: '#1d2550', sh: .32, lights: 1,   stars: 1,  nm: .78 }
 ];
 function phaseName(h) {
   if (h < 5) return 'Night';
@@ -974,7 +983,7 @@ function todSample(h) {
   function mixc(p, q) { return _ca.set(p).clone().lerp(_cb.set(q), t); }
   function mix3(p, q) { return [lerp(p[0], q[0], t), lerp(p[1], q[1], t), lerp(p[2], q[2], t)]; }
   return { top: mixc(a.top, b.top), bot: mixc(a.bot, b.bot), tint: mix3(a.tint, b.tint), gnd: mix3(a.gnd, b.gnd), ind: mixc(a.ind, b.ind),
-    sh: lerp(a.sh, b.sh, t), lights: lerp(a.lights, b.lights, t), stars: lerp(a.stars, b.stars, t) };
+    sh: lerp(a.sh, b.sh, t), lights: lerp(a.lights, b.lights, t), stars: lerp(a.stars, b.stars, t), nm: lerp(a.nm, b.nm, t) };
 }
 // where shadows fall (per unit of height) for the hour: east in the morning, north at noon, west at dusk
 function sunFor(h) {
@@ -1216,7 +1225,7 @@ function buildLabels() {
     var H = 2048; while (H > 256 && p.py + p.row + 8 < H / 2) H /= 2;
     var id = p.x.getImageData(0, 0, 2048, H).data, data = new Uint8Array(2048 * H);
     for (var j = 0; j < H; j++) { var src = (H - 1 - j) * 2048 * 4, dst = j * 2048; for (var i = 0; i < 2048; i++) data[dst + i] = id[src + i * 4 + 3]; }
-    var t = new THREE.DataTexture(data, 2048, H, THREE.LuminanceFormat, THREE.UnsignedByteType);
+    var t = new THREE.DataTexture(data, 2048, H, LUMF(), THREE.UnsignedByteType);
     t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter; t.anisotropy = ANISO; t.needsUpdate = true;
     p.H = H;
     var m = worldMat(FS_PAINT, { uMap: { value: t }, uColor: { value: new THREE.Color(1, 1, 1) }, uOpacity: { value: 1 } },
@@ -1414,7 +1423,7 @@ function roundedRect(x0, x1, y0, y1, r) {
 var groundMat;
 function buildLand() {
   groundMat = new THREE.ShaderMaterial({
-    uniforms: { uGround: SU.uGround, uShadowTex: SU.uShadowTex, uRect: SU.uRect, uGroundTint: SU.uGroundTint, uShadowStrength: SU.uShadowStrength, uShadowColor: SU.uShadowColor },
+    uniforms: { uGround: SU.uGround, uShadowTex: SU.uShadowTex, uRect: SU.uRect, uGroundTint: SU.uGroundTint, uShadowStrength: SU.uShadowStrength, uShadowColor: SU.uShadowColor, uNightMix: SU.uNightMix, uNightTint: SU.uNightTint },
     vertexShader: VS_WORLD, fragmentShader: FS_GROUND
   });
   var sideMat = [new THREE.MeshBasicMaterial({ visible: false }), mat('#ffffff', { strata: true, reveal: false })];
@@ -1520,7 +1529,7 @@ function paintShadows(hour) {
   var id = x.getImageData(0, 0, GW_PX, GH_PX).data, data = shadowTexData;
   for (var j = 0; j < GH_PX; j++) { var src = (GH_PX - 1 - j) * GW_PX * 4, dst = j * GW_PX; for (var i = 0; i < GW_PX; i++) data[dst + i] = id[src + i * 4 + 3]; }
   if (!SU.uShadowTex.value || !SU.uShadowTex.value.isDataTexture) {
-    var t = new THREE.DataTexture(data, GW_PX, GH_PX, THREE.LuminanceFormat, THREE.UnsignedByteType);
+    var t = new THREE.DataTexture(data, GW_PX, GH_PX, LUMF(), THREE.UnsignedByteType);
     t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter; t.generateMipmaps = false; t.needsUpdate = true;
     SU.uShadowTex.value = t;
   } else SU.uShadowTex.value.needsUpdate = true;
@@ -1780,7 +1789,7 @@ var waterMats = [];
 function waterMat(deep, shallow, box4, flow, dark) {
   var m = new THREE.ShaderMaterial({
     uniforms: { uDeep: { value: new THREE.Color(deep) }, uShallow: { value: new THREE.Color(shallow) }, uTime: SU.uTime, uFlow: { value: new THREE.Vector2(flow[0], flow[1]) },
-      uBox: { value: new THREE.Vector4(box4[0], box4[1], box4[2], box4[3]) }, uDark: { value: dark || 0 }, uPaint: SU.uPaint, uGroundTint: SU.uGroundTint, uLights: SU.uLights },
+      uBox: { value: new THREE.Vector4(box4[0], box4[1], box4[2], box4[3]) }, uDark: { value: dark || 0 }, uPaint: SU.uPaint, uGroundTint: SU.uGroundTint, uLights: SU.uLights, uNightMix: SU.uNightMix, uNightTint: SU.uNightTint },
     vertexShader: VS_WORLD, fragmentShader: FS_WATER, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2
   });
   waterMats.push(m);
@@ -1790,12 +1799,13 @@ var VS_FALL = 'varying vec2 vUv; varying vec3 vW;\nvoid main(){ vUv = uv; vec4 w
 var FS_FALL = [
   'uniform float uTime; uniform vec3 uGroundTint; uniform float uPaint;',
   'varying vec2 vUv; varying vec3 vW;',
+  GLSL_NIGHT,
   'void main(){',
   '  float s = fract(vUv.x * 7.0 + sin(vUv.x * 40.0) * 0.2);',
   '  float streak = 0.5 + 0.5 * sin((vUv.y * 9.0 + uTime * 5.0) + s * 6.28);',
   '  vec3 c = mix(vec3(0.28, 0.55, 0.66), vec3(0.85, 0.95, 1.0), streak * 0.45);',
   '  float a = smoothstep(0.0, 0.5, vUv.y) * 0.9 * uPaint;',
-  '  gl_FragColor = vec4(c * uGroundTint, a);',
+  '  gl_FragColor = vec4(nightify(c * uGroundTint), a);',
   '}'
 ].join('\n');
 function buildBridge() {
@@ -1807,7 +1817,7 @@ function buildBridge() {
   var pd = rv.pond, pm = waterMat('#2a6173', '#5f9fae', [pd[0], pd[2], pd[1], pd[3]], [0.1, 0.05], 0);
   var pond = new THREE.Mesh(new THREE.CircleGeometry(1, 40), pm);
   pond.scale.set((pd[1] - pd[0]) / 2, (pd[3] - pd[2]) / 2, 1); pond.position.set((pd[0] + pd[1]) / 2, (pd[2] + pd[3]) / 2, 0.007); scene.add(pond);
-  var fall = new THREE.Mesh(new THREE.PlaneGeometry(rv.x1 - rv.x0, 9), new THREE.ShaderMaterial({ uniforms: { uTime: SU.uTime, uGroundTint: SU.uGroundTint, uPaint: SU.uPaint }, vertexShader: VS_FALL, fragmentShader: FS_FALL, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+  var fall = new THREE.Mesh(new THREE.PlaneGeometry(rv.x1 - rv.x0, 9), new THREE.ShaderMaterial({ uniforms: { uTime: SU.uTime, uGroundTint: SU.uGroundTint, uPaint: SU.uPaint, uNightMix: SU.uNightMix, uNightTint: SU.uNightTint }, vertexShader: VS_FALL, fragmentShader: FS_FALL, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
   fall.rotation.x = PI / 2; fall.position.set((rv.x0 + rv.x1) / 2, rv.y0 - 0.12, -4.5); scene.add(fall);
   groundJobs.push(function (x) {
     x.fillStyle = 'rgba(214,190,130,.9)'; x.fillRect(gx(rv.x0 - 1.4), gy(rv.y1 + 1), (rv.x1 - rv.x0 + 2.8) * GSX, (rv.y1 - rv.y0 + 1) * GSY);
@@ -2947,6 +2957,7 @@ function applyTod(force) {
   SU.uGroundTint.value.setRGB(s.gnd[0], s.gnd[1], s.gnd[2]);
   SU.uIndirect.value.copy(s.ind);
   SU.uLights.value = s.lights;
+  SU.uNightMix.value = s.nm;
   skyU.uTop.value.copy(s.top); skyU.uBot.value.copy(s.bot); skyU.uStars.value = s.stars;
   todState.shadowTarget = s.sh;
   if (revealed) SU.uShadowStrength.value = s.sh;
@@ -3037,7 +3048,7 @@ function buildStartPad() {
 }
 function buildStartLabels() {
   function lm(tex) {
-    var m = worldMat(FS_PAINT, { uMap: { value: tex }, uColor: { value: new THREE.Color('#ffffff') }, uOpacity: { value: 0 }, uPaint: { value: 1 } }, { transparent: true, depthWrite: false, defines: { USE_MAP: '', MAP_ALPHA: '' } });
+    var m = worldMat(FS_PAINT, { uMap: { value: tex }, uColor: { value: new THREE.Color('#ffffff') }, uOpacity: { value: 0 }, uPaint: { value: 1 }, uGroundTint: { value: new THREE.Color(1, 1, 1) }, uNightMix: { value: 0 }, uShadowStrength: { value: 0 } }, { transparent: true, depthWrite: false, defines: { USE_MAP: '', MAP_ALPHA: '' } });
     var me = new THREE.Mesh(GEO.plane, m); me.scale.set(3.4, 3.4 * 160 / 512 * STRETCH, 1); me.position.set(START.x, START.y, 0.032); me.renderOrder = 6; scene.add(me); return me;
   }
   startPad.loading = lm(labelTex('LOADING', 64)); startPad.loading.scale.multiplyScalar(0.8);
@@ -3350,7 +3361,7 @@ function initWorld() {
   initUniforms();
   var one = new Uint8Array([223, 168, 79, 255]);
   var gt = new THREE.DataTexture(one, 1, 1, THREE.RGBAFormat); gt.needsUpdate = true; SU.uGround.value = gt;
-  var st = new THREE.DataTexture(new Uint8Array([0]), 1, 1, THREE.LuminanceFormat); st.needsUpdate = true; SU.uShadowTex.value = st;
+  var st = new THREE.DataTexture(new Uint8Array([0]), 1, 1, LUMF()); st.needsUpdate = true; SU.uShadowTex.value = st;
   MATCAP.clay = makeMatcap('clay'); MATCAP.gloss = makeMatcap('gloss'); MATCAP.metal = makeMatcap('metal'); MATCAP.glass = makeMatcap('glass');
   initGeo();
   initPhysics();
@@ -3365,6 +3376,8 @@ function initWorld() {
   window.addEventListener('resize', resize);
   $('startBtn').addEventListener('click', startWorld);
   html.classList.add('has-world', 'booted');
+  var dh = /[?&]debug\b/.test(location.search) && location.search.match(/hour=([\d.]+)/);
+  if (dh) { todState.preview = parseFloat(dh[1]); applyTod(false); }
   planBuild();
   startLoop();
   if (RM && !FROM) {
@@ -3378,6 +3391,7 @@ function initWorld() {
   if (TOUCH) $('startHint').innerHTML = 'Tap <b>START</b>. Or <button class="linkish" type="button" data-open-map>read the map instead</button>.';
   Array.prototype.forEach.call($('startHint').querySelectorAll('[data-open-map]'), function (b) { b.addEventListener('click', openMap); });
 }
+if (/[?&]debug\b/.test(location.search)) window.__W = { car: car, letters: letters, camState: camState, SU: SU, todState: todState, applyTod: applyTod, dyn: dyn, placeCar: placeCar, teleport: teleport, get state() { return state; }, scene: function () { return scene; }, renderer: function () { return renderer; } };
 WORLD = {
   sfx: function (n, v) { sfx(n, v); },
   teleport: teleport,

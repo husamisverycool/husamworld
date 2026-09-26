@@ -115,13 +115,12 @@ html.os-live #page{display:none}
 #splash-cv{position:absolute;inset:0;width:100%;height:100%;display:block}
 .sp-logo{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:22px;color:#000;white-space:nowrap}
 .sp-mark{width:96px;height:96px;image-rendering:pixelated}
-.sp-word{display:flex;flex-direction:column;line-height:.9}
-.sp-word small{font:700 26px/1 var(--serif);letter-spacing:.5px;margin-left:4px}
-.sp-word span{font:400 84px/.95 var(--disp);letter-spacing:-1px}
-.sp-word span b{font-weight:400;color:#0a1a7a;font-size:1.25em;margin-left:10px}
+.sp-word{display:flex;align-items:baseline;gap:14px;line-height:.9}
+.sp-word span{font:400 76px/.95 var(--disp);letter-spacing:-1px;text-shadow:0 2px 0 rgba(255,255,255,.35)}
+.sp-word b{font:400 108px/.9 var(--disp);color:#0a1a7a;text-shadow:0 2px 0 rgba(255,255,255,.35)}
 .sp-bar{position:absolute;left:0;right:0;bottom:0;height:14px;background:linear-gradient(90deg,#000070,#1b4fd8 18%,#8fd8ff 34%,#fff 42%,#3e9697 58%,#000070 76%,#000070) 0 0/720px 100% repeat-x;animation:spbar 1.2s linear infinite}
 @keyframes spbar{to{background-position:720px 0}}
-@media (max-width:640px){.sp-mark{width:64px;height:64px}.sp-word span{font-size:54px}.sp-word small{font-size:19px}.sp-logo{gap:14px}}
+@media (max-width:640px){.sp-mark{width:56px;height:56px}.sp-word span{font-size:40px}.sp-word b{font-size:56px}.sp-word{gap:8px}.sp-logo{gap:10px}}
 
 /* ---------- 3. HusamOS 95 ---------- */
 #os{position:absolute;inset:0;background:var(--teal);font:14px/1.25 var(--ui);color:#000;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
@@ -477,6 +476,7 @@ html.noglass .g-scan,html.noglass .g-flick,html.noglass .g-smudge{display:none}
   .hbox{font-size:18px;padding:3px 10px;min-height:29px}
   .hsq{width:29px;height:29px}
   .popup{bottom:96px}
+  #skip{top:12px;right:12px;font-size:17px;padding:4px 9px;border-width:2px}
   .pbox{padding:18px;border-width:6px}
   #loader{padding:16px}
   .bios{font-size:17px;padding:16px 16px 88px}
@@ -596,7 +596,7 @@ html.noglass .g-scan,html.noglass .g-flick,html.noglass .g-smudge{display:none}
 
   <div id="splash" hidden aria-hidden="true">
     <canvas id="splash-cv"></canvas>
-    <div class="sp-logo"><canvas class="sp-mark" id="sp-mark" width="24" height="24"></canvas><div class="sp-word"><small>Husam</small><span>OS<b>95</b></span></div></div>
+    <div class="sp-logo"><canvas class="sp-mark" id="sp-mark" width="24" height="24"></canvas><div class="sp-word"><span>HusamOS</span><b>95</b></div></div>
     <div class="sp-bar"></div>
   </div>
 
@@ -1519,7 +1519,7 @@ const Garage = (() => {
   }
 
   function buildLights() {
-    S.add(new T.HemisphereLight(0x3a4659, 0x120d09, .55));
+    S.add(new T.HemisphereLight(0x3a4659, 0x120d09, .46));
     screenLight = new T.PointLight(0x9fc0ff, .45, 1.8, 2); screenLight.position.set(.03, 1.3, -.42); S.add(screenLight);
     tubeLight = new T.PointLight(0xe8efff, 0, 9, 1.3); tubeLight.position.set(0, 2.4, -.2); S.add(tubeLight);
     const n = 320, g = new T.BufferGeometry(), a = new Float32Array(n * 3), r = rng(17);
@@ -2951,7 +2951,7 @@ function Term(root, w) {
     'CLS / CLEAR       Clear the screen', 'SHUTDOWN          Shut down HusamOS', 'WORLD             Go back to the world', 'EXIT              Close this window'].join('\n'));
   const neofetch = () => {
     const up = Math.round((Date.now() - t0) / 1000);
-    const art = ['   ._______.  ', '  /       /| ', ' / _____ / | ', '|:|>_  |:| | ', '|:|____|:| / ', '|_______|/  ', ' [#######]   ', '             ', '             ', '             '];
+    const art = ['   ._______.  ', '  /       /|  ', ' / _____ / |  ', '|:|>_  |:| |  ', '|:|____|:| /  ', '|_______|/   ', ' [#######]    ', '              ', '              ', '              '].map(x => x.padEnd(14, ' '));
     const info = ['husam@garage', '------------', 'OS: HusamOS 95 (V1.0)', 'Host: Fresno, CA -> Cambridge, MA', 'Kernel: operator since age 14', 'Now: co-founder & CEO, stealth startup', "Backed by: DoorDash's early team", 'Languages: EN, AR', `Uptime: ${up}s`, `Resolution: ${innerWidth}x${innerHeight}`];
     art.forEach((a, i) => { const inf = info[i] || ''; const [k, ...v] = inf.split(': '); html(`<span style="color:#55ffff">${esc(a)}</span>  ` + (v.length ? `<span style="color:#ffff55">${esc(k)}</span>: ${esc(v.join(': '))}` : `<span style="color:#ffff55">${esc(inf)}</span>`)); });
     html('               ' + ['#000', '#a00', '#0a0', '#a50', '#00a', '#a0a', '#0aa', '#aaa'].map(c => `<span class="sw" style="background:${c}"></span>`).join(''));
