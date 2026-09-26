@@ -239,7 +239,7 @@ html.os-live #page{display:none}
 
 /* start menu + menus */
 #startmenu{position:absolute;left:76px;bottom:29px;z-index:100001;display:flex;width:252px;background:var(--lg);box-shadow:var(--out);padding:3px}
-.sm-banner{width:32px;flex:none;background:var(--dg);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.sm-banner{width:32px;flex:none;background:var(--dg);display:flex;align-items:flex-end;justify-content:center}
 .sm-banner span{writing-mode:vertical-rl;transform:rotate(180deg);font:32px/1 var(--bios);color:var(--lg);padding:10px 0 12px;letter-spacing:1px;white-space:nowrap}
 .sm-banner b{color:#fff;font-weight:400}
 .menu{display:flex;flex-direction:column;min-width:0;flex:1}
@@ -2389,10 +2389,10 @@ const StartMenu = {
       { label: '<u>S</u>ettings', icon: 'display', sub: () => [
         { label: '<u>D</u>isplay...', icon: 'display', action: () => WM.open('display') },
         { label: '<u>S</u>ound', checked: Sound.on, action: () => Sound.set(!Sound.on) }] },
-      { label: '<u>H</u>elp (read as a page)', icon: 'book', action: () => { location.hash = '#page'; } },
+      { label: '<u>H</u>elp', icon: 'book', action: () => { location.hash = '#page'; } },
       { label: '<u>R</u>un...', icon: 'run', action: () => WM.open('run') },
       { sep: 1 },
-      { label: 'Stand <u>u</u>p from the desk', icon: 'computer', action: () => Flow.standUp() },
+      { label: 'Leave the des<u>k</u>', icon: 'computer', action: () => Flow.standUp() },
       { label: 'Back to the <u>w</u>orld', icon: 'globe', href: WORLD, leave: true, action: () => Flow.leave() },
       { label: 'Sh<u>u</u>t Down...', icon: 'shut', action: () => WM.open('shutdown') }
     ];
@@ -3044,8 +3044,10 @@ function Term(root, w) {
   root.innerHTML = '<div class="term" role="log" aria-label="Prompt"><pre class="t-out"></pre><div class="t-line"><span class="t-ps">C:\\GARAGE&gt;</span><input class="t-in" aria-label="Command" autocomplete="off" autocapitalize="off" spellcheck="false"></div></div>';
   const term = $('.term', root), out = $('.t-out', root), inp = $('.t-in', root), ps = $('.t-ps', root);
   let cwd = 'C:\\GARAGE', hist = [], hi = 0, pwMode = false, denyN = 0; const t0 = Date.now();
-  const print = (s, cls) => { const sp = document.createElement('span'); if (cls) sp.style.color = cls; sp.textContent = s + '\n'; out.append(sp); term.scrollTop = term.scrollHeight; };
-  const html = s => { const sp = document.createElement('span'); sp.innerHTML = s + '\n'; out.append(sp); term.scrollTop = term.scrollHeight; };
+  // DOS text mode keeps no scrollback: when the screen is full, the top line scrolls away for good
+  const fit = () => { let n = 0; while (term.scrollHeight > term.clientHeight + 1 && out.firstChild && n++ < 400) { const f = out.firstChild; if (f.nodeType === 1 && f.textContent.split('\n').length > 2) { const t = f.textContent; const k = t.indexOf('\n'); if (f.children.length) f.remove(); else f.textContent = t.slice(k + 1); } else f.remove(); } term.scrollTop = 0; };
+  const print = (s, cls) => { s.split('\n').forEach(line => { const sp = document.createElement('span'); if (cls) sp.style.color = cls; sp.textContent = line + '\n'; out.append(sp); }); fit(); };
+  const html = s => { const sp = document.createElement('span'); sp.innerHTML = s + '\n'; out.append(sp); fit(); };
   const setPs = () => { ps.textContent = pwMode ? 'Password: ' : cwd + '>'; inp.type = pwMode ? 'password' : 'text'; WM.status('prompt', cwd); };
   print('HusamOS 95 [Version 4.00.2020]');
   print('(C) Husam Sokar 2020-2026. Type HELP for commands.\n');
