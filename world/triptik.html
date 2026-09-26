@@ -99,8 +99,10 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 .keywrap{padding:30px 18px 22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:26px;align-items:start}
 .sanborn{position:relative;border:1.5px solid #111;outline:5px solid #111;outline-offset:3px;margin:22px 8px 8px;padding:34px 18px 14px;background:#fffdf5}
 .sanborn h2{position:absolute;top:-30px;left:50%;transform:translateX(-50%);margin:0;background:#fffdf5;padding:4px 30px 2px;
-  font:400 40px/1 var(--slab);letter-spacing:.06em;border:1.5px solid #111;
-  clip-path:polygon(0 0,100% 0,100% 100%,calc(100% - 18px) 62%,18px 62%,0 100%)}
+  font:400 38px/1.1 var(--slab);letter-spacing:.08em;border:1.5px solid #111;border-bottom:0}
+.sanborn h2::before,.sanborn h2::after{content:"";position:absolute;bottom:-1px;width:0;height:0;border-style:solid}
+.sanborn h2::before{left:-16px;border-width:0 16px 16px 0;border-color:transparent #111 transparent transparent}
+.sanborn h2::after{right:-16px;border-width:0 0 16px 16px;border-color:transparent transparent transparent #111}
 .sanborn ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:0}
 .sanborn li{display:grid;grid-template-columns:62px 1fr;gap:12px;align-items:center;padding:6px 0;border-bottom:1px solid #d9d2bd;font-size:14.5px;line-height:1.3}
 .sanborn li:last-child{border-bottom:0}
@@ -127,7 +129,6 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 .body{padding:24px 26px 22px;position:relative}
 .track{position:relative;list-style:none;margin:0;padding:0;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:18px}
 .track::before{content:"";position:absolute;left:0;right:0;top:15px;height:10px;background:var(--c)}
-.track.open::before{right:-26px}
 .track .hlbar{position:absolute;left:-10px;right:-10px;top:5px;height:30px;background:var(--hi);mix-blend-mode:multiply;transform:scaleX(0);transform-origin:left center;border-radius:14px;pointer-events:none}
 .line.marked .hlbar{transform:scaleX(1);transition:transform 1.4s cubic-bezier(.55,.05,.25,1)}
 .stop{position:relative;padding-top:44px;min-width:0}
@@ -139,9 +140,17 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 .stop .hand{font-family:var(--hand);color:var(--pen);font-size:25px;line-height:1;margin-top:6px;display:flex;align-items:flex-start;gap:4px}
 .hand svg{flex:none;width:34px;height:24px;margin-top:-4px}
 .hand svg path{fill:none;stroke:var(--pen);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.line.short .track{grid-template-columns:1fr 2fr;grid-auto-flow:row}
-.fork{display:block;width:100%;height:90px;margin:6px 0 0}
-.fork path{fill:none;stroke:var(--M);stroke-width:10;stroke-linejoin:miter}
+.line.short .track{display:flex;align-items:flex-start;gap:18px}
+.line.short .stop.home{flex:0 0 190px}
+.run{flex:1 1 auto;text-align:center;padding-top:9px;min-width:0}
+.run span{display:inline-block;background:#111;color:#fff;font:700 12px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;padding:5px 10px 4px;position:relative;z-index:1}
+.line.short .stop.term{flex:0 1 400px;text-align:right}
+.line.short .stop.term::before{left:auto;right:0}
+.line.short .stop.term .hand{justify-content:flex-end}
+.forkspace{height:64px}
+.forksvg{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+.forksvg path{fill:none;stroke:var(--M);stroke-width:10;stroke-linejoin:miter;stroke-linecap:butt}
+.track.open::before{right:-10px}
 .ends{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
 .end{position:relative;padding-top:34px}
 .end::before{content:"";position:absolute;top:0;left:0;width:22px;height:22px;border-radius:50%;background:#111}
@@ -188,7 +197,12 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   .stop{padding-top:0}
   .stop::before{left:-44px;top:1px}
   .stop.home::before{width:22px;height:50px;top:-4px}
-  .fork{display:none}
+  .forkspace,.forksvg{display:none}
+  .line.short .track{display:grid}
+  .line.short .stop.term{text-align:left}
+  .line.short .stop.term::before{left:-44px;right:auto}
+  .line.short .stop.term .hand{justify-content:flex-start}
+  .run{text-align:left;padding-top:0}
   .ends{grid-template-columns:1fr;gap:24px;padding-left:44px;position:relative;margin-top:16px}
   .ends::before{content:"";position:absolute;left:6px;top:-16px;bottom:auto;height:calc(100% - 60px);width:10px;background:var(--M)}
   .end{padding-top:0}
@@ -215,18 +229,18 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 <svg class="wide" viewBox="0 0 1200 400" aria-hidden="true">
   <defs>
     <linearGradient id="sky1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#27348a"/><stop offset=".55" stop-color="#6a4f9c"/><stop offset=".78" stop-color="#e2793a"/><stop offset="1" stop-color="#f6c25b"/></linearGradient>
-    <clipPath id="vig1"><path d="M400,392 V236 Q400,150 600,150 Q800,150 800,236 V392Z"/></clipPath>
-    <path id="arc1" d="M120,268 Q600,-58 1080,268"/>
+    <clipPath id="vig1"><path d="M430,350 V250 Q430,170 600,170 Q770,170 770,250 V350Z"/></clipPath>
+    <path id="arc1" d="M318,214 Q600,14 882,214"/>
   </defs>
   <rect width="1200" height="400" fill="#1c2a6e"/>
   <rect x="9" y="9" width="1182" height="382" fill="none" stroke="#f6e7a1" stroke-width="3"/>
   <rect x="17" y="17" width="1166" height="366" fill="none" stroke="#f6e7a1" stroke-width="1"/>
   <g clip-path="url(#vig1)">
     <rect x="400" y="150" width="400" height="250" fill="url(#sky1)"/>
-    <g stroke="#f6c25b" stroke-width="3" opacity=".55">
-      <path d="M600,300 L470,160 M600,300 L520,150 M600,300 L600,150 M600,300 L680,150 M600,300 L730,160"/>
+    <g stroke="#f6c25b" stroke-width="3" opacity=".6">
+      <path d="M600,262 L470,170 M600,262 L525,160 M600,262 L600,160 M600,262 L675,160 M600,262 L730,170"/>
     </g>
-    <circle cx="600" cy="300" r="46" fill="#f08a24"/>
+    <circle cx="600" cy="262" r="40" fill="#f08a24"/>
     <path d="M400,300 L440,262 L470,280 L520,232 L556,266 L598,226 L640,262 L690,236 L730,272 L770,250 L800,272 V320 H400Z" fill="#5a4a95"/>
     <path d="M430,300 L470,270 L500,290 L540,262 L580,292 H400Z M650,292 L700,262 L740,290 L780,270 L800,284 V300 H640Z" fill="#f4f0ff" opacity=".22"/>
     <rect x="400" y="300" width="400" height="100" fill="#3d6b3a"/>
@@ -235,56 +249,57 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
     </g>
     <g fill="#6c2a57"><circle cx="452" cy="378" r="6"/><circle cx="462" cy="386" r="6"/><circle cx="446" cy="390" r="6"/><circle cx="742" cy="374" r="6"/><circle cx="752" cy="382" r="6"/><circle cx="738" cy="388" r="6"/></g>
   </g>
-  <path d="M400,392 V236 Q400,150 600,150 Q800,150 800,236 V392" fill="none" stroke="#f6e7a1" stroke-width="4"/>
-  <g class="lbl-slab" font-size="84">
-    <text fill="#111" transform="translate(7,8)"><textPath href="#arc1" startOffset="50%" text-anchor="middle" textLength="880" lengthAdjust="spacing">FRESNO · CLOVIS</textPath></text>
-    <text fill="#7e1a12" transform="translate(5,6)"><textPath href="#arc1" startOffset="50%" text-anchor="middle" textLength="880" lengthAdjust="spacing">FRESNO · CLOVIS</textPath></text>
-    <text fill="#d8412f" transform="translate(2.5,3)"><textPath href="#arc1" startOffset="50%" text-anchor="middle" textLength="880" lengthAdjust="spacing">FRESNO · CLOVIS</textPath></text>
-    <text fill="#f6e7a1" stroke="#111" stroke-width="1.6" paint-order="stroke"><textPath href="#arc1" startOffset="50%" text-anchor="middle" textLength="880" lengthAdjust="spacing">FRESNO · CLOVIS</textPath></text>
+  <path d="M430,350 V250 Q430,170 600,170 Q770,170 770,250 V350" fill="none" stroke="#f6e7a1" stroke-width="4"/>
+  <g class="lbl-slab" font-size="56">
+    <text fill="#111" transform="translate(7,8)"><textPath href="#arc1" startOffset="50%" text-anchor="middle" textLength="560" lengthAdjust="spacing">FRESNO · CLOVIS</textPath></text>
+    <text fill="#7e1a12" transform="translate(5,6)"><textPath href="#arc1" startOffset="50%" text-anchor="middle" textLength="560" lengthAdjust="spacing">FRESNO · CLOVIS</textPath></text>
+    <text fill="#d8412f" transform="translate(2.5,3)"><textPath href="#arc1" startOffset="50%" text-anchor="middle" textLength="560" lengthAdjust="spacing">FRESNO · CLOVIS</textPath></text>
+    <text fill="#f6e7a1" stroke="#111" stroke-width="1.6" paint-order="stroke"><textPath href="#arc1" startOffset="50%" text-anchor="middle" textLength="560" lengthAdjust="spacing">FRESNO · CLOVIS</textPath></text>
   </g>
-  <g transform="rotate(-7 210 270)">
-    <text x="214" y="276" text-anchor="middle" class="lbl-script" font-size="86" fill="#111">Home</text>
-    <text x="210" y="272" text-anchor="middle" class="lbl-script" font-size="86" fill="#f6e7a1" stroke="#111" stroke-width="1.4" paint-order="stroke">Home</text>
-    <text x="244" y="336" text-anchor="middle" class="lbl-script" font-size="86" fill="#111">Lines</text>
-    <text x="240" y="332" text-anchor="middle" class="lbl-script" font-size="86" fill="#f6e7a1" stroke="#111" stroke-width="1.4" paint-order="stroke">Lines</text>
+  <g transform="translate(-34,26) rotate(-7 225 230)">
+    <text x="224" y="214" text-anchor="middle" class="lbl-script" font-size="80" fill="#111">Home</text>
+    <text x="220" y="210" text-anchor="middle" class="lbl-script" font-size="80" fill="#f6e7a1" stroke="#111" stroke-width="1.4" paint-order="stroke">Home</text>
+    <text x="250" y="284" text-anchor="middle" class="lbl-script" font-size="80" fill="#111">Lines</text>
+    <text x="246" y="280" text-anchor="middle" class="lbl-script" font-size="80" fill="#f6e7a1" stroke="#111" stroke-width="1.4" paint-order="stroke">Lines</text>
   </g>
-  <text x="252" y="360" text-anchor="middle" class="lbl-cond" font-size="15" fill="#f08a24" letter-spacing="7">BRAND</text>
-  <text x="992" y="234" text-anchor="middle" class="lbl-cond" font-size="44" fill="#f6e7a1">CENTRAL</text>
-  <text x="992" y="282" text-anchor="middle" class="lbl-cond" font-size="44" fill="#f6e7a1">VALLEY</text>
-  <text x="992" y="314" text-anchor="middle" class="lbl-cond" font-size="17" fill="#f08a24" letter-spacing="4">CALIFORNIA</text>
-  <text x="992" y="340" text-anchor="middle" class="lbl-cond" font-size="15" fill="#f6e7a1" letter-spacing="3">2015 – 2025</text>
+  <text x="214" y="338" text-anchor="middle" class="lbl-cond" font-size="15" fill="#f08a24" letter-spacing="7">BRAND</text>
+  <text x="1012" y="214" text-anchor="middle" class="lbl-cond" font-size="46" fill="#f6e7a1">CENTRAL</text>
+  <text x="1012" y="264" text-anchor="middle" class="lbl-cond" font-size="46" fill="#f6e7a1">VALLEY</text>
+  <text x="1012" y="296" text-anchor="middle" class="lbl-cond" font-size="17" fill="#f08a24" letter-spacing="4">CALIFORNIA</text>
+  <text x="1012" y="326" text-anchor="middle" class="lbl-cond" font-size="15" fill="#f6e7a1" letter-spacing="3">2015 – 2025</text>
   <rect x="17" y="350" width="1166" height="33" fill="#d8412f"/>
   <text x="600" y="374" text-anchor="middle" class="lbl-cond" font-size="18" fill="#f6e7a1" letter-spacing="4">GROWN IN THE CENTRAL VALLEY · FRESNO &amp; CLOVIS, CALIFORNIA</text>
 </svg>
 <svg class="tall" viewBox="0 0 600 700" aria-hidden="true">
   <defs>
     <linearGradient id="sky2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#27348a"/><stop offset=".55" stop-color="#6a4f9c"/><stop offset=".78" stop-color="#e2793a"/><stop offset="1" stop-color="#f6c25b"/></linearGradient>
-    <clipPath id="vig2"><path d="M110,560 V340 Q110,230 300,230 Q490,230 490,340 V560Z"/></clipPath>
-    <path id="arc2" d="M52,236 Q300,20 548,236"/>
+    <clipPath id="vig2"><path d="M110,560 V350 Q110,300 300,300 Q490,300 490,350 V560Z"/></clipPath>
+    <path id="arc2" d="M92,214 Q300,34 508,214"/>
   </defs>
   <rect width="600" height="700" fill="#1c2a6e"/>
   <rect x="10" y="10" width="580" height="680" fill="none" stroke="#f6e7a1" stroke-width="4"/>
   <rect x="20" y="20" width="560" height="660" fill="none" stroke="#f6e7a1" stroke-width="1.4"/>
   <g clip-path="url(#vig2)">
-    <rect x="110" y="230" width="380" height="340" fill="url(#sky2)"/>
-    <circle cx="300" cy="420" r="52" fill="#f08a24"/>
+    <rect x="110" y="300" width="380" height="270" fill="url(#sky2)"/>
+    <g stroke="#f6c25b" stroke-width="3" opacity=".6"><path d="M300,372 L180,250 M300,372 L240,236 M300,372 L300,232 M300,372 L360,236 M300,372 L420,250"/></g>
+    <circle cx="300" cy="372" r="46" fill="#f08a24"/>
     <path d="M110,420 L150,380 L182,402 L232,348 L268,384 L302,340 L344,384 L394,352 L436,392 L490,366 V450 H110Z" fill="#5a4a95"/>
     <rect x="110" y="420" width="380" height="160" fill="#3d6b3a"/>
     <g stroke="#223f22" stroke-width="8">
       <path d="M300,422 L-20,600 M300,422 L110,600 M300,422 L220,600 M300,422 L300,600 M300,422 L380,600 M300,422 L490,600 M300,422 L620,600"/>
     </g>
   </g>
-  <path d="M110,560 V340 Q110,230 300,230 Q490,230 490,340 V560" fill="none" stroke="#f6e7a1" stroke-width="4"/>
-  <g class="lbl-slab" font-size="62">
-    <text fill="#111" transform="translate(6,7)"><textPath href="#arc2" startOffset="50%" text-anchor="middle" textLength="470" lengthAdjust="spacing">FRESNO</textPath></text>
-    <text fill="#7e1a12" transform="translate(4,5)"><textPath href="#arc2" startOffset="50%" text-anchor="middle" textLength="470" lengthAdjust="spacing">FRESNO</textPath></text>
-    <text fill="#d8412f" transform="translate(2,2.5)"><textPath href="#arc2" startOffset="50%" text-anchor="middle" textLength="470" lengthAdjust="spacing">FRESNO</textPath></text>
-    <text fill="#f6e7a1" stroke="#111" stroke-width="1.4" paint-order="stroke"><textPath href="#arc2" startOffset="50%" text-anchor="middle" textLength="470" lengthAdjust="spacing">FRESNO</textPath></text>
+  <path d="M110,560 V350 Q110,300 300,300 Q490,300 490,350 V560" fill="none" stroke="#f6e7a1" stroke-width="4"/>
+  <g class="lbl-slab" font-size="82">
+    <text fill="#111" transform="translate(6,7)"><textPath href="#arc2" startOffset="50%" text-anchor="middle" textLength="372" lengthAdjust="spacing">FRESNO</textPath></text>
+    <text fill="#7e1a12" transform="translate(4,5)"><textPath href="#arc2" startOffset="50%" text-anchor="middle" textLength="372" lengthAdjust="spacing">FRESNO</textPath></text>
+    <text fill="#d8412f" transform="translate(2,2.5)"><textPath href="#arc2" startOffset="50%" text-anchor="middle" textLength="372" lengthAdjust="spacing">FRESNO</textPath></text>
+    <text fill="#f6e7a1" stroke="#111" stroke-width="1.4" paint-order="stroke"><textPath href="#arc2" startOffset="50%" text-anchor="middle" textLength="372" lengthAdjust="spacing">FRESNO</textPath></text>
   </g>
-  <g class="lbl-slab" font-size="50" text-anchor="middle">
-    <text x="306" y="221" fill="#111">· CLOVIS ·</text>
-    <text x="304" y="219" fill="#7e1a12">· CLOVIS ·</text>
-    <text x="300" y="215" fill="#f6e7a1" stroke="#111" stroke-width="1.2" paint-order="stroke">· CLOVIS ·</text>
+  <g class="lbl-slab" font-size="46" text-anchor="middle">
+    <text x="305" y="287" fill="#111">CLOVIS</text>
+    <text x="303" y="285" fill="#7e1a12">CLOVIS</text>
+    <text x="300" y="281" fill="#f6e7a1" stroke="#111" stroke-width="1.2" paint-order="stroke">CLOVIS</text>
   </g>
   <g transform="rotate(-7 300 560)">
     <text x="304" y="574" text-anchor="middle" class="lbl-script" font-size="92" fill="#111">Home Lines</text>
@@ -360,8 +375,9 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   <div class="body">
     <ol class="track"><span class="hlbar" aria-hidden="true"></span>
       <li class="stop home"><b>Home</b><span>Fresno &amp; Clovis</span></li>
+      <li class="run" aria-hidden="true"><span>Volunteer · Sundays</span></li>
       <li class="stop term"><b>Central California Food Bank</b><span>Volunteer, most Sundays, 2015 to 2021.</span>
-        <span class="hand"><svg viewBox="0 0 34 24" aria-hidden="true"><path d="M30,20 C22,6 12,4 4,8 M4,8 L10,3 M4,8 L10,12"/></svg>the first line: it opens in 2015</span></li>
+        <span class="hand"><svg viewBox="0 0 34 24" aria-hidden="true"><path d="M4,20 C12,6 22,4 30,8 M30,8 L24,3 M30,8 L24,12"/></svg>the first line: it opens in 2015</span></li>
     </ol>
   </div>
 </article>
@@ -372,8 +388,9 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   <div class="body">
     <ol class="track"><span class="hlbar" aria-hidden="true"></span>
       <li class="stop home"><b>Home</b><span>Fresno &amp; Clovis</span></li>
+      <li class="run" aria-hidden="true"><span>Volunteer · Saturdays</span></li>
       <li class="stop term"><b>Masjid Fresno Saturday School</b><span>Volunteer, most Saturdays, 2018 to 2021.</span>
-        <span class="hand"><svg viewBox="0 0 34 24" aria-hidden="true"><path d="M30,20 C22,6 12,4 4,8 M4,8 L10,3 M4,8 L10,12"/></svg>runs beside line F until 2021</span></li>
+        <span class="hand"><svg viewBox="0 0 34 24" aria-hidden="true"><path d="M4,20 C12,6 22,4 30,8 M30,8 L24,3 M30,8 L24,12"/></svg>runs beside line F until 2021</span></li>
     </ol>
   </div>
 </article>
@@ -388,9 +405,7 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
       <li class="stop"><b>VP &amp; Executive Director</b><span>May 2022 to Dec 2025</span>
         <span class="hand"><svg viewBox="0 0 34 24" aria-hidden="true"><path d="M30,4 C22,18 12,20 4,16 M4,16 L10,11 M4,16 L11,20"/></svg>the line forks here</span></li>
     </ol>
-    <svg class="fork" viewBox="0 0 1000 90" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M1000,0 V20 H10 V90 M256,20 V90 M502,20 V90 M748,20 V90"/>
-    </svg>
+    <div class="forkspace" aria-hidden="true"></div>
     <ul class="ends" aria-label="Four ends of line M">
       <li class="end"><span class="big">150+</span><p>community events.</p></li>
       <li class="end"><span class="big">$240K+</span><p>raised for Syrian and Afghan refugees and Pakistan flood victims.</p></li>
@@ -418,8 +433,9 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   <div class="body">
     <ol class="track"><span class="hlbar" aria-hidden="true"></span>
       <li class="stop home"><b>Home</b><span>Fresno &amp; Clovis</span></li>
+      <li class="run" aria-hidden="true"><span>Director of Community Relations</span></li>
       <li class="stop term"><b>Muslim Student Association</b><span>Director of Community Relations, Clovis Community College, 2022.</span>
-        <span class="hand"><svg viewBox="0 0 34 24" aria-hidden="true"><path d="M30,20 C22,6 12,4 4,8 M4,8 L10,3 M4,8 L10,12"/></svg>opens while line M is running</span></li>
+        <span class="hand"><svg viewBox="0 0 34 24" aria-hidden="true"><path d="M4,20 C12,6 22,4 30,8 M30,8 L24,3 M30,8 L24,12"/></svg>opens while line M is running</span></li>
     </ol>
   </div>
 </article>
@@ -430,8 +446,9 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   <div class="body">
     <ol class="track"><span class="hlbar" aria-hidden="true"></span>
       <li class="stop home"><b>Home</b><span>Fresno &amp; Clovis</span></li>
+      <li class="run" aria-hidden="true"><span>Tutor</span></li>
       <li class="stop term"><b>Instilt Educate</b><span>Tutor, 2023.</span>
-        <span class="hand"><svg viewBox="0 0 34 24" aria-hidden="true"><path d="M30,20 C22,6 12,4 4,8 M4,8 L10,3 M4,8 L10,12"/></svg>the newest line</span></li>
+        <span class="hand"><svg viewBox="0 0 34 24" aria-hidden="true"><path d="M4,20 C12,6 22,4 30,8 M30,8 L24,3 M30,8 L24,12"/></svg>the newest line</span></li>
     </ol>
   </div>
 </article>
@@ -447,7 +464,7 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
 
   /* ---------- system map data: two hand-set layouts, same topology ---------- */
   var W = {
-    home:{bar:[508,312,152,16],dots:{F:520,C:548,S:576,T:604,M:648},y:320,label:[590,288],sub:[590,306],labelAnchor:'start'},
+    home:{bar:[508,312,152,16],dots:{F:520,C:548,S:576,T:604,M:648},y:320,label:[590,282],sub:[590,299],labelAnchor:'start'},
     lines:{
       F:{d:'M520,320 H138', st:[[180,320,'t']], bul:[138,320],
          labels:[[180,294,'Central California Food Bank','t-st','start'],[180,352,'SUNDAYS · 2015–2021','svc','start']]},
@@ -463,28 +480,28 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
     },
     boro:[[40,610,'CENTRAL VALLEY'],[40,76,'FRESNO · CLOVIS']],
     pen:[
-      {t:'most Sundays',x:300,y:258,path:'M296,262 C270,268 250,280 236,300 M236,300 L238,290 M236,300 L246,296',r:-4},
-      {t:'the line forks here',x:760,y:430,path:'M905,398 C890,420 880,428 872,426 M905,398 L895,400 M905,398 L906,408',r:-3},
-      {t:'Fresno’s first',x:1000,y:470,path:'M1060,450 C1072,420 1068,394 1058,376 M1058,376 L1056,386 M1058,376 L1066,382',r:-5}
+      {t:'most Sundays',x:372,y:378,path:'M366,370 C392,352 414,344 430,332 M430,332 L420,334 M430,332 L428,342',r:-4},
+      {t:'the line forks here',x:792,y:250,path:'M912,258 C926,272 934,288 936,304 M936,304 L930,296 M936,304 L941,295',r:-3},
+      {t:'most Saturdays',x:458,y:536,path:'M470,512 C468,504 470,496 474,488 M474,488 L468,495 M474,488 L479,496',r:-3}
     ],
     grid:{w:1200,h:640,cols:10,rows:6}
   };
   var T = {
-    home:{bar:[127,292,136,16],dots:{F:138,C:168,S:198,T:228,M:252},y:300,label:[208,346],sub:[208,362],labelAnchor:'start'},
+    home:{bar:[127,292,136,16],dots:{F:138,C:168,S:198,T:228,M:252},y:300,label:[56,334],sub:[56,351],labelAnchor:'start'},
     lines:{
-      F:{d:'M138,300 H44 V186', st:[[44,196,'t']], bul:[44,250],
-         labels:[[34,150,'Central California','t-st','start'],[34,166,'Food Bank','t-st','start'],[34,182,'SUNDAYS','svcs','start']]},
-      C:{d:'M168,300 V210 L208,170 V78', st:[[208,86,'t']], bul:[168,250],
-         labels:[[224,70,'MSA, Clovis','t-st','start'],[224,86,'Community College','t-st','start'],[224,102,'2022','t-sub','start']]},
-      S:{d:'M198,300 V420 L130,488 V548', st:[[130,540,'t']], bul:[198,400],
-         labels:[[146,528,'Masjid Fresno','t-st','start'],[146,544,'Saturday School','t-st','start'],[146,560,'SATURDAYS','svcs','start']]},
-      T:{d:'M228,300 V436 L270,478 V548', st:[[270,540,'t']], bul:[228,400],
-         labels:[[286,528,'Instilt','t-st','start'],[286,544,'Educate','t-st','start'],[286,560,'2023','t-sub','start']]},
-      M:{d:'M252,300 H330 V214 M330,214 L370,174 V132 M330,214 V132 M330,214 L290,174 V132 M330,214 L250,134 V132', st:[[330,264,'s'],[330,232,'s'],[370,132,'t'],[330,132,'t'],[290,132,'t'],[250,132,'t']], bul:[294,300],
-         labels:[[318,268,'Earlier roles','t-sub','end'],[318,237,'VP & Exec. Director','t-sub','end'],
-                 [250,112,'drives','t-sub','middle'],[290,98,'150+','t-st','middle'],[330,112,'$240K+','t-st','middle'],[364,98,'$500K','t-st','middle']]}
+      F:{d:'M138,300 H44 V412', st:[[44,408,'t']], bul:[92,300],
+         labels:[[30,436,'Central California','t-st','start'],[30,452,'Food Bank','t-st','start'],[30,470,'SUNDAYS','svcs','start']]},
+      C:{d:'M168,300 V200 L128,160 V100', st:[[128,104,'t']], bul:[168,250],
+         labels:[[144,84,'MSA, Clovis','t-st','start'],[144,100,'Community College','t-st','start'],[144,116,'2022','t-sub','start']]},
+      S:{d:'M198,300 V420 L130,488 V548', st:[[130,544,'t']], bul:[198,382],
+         labels:[[146,532,'Masjid Fresno','t-st','start'],[146,548,'Saturday School','t-st','start'],[146,566,'SATURDAYS','svcs','start']]},
+      T:{d:'M228,300 V436 L270,478 V548', st:[[270,544,'t']], bul:[228,382],
+         labels:[[286,532,'Instilt','t-st','start'],[286,548,'Educate','t-st','start'],[286,564,'2023','t-sub','start']]},
+      M:{d:'M252,300 H340 V220 L260,140 M340,220 L300,180 V140 M340,220 V140 M340,220 L372,188 V140', st:[[340,276,'s'],[340,248,'s'],[260,140,'t'],[300,140,'t'],[340,140,'t'],[372,140,'t']], bul:[296,300],
+         labels:[[328,281,'Earlier roles','t-sub','end'],[328,253,'VP & Exec. Director','t-sub','end'],
+                 [260,124,'drives','t-sub','middle'],[300,110,'150+','t-st','middle'],[340,124,'$240K+','t-st','middle'],[368,110,'$500K','t-st','middle']]}
     },
-    boro:[[16,590,'CENTRAL VALLEY']],
+    boro:[[16,40,'CENTRAL VALLEY']],
     pen:[],
     grid:{w:390,h:600,cols:0,rows:0}
   };
@@ -523,7 +540,7 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
       el('circle',{'class':'ring',cx:ln.bul[0],cy:ln.bul[1],r:tall?17:22},g);
       ln.labels.forEach(function(lb){
         if (lb[3]==='svc' || lb[3]==='svcs'){
-          var w = lb[2].length*(lb[3]==='svcs'?6.6:7.6)+14;
+          var w = lb[2].length*8.3+14;
           var x0 = lb[4]==='start'?lb[0]:lb[0]-w/2;
           el('rect',{x:x0,y:lb[1]-13,width:w,height:18,fill:'#111'},g);
           el('text',{x:x0+7,y:lb[1],'class':'t-svc'},g,lb[2]);
@@ -572,7 +589,11 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
       if (line){ line.classList.remove('marked'); void line.offsetWidth; line.classList.add('marked'); }
     }
   }
-  document.querySelectorAll('.rbtn').forEach(function(b){ b.addEventListener('click', function(){ mark(b.getAttribute('data-r'), true); }); });
+  document.querySelectorAll('.rbtn').forEach(function(b){ b.addEventListener('click', function(){
+    mark(b.getAttribute('data-r'), true);
+    var fig = document.querySelector('.system'), r = fig.getBoundingClientRect();
+    if (current && (r.top > innerHeight * .55 || r.bottom < 80)) fig.scrollIntoView({block:'start', behavior: reduce ? 'auto' : 'smooth'});
+  }); });
   document.querySelectorAll('.lg').forEach(function(g){
     g.addEventListener('click', function(){ mark(g.getAttribute('data-r'), true); });
     g.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); mark(g.getAttribute('data-r'), true); } });
@@ -593,6 +614,27 @@ h1{font:700 clamp(30px,3.4vw,42px)/1 var(--sans);letter-spacing:-.015em;margin:0
   } else {
     document.querySelectorAll('.line').forEach(function(l){ l.classList.add('marked'); });
   }
+
+  /* ---------- the M line's fork, drawn to the real positions of its ends ---------- */
+  var mBody = document.querySelector('#line-M .body');
+  function drawFork(){
+    var old = mBody.querySelector('.forksvg'); if (old) old.remove();
+    if (!matchMedia('(min-width: 721px)').matches) return;
+    var track = mBody.querySelector('.track'), ends = mBody.querySelectorAll('.end');
+    var W = mBody.clientWidth, H = mBody.clientHeight, B = mBody.getBoundingClientRect();
+    var tr = track.getBoundingClientRect(), e0 = ends[0].getBoundingClientRect();
+    var lineY = tr.top - B.top + 20, x0 = W - 21;
+    var dotY = e0.top - B.top + 11;
+    var barY = dotY - 44;
+    var d = 'M' + (x0 - 6) + ',' + lineY + ' H' + x0 + ' V' + barY + ' H' + (e0.left - B.left + 11 - 5);
+    ends.forEach(function(e){ var x = e.getBoundingClientRect().left - B.left + 11; d += ' M' + x + ',' + (barY - 5) + ' V' + dotY; });
+    var svg = el('svg', {'class':'forksvg', width:W, height:H, viewBox:'0 0 ' + W + ' ' + H, 'aria-hidden':'true'}, null);
+    el('path', {d:d}, svg);
+    mBody.insertBefore(svg, mBody.firstChild);
+  }
+  drawFork();
+  var ft; addEventListener('resize', function(){ clearTimeout(ft); ft = setTimeout(drawFork, 80); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawFork);
 
   /* ---------- tear-off tabs ---------- */
   var tabs = document.querySelectorAll('.tab'), note = document.querySelector('.tornnote'), torn = 0;

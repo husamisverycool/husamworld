@@ -423,7 +423,8 @@ html.intro .skip{display:block}
     },
     /* the newspaper: a folded front page, masthead bar and columns */
     paper: function () {
-      return '<path ' + W + ' d="M8 8 h32 v32 H8z M11 12 v4 h26 v-4z M11 19 v18 h7 V19z M20.5 19 v18 h7 V19z M30 19 v18 h7 V19z" fill-rule="evenodd"/>';
+      return '<path ' + W + ' fill-rule="evenodd" d="M7 5 h28 l6 6 v32 H7z M11 10 v5.5 h20 V10z M11 19.5 v10 h12 v-10z M26 19.5 v2.5 h11 v-2.5z M26 25 v2.5 h11 v-2.5z M11 32.5 v2.5 h26 v-2.5z M11 37.5 v2.5 h19 v-2.5z"/>' +
+        '<path ' + W + ' d="M36.5 5 v4.5 h4.5z"/>';
     },
     /* a research tour: a walker with a book */
     tour: function () {
@@ -745,7 +746,7 @@ var ENTRIES = [
   { code: 'LTU', name: 'Lithuania', what: 'Hillel Travel Program', places: ['lithuania'], hl: [2], f: midFocus(['cambridge', 'lithuania'], 1.05, [0.6, 1.4]) },
   { code: 'POL', name: 'Poland', what: 'Hillel Travel Program', places: ['poland'], hl: [3], f: midFocus(['cambridge', 'poland'], 1.05, [0.6, 1.4]) },
   { code: 'HUN', name: 'Hungary', what: 'Hillel Travel Program', places: ['hungary'], hl: [4], f: midFocus(['cambridge', 'hungary'], 1.05, [0.6, 1.4]) },
-  { code: 'PRI', name: 'Puerto Rico', what: 'Catalyst Sustainability', places: ['pr'], hl: [6], f: midFocus(['cambridge', 'pr'], 1.5) },
+  { code: 'PRI', name: 'Puerto Rico', what: 'Catalyst Sustainability', places: ['pr'], hl: [6], f: midFocus(['cambridge', 'pr'], 1.12) },
   { code: 'EUR', name: 'Europe', what: 'HMC Europe', places: ['europe'], hl: [1], f: midFocus(['cambridge', 'europe'], 0.98, [0.7, 1.3]) }
 ];
 ENTRIES.forEach(function (e) { e.f.lat = clamp(e.f.lat, -78, 80); });
@@ -873,7 +874,7 @@ function buildLetters() {
   var c = doc.createElement('canvas'); c.width = bw * SX; c.height = bh * SY;
   var g = c.getContext('2d', { willReadFrequently: true });
   var fpx = L.a * M.cw / 0.6, usedRows = L.lines.length * L.capRows + (L.lines.length - 1) * L.gap;
-  var y0rows = Math.max(0, Math.round((bh - usedRows) * (F.wide ? 0.45 : 0.3)));
+  var y0rows = Math.max(0, Math.round((bh - usedRows) * (F.wide ? 0.3 : 0.3)));
   g.fillStyle = '#fff'; g.strokeStyle = '#fff'; g.textBaseline = 'alphabetic'; g.lineJoin = 'round';
   L.lines.forEach(function (text, li) {
     var topRows = y0rows + li * (L.capRows + L.gap);
@@ -986,9 +987,11 @@ function flapWord(w) {
   if (REDUCED) { WF.cur = WF.tgt.slice(); F.word = w; buildLetters(); F.dirty = true; }
 }
 function wordTick(now) {
-  if (now < WF.next) return; WF.next = now + 33;
+  if (now < WF.next) return;
+  /* time-based, so a slow frame rate never leaves the word half-changed for long */
+  var steps = Math.min(8, 1 + Math.floor((now - WF.next) / 33)); WF.next = now + 33;
   var ch = false;
-  for (var k = 0; k < WF.cur.length; k++) {
+  for (var n = 0; n < steps; n++) for (var k = 0; k < WF.cur.length; k++) {
     if (now - WF.t0 < k * 100 || WF.cur[k] === WF.tgt[k]) continue;
     WF.cur[k] = LDRUM.charAt((LDRUM.indexOf(WF.cur[k]) + 1) % LDRUM.length); ch = true;
   }
@@ -1011,7 +1014,7 @@ function heroLayout(W, H) {
   }
   var top = (F.box ? (F.box.y1 + 1.2) * lh : hb + lh * 10);
   var R2 = Math.max(110, Math.min(W / 2 - 2 * cw, 210));
-  return { cx: W / 2, cy: top + R2 + lh * 0.6, R: R2 };
+  return { cx: W / 2, cy: top + R2 + lh * 1.6, R: R2 };
 }
 function globeUpdate(now, dt) {
   var hl = G.hero;
@@ -1231,6 +1234,8 @@ function globeFrame(now) {
     var el = now - INTRO.t0;
     for (y = 0; y < rows; y++) for (x = 0; x < cols; x++) if (el < trCell(x, y)) { var q2 = y * cols + x; g.ch[q2] = ' '; g.bg[q2] = 0; }
   }
+  /* phones: the globe stays inside its own band, above the hint */
+  if (G.botPx) { var yb = Math.floor(G.botPx / lh); for (y = Math.max(0, yb); y < rows; y++) for (x = 0; x < cols; x++) { var q5 = y * cols + x; g.ch[q5] = ' '; g.bg[q5] = 0; } }
   /* keep the bottom-left 72×72 corner free for the shared world button */
   for (y = 0; y < rows; y++) for (x = 0; x < cols; x++) if (inCorner(x, y, g)) { var q3 = y * cols + x; g.ch[q3] = ' '; g.bg[q3] = 0; }
   g.render();
@@ -1519,7 +1524,27 @@ function buildBoards() {
   /* the sign sheet */
   $$('.sheet .sq').forEach(function (el) { el.innerHTML = pictoSVG(el.getAttribute('data-p')); });
 }
-function layoutBoards() { Object.keys(BOARDS).forEach(function (k) { BOARDS[k].info.build(); }); }
+/* long names are painted narrower, as sign painters did on real flaps */
+var fitCanvas = null;
+function fitFlaps() {
+  fitCanvas = fitCanvas || doc.createElement('canvas').getContext('2d');
+  Object.keys(BOARDS).forEach(function (k) {
+    BOARDS[k].rows.forEach(function (r) {
+      r.grps.forEach(function (g) {
+        if (g.letter) return;
+        var el = g.f.el; el.style.fontSize = '';
+        var cs = getComputedStyle(el), fs = parseFloat(cs.fontSize), ls = parseFloat(cs.letterSpacing) || 0;
+        var avail = el.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 4;
+        if (avail <= 0) return;
+        fitCanvas.font = '700 ' + fs + 'px ' + FONT;
+        var need = 0;
+        g.vals.forEach(function (v) { v = v.toUpperCase(); need = Math.max(need, fitCanvas.measureText(v).width + ls * v.length); });
+        if (need > avail) el.style.fontSize = Math.max(fs * 0.7, fs * avail / need).toFixed(2) + 'px';
+      });
+    });
+  });
+}
+function layoutBoards() { Object.keys(BOARDS).forEach(function (k) { BOARDS[k].info.build(); }); fitFlaps(); }
 function arriveBoard(key) {
   var B = BOARDS[key]; if (!B || BOARDS_SEEN[key]) return; BOARDS_SEEN[key] = 1;
   if (REDUCED) return;
@@ -1560,7 +1585,7 @@ function layoutAll() {
   var PH = null;
   if (!F.wide) {
     PH = { bh: 9, R: Math.max(110, Math.min(W / 2 - 2 * M.cw, 210)) };
-    hpad.style.height = Math.round((PH.bh + 2) * M.lh + 2 * PH.R + 2.5 * M.lh) + 'px';
+    hpad.style.height = Math.round((PH.bh + 2) * M.lh + 2 * PH.R + 3.5 * M.lh) + 'px';
   } else hpad.style.height = '0px';
   var hr = hero.getBoundingClientRect(), H = hr.height;
   FG.resize(hr.width, H, M);
@@ -1588,6 +1613,7 @@ function layoutAll() {
   if (F.infoForce === 1 && !F.info && F.wide) F.info = { x: Math.max(9, F.gx - 30), y: rows - 13 };
   if (F.infoForce === 0) F.info = null;
   if (G.cx === 0) { G.cx = G.hero.cx; G.cy = G.hero.cy; G.R = G.hero.R; }
+  G.botPx = F.wide ? 0 : hint.getBoundingClientRect().top - hr.top - M.lh * 0.5;
   INTRO.k = 1500 / (FG.cols / 3 + 2 * FG.rows);
   INTRO.end = INTRO.noise + 1500 + 300 + 60;
   prepareDecode();

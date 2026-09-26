@@ -1,0 +1,438 @@
+<script>
+(function(){
+'use strict';
+var doc=document,$=function(id){return doc.getElementById(id)};
+var RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
+var INK='#1d1a17';
+
+/* =====================================================================
+   The cartoon: 1970s cel style. Fat boiling ink, flat colour, held poses.
+   Every drawing is made here; nothing is loaded.
+   ===================================================================== */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function T(x,y,size,txt,o){o=o||{};return '<text class="t" x="'+x+'" y="'+y+'" font-size="'+size+'"'+(o.anchor?' text-anchor="'+o.anchor+'"':' text-anchor="middle"')+(o.fill?' fill="'+o.fill+'" style="fill:'+o.fill+'"':'')+(o.font?' font-family="'+o.font+'"':'')+(o.w?' font-weight="'+o.w+'"':'')+(o.ls?' letter-spacing="'+o.ls+'"':'')+(o.cls?' class="t '+o.cls+'"':'')+(o.style?' style="'+o.style+'"':'')+'>'+txt+'</text>'}
+function hand(x,y){return '<circle class="ink" style="stroke-width:5" cx="'+x+'" cy="'+y+'" r="11" fill="#fff"/>'}
+function arm(d){return '<path class="ink" fill="none" d="'+d+'"/>'}
+
+/* the bill: feet at (0,0), about 320 tall */
+function bill(label,o){
+  o=o||{};var pose=o.pose||'stand',mouth=o.mouth||'smile',s='';
+  // legs
+  function legs(a,b){return arm('M-28 -64 L'+a[0]+' '+a[1])+arm('M28 -64 L'+b[0]+' '+b[1])+
+    '<ellipse class="ink" style="stroke-width:5" cx="'+(a[0]-12)+'" cy="'+(a[1]+4)+'" rx="22" ry="10" fill="#fff"/><ellipse class="ink" style="stroke-width:5" cx="'+(b[0]+12)+'" cy="'+(b[1]+4)+'" rx="22" ry="10" fill="#fff"/>'}
+  if(pose==='sit') s+=arm('M-26 -64 Q-30 -34 -46 -8')+arm('M26 -64 Q30 -34 46 -8')+'<ellipse class="ink" style="stroke-width:5" cx="-58" cy="-4" rx="26" ry="14" fill="#fff"/><ellipse class="ink" style="stroke-width:5" cx="58" cy="-4" rx="26" ry="14" fill="#fff"/>';
+  else if(o.walk) s+='<g class="lA">'+legs([-46,-14],[40,-14])+'</g><g class="lB">'+legs([-22,-14],[22,-14])+'</g>';
+  else s+=legs([-32,-14],[32,-14]);
+  // body
+  s+='<path class="ink" fill="#fffdf4" d="M-62 -262 C-72 -200 -68 -120 -60 -66 L60 -62 C68 -130 72 -210 64 -250 C62 -290 22 -304 -8 -296 C-38 -289 -60 -282 -62 -262Z"/>';
+  s+='<path class="ink" fill="#efe4c4" d="M64 -250 C88 -284 70 -322 32 -314 C4 -310 -6 -298 -8 -296 C20 -300 46 -288 64 -250Z"/>';
+  s+='<path d="M-44 -86 H22 M-44 -74 H6" stroke="#cfc8b2" stroke-width="3"/>';
+  // face
+  s+='<path d="M-36 -254 q14 -9 27 -3 M9 -257 q14 -6 27 3" fill="none" stroke="'+INK+'" stroke-width="5" stroke-linecap="round"/>';
+  s+='<g class="eyes"><ellipse class="ink" style="stroke-width:5" cx="-19" cy="-222" rx="17" ry="22" fill="#fff"/><ellipse class="ink" style="stroke-width:5" cx="19" cy="-222" rx="17" ry="22" fill="#fff"/><circle cx="'+(o.look==='up'?-17:-14)+'" cy="'+(o.look==='up'?-230:-215)+'" r="6.5" fill="'+INK+'"/><circle cx="'+(o.look==='up'?21:24)+'" cy="'+(o.look==='up'?-230:-215)+'" r="6.5" fill="'+INK+'"/></g>';
+  s+='<path d="M-1 -196 q11 9 0 17" fill="none" stroke="'+INK+'" stroke-width="5" stroke-linecap="round"/>';
+  if(mouth==='o') s+='<ellipse class="ink" style="stroke-width:5" cx="0" cy="-158" rx="11" ry="13" fill="#7a2a22"/>';
+  else if(mouth==='flat') s+='<path d="M-16 -160 q16 -5 30 2" fill="none" stroke="'+INK+'" stroke-width="5" stroke-linecap="round"/>';
+  else s+='<path d="M-24 -166 q22 17 44 0" fill="none" stroke="'+INK+'" stroke-width="5" stroke-linecap="round"/>';
+  // sash + campaign button with its number
+  s+='<path class="ink" style="stroke-width:4" fill="#d63a2f" d="M-64 -150 L63 -100 L62 -78 L-63 -128Z"/>';
+  s+='<g transform="translate(18 -100)"><circle class="ink" style="stroke-width:5" r="40" fill="#fff"/><path d="M-37 -2 a37 37 0 0 1 74 0z" fill="#d63a2f"/><path d="M-37 2 a37 37 0 0 0 74 0z" fill="#2d4fa0"/><rect class="ink" style="stroke-width:3" x="-39" y="-14" width="78" height="27" fill="#fff"/>'+T(0,7,label.length>7?15:17,esc(label))+'</g>';
+  // arms
+  if(pose==='wave'){s+=arm('M-60 -150 Q-96 -120 -100 -74')+hand(-100,-70)+'<g transform="translate(60 -150)"><g class="wave">'+arm('M0 0 Q44 -18 50 -84')+hand(50,-90)+'</g></g>';}
+  else if(pose==='cheer'){s+=arm('M-60 -150 Q-104 -170 -104 -236')+hand(-104,-242)+arm('M60 -150 Q104 -170 104 -236')+hand(104,-242);}
+  else if(pose==='raise'){s+=arm('M-60 -150 Q-96 -120 -100 -74')+hand(-100,-70)+arm('M60 -150 Q74 -210 70 -272')+hand(70,-278);}
+  else if(pose==='hold'){s+=arm('M-60 -150 Q-84 -86 -30 -58')+hand(-26,-56)+arm('M60 -150 Q84 -86 30 -58')+hand(26,-56);}
+  else if(pose==='phone'){s+=arm('M-60 -150 Q-96 -120 -100 -74')+hand(-100,-70)+arm('M60 -150 Q96 -150 76 -206')+'<path class="ink" style="stroke-width:5" fill="#d63a2f" d="M56 -238 q-18 30 6 56 l14 -10 q-14 -18 -4 -36z"/>'+hand(74,-210);}
+  else if(pose==='sit'){s+=arm('M-60 -150 Q-92 -110 -80 -70')+hand(-78,-66)+arm('M60 -150 Q92 -110 80 -70')+hand(78,-66);}
+  else {s+=arm('M-60 -150 Q-96 -120 -100 -74')+hand(-100,-70)+arm('M60 -150 Q96 -120 100 -74')+hand(100,-70);}
+  return s;
+}
+/* the advocate who carries it: feet at (0,0) */
+function person(o){
+  o=o||{};var s='';
+  function lg(a,b){return '<path d="M-16 -124 L'+a+' -10 M16 -124 L'+b+' -10" stroke="'+INK+'" stroke-width="34" stroke-linecap="round"/><path d="M-16 -124 L'+a+' -10 M16 -124 L'+b+' -10" stroke="#2b3140" stroke-width="24" stroke-linecap="round"/>'+
+    '<ellipse class="ink" style="stroke-width:5" cx="'+(a-8)+'" cy="-4" rx="24" ry="11" fill="#3a2a22"/><ellipse class="ink" style="stroke-width:5" cx="'+(b+8)+'" cy="-4" rx="24" ry="11" fill="#3a2a22"/>'}
+  if(o.walk) s+='<g class="lA">'+lg(-36,26)+'</g><g class="lB">'+lg(-10,10)+'</g>'; else s+=lg(-20,20);
+  s+='<path class="ink" fill="#2d4fa0" d="M-50 -262 Q-62 -170 -46 -118 L46 -118 Q62 -170 50 -262 Q0 -284 -50 -262Z"/>';
+  s+='<path d="M-6 -270 L0 -240 L6 -270" fill="#fffdf4" stroke="'+INK+'" stroke-width="4"/>';
+  s+=arm('M-48 -248 Q-74 -190 -66 -128')+'<circle class="ink" style="stroke-width:5" cx="-66" cy="-122" r="11" fill="#b97b52"/>';
+  s+=arm('M48 -248 Q76 -190 68 -128')+'<circle class="ink" style="stroke-width:5" cx="68" cy="-122" r="11" fill="#b97b52"/>';
+  s+='<path d="M-22 -262 L0 -212 L22 -262" fill="none" stroke="#d63a2f" stroke-width="6"/><rect class="ink" style="stroke-width:4" x="-22" y="-214" width="44" height="30" fill="#fff"/>'+T(0,-193,15,'CAIR');
+  s+='<rect x="-12" y="-288" width="24" height="24" fill="#b97b52" stroke="'+INK+'" stroke-width="5"/>';
+  s+='<circle class="ink" cx="0" cy="-326" r="44" fill="#b97b52"/>';
+  s+='<path class="ink" fill="#231a14" d="M-45 -330 C-52 -392 52 -392 45 -330 C34 -352 -6 -364 -45 -330Z"/>';
+  s+='<circle cx="-15" cy="-322" r="5" fill="'+INK+'"/><circle cx="15" cy="-322" r="5" fill="'+INK+'"/><path d="M-14 -302 q14 11 28 0" fill="none" stroke="'+INK+'" stroke-width="5" stroke-linecap="round"/>';
+  return s;
+}
+function palm(x,y,h,flip){
+  var tx=flip?-1:1,top=[x+tx*-18,y-h],s='';
+  var tr='M'+x+' '+y+' Q'+(x+tx*34)+' '+(y-h*.55)+' '+top[0]+' '+top[1];
+  s+='<path d="'+tr+'" fill="none" stroke="'+INK+'" stroke-width="40" stroke-linecap="round"/><path d="'+tr+'" fill="none" stroke="#9a6a3c" stroke-width="28" stroke-linecap="round"/>';
+  for(var k=0;k<5;k++){var yy=y-h*(.15+k*.16);s+='<path d="M'+(x+tx*(8-k*6)-14)+' '+yy+' q14 -8 28 0" fill="none" stroke="#6e4726" stroke-width="4"/>';}
+  var fr=[[-150,40],[-120,-50],[-40,-90],[50,-92],[130,-40],[160,50],[20,70]];
+  fr.forEach(function(f){var d='M'+top[0]+' '+top[1]+' q'+(f[0]*.5)+' '+(f[1]*.3-60)+' '+f[0]+' '+f[1];
+    s+='<path d="'+d+'" fill="none" stroke="'+INK+'" stroke-width="36" stroke-linecap="round"/><path d="'+d+'" fill="none" stroke="#3f8f3a" stroke-width="24" stroke-linecap="round"/>';});
+  return s;
+}
+function star(x,y,r,fill){var p='';for(var i=0;i<10;i++){var a=Math.PI/5*i-Math.PI/2,rr=i%2?r*.45:r;p+=(i?'L':'M')+(x+Math.cos(a)*rr).toFixed(1)+' '+(y+Math.sin(a)*rr).toFixed(1);}return '<g><path class="ink" style="stroke-width:5" fill="'+fill+'" d="'+p+'Z"/></g>'}
+function g(inner,tr,cls,style){return '<g'+(tr?' transform="'+tr+'"':'')+(cls?' class="'+cls+'"':'')+(style?' style="'+style+'"':'')+'>'+inner+'</g>'}
+function sky(c){return '<rect width="1600" height="900" fill="'+(c||'#62c3d6')+'"/>'}
+
+var SC=[];
+/* 0 · the steps of the State Capitol, Sacramento */
+SC.push(function(){
+  var s=sky()+'<circle class="ink" cx="1400" cy="150" r="70" fill="#f2b632"/>';
+  s+='<path class="ink" fill="#4f9a55" d="M0 610 C80 540 160 560 220 590 C300 530 380 560 420 600 L1180 600 C1240 540 1330 560 1380 590 C1450 530 1540 560 1600 590 L1600 640 L0 640Z"/>';
+  var c='<g class="ink" style="stroke-width:6">';
+  c+='<rect x="650" y="196" width="300" height="74" fill="#f4ecd8"/><rect x="684" y="128" width="232" height="80" fill="#fbf6e6"/>';
+  c+='<path d="M684 130 C684 22 916 22 916 130Z" fill="#fbf6e6"/><path d="M700 110 C730 60 870 60 900 110" fill="none"/>';
+  c+='<rect x="782" y="22" width="36" height="26" fill="#fbf6e6"/><path d="M780 24 C780 4 820 4 820 24Z" fill="#fbf6e6"/></g>';
+  c+='<circle class="ink" style="stroke-width:5" cx="800" cy="-2" r="12" fill="#f2b632"/>';
+  c+='<path d="M708 140 v60 M740 140 v60 M772 140 v60 M828 140 v60 M860 140 v60 M892 140 v60" stroke="'+INK+'" stroke-width="5"/>';
+  c+='<g class="ink"><rect x="250" y="392" width="1100" height="24" fill="#f4ecd8"/><rect x="262" y="414" width="1076" height="196" fill="#fbf6e6"/></g>';
+  for(var i=0;i<8;i++){c+='<rect class="ink" style="stroke-width:4" x="'+(300+i*34)+'" y="450" width="18" height="44" fill="#9fd9e4"/><rect class="ink" style="stroke-width:4" x="'+(1030+i*34)+'" y="450" width="18" height="44" fill="#9fd9e4"/>';
+    c+='<rect class="ink" style="stroke-width:4" x="'+(300+i*34)+'" y="530" width="18" height="44" fill="#9fd9e4"/><rect class="ink" style="stroke-width:4" x="'+(1030+i*34)+'" y="530" width="18" height="44" fill="#9fd9e4"/>';}
+  c+='<g class="ink"><rect x="590" y="330" width="420" height="280" fill="#fbf6e6"/><path d="M566 334 L800 246 L1034 334Z" fill="#f4ecd8"/></g>';
+  c+='<path d="M650 318 L800 262 L950 318Z" fill="none" stroke="'+INK+'" stroke-width="4"/>';
+  for(var j=0;j<8;j++) c+='<rect class="ink" style="stroke-width:4" x="'+(612+j*52)+'" y="350" width="22" height="250" fill="#fff"/>';
+  c+='<rect class="ink" style="stroke-width:5" x="578" y="330" width="444" height="22" fill="#f4ecd8"/>';
+  var st='';[[520,1080,610],[470,1130,640],[420,1180,670],[370,1230,700]].forEach(function(r){st+='<rect class="ink" style="stroke-width:5" x="'+r[0]+'" y="'+r[2]+'" width="'+(r[1]-r[0])+'" height="30" fill="#ddd2b8"/>';});
+  s+=g(c+st,'','boil');
+  s+='<rect class="ink" x="-10" y="730" width="1620" height="190" fill="#7fb446"/>';
+  s+=g(palm(150,760,420)+palm(1450,760,420,true),'','boil');
+  s+=g(g(bill('AB 1766',{pose:'sit',mouth:'flat'}),'','sighs'),'translate(960 702) scale(.74)','early boil','--del:4.6s');
+  s+=g(bill('AB 1766',{pose:'wave'}),'translate(960 700) scale(.74)','late boil','--del:4.6s');
+  s+=g(g(person({walk:true}),'','walk','--from:-900px;--dur:2.8s;--del:1.4s'),'translate(700 860) scale(.84)','boil');
+  return s;
+});
+/* 1 · upstairs: Assembly green, Senate red */
+SC.push(function(){
+  var s='<rect width="1600" height="900" fill="#f2dfb9"/><rect class="ink" x="-10" y="560" width="1620" height="150" fill="#d9ad72"/><path d="M0 590 H1600" stroke="'+INK+'" stroke-width="4"/>';
+  s+='<rect class="ink" x="-10" y="706" width="1620" height="210" fill="#c7b08a"/>';
+  function door(x,col,a,b,c){var d='<rect class="ink" style="stroke-width:7" x="'+x+'" y="160" width="420" height="548" fill="'+col+'"/><rect x="'+(x+40)+'" y="420" width="150" height="250" fill="none" stroke="'+INK+'" stroke-width="4"/><rect x="'+(x+230)+'" y="420" width="150" height="250" fill="none" stroke="'+INK+'" stroke-width="4"/><circle class="ink" style="stroke-width:4" cx="'+(x+206)+'" cy="560" r="12" fill="#f2b632"/>';
+    d+='<rect class="ink" style="stroke-width:5" x="'+(x+30)+'" y="196" width="360" height="190" fill="#fbf6e6"/>'+T(x+210,262,50,a,{font:'Shrikhand',w:'400',fill:col})+T(x+210,314,31,b)+T(x+210,356,22,c,{w:'600'});return d;}
+  s+=g(door(170,'#2f7d4a','Assembly','Asm. Jim Patterson','Leg. Director Ian Coolbear')+door(1010,'#b2332b','Senate','Sen. Shannon Grove','State Senate'),'','boil');
+  s+='<path d="M40 822 H800 V772 H1560" fill="none" stroke="'+INK+'" stroke-width="36" stroke-linejoin="round"/><path d="M40 822 H800" stroke="#2f7d4a" stroke-width="24"/><path d="M800 772 H1560" stroke="#b2332b" stroke-width="24"/><path d="M800 834 V772" stroke="#6e6e6e" stroke-width="24"/>';
+  s+=T(60,880,30,'ASSEMBLY',{anchor:'start',fill:'#2f7d4a',ls:'3'})+T(1540,730,30,'SENATE',{anchor:'end',fill:'#b2332b',ls:'3'});
+  s+=g(g(g(bill('AB 1766',{walk:true}),'','up','--dur:3s;--del:1s'),'','walk','--from:-820px;--dur:3s;--del:1s'),'translate(1220 760) scale(.72)','boil');
+  s+=g(g(person({walk:true}),'','walk','--from:-760px;--dur:3.2s;--del:.8s'),'translate(560 842) scale(.78)','boil');
+  return s;
+});
+/* 2 · five bills */
+SC.push(function(){
+  var s='<rect width="1600" height="900" fill="#c9874d"/>';
+  for(var x=100;x<1600;x+=200) s+='<path d="M'+x+' 0 V700" stroke="#a86a35" stroke-width="5"/>';
+  s+=g('<rect class="ink" x="260" y="44" width="1080" height="140" fill="#fbf6e6"/>'+T(800,124,54,'Five bills, worked end to end',{font:'Shrikhand',w:'400',fill:'#d63a2f'})+T(800,166,26,'SACRAMENTO · MAY 2021 – MAY 2023',{ls:'3'}),'','boil');
+  s+='<rect class="ink" x="-10" y="668" width="1620" height="40" fill="#a86a3c"/><rect class="ink" x="-10" y="706" width="1620" height="210" fill="#7e4a2a"/>';
+  var B=[['AB 1947','Hate crimes',240,.62,.8],['SB 1161','Transit safety',520,.62,1.4],['AB 1766','IDs for All',800,.74,.2],['AB 2549','Street harassment',1080,.62,2],['SB 1038','Surveillance limits',1360,.62,2.6]];
+  B.forEach(function(b){
+    var card='<rect class="ink" style="stroke-width:5" x="'+(b[2]-122)+'" y="'+(b[0]==='AB 1766'?300:360)+'" width="244" height="58" fill="#fbf6e6"/>'+T(b[2],(b[0]==='AB 1766'?340:400),26,b[1]);
+    s+=g(g(card+g(bill(b[0],{pose:b[0]==='AB 1766'?'cheer':'stand',mouth:b[0]==='AB 1766'?'o':'smile'}),'translate('+b[2]+' 690) scale('+b[3]+')'),'','pop-in','--del:'+b[4]+'s'),'','boil');
+  });
+  return s;
+});
+/* 3 · the House, district office in Clovis */
+SC.push(function(){
+  var s=sky('#7fd0de')+'<circle class="ink" cx="170" cy="130" r="56" fill="#f2b632"/>';
+  var b='<rect class="ink" x="250" y="190" width="1100" height="540" fill="#c96a45"/>';
+  for(var y=460;y<720;y+=40) b+='<path d="M250 '+y+' H330 M1030 '+y+' H1080 M1290 '+y+' H1350" stroke="#a3502f" stroke-width="4"/>';
+  b+='<rect class="ink" x="300" y="222" width="1000" height="116" fill="#1b4b6f"/>'+T(800,280,46,'U.S. HOUSE OF REPRESENTATIVES',{fill:'#fbf6e6',ls:'2'})+T(800,322,27,'DISTRICT OFFICE · CLOVIS, CALIFORNIA',{fill:'#f2b632',ls:'3'});
+  for(var i=0;i<11;i++) b+='<rect x="'+(300+i*91)+'" y="352" width="91" height="58" fill="'+(i%2?'#fbf6e6':'#d63a2f')+'"/>';
+  b+='<rect x="300" y="352" width="1001" height="58" fill="none" stroke="'+INK+'" stroke-width="6"/>';
+  for(var k=0;k<11;k++) b+='<path class="ink" style="stroke-width:5" d="M'+(300+k*91)+' 408 a45.5 26 0 0 0 91 0" fill="'+(k%2?'#fbf6e6':'#d63a2f')+'"/>';
+  b+='<rect class="ink" x="330" y="450" width="700" height="260" fill="#bfe6ee"/>';
+  b+='<rect class="ink" style="stroke-width:5" x="1080" y="450" width="200" height="280" fill="#1b4b6f"/><rect class="ink" style="stroke-width:4" x="1100" y="470" width="160" height="112" fill="#fbf6e6"/>'+T(1180,506,22,'Office of')+T(1180,536,24,'Kevin')+T(1180,566,24,'McCarthy');
+  s+=g(b,'','boil');
+  s+=g(bill('INTERN',{pose:'raise',mouth:'o'}),'translate(800 650) scale(.56)','boil');
+  s+=g('<rect class="ink" x="380" y="600" width="600" height="110" fill="#8a5530"/>'+T(680,670,30,'INTERN · JUNE – DEC. 2022',{fill:'#fbf6e6',ls:'2'}),'','boil');
+  s+=g(g('<path class="ink" style="stroke-width:5" d="M440 600 l10 -40 h80 l10 40z" fill="#d63a2f"/><path class="ink" style="stroke-width:5" d="M430 556 q60 -40 120 0 l-12 12 q-48 -22 -96 0z" fill="#d63a2f"/>','','ring'),'','boil');
+  s+='<path d="M420 540 l-24 -18 M420 520 l-8 -26 M560 540 l24 -18 M560 520 l8 -26" stroke="'+INK+'" stroke-width="5" stroke-linecap="round"/>';
+  s+='<rect class="ink" x="-10" y="728" width="1620" height="190" fill="#b9b3a4"/><path d="M0 760 H1600" stroke="'+INK+'" stroke-width="4"/>';
+  s+=g('<rect class="ink" style="stroke-width:5" x="1452" y="140" width="16" height="600" fill="#ddd"/><circle class="ink" style="stroke-width:5" cx="1460" cy="134" r="12" fill="#f2b632"/>','','boil');
+  var f='';for(var r=0;r<7;r++) f+='<rect x="1468" y="'+(150+r*14)+'" width="130" height="14" fill="'+(r%2?'#fbf6e6':'#d63a2f')+'"/>';
+  f+='<rect x="1468" y="150" width="58" height="56" fill="#2d4fa0"/><rect x="1468" y="150" width="130" height="98" fill="none" stroke="'+INK+'" stroke-width="5"/>';
+  s+=g(g(f,'','flag'),'','boil');
+  return s;
+});
+/* 4 · LegislativeLift */
+SC.push(function(){
+  var s='<rect width="1600" height="900" fill="#8f2a2a"/>';
+  for(var x=40;x<1600;x+=80) s+='<path d="M'+x+' 80 V660" stroke="#6e1f1f" stroke-width="12"/>';
+  var v='<path class="ink" fill="#b8392f" d="M-10 -10 H1610 V70';for(var i=0;i<16;i++) v+=' q-50 50 -100 0';v+='Z"/>';s+=g(v,'','boil');
+  [['EGYPT','#f2b632',300],['INDIA','#62c3d6',800],['U.S.','#fbf6e6',1300]].forEach(function(b){
+    s+=g('<path d="M'+(b[2]-100)+' 70 V116 M'+(b[2]+100)+' 70 V116" stroke="'+INK+'" stroke-width="5"/><path class="ink" fill="'+b[1]+'" d="M'+(b[2]-150)+' 116 H'+(b[2]+150)+' V250 L'+b[2]+' 290 L'+(b[2]-150)+' 250Z"/>'+T(b[2],214,62,b[0],{font:'Shrikhand',w:'400'}),'','boil');});
+  s+=g('<rect class="ink" x="60" y="370" width="250" height="190" fill="#fbf6e6"/>'+T(185,452,70,'11K+',{font:'Shrikhand',w:'400',fill:'#d63a2f'})+T(185,506,26,'MEMBERS',{ls:'3'})+
+       '<rect class="ink" x="1290" y="370" width="250" height="190" fill="#fbf6e6"/>'+T(1415,452,70,'80+',{font:'Shrikhand',w:'400',fill:'#2d4fa0'})+T(1415,506,26,'VOLUNTEERS',{ls:'3'}),'','boil');
+  s+='<rect class="ink" x="-10" y="640" width="1620" height="60" fill="#b07a44"/><rect class="ink" x="-10" y="698" width="1620" height="220" fill="#6b4125"/>';
+  s+=g(bill('AB 1766',{pose:'cheer',mouth:'o'}),'translate(800 560) scale(.66)','boil');
+  var p='<path class="ink" fill="#fbf6e6" d="M600 470 H1000 L980 700 H620Z"/>'+T(800,530,34,'LEGISLATIVELIFT',{ls:'2',fill:'#1b4b6f'});
+  p+=T(800,584,30,'volunteer',{w:'600'})+'<path class="strike" d="M720 574 H880" stroke="#c0392b" stroke-width="5" style="--del:1.6s"/>';
+  p+=g(T(800,626,30,'Outreach Director',{w:'600'})+'<path class="strike" d="M680 616 H920" stroke="#c0392b" stroke-width="5" style="--del:3s"/>','','late','--del:1.6s');
+  p+=g(T(800,670,32,'Executive Director',{style:'font-style:italic;fill:#1c3f8f'}),'','late','--del:3s');
+  s+=g(p,'','boil');
+  var cr='';var cols=['#b97b52','#8a5a3c','#e0b089','#6b4125','#c98e62','#f2c9a0'];
+  for(var r=0;r<2;r++) for(var c=0;c<14;c++){var cx=30+c*118+(r?58:0),cy=820+r*70;cr+='<g class="crowd" style="animation-delay:'+((c+r)%3*.27)+'s"><circle class="ink" cx="'+cx+'" cy="'+cy+'" r="46" fill="'+cols[(c+r*2)%6]+'"/><path class="ink" style="stroke-width:5" fill="#231a14" d="M'+(cx-46)+' '+(cy-4)+' C'+(cx-50)+' '+(cy-66)+' '+(cx+50)+' '+(cy-66)+' '+(cx+46)+' '+(cy-4)+' C'+(cx+26)+' '+(cy-30)+' '+(cx-20)+' '+(cy-34)+' '+(cx-46)+' '+(cy-4)+'Z"/></g>';}
+  s+=g(cr,'','boil');
+  return s;
+});
+/* 5 · nationwide */
+SC.push(function(){
+  var s='<rect width="1600" height="900" fill="#f2b632"/>';
+  var b='<rect class="ink" style="stroke-width:7" x="150" y="80" width="880" height="440" fill="#7a4a22"/><rect class="ink" style="stroke-width:5" x="172" y="102" width="836" height="396" fill="#c8955b"/>';
+  b+='<rect class="ink" style="stroke-width:5" x="250" y="118" width="680" height="62" fill="#fbf6e6"/>'+T(590,162,34,'DIVERSIFY OUR NARRATIVE',{ls:'2'});
+  b+='<rect class="ink" style="stroke-width:5" x="250" y="424" width="680" height="54" fill="#fbf6e6"/>'+T(590,462,28,'5,000+ ORGANIZERS · 800+ CHAPTERS',{ls:'1'});
+  var pins='';var seed=7;function rnd(){seed=(seed*9301+49297)%233280;return seed/233280;}
+  for(var i=0;i<64;i++){var px=200+rnd()*780,py=200+rnd()*205;pins+='<circle class="pin" style="--del:'+(0.3+i*.05).toFixed(2)+'s" cx="'+px.toFixed(0)+'" cy="'+py.toFixed(0)+'" r="9" fill="'+(i%3?'#d63a2f':'#2d4fa0')+'" stroke="'+INK+'" stroke-width="4"/>';}
+  b+=pins;
+  b+='<rect class="ink" x="1080" y="80" width="400" height="230" fill="#fbf6e6"/>'+T(1280,130,24,'AS FEATURED IN',{ls:'3',fill:'#d63a2f'})+T(1280,178,32,'TIME · Bloomberg · Vox')+T(1280,222,32,'ABC Nightline')+T(1280,266,30,'The Washington Post');
+  b+='<rect class="ink" x="1080" y="340" width="400" height="180" fill="#1b4b6f"/>'+T(1280,392,24,'CALIFORNIA HIGH',{fill:'#fbf6e6',ls:'2'})+T(1280,424,24,'SCHOOL DEMOCRATS',{fill:'#fbf6e6',ls:'2'})+T(1280,482,42,'1 of 9',{font:'Shrikhand',w:'400',fill:'#f2b632'});
+  s+=g(b,'','boil');
+  s+='<rect class="ink" x="-10" y="700" width="1620" height="220" fill="#b86b36"/>';
+  s+=g(bill('1 OF 50',{pose:'phone',mouth:'o'}),'translate(800 700) scale(.58)','boil');
+  var t='<rect class="ink" x="130" y="600" width="1340" height="40" fill="#8a5530"/><rect class="ink" x="160" y="640" width="1280" height="120" fill="#6b3f22"/>'+T(800,714,34,'VOTERS OF TOMORROW · PHONE BANK · 1 OF 50 FELLOWS',{fill:'#fbf6e6',ls:'1'});
+  s+=g(t,'','boil');
+  [330,1080,1270].forEach(function(x){s+=g(g('<path class="ink" style="stroke-width:5" d="M'+(x-40)+' 600 l10 -36 h60 l10 36z" fill="#2d4fa0"/><path class="ink" style="stroke-width:5" d="M'+(x-50)+' 560 q50 -34 100 0 l-10 10 q-40 -18 -80 0z" fill="#2d4fa0"/>','','ring'),'','boil');});
+  return s;
+});
+/* 6 · civics class */
+SC.push(function(){
+  var s='<rect width="1600" height="900" fill="#e9dcc0"/>';
+  s+=g('<rect class="ink" style="stroke-width:7" x="170" y="70" width="1260" height="490" fill="#8a5530"/><rect class="ink" style="stroke-width:5" x="194" y="94" width="1212" height="442" fill="#2f5a45"/><rect class="ink" style="stroke-width:5" x="194" y="540" width="1212" height="22" fill="#a86a3c"/><rect class="ink" style="stroke-width:4" x="1200" y="524" width="90" height="22" fill="#fbf6e6"/>','','boil');
+  var L=[['AMERICAN LEGION CALIFORNIA BOYS STATE',186,.3],['ACLU NATIONAL ADVOCACY INSTITUTE',276,1.4],['CIVICS UNPLUGGED FELLOW ’23 · 11% ADMITTED',366,2.5],['ENCODE JUSTICE · ADVOCACY FELLOW · 2022',456,3.6]];
+  L.forEach(function(l){s+=g(T(250,l[1],42,l[0],{anchor:'start',fill:'#eef3ea',w:'600',ls:'1'}),'','chalk','--del:'+l[2]+'s');});
+  s+='<rect class="ink" x="-10" y="700" width="1620" height="220" fill="#9c7b58"/>';
+  s+=g(bill('AB 1766',{pose:'raise',mouth:'o'}),'translate(1120 720) scale(.6)','boil');
+  s+=g('<rect class="ink" x="180" y="660" width="520" height="40" fill="#c98e62"/><path d="M220 700 V860 M660 700 V860" stroke="'+INK+'" stroke-width="10"/>'+
+       '<rect class="ink" x="900" y="660" width="520" height="40" fill="#c98e62"/><path d="M940 700 V860 M1380 700 V860" stroke="'+INK+'" stroke-width="10"/>'+
+       '<circle class="ink" cx="440" cy="628" r="34" fill="#d63a2f"/><path d="M440 596 q6 -20 22 -24" fill="none" stroke="'+INK+'" stroke-width="5"/><path class="ink" style="stroke-width:4" d="M446 590 q18 -14 30 -4 q-14 10 -30 4z" fill="#3f8f3a"/>','','boil');
+  return s;
+});
+/* 7 · the desk: your signature */
+SC.push(function(){
+  var s='<rect width="1600" height="900" fill="#7fa7c9"/>';
+  for(var x=0;x<1600;x+=64) s+='<rect x="'+x+'" y="0" width="30" height="620" fill="#739dc2"/>';
+  s+='<rect class="ink" x="-10" y="600" width="1620" height="40" fill="#8a5530"/><rect class="ink" x="-10" y="638" width="1620" height="280" fill="#6b3f22"/>';
+  s+=g('<rect class="ink" x="290" y="500" width="110" height="110" fill="#2d4fa0"/><path d="M320 500 L290 380 M360 500 L400 386" stroke="'+INK+'" stroke-width="12" stroke-linecap="round"/><path d="M320 500 L290 380 M360 500 L400 386" stroke="#f2b632" stroke-width="6" stroke-linecap="round"/>'+
+       '<path class="ink" d="M1220 600 h140 l-20 -30 h-100z" fill="#3f8f3a"/><path d="M1290 570 V440" stroke="'+INK+'" stroke-width="10"/><path class="ink" d="M1210 450 L1250 360 H1330 L1370 450Z" fill="#3f8f3a"/>','','boil');
+  s+=g('<path class="ink" d="M560 700 L1040 700 L1060 880 L540 880Z" fill="#fbf6e6"/><path d="M620 820 H980" stroke="'+INK+'" stroke-width="4"/>'+T(640,812,40,'×',{anchor:'start'})+T(800,760,26,'H. R. 2026 · APPROVED',{ls:'2'}),'','boil');
+  s+=g('<path d="M680 812 c20 -40 40 -40 30 0 c-6 24 30 -30 50 -20 c20 10 -10 30 20 20 c30 -10 40 -40 60 -10 c10 14 30 -6 60 -8" fill="none" stroke="#1c2f6e" stroke-width="6" stroke-linecap="round"/>'+
+       '<g transform="rotate(-10 820 790)"><rect x="700" y="750" width="240" height="84" fill="none" stroke="#c0392b" stroke-width="7"/>'+T(820,810,50,'SIGNED',{fill:'#c0392b',ls:'6'})+'</g>','','jubil');
+  s+=g(bill('AB 1766',{pose:'hold',mouth:'flat',look:'up'}),'translate(800 640) scale(.7)','waiting boil');
+  s+=g(g(bill('AB 1766',{pose:'cheer',mouth:'o'}),'','jumper'),'translate(800 640) scale(.7)','jubil boil');
+  s+=g(star(560,300,40,'#f2b632')+star(1060,260,34,'#fbf6e6')+star(480,470,26,'#fbf6e6')+star(1120,450,44,'#f2b632')+star(800,120,30,'#fbf6e6'),'','stars');
+  return s;
+});
+
+var TITLES=['The steps','Upstairs','Five bills','The House','LegislativeLift','Nationwide','Civics','Your signature'];
+var CAPS=[
+ '<b>Sacramento, May 2021.</b> AB 1766, California IDs for All, sits on the State Capitol steps. A bill can’t climb them by itself, so CAIR sent up a lead community advocate. For two years he did the carrying.',
+ 'Two doors upstairs. <b>Green is the Assembly</b>: Jim Patterson’s office, through Legislative Director Ian Coolbear. <b>Red is the Senate</b>: Shannon Grove’s office. Walk the bill down one hall, then up the other.',
+ 'It had company. <b>AB 1947</b>, Freedom from Hate Crimes. <b>SB 1161</b>, Transit Safety. <b>AB 2549</b>, Ending Street Harassment. <b>SB 1038</b>, limits on biometric surveillance by law enforcement. Five bills, worked end to end.',
+ '<b>June to December 2022</b>, the federal side: Congressional Intern in the Office of Kevin McCarthy, U.S. House of Representatives, at the district office in Clovis.',
+ 'Laws move when people know how they’re made. <b>LegislativeLift</b>, a global Muslim civil-rights nonprofit: 11K+ members, 80+ volunteers, events in Egypt, India and the U.S. Volunteer, then Outreach Director, then Executive Director.',
+ '<b>Diversify Our Narrative</b>: 1 of 5 executives, 5,000+ student organizers, 800+ chapters. <b>Voters of Tomorrow</b>: 1 of 50 election fellows, on the phones and at the doors. <b>California High School Democrats</b>: 1 of 9 directors, every region.',
+ 'And the rooms where you learn the rules: <b>American Legion Boys State</b>, the <b>ACLU National Advocacy Institute</b>, <b>Civics Unplugged</b> (11% get in), and a fellowship with <b>Encode Justice</b>.',
+ 'Every bill ends up on a desk, waiting for a signature. This one is waiting for yours: <a href="#sign">sign it at the foot of the text</a>.'
+];
+var CAP_SIGNED='<b>Signed.</b> Enrolled, stamped, and into the record. Thanks for carrying it the last few steps.';
+var DUR=[9000,8500,9500,8000,9500,10000,8500,0];
+
+var host=$('scenes'),html='';
+SC.forEach(function(f,i){html+='<g class="scene" data-s="'+i+'">'+f()+'</g>';});
+host.innerHTML=html;
+var scenes=[].slice.call(host.querySelectorAll('.scene'));
+var tbtns=[].slice.call(doc.querySelectorAll('#tracker button'));
+var script=$('script');
+script.innerHTML=CAPS.map(function(c,i){return '<li data-s="'+i+'">'+c.replace(/<a [^>]*>([^<]*)<\/a>/,'$1')+'</li>';}).join('');
+var slis=[].slice.call(script.children);
+
+var cur=-1,playing=!RM,inView=true,timer=null,signed=false;
+function show(i,user){
+  i=Math.max(0,Math.min(scenes.length-1,i));
+  scenes.forEach(function(s,k){s.classList.remove('play');s.classList.toggle('on',k===i);});
+  void host.getBoundingClientRect();
+  scenes[i].classList.add('play');
+  cur=i;
+  tbtns.forEach(function(b,k){if(k===i)b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');});
+  slis.forEach(function(l,k){l.classList.toggle('now',k===i);});
+  $('where').textContent='Scene '+(i+1)+' of '+scenes.length+' · '+TITLES[i];
+  $('caption').innerHTML='<span class="sc">'+TITLES[i]+'</span>'+(i===7&&signed?CAP_SIGNED:CAPS[i]);
+  schedule();
+}
+function schedule(){
+  clearTimeout(timer);timer=null;
+  if(playing&&inView&&cur<scenes.length-1&&!doc.hidden) timer=setTimeout(function(){show(cur+1);},DUR[cur]);
+}
+function setPlaying(p){
+  playing=p;
+  $('playb').setAttribute('aria-label',p?'Pause':'Play');
+  $('plbl').textContent=p?'Pause':'Play';
+  $('pico').innerHTML=p?'<path d="M2 1h3v10H2zM7 1h3v10H7z"/>':'<path d="M2 1v10l9-5z"/>';
+  if(p&&cur===scenes.length-1&&!signed) show(0); else schedule();
+}
+tbtns.forEach(function(b){b.addEventListener('click',function(){show(+b.dataset.s,true);});});
+$('prev').onclick=function(){show(cur-1,true)};
+$('next').onclick=function(){show(cur+1,true)};
+$('playb').onclick=function(){setPlaying(!playing)};
+doc.addEventListener('visibilitychange',schedule);
+if('IntersectionObserver' in window){new IntersectionObserver(function(es){inView=es[0].isIntersecting;schedule();},{threshold:.35}).observe($('player'));}
+setPlaying(playing);
+show(0);
+
+// the line boil: redraw the ink eight times a second while the cartoon is on screen
+var turb=$('turb'),seedN=1;
+if(!RM) setInterval(function(){if(!inView||doc.hidden)return;seedN=seedN%3+1;turb.setAttribute('seed',seedN);},125);
+else $('toon').classList.remove('toon');
+
+/* =====================================================================
+   The bill text: line numbers that count real lines, sidenotes in the
+   margin, gwern-style popups on the measures.
+   ===================================================================== */
+var sheet=$('sheet'),gut=$('gut'),lines=$('lines'),LINES=[];
+function layout(){
+  var wide=innerWidth>980;
+  // sidenotes
+  var prev=-1e9;
+  [].forEach.call(sheet.querySelectorAll('.side'),function(a){
+    if(!wide){a.style.top='';return;}
+    var h=$(a.dataset.for),top=h.offsetTop+4;
+    if(top<prev+14) top=prev+14;
+    a.style.top=top+'px';prev=top+a.offsetHeight;
+  });
+  // line numbers
+  var base=sheet.getBoundingClientRect().top,mids=[];
+  var w=doc.createTreeWalker(lines,NodeFilter.SHOW_TEXT,{acceptNode:function(n){return (!n.nodeValue.trim()||n.parentElement.closest('.side'))?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;}});
+  var n,rg=doc.createRange();
+  while((n=w.nextNode())){rg.selectNodeContents(n);var rs=rg.getClientRects();for(var i=0;i<rs.length;i++){if(rs[i].height<4)continue;mids.push(rs[i].top-base+rs[i].height/2);}}
+  mids.sort(function(a,b){return a-b});
+  var uniq=[];mids.forEach(function(m){if(!uniq.length||m-uniq[uniq.length-1]>8)uniq.push(m);});
+  LINES=uniq;
+  var out='';
+  uniq.forEach(function(m,i){var ln=i%25+1,pg=Math.floor(i/25)+1;
+    if(ln===1&&pg>1) out+='<i style="top:'+(m-24).toFixed(1)+'px">'+pg+'</i>';
+    out+='<span style="top:'+(m-7).toFixed(1)+'px">'+ln+'</span>';});
+  gut.innerHTML=out;
+  var lab='Text ('+uniq.length+' lines)';$('texttab').textContent=lab;$('textlink').textContent=lab;
+}
+var lt;addEventListener('resize',function(){clearTimeout(lt);lt=setTimeout(function(){layout();sizePad();},120);});
+layout();
+if(doc.fonts&&doc.fonts.ready) doc.fonts.ready.then(function(){layout();});
+addEventListener('load',layout);
+
+// popups
+var POP={
+  ab1766:['AB 1766',[['Topic','California IDs for All'],['His part','Lead community advocate, as Lead Advocate for CAIR'],['Assembly','Office of Asm. Jim Patterson, through Legislative Director Ian Coolbear'],['Senate','Office of Sen. Shannon Grove'],['When','May 2021–May 2023, Sacramento']]],
+  ab1947:['AB 1947',[['Topic','Freedom from Hate Crimes'],['His part','Advocate, as Lead Advocate for CAIR'],['When','May 2021–May 2023, Sacramento']]],
+  sb1161:['SB 1161',[['Topic','Transit Safety'],['His part','Advocate, as Lead Advocate for CAIR'],['When','May 2021–May 2023, Sacramento']]],
+  ab2549:['AB 2549',[['Topic','Ending Street Harassment'],['His part','Advocate, as Lead Advocate for CAIR'],['When','May 2021–May 2023, Sacramento']]],
+  sb1038:['SB 1038',[['Topic','Limits on biometric surveillance by law enforcement'],['His part','Advocate, as Lead Advocate for CAIR'],['When','May 2021–May 2023, Sacramento']]]
+};
+var pop=$('pop'),popFor=null,popT=null,coarse=false;try{coarse=matchMedia('(pointer: coarse)').matches;}catch(e){}
+function openPop(a){
+  var d=POP[a.dataset.pop];if(!d)return;clearTimeout(popT);
+  $('pop-h').textContent=d[0];
+  $('pop-dl').innerHTML=d[1].map(function(r){return '<dt>'+r[0]+'</dt><dd>'+r[1]+'</dd>';}).join('');
+  pop.classList.add('on');popFor=a;
+  var r=a.getBoundingClientRect(),pw=pop.offsetWidth,ph=pop.offsetHeight;
+  var x=Math.max(12,Math.min(r.left,innerWidth-pw-12)),y=r.bottom+8;
+  if(y+ph>innerHeight-8&&r.top-ph-8>8) y=r.top-ph-8;
+  pop.style.left=(x+scrollX)+'px';pop.style.top=(y+scrollY)+'px';
+}
+function closePop(){pop.classList.remove('on');popFor=null;}
+[].forEach.call(doc.querySelectorAll('a.bn[data-pop]'),function(a){
+  a.setAttribute('aria-haspopup','dialog');
+  a.addEventListener('mouseenter',function(){if(coarse)return;clearTimeout(popT);popT=setTimeout(function(){openPop(a);},180);});
+  a.addEventListener('mouseleave',function(){clearTimeout(popT);popT=setTimeout(closePop,260);});
+  a.addEventListener('focus',function(){openPop(a);});
+  a.addEventListener('blur',function(){popT=setTimeout(closePop,200);});
+  a.addEventListener('click',function(e){if(coarse){e.preventDefault();if(popFor===a)closePop();else openPop(a);}});
+});
+pop.addEventListener('mouseenter',function(){clearTimeout(popT);});
+pop.addEventListener('mouseleave',function(){popT=setTimeout(closePop,220);});
+doc.addEventListener('keydown',function(e){if(e.key==='Escape')closePop();});
+doc.addEventListener('click',function(e){if(popFor&&!e.target.closest('.pop,a.bn'))closePop();});
+addEventListener('scroll',function(){if(popFor&&coarse)closePop();},{passive:true});
+
+/* =====================================================================
+   Find in the record (the congress.gov search band, working)
+   ===================================================================== */
+var q=$('q'),found=$('found'),marks=[],mi=-1,qt;
+function clearMarks(){marks.forEach(function(m){var p=m.parentNode;if(!p)return;p.replaceChild(doc.createTextNode(m.textContent),m);p.normalize();});marks=[];mi=-1;}
+function lineOf(el){var base=sheet.getBoundingClientRect().top,r=el.getBoundingClientRect(),m=r.top-base+r.height/2,best=-1,bd=1e9;
+  LINES.forEach(function(l,i){var d=Math.abs(l-m);if(d<bd){bd=d;best=i;}});return best<0?null:{ln:best%25+1,pg:Math.floor(best/25)+1};}
+function find(){
+  clearMarks();closePop();
+  var s=q.value.trim();if(s.length<2){found.textContent='';return;}
+  var roots=$('scope').value==='text'?[sheet]:[$('actions'),$('measures'),sheet];
+  var re=new RegExp(s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+  roots.forEach(function(root){
+    var w=doc.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){return n.parentElement.closest('.gut,script,style')?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;}}),list=[],n;
+    while((n=w.nextNode())){re.lastIndex=0;if(re.test(n.nodeValue)) list.push(n);}
+    list.forEach(function(n){re.lastIndex=0;var t=n.nodeValue,f=doc.createDocumentFragment(),last=0,m;
+      while((m=re.exec(t))){f.appendChild(doc.createTextNode(t.slice(last,m.index)));var k=doc.createElement('mark');k.setAttribute('data-f','');k.textContent=m[0];f.appendChild(k);marks.push(k);last=m.index+m[0].length;}
+      f.appendChild(doc.createTextNode(t.slice(last)));n.parentNode.replaceChild(f,n);});
+  });
+  if(!marks.length){found.textContent='No matches in this record for “'+s+'”.';return;}
+  var inText=marks.filter(function(m){return sheet.contains(m);}),msg=marks.length+(marks.length===1?' match':' matches')+' in this record';
+  if(inText.length){var L=lineOf(inText[0]);if(L) msg+='; first in the bill at page '+L.pg+', line '+L.ln;}
+  found.textContent=msg+'. Press Enter for the next one.';
+}
+function nextMark(){
+  if(!marks.length){find();if(!marks.length)return;}
+  if(mi>=0&&marks[mi])marks[mi].classList.remove('cur');
+  mi=(mi+1)%marks.length;var m=marks[mi];m.classList.add('cur');
+  m.scrollIntoView({block:'center',behavior:RM?'auto':'smooth'});
+  var L=sheet.contains(m)?lineOf(m):null;
+  found.textContent='Match '+(mi+1)+' of '+marks.length+(L?' · page '+L.pg+', line '+L.ln:'')+'. Press Enter for the next one.';
+}
+q.addEventListener('input',function(){clearTimeout(qt);qt=setTimeout(find,220);});
+$('scope').addEventListener('change',find);
+$('find').addEventListener('submit',function(e){e.preventDefault();nextMark();});
+
+/* =====================================================================
+   Tabs follow the reader
+   ===================================================================== */
+var tabs=[].slice.call(doc.querySelectorAll('.tabs a')),secs=tabs.map(function(a){return $(a.dataset.t);}),tick=false;
+function spy(){tick=false;var k=-1;secs.forEach(function(s,i){if(s.getBoundingClientRect().top<=90)k=i;});tabs.forEach(function(a,i){a.setAttribute('aria-current',i===(k<0?0:k)?'true':'false');});}
+addEventListener('scroll',function(){if(!tick){tick=true;requestAnimationFrame(spy);}},{passive:true});spy();
+
+/* =====================================================================
+   The signature pad and the rubber stamp
+   ===================================================================== */
+var pad=$('pad'),ctx=pad.getContext('2d'),strokes=[],curS=null,inked=0,dpr=1;
+function sizePad(){dpr=Math.min(2,window.devicePixelRatio||1);var w=pad.clientWidth,h=pad.clientHeight;pad.width=Math.round(w*dpr);pad.height=Math.round(h*dpr);redraw();}
+function seg(a,b,c){var v=Math.hypot(c.x-b.x,c.y-b.y);var lw=Math.max(1.4,3.4-v*.06);ctx.lineWidth=lw*dpr;ctx.beginPath();ctx.moveTo((a.x+b.x)/2*dpr,(a.y+b.y)/2*dpr);ctx.quadraticCurveTo(b.x*dpr,b.y*dpr,(b.x+c.x)/2*dpr,(b.y+c.y)/2*dpr);ctx.stroke();}
+function redraw(){ctx.clearRect(0,0,pad.width,pad.height);ctx.strokeStyle='#1c2f6e';ctx.lineCap='round';ctx.lineJoin='round';
+  strokes.forEach(function(s){for(var i=1;i<s.length;i++)seg(s[Math.max(0,i-2)],s[i-1],s[i]);});}
+function pt(e){var r=pad.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+pad.addEventListener('pointerdown',function(e){e.preventDefault();try{pad.setPointerCapture(e.pointerId);}catch(_){ }curS=[pt(e)];strokes.push(curS);$('sign').classList.add('drawing');sheet.classList.add('inking');});
+pad.addEventListener('pointermove',function(e){if(!curS)return;var p=pt(e),l=curS[curS.length-1];if(Math.hypot(p.x-l.x,p.y-l.y)<1.5)return;inked+=Math.hypot(p.x-l.x,p.y-l.y);curS.push(p);ctx.strokeStyle='#1c2f6e';ctx.lineCap='round';var n=curS.length;seg(curS[Math.max(0,n-3)],curS[n-2],curS[n-1]);});
+function up(){if(!curS)return;curS=null;if(inked>90)doSign();}
+pad.addEventListener('pointerup',up);pad.addEventListener('pointercancel',up);
+function doSign(){
+  if(signed)return;signed=true;
+  sheet.classList.add('signed');
+  $('after').textContent='Signed. Enrolled, stamped, and into the record.';
+  var sb=doc.querySelector('#tracker .sig');sb.classList.add('done');sb.querySelector('span').textContent='Signed';
+  $('toon').classList.add('signed-toon');
+  if(cur===7) show(7);
+}
+function unSign(){
+  signed=false;sheet.classList.remove('signed');$('after').textContent='';
+  var sb=doc.querySelector('#tracker .sig');sb.classList.remove('done');sb.querySelector('span').textContent='Your signature';
+  $('toon').classList.remove('signed-toon');if(cur===7) show(7);
+}
+$('clear').onclick=function(){strokes=[];inked=0;redraw();unSign();};
+$('autosign').onclick=function(){
+  strokes=[];inked=0;redraw();
+  var w=pad.clientWidth,h=pad.clientHeight,pts=[],N=90;
+  for(var i=0;i<=N;i++){var t=i/N,x=w*.1+t*w*.72,y=h*.62-Math.sin(t*Math.PI*5.2)*h*.2*(1-t*.5)-Math.sin(t*Math.PI*1.3)*h*.1;pts.push({x:x+Math.cos(t*Math.PI*10.4)*12*(1-t),y:y});}
+  pts.push({x:w*.84,y:h*.46});pts.push({x:w*.88,y:h*.4});
+  var s=[];strokes.push(s);
+  if(RM){pts.forEach(function(p){s.push(p);});redraw();doSign();return;}
+  var i=0;(function step(){for(var k=0;k<4&&i<pts.length;k++,i++){s.push(pts[i]);var n=s.length;if(n>1){ctx.strokeStyle='#1c2f6e';ctx.lineCap='round';seg(s[Math.max(0,n-3)],s[n-2],s[n-1]);}}
+    if(i<pts.length)requestAnimationFrame(step);else doSign();})();
+};
+sizePad();
+})();
+</script>

@@ -31,7 +31,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     await sleep(2500);
     const y1 = await page.evaluate(() => scrollY);
     await page.screenshot({ path: out + '-02sink.png' });
-    if (phone) await page.touchscreen.tap(200, 400); else await page.mouse.wheel(0, 10);
+    if (phone) await page.touchscreen.tap(200, 400); else { await page.mouse.move(700, 450); await page.mouse.wheel(0, 10); }
     await sleep(600);
     const y2 = await page.evaluate(() => scrollY); await sleep(600);
     const y3 = await page.evaluate(() => scrollY);
