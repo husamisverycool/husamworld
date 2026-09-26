@@ -186,7 +186,7 @@ def floor_html():
             f'<div class="spec-text"><h3 class="spec-name" id="s-{s["id"]}-h">{E(s["name"])}</h3>'
             f'<p class="spec-fact">{E(s["fact"])}<span class="note">{E(s["note"])}</span></p></div>'
             f'<div class="spec-art floor-angler">{art.anglerfish(s["id"])}{no_html(s["no"])}</div>'
-            f'<p class="spec-odds"><span>{odds_html(s)}</span></p>'
+            f'<p class="spec-odds">{odds_html(s)}</p>'
             '</article>')
 
 
@@ -256,7 +256,7 @@ def plate_html():
         figs.append(_fig(CX + _m.cos(a) * 208, CY + _m.sin(a) * 208, 118, sp['art']('pl-' + sid), sp['no'], sp['name']))
     # twilight ring: nine, mirrored about the axis, rarest at the top
     order = ['gates', 'elks', 'coolidge', 'quest-excellence', 'taco-bell', 'tass', 'climate', 'jfk', 'notre-dame']
-    angs = [-90, -50, -130, -10, 190, 30, 150, 70, 110]
+    angs = [-90, -50, -130, -10, 190, 30, 150, 60, 120]
     for sid, ang in zip(order, angs):
         sp = by[sid]; a = _m.radians(ang)
         figs.append(_fig(CX + _m.cos(a) * 338, CY + _m.sin(a) * 338, 104, sp['art']('pl-' + sid), sp['no'], sp['name']))

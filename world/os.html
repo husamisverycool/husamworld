@@ -175,7 +175,7 @@ html.os-live #page{display:none}
 .win-body{flex:1;min-height:0;min-width:0;overflow:auto;background:#fff;position:relative;-webkit-user-select:text;user-select:text;overscroll-behavior:contain}
 .win.dialog .win-well{margin:0;padding:0;box-shadow:none}
 .win.dialog .win-body{background:var(--lg);overflow:visible}
-.win-status{height:20px;flex:none;display:flex;gap:2px}
+.win-status{height:20px;flex:none;display:flex;gap:2px;background:var(--lg)}
 .st{box-shadow:var(--thin-in);padding:0 4px;font:12px/20px var(--ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .st-main{flex:5}
 .st-sp{width:16px;flex:none}
@@ -351,7 +351,7 @@ html.os-live #page{display:none}
 .ed-logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:18px;letter-spacing:-.3px;white-space:nowrap}
 .ed-logo i{width:30px;height:30px;border-radius:50%;background:#111;display:grid;place-items:center;flex:none}
 .ed-logo svg{width:14px;height:20px}
-.ed-search{flex:1;min-width:60px;max-width:280px;background:#f0f2f5;border-radius:20px;padding:7px 14px;color:#65676b;font-size:14px;white-space:nowrap;overflow:hidden}
+.ed-search{flex:1;min-width:60px;max-width:280px;background:#f0f2f5;border-radius:20px;padding:7px 14px;color:#65676b;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ed-wrap{padding:12px 14px 18px;display:flex;flex-direction:column;gap:12px}
 .ed-card{background:#fff;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.2);padding:16px}
 .ed-hero{display:flex;gap:14px;align-items:center}
@@ -2690,7 +2690,7 @@ const APPS = {
     menu: ['File', 'Edit', 'View', 'Go', 'Favorites', 'Help'],
     pos: (ww, hh, W) => [Math.max(8, W - ww - 36), 62],
     mount(b, w) {
-      b.style.background = 'var(--lg)'; b.style.overflow = 'hidden';
+      b.style.background = 'var(--lg)';
       b.innerHTML = `<div class="browser">
         <div class="bz-tools" role="toolbar" aria-label="Browser">
           ${tb('back', 'Back', 'disabled')}${tb('fwd', 'Forward', 'disabled')}${tb('stop', 'Stop', 'data-b="stop"')}${tb('ref', 'Refresh', 'data-b="ref"')}${tb('home', 'Home', 'data-b="home"')}

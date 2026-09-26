@@ -201,7 +201,7 @@ html.sinking #sinkBtn{background:var(--cream);color:var(--navy)}
   .plate-sheet{padding:12px 10px 16px}
   .plate-run{font-size:11px}
   .pf-no{font-size:10.5px;right:-12%}
-  .pr-lab{font-size:11px;padding:0 4px}
+  .pr-lab{font-size:10.5px;padding:0 3px}
   .plate-cap{font-size:19px}
   .tally-big{font-size:50px}
   .tally-line{font-size:19px}
