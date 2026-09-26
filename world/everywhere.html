@@ -776,7 +776,7 @@ function computeFieldMask() {
     Array.prototype.forEach.call(rng.getClientRects(), function (r) { if (r.width > 0) mark(r, 1); });
   });
   var hs = getComputedStyle(hint);
-  if (hs.position === 'static') { var hrr = hint.getBoundingClientRect(); hb = Math.max(hb, hrr.bottom - hr.top); }
+  if (hs.position !== 'absolute') { var hrr = hint.getBoundingClientRect(); hb = Math.max(hb, hrr.bottom - hr.top); }
   $$('.hcols > div').forEach(function (el) {
     var r = el.getBoundingClientRect(); if (!r.width || getComputedStyle(el).display === 'none') return;
     hb = Math.max(hb, r.bottom - hr.top);
