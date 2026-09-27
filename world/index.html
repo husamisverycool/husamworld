@@ -30,8 +30,8 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 :focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
 .sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 kbd{font:700 .86em/1 var(--cond);letter-spacing:.04em;border:1.5px solid currentColor;border-radius:3px;padding:2px 5px 1px;white-space:nowrap}
-.skip{position:fixed;left:16px;top:-80px;z-index:95;background:var(--ink);color:var(--cream);padding:10px 14px;font:400 15px var(--display);text-decoration:none}
-.skip:focus{top:16px}
+.skip{position:fixed;left:16px;top:-80px;z-index:95;background:var(--cream);color:var(--ink);box-shadow:0 0 0 2.5px var(--ink),0 4px 0 2.5px var(--ink);padding:10px 14px;font:400 15px var(--display);text-decoration:none}
+.skip:focus-visible{top:16px} /* only for keyboard users; a tap or a restored focus never flashes it */
 /* slab: the one UI material (Messenger's BEGIN button): flat colour, ink edge, hard drop */
 .slab{background:var(--cream);box-shadow:0 0 0 2.5px var(--ink),0 5px 0 2.5px var(--ink)}
 .slab-btn{transition:transform .15s var(--spring),box-shadow .15s}
@@ -118,7 +118,7 @@ html.started .tab:nth-child(4){transition-delay:.18s}
 .exit-line{font:500 16px/1.35 var(--text);margin-top:6px}
 .exit-go{flex:none;display:flex;align-items:center;gap:8px;background:var(--yellow);color:var(--ink);font:400 16px/1 var(--display);padding:13px 14px 12px;box-shadow:0 0 0 2.5px var(--ink),0 4px 0 2.5px var(--ink)}
 .exit-go:active{transform:translateY(3px);box-shadow:0 0 0 2.5px var(--ink),0 1px 0 2.5px var(--ink)}
-.toast{position:fixed;left:50%;top:max(18px,env(safe-area-inset-top));z-index:50;transform:translate(-50%,calc(-100% - 40px));visibility:hidden;background:var(--ink);color:var(--cream);font:400 14px/1.2 var(--display);padding:11px 14px 10px;transition:transform .5s var(--spring);pointer-events:none;max-width:calc(100vw - 200px);text-align:center}
+.toast{position:fixed;left:50%;top:max(18px,env(safe-area-inset-top));z-index:50;transform:translate(-50%,calc(-100% - 40px));visibility:hidden;background:var(--cream);color:var(--ink);box-shadow:0 0 0 2.5px var(--ink),0 4px 0 2.5px var(--ink);font:400 14px/1.2 var(--display);padding:11px 14px 10px;transition:transform .5s var(--spring);pointer-events:none;max-width:calc(100vw - 200px);text-align:center}
 .toast.show{transform:translate(-50%,0);visibility:visible}
 /* touch controls: the container is #pad; nothing on <html> ever gets this class */
 .pad{display:none}
@@ -167,7 +167,7 @@ html.has-world.coarse .atlas-panel{height:calc(100% - 72px);min-height:0;overflo
 html.has-world.coarse .atlas{overflow:hidden}
 .atlas-bar{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;pointer-events:none}
 .atlas-bar>*{pointer-events:auto}
-.atlas-kicker{margin:0;font:400 15px/1 var(--display);background:var(--ink);color:var(--cream);padding:9px 11px 8px}
+.atlas-kicker{margin:0;font:400 15px/1 var(--display);background:var(--cream);color:var(--ink);padding:9px 11px 8px;box-shadow:0 0 0 2.5px var(--ink),0 4px 0 2.5px var(--ink)} /* the same cream slab as every other label in the HUD */
 .atlas-close{display:none;align-items:center;gap:10px;height:44px;padding:0 16px 0 14px;font:400 15px/1 var(--display);background:var(--yellow)}
 html.has-world .atlas-close{display:inline-flex}
 .atlas-panel{pointer-events:auto;width:min(520px,100%);padding:4px 16px 48px 16px;transform:translateX(-30px);opacity:0;transition:transform .5s var(--spring),opacity .3s}
@@ -476,7 +476,7 @@ html.notice-up .bubble{visibility:hidden!important}
       <div class="row row-wide"><label class="row-l" for="sVol">Sound <span class="row-val" id="sVolV">Off</span></label><input class="road" id="sVol" type="range" min="0" max="10" step="1" value="0"></div>
       <div class="row row-wide"><span class="row-l" id="sQualL">Quality</span><div class="seg" role="radiogroup" aria-labelledby="sQualL" aria-describedby="sQualH"><label><input type="radio" name="sQual" value="auto" checked><span>Auto</span></label><label><input type="radio" name="sQual" value="high"><span>High</span></label><label><input type="radio" name="sQual" value="low"><span>Low</span></label></div><p class="row-h" id="sQualH">Auto lowers the detail if frames run slow.</p></div>
       <div class="row row-wide"><span class="row-l" id="sWxL">Weather</span><div class="seg" role="radiogroup" aria-labelledby="sWxL" aria-describedby="sWxH"><label><input type="radio" name="sWx" value="live" checked><span>Changing</span></label><label><input type="radio" name="sWx" value="clear"><span>Clear</span></label><label><input type="radio" name="sWx" value="rain"><span>Rain</span></label></div><p class="row-h" id="sWxH">Up north, rain turns to snow.</p></div>
-      <div class="row row-wide"><span class="row-l" id="sTodL">Time of day <span class="row-val" id="sTodV">--:--</span></span><div class="seg seg5" role="radiogroup" aria-labelledby="sTodL" aria-describedby="sTodH"><label><input type="radio" name="sTod" value="now" checked><span>Mine</span></label><label><input type="radio" name="sTod" value="6.8"><span>Dawn</span></label><label><input type="radio" name="sTod" value="12.5"><span>Day</span></label><label><input type="radio" name="sTod" value="18.6"><span>Dusk</span></label><label><input type="radio" name="sTod" value="22.5"><span>Night</span></label></div><p class="row-h" id="sTodH">The light follows your own clock, or try another hour.</p></div>
+      <div class="row row-wide"><span class="row-l" id="sTodL">Time of day <span class="row-val" id="sTodV">--:--</span></span><div class="seg seg5" role="radiogroup" aria-labelledby="sTodL" aria-describedby="sTodH"><label><input type="radio" name="sTod" value="now"><span>Mine</span></label><label><input type="radio" name="sTod" value="6.8"><span>Dawn</span></label><label><input type="radio" name="sTod" value="12.5" checked><span>Day</span></label><label><input type="radio" name="sTod" value="18.6"><span>Dusk</span></label><label><input type="radio" name="sTod" value="22.5"><span>Night</span></label></div><p class="row-h" id="sTodH">The light follows your own clock, or try another hour.</p></div>
       <div class="row"><label class="row-l" for="sRM">Reduced motion</label><span class="sw"><input type="checkbox" id="sRM" role="switch" aria-describedby="sRMH"><span>Off</span></span><p class="row-h" id="sRMH">A steadier camera: no shakes, sways or flights.</p></div>
       <div class="row"><span class="row-l">Knocked it all over?</span><button class="act" id="sTidy" type="button">Tidy up</button></div>
     </div>
@@ -1941,7 +1941,7 @@ function updateCamera(dt, t) {
 }
 
 // ---------------------------------------------------------------- the light follows the visitor's clock (tabs: preview other times)
-var tod = { preview: null, anim: null };
+var tod = { preview: 12.5, anim: null }; // opens on a clear light-blue day; 'Mine' in Settings follows the visitor's clock
 var PREVIEWS = [null, 6.8, 12.5, 18.6, 22.5];
 function nowH() { var d = new Date(); return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600; }
 function hourNow() { return tod.anim != null ? tod.anim : tod.preview != null ? tod.preview : nowH(); }
@@ -2645,6 +2645,7 @@ function updateLife(dt, now) {
 }
 var lastTitleT = 0, cloudLift = 0;
 function updateTabTitle(now) { lastTitleT = now; var s = nearestRoad(car.n).s / ROAD_LEN, n = 11, k = Math.round(s * (n - 1)), bar = ''; for (var i = 0; i < n; i++) bar += i === k ? '●' : '·'; doc.title = 'Fresno ' + bar + ' Cambridge'; }
+var _tagRV = new V3();
 function updateWorldBits(dt, now) {
   // tags: face the camera; labels slide out when you're close (or in the map)
   var narrow = narrowUI(), nearTag = null, ntd = 1e9; STOPS.forEach(function (d) { var dd = arc(car.n, d.site); if (dd < ntd) { ntd = dd; nearTag = d; } });
@@ -2659,6 +2660,15 @@ function updateWorldBits(dt, now) {
     d.tag = d.flip ? d.tagL : d.tagR; (d.flip ? d.tagR : d.tagL).visible = false;
     d.tag.quaternion.copy(camera.quaternion);
     var dist = arc(car.n, d.site), open = state === 'map' ? (hovered ? hovered === d : true) : (state === 'play' && dist < (narrow ? 17 : 26) && (!narrow || d === nearTag)) || d === near;
+    // a label never slides out half off the screen (that read as a stray black box at the edge): open it on the side that fits, or keep it folded
+    if (open && state !== 'map') {
+      var tsc = (.82 + cam.zoom * 1.1) * (narrow ? .66 : 1), tw = (d.tagR.geometry.parameters.width || 4) * tsc, rv = _tagRV.setFromMatrixColumn(camera.matrixWorld, 0);
+      var ax = anchor.clone().project(camera).x, rx = anchor.clone().addScaledVector(rv, tw).project(camera).x, lx = anchor.clone().addScaledVector(rv, -tw).project(camera).x;
+      var fitsR = ax > -.96 && rx < .96, fitsL = ax < .96 && lx > -.96;
+      if (d.flip && !fitsL && fitsR) { d.flip = false; } else if (!d.flip && !fitsR && fitsL) { d.flip = true; }
+      if (!(d.flip ? fitsL : fitsR)) open = false;
+      if (open) { d.tag = d.flip ? d.tagL : d.tagR; (d.flip ? d.tagR : d.tagL).visible = false; d.tag.quaternion.copy(camera.quaternion); }
+    }
     var vis = state === 'play' || state === 'map' || state === 'enter'; d.tag.visible = vis;
     // round 6: Bruno 2025's interactive points: the label slides out with power2.out (0.6 s, 0.2 s late) while the diamond springs
     // with elastic.out; closing slides it back in with power2.in
