@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><link rel="icon" href="favicon.ico" sizes="48x48"><link rel="icon" href="icons/favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Husam Sokar, the short version</title>
+<meta name="description" content="Husam Sokar on one plain page: what he is building, what he does at Harvard, and everything before it, with dates and numbers. Prints as a résumé.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#FFFCF0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#100F0F" media="(prefers-color-scheme: dark)">
+<!--
+  The plain page. Every fact from every district, stated once, in the order a recruiter or an investor reads.
+  Study: world/_study/facts.md. Measure and leading from bettermotherfuckingwebsite (650px, 18px/1.6);
+  no webfonts and no required JS (danluu); Flexoki paper and ink, links as underlined text (stephango.com);
+  a muted tabular date column beside Role, Organization (brittanychiang.com); self-linking section headings
+  and tabular numerals (gwern.net). The script at the bottom only adds conveniences; the page is complete without it.
+  This page is the one deliberate exception to OWNERSHIP.md: a plain summary that repeats the districts on purpose.
+-->
+<style>
+:root{
+  --bg:#FFFCF0; --tx:#100F0F; --tx-2:#6F6E69; --rule:#DAD8CE; --link-hover:#205EA6; --mark:#F2F0E5;
+  --stack:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#100F0F; --tx:#CECDC3; --tx-2:#878580; --rule:#343331; --link-hover:#4385BE; --mark:#1C1B1A; }
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:18px/1.6 var(--stack);font-variant-numeric:tabular-nums;overflow-wrap:break-word}
+main,.top,footer{max-width:650px;margin:0 auto;padding:0 16px}
+h1,h2,h3{line-height:1.2;margin:0}
+a{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em;text-decoration-color:var(--tx-2)}
+a:hover{color:var(--link-hover);text-decoration-color:currentColor}
+a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--link-hover);outline-offset:2px}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.18em;text-decoration-color:var(--tx-2)}
+button:hover{color:var(--link-hover);text-decoration-color:currentColor}
+
+.top{padding-top:28px;font-size:15px;color:var(--tx-2)}
+.top p{margin:0}
+header{margin:28px 0 0}
+h1{font-size:34px;font-weight:700}
+.lede{margin:12px 0 0}
+.contact{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:4px 18px}
+.contact .mail{white-space:nowrap}
+.contact .copy{font-size:15px;color:var(--tx-2);margin-left:4px}
+.toc{margin:22px 0 0;padding:12px 0 0;border-top:1px solid var(--rule);font-size:15px;color:var(--tx-2)}
+.toc a{color:var(--tx-2);margin-right:.2em}
+.toc a:hover{color:var(--link-hover)}
+.find{margin:12px 0 0;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;font-size:15px;color:var(--tx-2)}
+.find label{display:flex;align-items:baseline;gap:10px;flex:1 1 260px;min-width:0}
+.find input{flex:1;min-width:0;font:inherit;font-size:16px;color:var(--tx);background:transparent;border:0;border-bottom:1px solid var(--rule);border-radius:0;padding:4px 0;-webkit-appearance:none;appearance:none}
+.find input::placeholder{color:var(--tx-2);opacity:1}
+.find input:focus{outline:none;border-bottom-color:var(--link-hover)}
+.find input::-webkit-search-cancel-button{display:none}
+.none{margin:24px 0 0}
+
+section{margin:44px 0 0}
+.sh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:2px 16px;padding-bottom:6px;border-bottom:1px solid var(--rule)}
+h2{font-size:22px;font-weight:700}
+h2 a{text-decoration:none}
+h2 a:hover{text-decoration:underline}
+.more{font-size:15px;color:var(--tx-2)}
+h3{font-size:16px;font-weight:700;margin:22px 0 0;color:var(--tx-2)}
+ul{list-style:none;margin:0;padding:0}
+li{margin:14px 0 0}
+li b{font-weight:650}
+.when{display:block;font-size:14px;line-height:1.4;color:var(--tx-2)}
+.dots li{padding-left:1em;position:relative;margin-top:8px}
+.dots li::before{content:"";position:absolute;left:.15em;top:.72em;width:.3em;height:.3em;background:var(--tx-2)}
+.sub{margin:6px 0 0 1em;font-size:16px}
+.sub li{margin:2px 0 0}
+q{quotes:"\201C" "\201D"}
+footer{margin:56px auto 0;padding-bottom:48px;font-size:15px;color:var(--tx-2)}
+footer p{margin:0 0 6px;padding:0}
+footer .rule{border-top:1px solid var(--rule);padding-top:14px}
+kbd{font:inherit;font-size:.9em;padding:0 .3em;border:1px solid var(--rule)}
+
+/* wide screens: the date hangs in the left margin, so the reading line stays at 650px (gwern/Tufte hanging, Chiang's date column) */
+@media (min-width:980px){
+  .rows>li{position:relative}
+  .rows>li>.when{position:absolute;right:calc(100% + 20px);top:.2em;width:8em;text-align:right;font-size:14px}
+}
+@media (max-width:400px){
+  body{font-size:17px}
+  h1{font-size:30px}
+}
+
+/* print: a clean résumé */
+@media print{
+  @page{margin:.5in .55in}
+  :root{--bg:#fff;--tx:#000;--tx-2:#444;--rule:#bbb}
+  body{font-size:10pt;line-height:1.38;background:#fff;color:#000}
+  main,footer,.top{max-width:none;padding:0}
+  .top,.toc,.find,.none,.more,.noprint,footer .screen,.contact .copy,.contact .pdf{display:none!important}
+  header{margin:0}
+  h1{font-size:20pt}
+  .lede{margin-top:4pt}
+  .contact{margin-top:4pt;gap:0 14pt}
+  .contact .url{display:inline!important}
+  a{text-decoration:none;color:#000}
+  section{margin:12pt 0 0}
+  .sh{padding-bottom:2pt}
+  h2{font-size:12pt}
+  h3{font-size:10pt;margin:6pt 0 0;color:#000}
+  li{margin:4pt 0 0;break-inside:avoid;page-break-inside:avoid}
+  .rows>li{display:grid;grid-template-columns:5.6em 1fr;column-gap:10pt}
+  .sub li{display:inline}.sub li+li::before{content:"; ";margin-left:-.28em}
+  .rows>li>.when{position:static;width:auto;text-align:left;font-size:9pt;line-height:1.5}
+  .dots li{margin-top:2pt}
+  .sub{font-size:9.5pt;margin-top:2pt}
+  h2,h3,.sh{break-after:avoid;page-break-after:avoid}
+  footer{margin-top:14pt;padding:0}
+  footer .rule{border:0;padding:0}
+}
+</style>
+</head>
+<body>
+<div class="top"><p><a href="index.html">husam.world</a> / the short version</p></div>
+
+<main id="top">
+<header>
+  <h1>Husam Sokar</h1>
+  <p class="lede">Sophomore at Harvard College, concentrating in Applied Math in Government and Economics. From Fresno, California. Co-founder &amp; CEO of a stealth startup, backed by DoorDash&rsquo;s early team.</p>
+  <p class="contact">
+    <span class="mail"><a href="mailto:hramadan@college.harvard.edu">hramadan@college.harvard.edu</a> <button class="copy noprint" type="button" data-copy="hramadan@college.harvard.edu" hidden>Copy</button></span>
+    <span><a href="https://www.linkedin.com/in/husam-sokar-089648227/" target="_blank" rel="noopener">LinkedIn</a><span class="url" hidden> linkedin.com/in/husam-sokar-089648227</span></span>
+    <button class="pdf" type="button" hidden>Save as PDF</button>
+  </p>
+</header>
+
+<nav class="toc" aria-label="Sections">
+  <a href="#building">Building</a> &middot; <a href="#harvard">Harvard</a> &middot; <a href="#research">Research</a> &middot; <a href="#advocacy">Advocacy</a> &middot; <a href="#fresno">Fresno</a> &middot; <a href="#writing">Writing</a> &middot; <a href="#debate">Debate</a> &middot; <a href="#honors">Honors</a> &middot; <a href="#time">Time</a>
+</nav>
+<form class="find" role="search" hidden onsubmit="return false">
+  <label for="q">Filter <input id="q" type="search" autocomplete="off" spellcheck="false" placeholder="debate, 2024, Arabic&hellip;" aria-describedby="qn"></label>
+  <span id="qn" aria-live="polite"></span>
+</form>
+<p class="none" id="none" hidden>Nothing on the page matches that. <button type="button" id="clear">Clear the filter</button></p>
+
+<section id="building" aria-labelledby="h-building">
+  <div class="sh"><h2 id="h-building"><a href="#building">Building</a></h2><a class="more" href="os.html">The Garage</a></div>
+  <ul class="rows">
+    <li><span class="when">Now</span><div><b>Co-founder &amp; CEO of a stealth startup,</b> backed by DoorDash&rsquo;s early team. Spent summer 2026 building it full-time in San Francisco.</div></li>
+    <li><span class="when">2023&ndash;2024</span><div><b>Founder &amp; President, bayloop.</b> A Fresno think tank fighting restrictive zoning. Organized 7 youth phone banks across the Central Valley; legislative research with the National Low-Income Housing Coalition.</div></li>
+    <li><span class="when">2023</span><div><b>Paid Intern, Jetson.</b> Fintech for teens. 1 of 40 chosen from 1,000+ applicants.</div></li>
+    <li><span class="when">2020</span><div><b>Electric Deals, at 14.</b> Retail arbitrage stores on Facebook: ~$20,000 revenue at ~43% margin, 400+ products shipped, 131+ positive reviews. eBay drop-shipping: ~$8,000 revenue at ~39% margin, 150+ positive reviews.</div></li>
+    <li><span class="when">Growing up</span><div><b>Admin assistant, his father&rsquo;s law firm.</b> Worked billing and back-office operations.</div></li>
+  </ul>
+  <h3>Grants</h3>
+  <ul class="dots">
+    <li><b>LeapYear:</b> $30K grant, backed by Hank Couture and Charlton Soesanto.</li>
+    <li><b>Startups @ Harvard:</b> non-dilutive grant, backed by XFund.</li>
+    <li><b>Telora Fellowship:</b> finalist, 1 of 16 from 1K+ applicants, for a $55K grant and a 6-month residency. Withdrew.</li>
+    <li><b>GripTape Challenger:</b> grant, 2023.</li>
+  </ul>
+</section>
+
+<section id="harvard" aria-labelledby="h-harvard">
+  <div class="sh"><h2 id="h-harvard"><a href="#harvard">Harvard</a></h2><a class="more" href="everywhere.html">The Airport</a></div>
+  <ul class="rows">
+    <li><span class="when">2025&ndash;now</span><div><b>Harvard College.</b> Started fall 2025; now a sophomore. Concentration: Applied Math in Government and Economics.</div></li>
+    <li><span class="when">2025&ndash;now</span><div><b>Chair (Senior Staff), Harvard Model Congress, Boston &amp; Europe.</b> Directing the Boston conference, North America&rsquo;s largest congressional simulation: 1,500+ delegates from 100+ schools. Also staffs HMC Europe: 500+ delegates from 20+ countries. Chair since January 2026, on staff since September 2025.</div></li>
+    <li><span class="when">2025&ndash;now</span><div><b>Project Team Lead: TPR/AlgoEd, The Harvard Crimson Business Board.</b> Leads international writing and leadership camps with The Princeton Review and AlgoEd for the nation&rsquo;s oldest daily college newspaper (est. 1873, a $1M+ media enterprise). Before that, as Global Programs Associate, moderated and judged the international semifinal and final rounds of the Harvard Crimson Global Quiz Bowl, and went to South Korea to mentor students and lead two weeks of workshops on writing, leadership and journalism.</div></li>
+    <li><span class="when">2025&ndash;now</span><div><b>Harvard service, ethics and leadership fellowships.</b>
+      <ul class="sub">
+        <li>First-Year Outdoor Program leader</li>
+        <li>Honor Council member</li>
+        <li>Harvard Hillel Travel Program Fellow: research tour of Lithuania, Poland and Hungary</li>
+        <li>Catalyst Sustainability Scholar: service-learning trip to Puerto Rico</li>
+        <li>SPARK Fellow, summer 2025: $2,000 stipend, 7 weeks of public service</li>
+        <li>Fong Family Public Service Fellow, winter: $1,000, one month</li>
+      </ul></div></li>
+    <li><span class="when">2025&ndash;2026</span><div><b>Mentor, Emerging Leaders Program, Harvard Radcliffe Institute.</b> Mentored Boston high-school sophomores in leadership and social activism.</div></li>
+    <li><span class="when">2025&ndash;now</span><div><b>Also at Harvard.</b> Operations, Harvard College China Forum (America&rsquo;s largest conference on US-China relations). Assistant Director of Operations, Harvard International Relations Council (Harvard Model UN and Harvard National Model UN). Associate, Leadership Institute at Harvard College (Youth Lead the Change conferences).</div></li>
+  </ul>
+</section>
+
+<section id="research" aria-labelledby="h-research">
+  <div class="sh"><h2 id="h-research"><a href="#research">Research and policy</a></h2><a class="more" href="n1.html">The Polling Station</a></div>
+  <ul class="rows">
+    <li><span class="when">2025&ndash;2026</span><div><b>Institute of Politics, Harvard Kennedy School.</b> Analyst on the Harvard Youth Poll, America&rsquo;s largest poll of 18&ndash;29-year-olds. Associate to Ambassador Katherine Tai, 19th U.S. Trade Representative. Consulting for the Red Cross and the United Nations.</div></li>
+    <li><span class="when">Summer 2025</span><div><b>Fellow, Policy Program in Economics, Institute of Politics.</b> Researched the impact of international students on Harvard and U.S. universities.</div></li>
+    <li><span class="when">2025&ndash;2026</span><div><b>Senior Associate, Harvard Global Research and Consulting Group.</b> Consulting for UNICEF and the Urban Institute, and for the WHO and the UN.</div></li>
+    <li><span class="when">2024</span><div><b>Research Fellow, Ballotpedia.</b> 1 of 12 from 90+ applicants.</div></li>
+    <li><span class="when">2023&ndash;2024</span><div><b>Researcher, The World in Us.</b></div></li>
+    <li><span class="when">2023</span><div><b>Public Health Policy Analyst, Institute for Youth in Policy.</b></div></li>
+    <li><span class="when">2022&ndash;2023</span><div><b>Econometrics research, University of Nevada, Reno.</b> Under Prof. Mark Pingle, on the paper <q>Can Private Enterprise do for Health Care What it Has Done for Food?</q></div></li>
+    <li><span class="when">2022&ndash;2023</span><div><b>Economics research, University of Houston and Chapman University.</b> Houston in early 2023; Chapman in 2022.</div></li>
+  </ul>
+</section>
+
+<section id="advocacy" aria-labelledby="h-advocacy">
+  <div class="sh"><h2 id="h-advocacy"><a href="#advocacy">Advocacy and politics</a></h2><a class="more" href="bill.html">The Capitol</a></div>
+  <ul class="rows">
+    <li><span class="when">2021&ndash;2023</span><div><b>Lead Advocate, CAIR, Sacramento.</b> Five California bills worked end to end. Lead community advocate for AB 1766 (California IDs for All), with Asm. Jim Patterson&rsquo;s office (Legislative Director Ian Coolbear) and Sen. Shannon Grove&rsquo;s office. Also advocated for AB 1947 (Freedom from Hate Crimes), SB 1161 (Transit Safety), AB 2549 (Ending Street Harassment) and SB 1038 (limits on biometric surveillance by law enforcement).</div></li>
+    <li><span class="when">2024&ndash;2025</span><div><b>Executive Director of Operations, Diversify Our Narrative.</b> 1 of 5 executives leading a national <span style="white-space:nowrap">501(c)(3)</span> of 5,000+ student organizers and 800+ district chapters pushing curriculum equity reform. Featured in TIME, Bloomberg, Vox, ABC Nightline and The Washington Post.</div></li>
+    <li><span class="when">2024&ndash;2025</span><div><b>Managing Director, California High School Democrats.</b> 1 of 9 directors, managing all regions. Also National Muslim Caucus, High School Democrats of America (2023&ndash;2025).</div></li>
+    <li><span class="when">2024</span><div><b>Election Fellow, Voters of Tomorrow.</b> 1 of 50 paid fellows, phone banking and canvassing.</div></li>
+    <li><span class="when">2022</span><div><b>Congressional Intern, Office of Kevin McCarthy, U.S. House.</b> Clovis, California, June to December.</div></li>
+    <li><span class="when">2022</span><div><b>Executive Director, LegislativeLift.</b> A global Muslim civil-rights nonprofit: 11K+ members, 80+ volunteers, events in Egypt, India and the U.S.; scholar programs and legislative literacy. Earlier its Outreach Director, and a volunteer.</div></li>
+  </ul>
+  <h3>Programs</h3>
+  <ul class="dots">
+    <li>Civics Unplugged Fellow &rsquo;23 (11% acceptance)</li>
+    <li>Advocacy Fellow, Encode Justice (2022)</li>
+    <li>ACLU National Advocacy Institute</li>
+    <li>American Legion California Boys State delegate</li>
+  </ul>
+</section>
+
+<section id="fresno" aria-labelledby="h-fresno">
+  <div class="sh"><h2 id="h-fresno"><a href="#fresno">Fresno</a></h2><a class="more" href="triptik.html">The Map Room</a></div>
+  <ul class="rows">
+    <li><span class="when">2021&ndash;2025</span><div><b>VP &amp; Executive Director, Muslim Community Association of Fresno.</b> A youth-driven nonprofit. 150+ community events. $240K+ raised for Syrian and Afghan refugees and Pakistan flood victims. Secured a $500K pledge for Fresno&rsquo;s first Muslim women&rsquo;s transitional home, addressing homelessness and domestic abuse. Clothing and food drives; mentoring groups at local mosques and Islamic schools. On the board from September 2021 (Director of Outreach, of Relations, of External Relations); VP &amp; Executive Director from May 2022.</div></li>
+    <li><span class="when">2022</span><div><b>MSA Director of Community Relations, Clovis Community College.</b></div></li>
+    <li><span class="when">2023</span><div><b>Tutor, Instilt Educate.</b></div></li>
+    <li><span class="when">2018&ndash;2021</span><div><b>Volunteer, Masjid Fresno Saturday School.</b> Most Saturdays.</div></li>
+    <li><span class="when">2015&ndash;2021</span><div><b>Volunteer, Central California Food Bank.</b> Most Sundays.</div></li>
+  </ul>
+</section>
+
+<section id="writing" aria-labelledby="h-writing">
+  <div class="sh"><h2 id="h-writing"><a href="#writing">Writing and translation</a></h2><a class="more" href="translation.html">The Bridge</a></div>
+  <ul class="rows">
+    <li><span class="when">Languages</span><div><b>English and Arabic.</b> California State Seal of Biliteracy in Arabic; professional Arabic&ndash;English translation.</div></li>
+    <li><span class="when">2022&ndash;2024</span><div><b>Senior English Writer, White House in Arabic.</b> Began as an intern. Edited and translated press briefings, op-eds and documentary scripts between Arabic and English under Marah Bukai, Washington Bureau Chief of Al-Arab Media Organization. 350K+ combined readers and viewers (150K+ readers, 200K+ viewers). Articles he edited or translated:
+      <ul class="sub">
+        <li><a href="https://whia.us/en/5461/" target="_blank" rel="noopener">Mustafa Al-Kazemi&rsquo;s Crucial Role in the MENA Region</a></li>
+        <li><a href="https://whia.us/en/6115/" target="_blank" rel="noopener">The Sadrist Movement&rsquo;s Sit-In Sends Iraq into Political Turmoil</a></li>
+        <li><a href="https://whia.us/en/5276/" target="_blank" rel="noopener">MalikiLeaks: When Sectarianism Rules Iraq</a></li>
+        <li><a href="https://whia.us/en/5028/" target="_blank" rel="noopener">Iraq to Play a Major Role at Jeddah Summit</a></li>
+        <li><a href="https://whia.us/en/6215/" target="_blank" rel="noopener">The Possible Outcomes of the Iraqi Political Crisis</a></li>
+        <li><a href="https://whia.us/en/5047/" target="_blank" rel="noopener">Biden in Palestine: Is Health a Path to Statehood?</a></li>
+      </ul></div></li>
+    <li><span class="when">Apr 2025</span><div><b>Contributor, Wall Street Journal.</b> <a href="https://www.wsj.com/us-news/education/harvard-bound-students-stand-firm-while-some-columbia-prospects-think-twice-013d9afa" target="_blank" rel="noopener">Harvard-Bound Students Stand Firm While Some Columbia Prospects Think Twice</a>, April 16, 2025.</div></li>
+    <li><span class="when">Oct 2024</span><div><b>Contributor, The Nation.</b> <a href="https://www.thenation.com/article/society/artificial-intelligence-chatgpt-college-applications/" target="_blank" rel="noopener">AI Is Taking Over College Admissions</a>, October 11, 2024.</div></li>
+    <li><span class="when">2023&ndash;2024</span><div><b>Press Officer, Youth Climate Action Team.</b></div></li>
+    <li><span class="when">Program</span><div><b>Princeton Summer Journalism Program finalist.</b> About 60 of 900+.</div></li>
+  </ul>
+</section>
+
+<section id="debate" aria-labelledby="h-debate">
+  <div class="sh"><h2 id="h-debate"><a href="#debate">Debate, speech and mock trial</a></h2><a class="more" href="speech.html">The Chamber</a></div>
+  <ul class="dots">
+    <li><b>NSDA National Tournament Finalist, Congressional Debate:</b> 1 of 20 from 50,000+.</li>
+    <li><b>California Mock Trial Finals MVP:</b> 1 of 128 from 5,000+ competitors.</li>
+    <li><b>NSDA Student Leadership Council</b> (2024&ndash;2025): 1 of 23 students nationwide, representing 140,000+ members to the national board.</li>
+    <li>NSDA National Semifinalist, Congressional Debate</li>
+    <li>4&times; NSDA National Qualifier</li>
+    <li>NSDA National Legislation Author: 1 of 41 from 500+</li>
+    <li>CHSSA Congressional Debate semifinalist (top 15 in California); CHSSA Public Forum octofinalist</li>
+    <li>UOP Invitational, 3&times; champion: Parliamentary Debate, Oral Interpretation, Best Speaker</li>
+    <li>Berkeley National Congress Tournament, 3rd place</li>
+    <li>Ethics Bowl, California state quarterfinalist (top 8)</li>
+    <li>TED Student Talks mentee (2023)</li>
+  </ul>
+</section>
+
+<section id="honors" aria-labelledby="h-honors">
+  <div class="sh"><h2 id="h-honors"><a href="#honors">Honors</a></h2><a class="more" href="depths.html">The Pier</a></div>
+  <h3>Scholarships</h3>
+  <ul class="dots">
+    <li><b>Coca-Cola Scholar:</b> 1 of 150 from 105,000+.</li>
+    <li><b>Gates Scholar:</b> 1 of 750 from 48,000+.</li>
+    <li><b>Benjamin A. Gilman Scholar.</b></li>
+    <li><b>QuestBridge:</b> National College Match Finalist (1 of 7,287 from 25,500); College Prep Scholar (1 of 3,911 from 16,000); Quest for Excellence Award in Humanities (1 of about 100 from 3,911).</li>
+    <li><b>Taco Bell Live M&aacute;s Scholar:</b> $10K, 1 of about 400 from 14,000.</li>
+    <li><b>Elks Most Valuable Student Semifinalist:</b> 1 of 500 from 21,000+.</li>
+  </ul>
+  <h3>National recognition</h3>
+  <ul class="dots">
+    <li><b>Princeton Prize in Race Relations,</b> San Francisco: 1 of 3 from 600+.</li>
+    <li><b>NSDA Student of the Year:</b> 1 of 86 from 140,000+.</li>
+    <li>JFK Profile in Courage Essay Contest, top 5% (about 150 of 2,800+)</li>
+    <li>International Geography Olympiad, Team USA qualifier: 7th nationally, perfect qualifying score</li>
+    <li>International Climate Science Olympiad semifinalist: top 5% of 55,000+</li>
+    <li>National African American Recognition Program</li>
+    <li>National History Day, 2&times; Valley Champion</li>
+    <li>Summa Cum Laude, Clovis Community College</li>
+  </ul>
+  <h3>Selective programs</h3>
+  <ul class="dots">
+    <li><b>Telluride Association Summer Seminar</b> (summer 2024, Washington DC&ndash;Baltimore): 1 of 72 from 2,400+ applicants, tuition-free seminar in Critical Black Studies. Elected house chair.</li>
+    <li>Coolidge Scholarship Senator: 1 of 100 from 4,100+</li>
+    <li>Notre Dame Leadership Seminars: about 90 of 1,500+</li>
+    <li>High School Diplomats finalist: about 80 of 700+</li>
+    <li>USC Young Leaders Summit Scholar: about 200 of 1,800+</li>
+  </ul>
+</section>
+
+<section id="time" aria-labelledby="h-time">
+  <div class="sh"><h2 id="h-time"><a href="#time">Time</a></h2><a class="more" href="weeks.html">The Plaza</a></div>
+  <ul class="dots">
+    <li><b>President&rsquo;s Volunteer Service Award, Lifetime:</b> 4,000+ service hours.</li>
+  </ul>
+</section>
+</main>
+
+<footer>
+  <p class="rule">Updated September 2026.</p>
+  <p class="screen">The long version is a small planet with one road around it, from Fresno to Cambridge: <a href="index.html">husam.world</a>. Each section above has its own place there.</p>
+  <p class="screen noprint" id="keys" hidden>Keys: <kbd>/</kbd> to filter, <kbd>Esc</kbd> to clear.</p>
+</footer>
+
+<script>
+(function () {
+  var d = document, q = d.getElementById('q'), qn = d.getElementById('qn'), none = d.getElementById('none');
+  function show(el) { el.hidden = false; }
+  var keyboard = !window.matchMedia || matchMedia('(hover: hover) and (pointer: fine)').matches;
+  [].forEach.call(d.querySelectorAll(keyboard ? '.find, .copy, .pdf, #keys' : '.find, .copy, .pdf'), show);
+  if (keyboard) d.getElementById('q').placeholder += '  (press /)';
+
+  // Copy email (the address stays selectable text either way)
+  [].forEach.call(d.querySelectorAll('[data-copy]'), function (b) {
+    b.addEventListener('click', function () {
+      var t = b.getAttribute('data-copy');
+      function done(ok) { b.textContent = ok ? 'Copied' : 'Select and copy'; setTimeout(function () { b.textContent = 'Copy'; }, 1600); }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { done(true); }, function () { done(false); });
+      else done(false);
+    });
+  });
+  d.querySelector('.pdf').addEventListener('click', function () { window.print(); });
+
+  // Type to filter: every word must appear in a line (or in its section's name)
+  var secs = [].slice.call(d.querySelectorAll('main section'));
+  var items = [];
+  secs.forEach(function (s) {
+    var head = s.querySelector('h2').textContent + ' ' + s.querySelector('.more').textContent;
+    [].forEach.call(s.querySelectorAll('ul:not(.sub) > li'), function (li) {
+      var h3 = li.parentNode.previousElementSibling;
+      var group = h3 && h3.tagName === 'H3' ? h3.textContent : '';
+      items.push({ li: li, sec: s, text: (head + ' ' + group + ' ' + li.textContent).toLowerCase().replace(/\s+/g, ' ') });
+    });
+  });
+  function norm(s) { s = s.toLowerCase(); return s.normalize ? s.normalize('NFD').replace(/[\u0300-\u036f]/g, '') : s; }
+  items.forEach(function (it) { it.text = norm(it.text); });
+  function run() {
+    var words = norm(q.value).trim().split(/\s+/).filter(Boolean), n = 0;
+    items.forEach(function (it) {
+      var ok = words.every(function (w) { return it.text.indexOf(w) >= 0; });
+      it.li.hidden = !ok; if (ok) n++;
+    });
+    secs.forEach(function (s) {
+      var any = s.querySelector('ul:not(.sub) > li:not([hidden])');
+      s.hidden = !any;
+      [].forEach.call(s.querySelectorAll('h3'), function (h) { var ul = h.nextElementSibling; h.hidden = !ul.querySelector('li:not([hidden])'); });
+    });
+    none.hidden = !(words.length && !n);
+    qn.textContent = words.length ? (n === 1 ? '1 line' : n + ' lines') : '';
+  }
+  q.addEventListener('input', run);
+  q.addEventListener('keydown', function (e) { if (e.key === 'Escape') { q.value = ''; run(); q.blur(); } });
+  d.getElementById('clear').addEventListener('click', function () { q.value = ''; run(); q.focus(); });
+  d.addEventListener('keydown', function (e) {
+    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target && e.target.tagName;
+    if (t === 'INPUT' || t === 'TEXTAREA' || t === 'SELECT' || (e.target && e.target.isContentEditable)) return;
+    e.preventDefault(); q.focus(); q.select();
+  });
+  addEventListener('beforeprint', function () { if (q.value) { q.value = ''; run(); } });
+  if (q.value) run(); // a restored value after back/forward
+})();
+</script>
+</body>
+</html>

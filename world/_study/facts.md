@@ -57,4 +57,4 @@ paco.me, rsms.me, leerob, craigmod and Stamatiou could not be opened; nothing be
 | JS | danluu | none needed to read; an inline script only unhides: filter box (`/` to focus, Esc to clear), Copy email, Save as PDF (`window.print()`) |
 | Print | résumé | 10.5pt, black on white, no links row, no district pointers, rows don't split, URLs for email/LinkedIn printed as text |
 | Motion | all of them | none |
-| Updated line | leerob/danluu-style dated pages | "Updated September 2026" in the footer |
+| Updated line | a plain dated footer, so a reader knows how fresh the facts are | "Updated September 2026" in the footer |

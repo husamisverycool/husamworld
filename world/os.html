@@ -3400,6 +3400,13 @@ try { Flow.init(); } catch (e) {
         'a.row:focus-visible{box-shadow:inset 0 0 0 2.5px ' + INK + '}' +
         'a.row:hover .dia,a.row.on .dia,a.row:focus-visible .dia{transform:rotate(45deg) scale(1.35)}' +
         '.here{cursor:default}' +
+        // the plain page: a quiet row under the places, text face only, no diamond, no wipe (the way out of the game, not another place in it)
+        '.pl{margin-top:6px;border-top:1.5px dashed rgba(35,38,46,.35);padding-top:6px}' +
+        '.plain{display:grid;grid-template-columns:20px 1fr;column-gap:10px;align-items:center;min-height:44px;padding:6px 10px 6px 8px;color:#4b4f5c}' +
+        '.plain svg{grid-row:1/3;justify-self:center;width:14px;height:12px}' +
+        '.plain b{font:700 15px/1.2 "hwn Barlow","Helvetica Neue",Arial,sans-serif;color:' + INK + ';text-decoration:underline;text-underline-offset:3px}' +
+        '.plain span{grid-column:2;font-size:14px;line-height:1.25;margin-top:1px}' +
+        '.plain:hover,.plain:focus-visible{background:#fff}.plain:focus-visible{box-shadow:inset 0 0 0 2.5px ' + INK + '}' +
         // narrow screens: planet and the way home side by side, the list below
         '@media (max-width:560px){.inner{grid-template-columns:136px 1fr;grid-template-rows:auto auto;grid-template-areas:"map home" "list list";gap:10px 12px;padding:12px}.map{width:136px;height:136px}.row{min-height:42px;padding:4px 8px 4px 6px}.row b{font-size:14px}.row span{font-size:13.5px;margin-top:1px}.home{align-self:end;margin-bottom:9px;font-size:14px;padding:12px 10px 10px}}' +
         '@media (max-height:520px) and (min-width:561px){.inner{grid-template-columns:150px 1fr}.map{width:150px;height:150px}}' +
@@ -3419,7 +3426,7 @@ try { Flow.init(); } catch (e) {
         '<div class="paper"></div><div class="inner">' +
         '<div class="map" aria-hidden="true"><canvas class="big"></canvas>' + pins + '</div>' +
         '<a class="home" href="index.html#from-' + here + '" style="--i:0">' + HOME_WORD + '</a>' +
-        '<ul>' + rows + '</ul></div></div>' +
+        '<ul>' + rows + '<li class="pl"><a class="plain" href="facts.html"><svg viewBox="0 0 14 12" aria-hidden="true"><path d="M1 2h12M1 6h12M1 10h8" stroke="currentColor" stroke-width="1.6"/></svg><b>The short version</b><span>Every fact on one plain page</span></a></li></ul></div></div>' +
         '<div class="wipe" aria-hidden="true"><b></b></div>';
 
       var $ = function (s) { return root.querySelector(s); }, $$ = function (s) { return Array.prototype.slice.call(root.querySelectorAll(s)); };
@@ -3512,7 +3519,7 @@ try { Flow.init(); } catch (e) {
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && isOpen()) { close(true); } });
       root.addEventListener('keydown', function (e) {
         if (!isOpen()) return;
-        var list = [$('.home')].concat($$('a.row')), i = list.indexOf(root.activeElement);
+        var list = [$('.home')].concat($$('a.row'), $$('a.plain')), i = list.indexOf(root.activeElement);
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); var n = i < 0 ? 0 : (i + (e.key === 'ArrowDown' ? 1 : -1) + list.length) % list.length; list[n].focus(); }
         else if (e.key === 'Home' || e.key === 'End') { e.preventDefault(); list[e.key === 'Home' ? 0 : list.length - 1].focus(); }
       });

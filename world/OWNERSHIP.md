@@ -4,6 +4,8 @@ Husam's rule: **nothing written or mentioned in one section may be written or me
 
 The same goes for design devices: each signature device belongs to one page. Nobody else uses it, even in a small way.
 
+**The single deliberate exception: `facts.html`**, the plain summary ("the short version"). It repeats every district's facts on one calm page on purpose, links each section to its owner, and is exempt in `_shared/audit.py`. No other page may borrow from it.
+
 ## Fact ownership
 
 ### The World: `index.html` (the hub)

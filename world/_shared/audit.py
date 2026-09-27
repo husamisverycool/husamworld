@@ -5,6 +5,12 @@ import re, html, pathlib, itertools, collections
 
 W = pathlib.Path('world')
 PAGES = ['index', 'bill', 'speech', 'translation', 'n1', 'triptik', 'os', 'depths', 'weeks', 'everywhere']
+# Exempt summary pages: checked by neither the owned-facts check nor the shingle check.
+# facts.html is the plain, no-stimulation version of the whole site: every fact, stated once, on one page,
+# so a recruiter can read or print it. Repeating every district is its whole job, so it would fail both checks
+# by design. It is the single deliberate exception to OWNERSHIP.md; never add a district page here.
+EXEMPT = ['facts']
+assert not set(EXEMPT) & set(PAGES)
 
 # token (case-insensitive regex) -> owner page
 OWNED = {
