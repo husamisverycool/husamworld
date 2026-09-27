@@ -65,8 +65,12 @@ html.ready .t-go:not([disabled]){animation:goPop .9s linear}
 .t-map{pointer-events:auto;font:600 16px/1 var(--text);color:var(--ink);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;padding:10px 8px;margin-top:-2px}
 .t-map:hover{text-decoration-thickness:3px}
 /* the plain page sits beside the map link: same quiet underline (Henry Heffernan's "ESC to skip", as a real URL) */
-.t-alts{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:0 6px;margin-top:-2px}
+.t-alts{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 12px;margin-top:4px}
 .t-alts .t-map{margin-top:0}
+/* the plain résumé: a small cream slab beside the map link, same family as the start button but quieter */
+.t-cv{pointer-events:auto;display:inline-flex;align-items:center;min-height:40px;padding:9px 14px 8px;font:400 14px/1 var(--display);color:var(--ink);text-decoration:none;transform:rotate(.8deg)}
+.t-cv:hover{transform:rotate(.8deg) translateY(-2px)}
+html.has-world:not(.ready) .t-cv{visibility:hidden}
 .t-card{position:absolute;left:24px;bottom:28px;display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;transform:rotate(-2.5deg);text-align:left;pointer-events:auto}
 .t-card img{width:64px;height:64px;object-fit:cover;display:block;box-shadow:0 0 0 2px var(--ink)}
 .t-card b{display:block;font:400 15px/1.1 var(--display)}
@@ -392,7 +396,7 @@ html.notice-up .bubble{visibility:hidden!important}
 <section class="title" id="title" aria-labelledby="tName">
   <h1 class="t-name" id="tName"><span>Husam</span> <span>Sokar</span></h1>
   <button class="t-go" id="goBtn" type="button" disabled>Building the planet</button>
-  <span class="t-alts"><button class="t-map" type="button" data-open-map>Or read the map</button><a class="t-map" href="facts.html">or just the facts</a></span>
+  <span class="t-alts"><button class="t-map" type="button" data-open-map>Or read the map</button><a class="t-cv slab slab-btn" href="facts.html">One-page résumé</a></span>
   <div class="t-card slab" aria-hidden="true"><img class="ph" alt=""><div><b>Husam Sokar</b><span>Fresno &rarr; Cambridge, the long way around</span></div></div>
 </section>
 
