@@ -64,6 +64,9 @@ html.ready .t-go:not([disabled]){animation:goPop .9s linear}
 @keyframes goPop{0%{transform:rotate(-1.2deg) scale(.82)}22%{transform:rotate(-1.2deg) scale(1.09)}42%{transform:rotate(-1.2deg) scale(.97)}62%{transform:rotate(-1.2deg) scale(1.02)}82%{transform:rotate(-1.2deg) scale(.995)}100%{transform:rotate(-1.2deg) scale(1)}}
 .t-map{pointer-events:auto;font:600 16px/1 var(--text);color:var(--ink);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;padding:10px 8px;margin-top:-2px}
 .t-map:hover{text-decoration-thickness:3px}
+/* the plain page sits beside the map link: same quiet underline (Henry Heffernan's "ESC to skip", as a real URL) */
+.t-alts{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;gap:0 6px;margin-top:-2px}
+.t-alts .t-map{margin-top:0}
 .t-card{position:absolute;left:24px;bottom:28px;display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;transform:rotate(-2.5deg);text-align:left;pointer-events:auto}
 .t-card img{width:64px;height:64px;object-fit:cover;display:block;box-shadow:0 0 0 2px var(--ink)}
 .t-card b{display:block;font:400 15px/1.1 var(--display)}
@@ -172,6 +175,8 @@ html.has-world .atlas-panel{background:var(--paper);min-height:calc(100% - 72px)
 .card .contact{grid-column:1/-1}
 .card-note{grid-column:1/-1;margin:0;padding:12px 14px;background:#fff;box-shadow:0 0 0 2px var(--ink);font:500 15px/1.45 var(--text)}
 .card-note button{text-decoration:underline;text-underline-offset:3px;font-weight:700}
+.card-plain{grid-column:1/-1;margin:-4px 0 0;font:500 15px/1.45 var(--text);color:var(--ink-2)}
+.card-plain a{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px}
 .route-h{margin:0 0 6px;font:400 26px/1 var(--display)}
 .route-sub{margin:0 0 22px;font:500 16px/1.45 var(--text);max-width:46ch}
 .stops{list-style:none;margin:0;padding:0 0 0 30px;position:relative}
@@ -381,7 +386,7 @@ html.notice-up .bubble{visibility:hidden!important}
 <section class="title" id="title" aria-labelledby="tName">
   <h1 class="t-name" id="tName"><span>Husam</span> <span>Sokar</span></h1>
   <button class="t-go" id="goBtn" type="button" disabled>Building the planet</button>
-  <button class="t-map" type="button" data-open-map>Or read the map</button>
+  <span class="t-alts"><button class="t-map" type="button" data-open-map>Or read the map</button><a class="t-map" href="facts.html">or just the facts</a></span>
   <div class="t-card slab" aria-hidden="true"><img class="ph" alt=""><div><b>Husam Sokar</b><span>Fresno &rarr; Cambridge, the long way around</span></div></div>
 </section>
 
@@ -459,7 +464,7 @@ html.notice-up .bubble{visibility:hidden!important}
     </div>
     <div class="setp-page" id="spage-keys" role="tabpanel" aria-labelledby="stab-keys" hidden>
       <h3 class="keys-h">Keyboard</h3>
-      <ul class="keys"><li><span>Drive</span><span><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrows</span></li><li><span>Boost</span><span><kbd>Shift</kbd></span></li><li><span>Brake, slide</span><span><kbd>Space</kbd> (twice to hop)</span></li><li><span>Horn</span><span><kbd>H</kbd></span></li><li><span>Back on the road</span><span><kbd>R</kbd></span></li><li><span>Go in</span><span><kbd>Enter</kbd></span></li><li><span>Map, settings</span><span><kbd>M</kbd> <kbd>O</kbd></span></li><li><span>Time trial</span><span><kbd>T</kbd></span></li></ul>
+      <ul class="keys"><li><span>Drive</span><span><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrows</span></li><li><span>Boost</span><span><kbd>Shift</kbd></span></li><li><span>Brake, slide</span><span><kbd>Space</kbd> (twice to hop)</span></li><li><span>Horn</span><span><kbd>H</kbd></span></li><li><span>Back on the road</span><span><kbd>R</kbd></span></li><li><span>Go in</span><span><kbd>Enter</kbd></span></li><li><span>Map, settings</span><span><kbd>M</kbd> <kbd>O</kbd></span></li><li><span>Time trial</span><span><kbd>T</kbd></span></li><li><span>The plain page</span><span><kbd>P</kbd></span></li></ul>
       <h3 class="keys-h">Touch</h3>
       <ul class="keys"><li><span>Point</span><span>Put a thumb down on the left half and push the way to go</span></li><li><span>Steer</span><span>Left and right turn, up drives, down brakes</span></li><li><span>Tap to go</span><span>Tap a sign or the ground; the car drives there</span></li><li><span>Horn</span><span>Tap the car</span></li><li><span>Boost</span><span>Hold the &raquo; button</span></li><li><span>Look around</span><span>Drag on the right half; pinch to zoom</span></li></ul>
       <h3 class="keys-h">Gamepad</h3>
@@ -504,6 +509,7 @@ html.notice-up .bubble{visibility:hidden!important}
         <a class="btn" href="https://www.linkedin.com/in/husam-sokar-089648227/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">&nearr;</span></a>
         <span class="email"><span class="email-addr">hramadan@college.harvard.edu</span><button class="copy" type="button" data-copy="hramadan@college.harvard.edu">Copy</button></span>
       </div>
+      <p class="card-plain"><a href="facts.html">Every fact on one plain page</a>: no driving, and it prints as a r&eacute;sum&eacute;.</p>
       <p class="card-note" id="worldNote" hidden></p>
     </section>
     <section aria-labelledby="routeH">
@@ -512,7 +518,7 @@ html.notice-up .bubble{visibility:hidden!important}
       <ol class="stops" id="stops"></ol>
     </section>
     <footer class="atlas-foot">
-      <p>Driving: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrows, <kbd>Shift</kbd> to boost, <kbd>Space</kbd> to brake (twice to hop), <kbd>H</kbd> for the horn, <kbd>R</kbd> to get back on the road, <kbd>Enter</kbd> to go in, <kbd>M</kbd> for this map. On a phone, put a thumb down on the left half and push; tap the car to honk.</p>
+      <p>Driving: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrows, <kbd>Shift</kbd> to boost, <kbd>Space</kbd> to brake (twice to hop), <kbd>H</kbd> for the horn, <kbd>R</kbd> to get back on the road, <kbd>Enter</kbd> to go in, <kbd>M</kbd> for this map, <kbd>P</kbd> for the plain page. On a phone, put a thumb down on the left half and push; tap the car to honk.</p>
       <p>The light follows your own clock. A homage to Bruno Simon&rsquo;s folio and Abeto&rsquo;s Messenger; every shape, sound and letter here is drawn in code.</p>
     </footer>
   </div>
@@ -743,22 +749,49 @@ var U = {
   uWind: { value: new V3(.62, .35, .7).normalize() }, uWindT: { value: 0 }, uWindS: { value: .4 },
   uPal: { value: palTex }, uL: { value: new V3(0, 1, 0) }, uLight: { value: new C3() }, uShadow: { value: new C3() }, uRim: { value: new C3() },
   uEmis: { value: 0 }, uCam: { value: new V3() }, uRevDir: { value: new V3(0, -1, 0) }, uRev: { value: 10 }, uRevCol: { value: new C3() }, uPaper: { value: new C3() },
-  uOutline: { value: new C3() }, uOW: { value: 0.0019 }, uR: { value: R }, uTime: { value: 0 }
+  uOutline: { value: new C3() }, uOW: { value: 0.0016 }, uR: { value: R }, uTime: { value: 0 },
+  // round 6: atmosphere (Messenger's addFog: 1 - exp(-(d*k)^2), coloured like the sky; Bruno 2025 fogs to the background gradient),
+  // outlines that thin out with distance (Messenger's uOutlineFade), and see-through foliage round the car (Bruno 2025 Foliage.seeThrough)
+  uFogC: { value: new C3() }, uFog: { value: new THREE.Vector2(20, 1 / 45) }, uOF: { value: new THREE.Vector2(18, 90) },
+  uCarS: { value: new V3(.5, .5, 30) }, uRes: { value: new THREE.Vector2(1, 1) }, uSee: { value: 0 }
 };
+// GLSL shared by the solid, outline and ground shaders
+var ATMO_GLSL = [
+  'uniform vec3 uFogC, uCarS; uniform vec2 uFog, uRes; uniform float uSee;',
+  'float fogK(float d){ float x = max(0., d - uFog.x) * uFog.y; return (1. - exp(-x * x)) * .92; }',
+  'float ign(vec2 p){ return fract(52.9829189 * fract(dot(p, vec2(.06711056, .00583715)))); }', // interleaved gradient noise: an even dither
+  // true when this fragment should be dropped so the car stays visible: sway parts in front of it near its screen spot, anything right in front of the lens
+  'bool seeThru(vec3 w, float sw){ if (uSee < .5) return false; float cd = length(uCam - w); float keep = smoothstep(uCarS.z * .3, uCarS.z * .52, cd);',
+  ' if (sw > .5 && cd < uCarS.z - 1.2) { vec2 sp = gl_FragCoord.xy / uRes - uCarS.xy; sp.x *= uRes.x / uRes.y; keep = min(keep, smoothstep(.07, .24, length(sp))); }',
+  ' return keep < 1. && ign(gl_FragCoord.xy) > keep; }'].join('\n');
 // one shared wind (Bruno 2025, Wind.js: two scrolling noises along one direction) for tree canopies and grass tips
 var WIND_GLSL = 'uniform vec3 uWind; uniform float uWindT, uWindS, uR;\nfloat wn(vec3 p, float t){ return sin(p.x * .23 + t * 1.9) * sin(p.z * .19 + p.y * .11 + t * 1.3) * .6 + sin(dot(p, vec3(.07, .05, .09)) + t * .7) * .4; }\nvec3 sway(vec3 w, float amt){ vec3 n = normalize(w); float h = max(length(w) - uR, 0.); vec3 d = uWind - n * dot(uWind, n); return w + d * wn(w, uWindT) * uWindS * amt * h; }\n';
 var TOON_V = [WIND_GLSL,
-  'attribute float pal; varying float vPal; varying vec3 vN; varying vec3 vW;',
-  'void main(){ float sw = step(63.5, pal); vPal = pal - sw * 64.; vec4 p = vec4(position, 1.); vec3 n = normal;',
+  'attribute float pal; varying float vPal; varying vec3 vN; varying vec3 vW; varying float vSw;',
+  '#ifdef GROUND', 'attribute vec3 gv; varying vec3 vG;', '#endif',
+  'void main(){ float sw = step(63.5, pal); vSw = sw; vPal = pal - sw * 64.; vec4 p = vec4(position, 1.); vec3 n = normal;',
+  '#ifdef GROUND', ' vG = gv;', '#endif',
   '#ifdef USE_INSTANCING', ' p = instanceMatrix * p; n = mat3(instanceMatrix) * n;', '#endif',
   ' vec4 w = modelMatrix * p; if (sw > .5) w.xyz = sway(w.xyz, .075); vW = w.xyz; vN = normalize(mat3(modelMatrix) * n); gl_Position = projectionMatrix * viewMatrix * w; }'].join('\n');
 var TOON_F = [
   'uniform sampler2D uPal; uniform vec3 uL, uLight, uShadow, uRim, uCam, uRevDir, uRevCol, uPaper; uniform float uEmis, uRev; uniform float uR;',
-  'varying float vPal; varying vec3 vN; varying vec3 vW;',
+  ATMO_GLSL,
+  'varying float vPal; varying vec3 vN; varying vec3 vW; varying float vSw;',
+  '#ifdef GROUND', 'varying vec3 vG;', 'vec3 palC(float i){ return texture2D(uPal, vec2((i + .5) / 32., .5)).rgb; }', '#endif',
   'void main(){',
+  '#ifdef SEE', ' if (seeThru(vW, vSw)) discard;', '#endif',
+  '#ifdef GROUND',
+  // round 6: the ground is one smooth field, cut into crisp curved patches (Messenger's stepped gradients) instead of zig-zag facets:
+  // x = valley gold vs northern green, y = fields, z = a lighter mottle. Every edge is anti-aliased with fwidth.
+  ' float ax = fwidth(vG.x) * .7 + 1e-4, ay = fwidth(vG.y) * .7 + 1e-4, az = fwidth(vG.z) * .7 + 1e-4;',
+  ' vec3 base = mix(palC(0.), palC(1.), smoothstep(-ax, ax, vG.x));',
+  ' base = mix(base, vW.y < 2.8 ? palC(23.) : palC(24.), smoothstep(-ay, ay, vG.y - .7));',
+  ' base *= mix(1., 1.05, smoothstep(-az, az, vG.z - .58)) * mix(1., .965, smoothstep(-az, az, .3 - vG.z));',
+  '#else',
   ' vec3 base = texture2D(uPal, vec2((vPal + .5) / 32., .5)).rgb;',
+  '#endif',
   ' vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n;',
-  ' float d = dot(n, uL); float band = smoothstep(-.01, .05, d);',
+  ' float d = dot(n, uL); float fw = fwidth(d) * .8 + .004; float band = smoothstep(.02 - fw, .02 + fw, d);', // the toon edge, anti-aliased
   '#ifdef NOREV',
   ' vec3 lit = base * mix(uLight, vec3(1.), .6); vec3 sh = mix(base, base * uShadow, .4);',
   '#else',
@@ -768,23 +801,30 @@ var TOON_F = [
   ' vec3 v = normalize(uCam - vW); float rim = pow(1. - max(dot(n, v), 0.), 3.); col += uRim * rim * .16 * band;',
   ' float h = length(vW) - uR; if (h > .06 && h < 1.6 && (vPal < 1.5 || vPal > 3.5)) col *= mix(.8, 1., smoothstep(0., 1.5, h));',
   ' bool em = (vPal > 14.5 && vPal < 15.5) || (vPal > 24.5 && vPal < 25.5); if (em) col = mix(col, base * 1.3, uEmis);',
+  ' col = mix(col, uFogC, fogK(length(uCam - vW)));',
   ' float ang = acos(clamp(dot(normalize(vW), uRevDir), -1., 1.)); float edge = ang - uRev;',
   '#ifndef NOREV',
   ' if (edge > 0.) { vec3 pap = mix(uPaper * .72, uPaper, band); col = pap; }',
   ' col += uRevCol * smoothstep(.07, 0., abs(edge)) * 1.3;',
   '#endif',
   ' gl_FragColor = vec4(col, 1.); }'].join('\n');
-var toon = new THREE.ShaderMaterial({ uniforms: U, vertexShader: TOON_V, fragmentShader: TOON_F });
-var toonDS = toon.clone(); toonDS.uniforms = U; toonDS.side = THREE.DoubleSide;
-var toonKeep = new THREE.ShaderMaterial({ uniforms: U, vertexShader: TOON_V, fragmentShader: TOON_F, defines: { NOREV: '' } });
+var EXT = { derivatives: true };
+var toon = new THREE.ShaderMaterial({ uniforms: U, vertexShader: TOON_V, fragmentShader: TOON_F, defines: { SEE: '' }, extensions: EXT });
+var toonDS = new THREE.ShaderMaterial({ uniforms: U, vertexShader: TOON_V, fragmentShader: TOON_F, side: THREE.DoubleSide, extensions: EXT });
+var toonGround = new THREE.ShaderMaterial({ uniforms: U, vertexShader: TOON_V, fragmentShader: TOON_F, defines: { GROUND: '' }, extensions: EXT });
+var toonKeep = new THREE.ShaderMaterial({ uniforms: U, vertexShader: TOON_V, fragmentShader: TOON_F, defines: { NOREV: '', SEE: '' }, extensions: EXT });
 var OUT_V = [WIND_GLSL,
-  'attribute vec3 onormal; attribute float pal; uniform float uOW;',
-  'void main(){ vec4 p = vec4(position, 1.); vec3 n = onormal;',
+  'attribute vec3 onormal; attribute float pal; uniform float uOW; uniform vec2 uOF; varying vec3 vW; varying float vSw;',
+  'void main(){ vec4 p = vec4(position, 1.); vec3 n = onormal; vSw = step(63.5, pal);',
   '#ifdef USE_INSTANCING', ' p = instanceMatrix * p; n = mat3(instanceMatrix) * n;', '#endif',
-  ' vec4 w = modelMatrix * p; if (pal > 63.5) w.xyz = sway(w.xyz, .075); vec4 mv = viewMatrix * w; vec3 vn = normalize(mat3(viewMatrix) * mat3(modelMatrix) * n); mv.xyz += vn * clamp(uOW * -mv.z, .012, .4); gl_Position = projectionMatrix * mv; }'].join('\n');
-var outlineMat = new THREE.ShaderMaterial({ uniforms: U, side: THREE.BackSide, vertexShader: OUT_V, fragmentShader: 'uniform vec3 uOutline; void main(){ gl_FragColor = vec4(uOutline, 1.); }' });
-var UL = Object.assign({}, U, { uOW: { value: .0013 } });
-var outlineThin = new THREE.ShaderMaterial({ uniforms: UL, side: THREE.BackSide, vertexShader: OUT_V, fragmentShader: outlineMat.fragmentShader });
+  // Messenger fades its outlines with distance (uOutlineFade 5..80): far off the line thins to half, so the limb and the title planet stay clean
+  ' vec4 w = modelMatrix * p; if (pal > 63.5) w.xyz = sway(w.xyz, .075); vW = w.xyz; vec4 mv = viewMatrix * w; vec3 vn = normalize(mat3(viewMatrix) * mat3(modelMatrix) * n);',
+  ' float z = -mv.z; mv.xyz += vn * clamp(uOW * z * mix(1., .5, smoothstep(uOF.x, uOF.y, z)), .008, .4); gl_Position = projectionMatrix * mv; }'].join('\n');
+var OUT_F = ['uniform vec3 uOutline, uCam;', ATMO_GLSL, 'varying vec3 vW; varying float vSw;',
+  'void main(){', '#ifdef SEE', ' if (seeThru(vW, vSw)) discard;', '#endif', ' gl_FragColor = vec4(mix(uOutline, uFogC, fogK(length(uCam - vW))), 1.); }'].join('\n');
+var outlineMat = new THREE.ShaderMaterial({ uniforms: U, side: THREE.BackSide, vertexShader: OUT_V, fragmentShader: OUT_F, defines: { SEE: '' } });
+var UL = Object.assign({}, U, { uOW: { value: .0012 } });
+var outlineThin = new THREE.ShaderMaterial({ uniforms: UL, side: THREE.BackSide, vertexShader: OUT_V, fragmentShader: OUT_F, defines: { SEE: '' } });
 
 // ---------------------------------------------------------------- geometry kit: primitives carry a palette index and an outline normal
 function prim(g, cy) {
@@ -880,20 +920,23 @@ function kitAt(kit, n, f, lift) { var parts = kit.bake(frameAt(n, f, lift)); par
 function localToN(n, f, x, z) { var F = frameAt(n, f); var p = new V3(x, 0, z).applyMatrix4(F); return p.normalize(); }
 
 // the planet: a smooth ball, painted in patches: valley gold in the south, green in the north, fields between
+var planetGeo = null;
 (function planet() {
   var g = new THREE.IcosahedronGeometry(R, 22).toNonIndexed(), p = g.attributes.position.array, cnt = p.length / 3;
   var N = new Float32Array(p.length), pal = new Float32Array(cnt), c = new V3();
   for (var i = 0; i < p.length; i += 3) { var l = Math.sqrt(p[i] * p[i] + p[i + 1] * p[i + 1] + p[i + 2] * p[i + 2]); N[i] = p[i] / l; N[i + 1] = p[i + 1] / l; N[i + 2] = p[i + 2] / l; }
-  for (var f = 0; f < cnt; f += 3) {
-    c.set(p[f * 3] + p[f * 3 + 3] + p[f * 3 + 6], p[f * 3 + 1] + p[f * 3 + 4] + p[f * 3 + 7], p[f * 3 + 2] + p[f * 3 + 5] + p[f * 3 + 8]).normalize();
-    var lat = Math.asin(c.y) / DEG, nz = vnoise(c.x * 3.1 + 7, c.y * 3.1, c.z * 3.1) - .5, nz2 = vnoise(c.x * 9, c.y * 9 + 3, c.z * 9);
-    var col = lat + nz * 40 < -4 ? 0 : 1;
-    if (nz2 > .7) col = lat < 5 ? 23 : 24;
-    if (lat > 58 + nz * 10) col = 1;
-    pal[f] = pal[f + 1] = pal[f + 2] = col;
+  // round 6: per vertex (not per face), so the patches meet in smooth curves; the shader cuts them crisp (see GROUND)
+  var GV = new Float32Array(p.length);
+  for (var f = 0; f < cnt; f++) {
+    c.set(N[f * 3], N[f * 3 + 1], N[f * 3 + 2]);
+    var lat = Math.asin(c.y) / DEG, nz = vnoise(c.x * 3.1 + 7, c.y * 3.1, c.z * 3.1) - .5, nz2 = vnoise(c.x * 7, c.y * 7 + 3, c.z * 7);
+    var north = lat - 58 - nz * 10;
+    GV[f * 3] = Math.max(lat + nz * 40 + 4, north) / 6; GV[f * 3 + 1] = nz2 - Math.max(0, north) * .1; GV[f * 3 + 2] = vnoise(c.x * 5.3 + 11, c.y * 5.3, c.z * 5.3 - 4);
+    pal[f] = 0;
   }
+  g.setAttribute('gv', new THREE.BufferAttribute(GV, 3));
   g.setAttribute('normal', new THREE.BufferAttribute(N, 3)); g.setAttribute('onormal', new THREE.BufferAttribute(N.slice(), 3)); g.setAttribute('pal', new THREE.BufferAttribute(pal, 1));
-  solids.push(g);
+  planetGeo = g;
 })();
 
 // ---------------------------------------------------------------- the road: one ribbon from a rounded end behind the Fresno grid to a rounded end past the Cambridge finish
@@ -1231,8 +1274,9 @@ gantry(FINISH_S, ['CAMBRIDGE', 'FINISH: THE LONG WAY'], ['CAMBRIDGE', 'FRESNO: T
 // ---------------------------------------------------------------- bake: all solids in one mesh + one outline shell; flats in one more
 var solidGeo = merge(solids), flatGeo = merge(flats);
 var worldMesh = new THREE.Mesh(solidGeo, toon), outlineMesh = new THREE.Mesh(solidGeo, outlineMat), flatMesh = new THREE.Mesh(flatGeo, toonDS);
-worldMesh.frustumCulled = outlineMesh.frustumCulled = flatMesh.frustumCulled = false;
-scene.add(worldMesh, outlineMesh, flatMesh);
+var planetMesh = new THREE.Mesh(planetGeo, toonGround), planetLine = new THREE.Mesh(planetGeo, outlineMat);
+worldMesh.frustumCulled = outlineMesh.frustumCulled = flatMesh.frustumCulled = planetMesh.frustumCulled = planetLine.frustumCulled = false;
+scene.add(planetMesh, worldMesh, flatMesh, outlineMesh, planetLine);
 solids = flats = null;
 
 // ---------------------------------------------------------------- water: the stream under the bridge and the pond at the pier
@@ -1453,6 +1497,8 @@ function onKey(e, down) {
   var k = e.code, tag = e.target && e.target.tagName;
   if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
   if (down && k === 'Escape') { if (setOpen) closeSettings(); else if (letterOpen) closeLetter(); else if (mapIsOpen) closeMap(); else if (trial.on) endTrial(false); return; }
+  // P: the plain page (every fact, no driving). Not with a modifier, so Ctrl/Cmd+P still prints.
+  if (down && k === 'KeyP' && !e.repeat && !e.metaKey && !e.ctrlKey && !e.altKey && !letterOpen) { location.href = 'facts.html'; return; }
   if (state === 'title') { if (down && (k === 'Enter' || k === 'Space') && e.target === doc.body) { e.preventDefault(); startWorld(); } return; }
   if (state === 'intro') { if (!down) return; finishIntro(); }
   if (down && k === 'KeyM' && !letterOpen && !e.repeat) { if (setOpen) closeSettings(); mapIsOpen ? closeMap() : openMap(); return; }
@@ -2053,7 +2099,8 @@ var grass = (function () {
   geo.setAttribute('iPal', new THREE.InstancedBufferAttribute(pals, 1)); geo.instanceCount = list.length;
   var mat = new THREE.ShaderMaterial({ side: THREE.DoubleSide, uniforms: Object.assign({ uCarP: { value: new V3() } }, U),
     vertexShader: WIND_GLSL + 'attribute float tip; attribute float iPal; attribute vec4 iA; attribute vec4 iB; attribute vec4 iC; attribute vec4 iD; uniform vec3 uCarP; varying float vTip; varying float vPal; varying vec3 vW;\nvoid main(){ vTip = tip; vPal = iPal; mat4 im = mat4(iA, iB, iC, iD); vec4 w = im * vec4(position, 1.); vec3 n = normalize(w.xyz); w.xyz += (uWind - n * dot(uWind, n)) * wn(w.xyz, uWindT) * uWindS * .28 * tip; vec3 dc = w.xyz - uCarP; dc -= n * dot(dc, n); float cd = length(dc); float push = (1. - smoothstep(.7, 1.7, cd)) * tip; w.xyz += dc / max(cd, .001) * push * .3 - n * push * .22; vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
-    fragmentShader: 'uniform sampler2D uPal; uniform vec3 uLight, uShadow, uRevDir; uniform float uRev; varying float vTip; varying float vPal; varying vec3 vW; void main(){ float ang = acos(clamp(dot(normalize(vW), uRevDir), -1., 1.)); if (ang > uRev) discard; vec3 b = texture2D(uPal, vec2((vPal + .5) / 32., .5)).rgb; vec3 c = mix(mix(b, b * uShadow, .5), b * mix(vec3(1.), uLight, .5) * 1.12, vTip); gl_FragColor = vec4(c, 1.); }' });
+    // round 6: a tuft starts in the ground's own colour and only its tip lightens (Bruno 2025's Grass: blades read as texture, not as dark scratches)
+    fragmentShader: ['uniform sampler2D uPal; uniform vec3 uLight, uShadow, uRevDir, uCam; uniform float uRev;', ATMO_GLSL, 'varying float vTip; varying float vPal; varying vec3 vW;', 'void main(){ float ang = acos(clamp(dot(normalize(vW), uRevDir), -1., 1.)); if (ang > uRev) discard; vec3 b = texture2D(uPal, vec2((vPal + .5) / 32., .5)).rgb * uLight; vec3 c = mix(mix(b, b * uShadow, .22), b * vec3(1.1, 1.13, .98), vTip); gl_FragColor = vec4(mix(c, uFogC, fogK(length(uCam - vW))), 1.); }'].join('\n') });
   // split the mat4 into four vec4 attributes (WebGL1-safe)
   ['iA', 'iB', 'iC', 'iD'].forEach(function (nm, c) { geo.setAttribute(nm, new THREE.InterleavedBufferAttribute(new THREE.InstancedInterleavedBuffer(mats, 16, 1), 4, c * 4)); });
   geo.deleteAttribute('iM0');
@@ -2388,6 +2435,7 @@ function frame(now) {
   // light from the camera's upper left, so every side of the planet reads (Messenger's "smart" light)
   var cr = new V3().setFromMatrixColumn(camera.matrixWorld, 0), cu = new V3().setFromMatrixColumn(camera.matrixWorld, 1), cb = new V3().setFromMatrixColumn(camera.matrixWorld, 2);
   U.uL.value.copy(cr.multiplyScalar(-.55)).add(cu.multiplyScalar(.75)).add(cb.multiplyScalar(.45)).normalize(); U.uCam.value.copy(camera.position);
+  updateAtmo();
   applyTod();
   updateWorldBits(dt, now);
   if (state === 'play') { updateNear(dt); updateTrial(dt); checkProps(dt); }
@@ -2400,6 +2448,17 @@ function frame(now) {
   perf.cpu += performance.now() - c0; perf.n++;
   // adaptive quality (Jesse Zhou): under Auto, step down a tier while frames run long; the outline goes last
   if (state === 'play' && SET.qual === 'auto') { fpsAcc += dt; fpsN++; if (fpsN >= 90) { var avg = fpsAcc / fpsN; fpsAcc = 0; fpsN = 0; if (avg > .03 && quality.level > 0) { quality.auto = quality.level - 1; applyQuality(); } else if (avg > .045 && quality.level === 0) outlineMesh.visible = false; } }
+}
+// round 6: the air between the camera and the limb (Messenger addFog / Bruno 2025 Fog), outline thinning, and the car's spot on screen for see-through foliage
+var _cs = new V3(), _db = new THREE.Vector2();
+function updateAtmo() {
+  var far = state === 'title' || state === 'boot' || state === 'map', cz;
+  if (far) { cz = camera.position.length(); U.uFog.value.set(cz - R * .55, 1 / (R * 1.5)); U.uOF.value.set(cz - R, cz + R * .4); }
+  else { cz = camera.position.distanceTo(cam.tgt); U.uFog.value.set(cz * 1.02, 1 / (cz * 1.5)); U.uOF.value.set(cz * .8, cz * 3.2); }
+  U.uFogC.value.copy(blend.sky[0]).lerp(blend.sky[1], .3);
+  renderer.getDrawingBufferSize(_db); U.uRes.value.copy(_db);
+  _cs.copy(carG.position).addScaledVector(car.n, .5); var dz = camera.position.distanceTo(_cs); _cs.project(camera);
+  U.uCarS.value.set(_cs.x * .5 + .5, _cs.y * .5 + .5, dz); U.uSee.value = state === 'play' && carG.visible ? 1 : 0;
 }
 function updateLife(dt, now) {
   nightK = blend.emis;
