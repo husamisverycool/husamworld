@@ -67,10 +67,6 @@ html.ready .t-go:not([disabled]){animation:goPop .9s linear}
 /* the plain page sits beside the map link: same quiet underline (Henry Heffernan's "ESC to skip", as a real URL) */
 .t-alts{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 12px;margin-top:4px}
 .t-alts .t-map{margin-top:0}
-/* the plain résumé: a small cream slab beside the map link, same family as the start button but quieter */
-.t-cv{pointer-events:auto;display:inline-flex;align-items:center;min-height:40px;padding:9px 14px 8px;font:400 14px/1 var(--display);color:var(--ink);text-decoration:none;transform:rotate(.8deg)}
-.t-cv:hover{transform:rotate(.8deg) translateY(-2px)}
-html.has-world:not(.ready) .t-cv{visibility:hidden}
 .t-card{position:absolute;left:24px;bottom:28px;display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;transform:rotate(-2.5deg);text-align:left;pointer-events:auto}
 .t-card img{width:64px;height:64px;object-fit:cover;display:block;box-shadow:0 0 0 2px var(--ink)}
 .t-card b{display:block;font:400 15px/1.1 var(--display)}
@@ -396,7 +392,7 @@ html.notice-up .bubble{visibility:hidden!important}
 <section class="title" id="title" aria-labelledby="tName">
   <h1 class="t-name" id="tName"><span>Husam</span> <span>Sokar</span></h1>
   <button class="t-go" id="goBtn" type="button" disabled>Building the planet</button>
-  <span class="t-alts"><button class="t-map" type="button" data-open-map>Or read the map</button><a class="t-cv slab slab-btn" href="facts.html">One-page résumé</a></span>
+  <span class="t-alts"><button class="t-map" type="button" data-open-map>Or read the map</button><a class="t-map" href="facts.html">or the one-page résumé</a></span>
   <div class="t-card slab" aria-hidden="true"><img class="ph" alt=""><div><b>Husam Sokar</b><span>Fresno &rarr; Cambridge, the long way around</span></div></div>
 </section>
 
@@ -1476,7 +1472,22 @@ carBody.collisionFilterGroup = GROUP_CAR; carBody.collisionFilterMask = GROUP_DY
 function groundUnder(o) { var p = o.b.position, l = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z) || 1; _gn.set(p.x / l, p.y / l, p.z / l); o.ground.position.set(_gn.x * (R - 1), _gn.y * (R - 1), _gn.z * (R - 1)); o.ground.quaternion.setFromVectors(ZUP, _gn); }
 var dyn = [];
 var GRAV = 16;
-pw.addEventListener('preStep', function () { for (var i = 0; i < dyn.length; i++) { var b = dyn[i].b; if (!b || b.sleepState === CANNON.Body.SLEEPING) continue; groundUnder(dyn[i]); var p = b.position, l = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z) || 1, g = GRAV * b.mass / l; b.force.x -= p.x * g; b.force.y -= p.y * g; b.force.z -= p.z * g; if (l < R - 2 || l > R + 60) { dyn[i].lost = true; } } });
+pw.addEventListener('preStep', function () { for (var i = 0; i < dyn.length; i++) { var b = dyn[i].b; if (!b || b.sleepState === CANNON.Body.SLEEPING) continue; groundUnder(dyn[i]); var p = b.position, l = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z) || 1, g = GRAV * b.mass / l; b.force.x -= p.x * g; b.force.y -= p.y * g; b.force.z -= p.z * g; if (l < R - 2 || l > R + 60) { dyn[i].lost = true; } pushOffStatics(b, l); } });
+// rocks, trees, houses, lamps and landmarks are solid to everything that tumbles (the letters, crates, pins), not just to the car:
+// the same push-out the car gets, done in the step so bodies slide off them instead of passing through
+var _sn = new V3(), _sa = new V3();
+function pushOffStatics(b, l) {
+  if (l - R > 4.5) return; // flying over the rooftops
+  var p = b.position, rad = Math.min(1.6, (b.boundingRadius || .6) * .7);
+  _sn.set(p.x / l, p.y / l, p.z / l);
+  for (var k = 0; k < statics.length; k++) {
+    var s = statics[k], min = s.r + rad; if (_sn.dot(s.n) < Math.cos(min / R)) continue;
+    var d = arc(_sn, s.n); if (d >= min) continue;
+    _sa.copy(_sn).addScaledVector(s.n, -_sn.dot(s.n)); if (_sa.lengthSq() < 1e-8) _sa.set(1, 0, 0); _sa.normalize();
+    var nn = moveOn(s.n, _sa, min); p.set(nn.x * l, nn.y * l, nn.z * l); _sn.copy(nn);
+    var v = b.velocity, into = v.x * _sa.x + v.y * _sa.y + v.z * _sa.z; if (into < 0) { var k2 = into * 1.35; v.x -= _sa.x * k2; v.y -= _sa.y * k2; v.z -= _sa.z * k2; }
+  }
+}
 function addDyn(mesh, half, mass, sound, n, f, lift, shape) {
   var F = frameAt(n, f, lift), p = new V3(), q = new Q(); F.decompose(p, q, new V3());
   var b = new CANNON.Body({ mass: mass, shape: shape || new CANNON.Box(new CANNON.Vec3(half.x, half.y, half.z)), position: new CANNON.Vec3(p.x, p.y, p.z), quaternion: new CANNON.Quaternion(q.x, q.y, q.z, q.w), linearDamping: .05, angularDamping: .2 });

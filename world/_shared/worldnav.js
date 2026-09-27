@@ -5,6 +5,15 @@
    Everything is drawn here in code, in the hub's own palette, type and toon light. Shadow root: nothing leaks. */
 (function () {
   if (customElements.get('husam-world-nav')) return;
+  // every district opens at its top: on a fresh visit, on reload, and when the Back button brings it back from the page cache.
+  // (a real #section link is still honoured; #from-… is only the hub's return ticket)
+  try { history.scrollRestoration = 'manual'; } catch (e) {}
+  function toTop() {
+    if (location.hash && !/^#from-/.test(location.hash)) return;
+    var h = document.documentElement, sb = h.style.scrollBehavior; h.style.scrollBehavior = 'auto'; window.scrollTo(0, 0); h.style.scrollBehavior = sb;
+  }
+  toTop(); addEventListener('DOMContentLoaded', toTop); addEventListener('load', function () { if (window.scrollY < innerHeight) toTop(); });
+  addEventListener('pageshow', function (e) { if (e.persisted) toTop(); });
 
   // [id, name, short description (a pointer only: no facts a district owns)]
   var DISTRICTS = [
