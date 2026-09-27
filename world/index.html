@@ -65,8 +65,11 @@ html.ready .t-go:not([disabled]){animation:goPop .9s linear}
 .t-map{pointer-events:auto;font:600 16px/1 var(--text);color:var(--ink);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;padding:10px 8px;margin-top:-2px}
 .t-map:hover{text-decoration-thickness:3px}
 /* the plain page sits beside the map link: same quiet underline (Henry Heffernan's "ESC to skip", as a real URL) */
-.t-alts{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px 12px;margin-top:4px}
-.t-alts .t-map{margin-top:0}
+/* the quiet line under the start button: cream letters with the same ink edge as the HUD, so it reads on a noon sky and a midnight one */
+.t-alts{pointer-events:auto;display:block;max-width:100%;margin:6px auto 0;text-align:center;font:600 clamp(14px,3.9vw,16px)/1.5 var(--text);color:var(--cream);text-shadow:0 1.5px 0 var(--ink),1.5px 0 0 var(--ink),-1.5px 0 0 var(--ink),0 -1.5px 0 var(--ink),1px 1px 0 var(--ink),-1px 1px 0 var(--ink),1px -1px 0 var(--ink),-1px -1px 0 var(--ink),0 3px 0 var(--ink)}
+.t-alts .t-map{display:inline;margin:0;padding:6px 2px;font:inherit;color:inherit;text-shadow:inherit;text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:2.5px;text-underline-offset:5px}
+.t-alts .t-map:hover{text-decoration-thickness:4px}
+html.has-world:not(.ready) .t-alts{visibility:hidden}
 .t-card{position:absolute;left:24px;bottom:28px;display:flex;align-items:center;gap:12px;padding:10px 14px 10px 10px;transform:rotate(-2.5deg);text-align:left;pointer-events:auto}
 .t-card img{width:64px;height:64px;object-fit:cover;display:block;box-shadow:0 0 0 2px var(--ink)}
 .t-card b{display:block;font:400 15px/1.1 var(--display)}
@@ -392,7 +395,7 @@ html.notice-up .bubble{visibility:hidden!important}
 <section class="title" id="title" aria-labelledby="tName">
   <h1 class="t-name" id="tName"><span>Husam</span> <span>Sokar</span></h1>
   <button class="t-go" id="goBtn" type="button" disabled>Building the planet</button>
-  <span class="t-alts"><button class="t-map" type="button" data-open-map>Or read the map</button><a class="t-map" href="facts.html">or the one-page résumé</a></span>
+  <span class="t-alts">No time? <button class="t-map" type="button" data-open-map>Read the map</button> or <a class="t-map" href="facts.html">get the résumé</a>.</span>
   <div class="t-card slab" aria-hidden="true"><img class="ph" alt=""><div><b>Husam Sokar</b><span>Fresno &rarr; Cambridge, the long way around</span></div></div>
 </section>
 
