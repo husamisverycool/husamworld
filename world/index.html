@@ -286,7 +286,7 @@ html.set-open .tabs{visibility:hidden}
 .award{position:fixed;left:50%;top:max(16px,env(safe-area-inset-top));z-index:52;width:min(340px,calc(100vw - 32px));display:flex;gap:12px;align-items:center;padding:12px 14px 12px 12px;background:var(--paper);box-shadow:0 0 0 2.5px var(--ink),0 5px 0 2.5px var(--ink);transform:translate(-50%,calc(-100% - 40px));visibility:hidden;transition:transform .6s cubic-bezier(.4,1.6,.65,1),visibility 0s .6s;pointer-events:none}
 .award.show{transform:translate(-50%,0);visibility:visible;transition:transform .6s cubic-bezier(.4,1.6,.65,1),visibility 0s}
 .award::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--ink);transform-origin:0 50%;transform:scaleX(0)}
-.award.show::before{animation:awardBar 4s linear}
+.award.show::before{animation:awardBar var(--dur,4s) linear}
 @keyframes awardBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 .award-badge{flex:none;width:46px;height:46px;display:grid;place-items:center;background:var(--c,var(--yellow));box-shadow:0 0 0 2px var(--ink);transform:rotate(-6deg);font:400 20px/1 var(--display)}
 .award-k{display:block;font:600 13px/1.2 var(--text);color:var(--ink-2)}
@@ -318,7 +318,60 @@ html.exit-on .ctx{visibility:hidden}
 /* the touch stick floats: it centres wherever the thumb lands on the left of the screen (Messenger) */
 .joy{transition:opacity .3s}
 .joy.float{transition:none}
-html.scheme-tap .joy{display:none}
+html.scheme-tap .joy,html.scheme-tap .tbtns{display:none}
+/* ---------- round 5: a quieter phone (Bruno 2025 on mobile: one menu tab, no pedals, contextual buttons only; Messenger: a stick that
+   appears where the thumb lands). Map, sound and the clock move into the sheet; one boost button stays; the horn is a tap on the car. */
+.plate-map{display:none}
+.setp-q{display:none;align-items:center;gap:6px;height:40px;padding:0 11px;font:400 12px/1 var(--display);background:var(--cream);box-shadow:0 0 0 2px var(--ink),0 3px 0 2px var(--ink);white-space:nowrap}
+.setp-q svg{width:18px;height:18px;flex:none}
+.setp-q[aria-pressed="true"]{background:#9fe0b7}
+.setp-q:not([aria-pressed="true"]) .q-wave{opacity:.25}
+.setp-q:active,.setp-x:active{transform:translateY(2px);box-shadow:0 0 0 2px var(--ink),0 1px 0 2px var(--ink)}
+.seg5 span{padding-left:4px;padding-right:4px}
+/* one boost button, round, low in the right thumb's corner */
+.tbtns{display:block;grid-template-columns:none}
+.tbtn{width:62px;height:62px;border-radius:50%;background:rgba(245,240,225,.92)}
+.tbtn svg{width:26px;height:26px}
+.tbtn.on{background:var(--yellow)}
+/* the stick: a faint ring until the first drive, then nothing until a thumb lands (Messenger) */
+.joy{width:132px;height:132px}
+.joy-knob{left:calc(50% - 26px);top:calc(50% - 26px);width:52px;height:52px}
+html.drove .joy:not(.active){opacity:0}
+html.drove .joy.active{opacity:1}
+.joy:not(.active) .joy-knob{opacity:.8}
+html:has(.exit.show) .joy:not(.active){opacity:0} /* the idle stick ring never shows through under the exit sign */
+/* one notice at a time, in one place: toasts and sticker cards share a queue */
+.toast{max-width:min(420px,calc(100vw - 32px))}
+@media (max-width:760px){
+  .tabs .tab-map,.tabs .tab-sound,.tabs .tab-time{display:none}
+  .tab{height:44px;padding:0 12px}
+  .plate-btn{padding:7px 11px 6px}
+  .plate-name{display:flex;align-items:center;gap:8px;font-size:15px}
+  .plate-map{display:block;width:17px;height:17px}
+  .plate-sub{display:none}
+  .setp-q{display:inline-flex}
+  .setp-h{font-size:18px}
+  .setp-head{gap:8px;padding:12px 12px 0 14px}
+  /* the exit sign: one row, the teaser stays on the road paint and in the locals' mouths */
+  .exit{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px)}
+  html.coarse .exit{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px)}
+  .exit-line{display:none}
+  .exit-sign{padding:11px 10px 10px 14px}
+  .exit-name{font-size:18px}
+  html.coarse .ctx{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px)}
+  /* notices drop in under the plate row, full width, one line */
+  .toast,html.coarse .toast{top:calc(max(16px,env(safe-area-inset-top)) + 56px);bottom:auto;font-size:13px;padding:10px 12px 9px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s var(--spring),opacity .25s}
+  .toast.show,html.coarse .toast.show{transform:translate(-50%,0);opacity:1}
+  .award,html.coarse .award{top:calc(max(16px,env(safe-area-inset-top)) + 56px);left:16px;right:16px;width:auto;padding:8px 12px 8px 8px;gap:10px;transform:translateY(-14px);opacity:0;transition:transform .45s var(--spring),opacity .25s,visibility 0s .45s}
+  .award.show,html.coarse .award.show{transform:none;opacity:1;transition:transform .45s var(--spring),opacity .25s,visibility 0s}
+  .award-badge{width:30px;height:30px;font-size:14px}
+  .award-d{display:none}
+  .award-k{font-size:11px}
+  .award-t{font-size:15px}
+  .bubble{font-size:14px;max-width:min(210px,58vw);padding:8px 11px 7px}
+  .bubble-who{font-size:10px}
+}
+html.notice-up .bubble{visibility:hidden!important}
 </style>
 </head>
 <body>
@@ -335,8 +388,8 @@ html.scheme-tap .joy{display:none}
 <div class="hud">
   <header class="plate">
     <button class="plate-btn slab slab-btn" id="plateBtn" type="button" aria-controls="atlas">
-      <span class="plate-name">Husam Sokar</span>
-      <span class="plate-sub">Fresno &rarr; Cambridge</span>
+      <span class="plate-name">Husam Sokar<svg class="plate-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg></span>
+      <span class="plate-sub">Fresno &rarr; Cambridge</span><span class="sr"> (opens the map)</span>
     </button>
   </header>
   <nav class="tabs" aria-label="World">
@@ -367,10 +420,7 @@ html.scheme-tap .joy{display:none}
   <div class="pad" id="pad">
     <div class="joy" id="joy" aria-hidden="true"><div class="joy-ring"></div><div class="joy-knob" id="joyKnob"></div></div>
     <div class="tbtns">
-      <button class="tbtn" id="tBoost" type="button" aria-label="Boost">Boost</button>
-      <button class="tbtn" id="tHop" type="button" aria-label="Hop">Hop</button>
-      <button class="tbtn" id="tHorn" type="button" aria-label="Horn">Horn</button>
-      <button class="tbtn" id="tReset" type="button" aria-label="Back on the road">Road</button>
+      <button class="tbtn" id="tBoost" type="button" aria-label="Boost (hold)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6l6 6-6 6M13 6l6 6-6 6"/></svg></button>
     </div>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -381,7 +431,7 @@ html.scheme-tap .joy{display:none}
 </div>
 
 <section class="setp" id="setPanel" role="dialog" aria-modal="false" aria-labelledby="setH" tabindex="-1">
-  <div class="setp-head"><h2 class="setp-h" id="setH">Settings</h2><button class="setp-x" id="setX" type="button" aria-label="Close settings">&times;</button></div>
+  <div class="setp-head"><h2 class="setp-h" id="setH">Settings</h2><button class="setp-q" id="qSound" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path class="q-wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span id="qSoundW">Sound off</span></button><button class="setp-q" id="qMap" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span>Map</span></button><button class="setp-x" id="setX" type="button" aria-label="Close settings">&times;</button></div>
   <div class="setp-tabs" role="tablist" aria-label="Settings sections">
     <button class="setp-tab" role="tab" id="stab-drive" aria-controls="spage-drive" aria-selected="true" type="button">Driving</button>
     <button class="setp-tab" role="tab" id="stab-world" aria-controls="spage-world" aria-selected="false" tabindex="-1" type="button">World</button>
@@ -403,6 +453,7 @@ html.scheme-tap .joy{display:none}
       <div class="row row-wide"><label class="row-l" for="sVol">Sound <span class="row-val" id="sVolV">Off</span></label><input class="road" id="sVol" type="range" min="0" max="10" step="1" value="0"></div>
       <div class="row row-wide"><span class="row-l" id="sQualL">Quality</span><div class="seg" role="radiogroup" aria-labelledby="sQualL" aria-describedby="sQualH"><label><input type="radio" name="sQual" value="auto" checked><span>Auto</span></label><label><input type="radio" name="sQual" value="high"><span>High</span></label><label><input type="radio" name="sQual" value="low"><span>Low</span></label></div><p class="row-h" id="sQualH">Auto lowers the detail if frames run slow.</p></div>
       <div class="row row-wide"><span class="row-l" id="sWxL">Weather</span><div class="seg" role="radiogroup" aria-labelledby="sWxL" aria-describedby="sWxH"><label><input type="radio" name="sWx" value="live" checked><span>Changing</span></label><label><input type="radio" name="sWx" value="clear"><span>Clear</span></label><label><input type="radio" name="sWx" value="rain"><span>Rain</span></label></div><p class="row-h" id="sWxH">Up north, rain turns to snow.</p></div>
+      <div class="row row-wide"><span class="row-l" id="sTodL">Time of day <span class="row-val" id="sTodV">--:--</span></span><div class="seg seg5" role="radiogroup" aria-labelledby="sTodL" aria-describedby="sTodH"><label><input type="radio" name="sTod" value="now" checked><span>Mine</span></label><label><input type="radio" name="sTod" value="6.8"><span>Dawn</span></label><label><input type="radio" name="sTod" value="12.5"><span>Day</span></label><label><input type="radio" name="sTod" value="18.6"><span>Dusk</span></label><label><input type="radio" name="sTod" value="22.5"><span>Night</span></label></div><p class="row-h" id="sTodH">The light follows your own clock, or try another hour.</p></div>
       <div class="row"><label class="row-l" for="sRM">Reduced motion</label><span class="sw"><input type="checkbox" id="sRM" role="switch" aria-describedby="sRMH"><span>Off</span></span><p class="row-h" id="sRMH">A steadier camera: no shakes, sways or flights.</p></div>
       <div class="row"><span class="row-l">Knocked it all over?</span><button class="act" id="sTidy" type="button">Tidy up</button></div>
     </div>
@@ -410,14 +461,14 @@ html.scheme-tap .joy{display:none}
       <h3 class="keys-h">Keyboard</h3>
       <ul class="keys"><li><span>Drive</span><span><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrows</span></li><li><span>Boost</span><span><kbd>Shift</kbd></span></li><li><span>Brake, slide</span><span><kbd>Space</kbd> (twice to hop)</span></li><li><span>Horn</span><span><kbd>H</kbd></span></li><li><span>Back on the road</span><span><kbd>R</kbd></span></li><li><span>Go in</span><span><kbd>Enter</kbd></span></li><li><span>Map, settings</span><span><kbd>M</kbd> <kbd>O</kbd></span></li><li><span>Time trial</span><span><kbd>T</kbd></span></li></ul>
       <h3 class="keys-h">Touch</h3>
-      <ul class="keys"><li><span>Point</span><span>Put a thumb down on the left and push the way to go</span></li><li><span>Steer</span><span>Left and right turn, up drives, down brakes</span></li><li><span>Tap to go</span><span>Tap a sign or the ground; the car drives there</span></li><li><span>Look around</span><span>Drag the world; pinch to zoom</span></li></ul>
+      <ul class="keys"><li><span>Point</span><span>Put a thumb down on the left half and push the way to go</span></li><li><span>Steer</span><span>Left and right turn, up drives, down brakes</span></li><li><span>Tap to go</span><span>Tap a sign or the ground; the car drives there</span></li><li><span>Horn</span><span>Tap the car</span></li><li><span>Boost</span><span>Hold the &raquo; button</span></li><li><span>Look around</span><span>Drag on the right half; pinch to zoom</span></li></ul>
       <h3 class="keys-h">Gamepad</h3>
       <ul class="keys"><li><span>Drive</span><span>Left stick, right trigger</span></li><li><span>Brake, reverse</span><span>Left trigger</span></li><li><span>Boost, hop, horn</span><span>B, Y, left stick click</span></li><li><span>Go in</span><span>A</span></li></ul>
     </div>
     <div class="setp-page" id="spage-stk" role="tabpanel" aria-labelledby="stab-stk" hidden>
       <p class="setp-note" id="stkCount">0 of 0 found. They last for this visit.</p>
       <ul class="stickers" id="stickers"></ul>
-      <p class="trial-best" id="trialBest">The long way: drive from the Fresno start line to Cambridge against the clock. Press <kbd>T</kbd> or tap <b>Race</b> at the start.</p>
+      <p class="trial-best" id="trialBest">The long way: drive from the Fresno start line to Cambridge against the clock. Press <kbd>T</kbd>, or back into the green box behind the start line and tap <b>Race</b>.</p>
     </div>
     <p class="setp-note">Settings last for this visit only.</p>
   </div>
@@ -461,7 +512,7 @@ html.scheme-tap .joy{display:none}
       <ol class="stops" id="stops"></ol>
     </section>
     <footer class="atlas-foot">
-      <p>Driving: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrows, <kbd>Shift</kbd> to boost, <kbd>Space</kbd> to brake (twice to hop), <kbd>H</kbd> for the horn, <kbd>R</kbd> to get back on the road, <kbd>Enter</kbd> to go in, <kbd>M</kbd> for this map. On a phone, the stick and the four buttons.</p>
+      <p>Driving: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrows, <kbd>Shift</kbd> to boost, <kbd>Space</kbd> to brake (twice to hop), <kbd>H</kbd> for the horn, <kbd>R</kbd> to get back on the road, <kbd>Enter</kbd> to go in, <kbd>M</kbd> for this map. On a phone, put a thumb down on the left half and push; tap the car to honk.</p>
       <p>The light follows your own clock. A homage to Bruno Simon&rsquo;s folio and Abeto&rsquo;s Messenger; every shape, sound and letter here is drawn in code.</p>
     </footer>
   </div>
@@ -512,8 +563,20 @@ var byId = {}; STOPS.forEach(function (d, i) { d.index = i; byId[d.id] = d; });
   ol.innerHTML = h;
 })();
 (function photos() { var src = $('photo').getAttribute('src'); Array.prototype.forEach.call(doc.querySelectorAll('img.ph'), function (im) { if (!im.getAttribute('src')) im.setAttribute('src', src); }); })();
-var toastT;
-function toast(msg, ms) { var t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('show'); }, ms || 2400); }
+// one notice at a time (Bruno 2025's Notifications: a queue, one card on screen): toasts and sticker cards wait their turn
+var NQ = [], nBusy = false;
+function narrowUI() { return innerWidth <= 760; }
+function notice(it) {
+  if (it.msg && NQ.some(function (q) { return q.msg === it.msg; })) return;
+  NQ.push(it); while (NQ.length > 3) { var k = -1; for (var i = 0; i < NQ.length; i++) if (NQ[i].el === 'toast') { k = i; break; } NQ.splice(k < 0 ? 0 : k, 1); }
+  if (!nBusy) nextNotice();
+}
+function nextNotice() {
+  var it = NQ.shift(); html.classList.toggle('notice-up', !!it && narrowUI()); if (!it) { nBusy = false; return; } nBusy = true;
+  var el = $(it.el); if (it.fill) it.fill(); el.style.setProperty('--dur', it.ms + 'ms'); el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  setTimeout(function () { el.classList.remove('show'); setTimeout(nextNotice, 420); }, it.ms);
+}
+function toast(msg, ms) { ms = ms || 2400; if (narrowUI()) ms = Math.min(ms, 2200); notice({ el: 'toast', msg: msg, ms: ms, fill: function () { $('toast').textContent = msg; } }); }
 doc.addEventListener('click', function (e) {
   var b = e.target.closest && e.target.closest('.copy'); if (!b) return;
   var txt = b.getAttribute('data-copy');
@@ -578,6 +641,7 @@ function selectSetTab(id) {
 }
 $('setBtn').addEventListener('click', function () { setOpen ? closeSettings() : openSettings(); });
 $('setX').addEventListener('click', closeSettings);
+$('qMap').addEventListener('click', function () { closeSettings(); openMap(); });
 doc.querySelector('.setp-tabs').addEventListener('click', function (e) { var t = e.target.closest('.setp-tab'); if (t) { selectSetTab(t.id.slice(5)); if (W && W.sfx) W.sfx('paper'); } });
 doc.querySelector('.setp-tabs').addEventListener('keydown', function (e) {
   var tabs = Array.prototype.slice.call(doc.querySelectorAll('.setp-tab')), i = tabs.indexOf(doc.activeElement); if (i < 0) return;
@@ -832,35 +896,104 @@ function localToN(n, f, x, z) { var F = frameAt(n, f); var p = new V3(x, 0, z).a
   solids.push(g);
 })();
 
-// the road ribbon, its edge lines and yellow centre dashes; roundabouts at both ends
-function ribbon(off0, off1, lift, pal, s0, s1, step, dashOn, dashOff) {
-  var P = [], cur = s0, out = [];
-  while (cur < s1) {
-    var a = cur, b = Math.min(s1, cur + step); cur = b;
-    if (dashOn && ((a % (dashOn + dashOff)) > dashOn)) continue;
-    var na = roadAt(a), nb = roadAt(b), sa = roadSide(a), sb = roadSide(b);
-    var A0 = moveOn(na, sa, off0).multiplyScalar(R + lift), A1 = moveOn(na, sa, off1).multiplyScalar(R + lift), B0 = moveOn(nb, sb, off0).multiplyScalar(R + lift), B1 = moveOn(nb, sb, off1).multiplyScalar(R + lift);
-    P.push(A0, B0, A1, A1, B0, B1);
-  }
-  var g = new THREE.BufferGeometry().setFromPoints(P), cnt = P.length, N = new Float32Array(cnt * 3);
-  P.forEach(function (v, i) { var u = v.clone().normalize(); N[i * 3] = u.x; N[i * 3 + 1] = u.y; N[i * 3 + 2] = u.z; });
-  g.setAttribute('normal', new THREE.BufferAttribute(N, 3)); g.setAttribute('onormal', new THREE.BufferAttribute(N.slice(), 3)); g.setAttribute('pal', new THREE.BufferAttribute(new Float32Array(cnt).fill(pal), 1));
+// ---------------------------------------------------------------- the road: one ribbon from a rounded end behind the Fresno grid to a rounded end past the Cambridge finish
+// Round 5: the ends are designed places, not discs. Bruno 2025's circuit start (CircuitArea + its GLB) is a straight of asphalt
+// with a two-row checkered line, grid-slot brackets and a truss gantry carrying the starting lights; Bruno 2019's areas are
+// rectangles squared to the world with a thin floor border. So the road runs on past both ends into a rounded cap, the Fresno
+// straight is the starting grid, and every landmark's pad is a lay-by cut into the roadside with a squared, rounded box.
+var STUB0 = 5.8, STUB1 = 3.4, START_S = 3.7, RACE_S = -3, FINISH_S = ROAD_LEN - .6;
+var END0 = roadAt(.6).sub(roadAt(0)).normalize(), END1 = roadAt(ROAD_LEN).sub(roadAt(ROAD_LEN - .6)).normalize();
+function roadX(s) { return s < 0 ? moveOn(RN[0], END0, s) : s > ROAD_LEN ? moveOn(RN[NS], END1, s - ROAD_LEN) : roadAt(s); } // the road, carried straight on past its ends
+function roadTanX(s) { return roadX(s + .6).sub(roadX(s - .6)).normalize(); }
+function roadSideX(s) { return roadTanX(s).cross(roadX(s)).normalize(); }
+function soPoint(s, off) { return moveOn(roadX(s), roadSideX(s), off); } // (distance along the road, offset to its right) -> a point on the planet
+function flatFrom(P, lift, pal) { // unit vectors in threes -> a flat patch laid on the planet at a small lift
+  for (var t = 0; t < P.length; t += 3) { var e1 = P[t + 1].clone().sub(P[t]), e2 = P[t + 2].clone().sub(P[t]); if (e1.cross(e2).dot(P[t]) < 0) { var sw = P[t + 1]; P[t + 1] = P[t + 2]; P[t + 2] = sw; } } // every triangle faces out (the toon shader flips back faces into shadow)
+  var cnt = P.length, pos = new Float32Array(cnt * 3), N = new Float32Array(cnt * 3);
+  for (var i = 0; i < cnt; i++) { var u = P[i].clone().normalize(); N[i * 3] = u.x; N[i * 3 + 1] = u.y; N[i * 3 + 2] = u.z; pos[i * 3] = u.x * (R + lift); pos[i * 3 + 1] = u.y * (R + lift); pos[i * 3 + 2] = u.z * (R + lift); }
+  var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.BufferAttribute(N, 3)); g.setAttribute('onormal', new THREE.BufferAttribute(N.slice(), 3)); g.setAttribute('pal', new THREE.BufferAttribute(new Float32Array(cnt).fill(pal), 1));
   flats.push(g); return g;
 }
-function disc(n, r, lift, pal, seg) {
-  var F = frameAt(n, null, lift), P = [];
-  var RG = 6; for (var i = 0; i < seg; i++) { var a0 = i / seg * TAU, a1 = (i + 1) / seg * TAU; for (var j = 0; j < RG; j++) { var r0 = r * j / RG, r1 = r * (j + 1) / RG; var p00 = new V3(Math.cos(a0) * r0, 0, Math.sin(a0) * r0), p01 = new V3(Math.cos(a1) * r0, 0, Math.sin(a1) * r0), p10 = new V3(Math.cos(a0) * r1, 0, Math.sin(a0) * r1), p11 = new V3(Math.cos(a1) * r1, 0, Math.sin(a1) * r1); P.push(p00, p11, p10); if (j) P.push(p00, p01, p11); } }
-  var g = new THREE.BufferGeometry().setFromPoints(P.map(function (v) { return v.applyMatrix4(F).normalize().multiplyScalar(R + lift); }));
-  var cnt = P.length, N = new Float32Array(cnt * 3); for (var k = 0; k < cnt; k++) { var u = new V3().fromBufferAttribute(g.attributes.position, k).normalize(); N[k * 3] = u.x; N[k * 3 + 1] = u.y; N[k * 3 + 2] = u.z; }
-  g.setAttribute('normal', new THREE.BufferAttribute(N, 3)); g.setAttribute('onormal', new THREE.BufferAttribute(N.slice(), 3)); g.setAttribute('pal', new THREE.BufferAttribute(new Float32Array(cnt).fill(pal), 1));
-  flats.push(g);
+// a band between two offsets (numbers, or functions of s) from s0 to s1; dashOn/dashOff break it into dashes
+function band(o0, o1, lift, pal, s0, s1, step, dashOn, dashOff) {
+  var P = [], cur = s0, per = (dashOn || 0) + (dashOff || 0);
+  function off(o, s) { return typeof o === 'function' ? o(s) : o; }
+  while (cur < s1 - 1e-6) {
+    var a = cur, b = Math.min(s1, cur + step); cur = b;
+    if (dashOn && ((((a - s0) % per) + per) % per) >= dashOn - 1e-6) continue;
+    P.push(soPoint(a, off(o0, a)), soPoint(b, off(o0, b)), soPoint(a, off(o1, a)), soPoint(a, off(o1, a)), soPoint(b, off(o0, b)), soPoint(b, off(o1, b)));
+  }
+  return flatFrom(P, lift, pal);
 }
-// the asphalt is laid in six strips so it follows the planet's curve across its width (one flat quad sagged below the ground at the centre line)
-for (var rs = 0; rs < 6; rs++) ribbon(-ROAD_W / 2 + ROAD_W * rs / 6, -ROAD_W / 2 + ROAD_W * (rs + 1) / 6, .045, 2, 0, ROAD_LEN, .5);
-ribbon(-ROAD_W / 2 + .12, -ROAD_W / 2 + .26, .06, 3, 0, ROAD_LEN, .5);
-ribbon(ROAD_W / 2 - .26, ROAD_W / 2 - .12, .06, 3, 0, ROAD_LEN, .5);
-ribbon(-.09, .09, .065, 11, 1.5, ROAD_LEN - 1.5, .5, 1.6, 1.4);
-disc(roadAt(0), 5.2, .04, 2, 40); disc(roadAt(ROAD_LEN), 5.2, .04, 2, 40);
+function ribbon(off0, off1, lift, pal, s0, s1, step, dashOn, dashOff) { return band(off0, off1, lift, pal, s0, s1, step, dashOn, dashOff); }
+function quadSO(P, s0, s1, o0, o1) { P.push(soPoint(s0, o0), soPoint(s1, o0), soPoint(s0, o1), soPoint(s0, o1), soPoint(s1, o0), soPoint(s1, o1)); }
+// a half ring (or half disc when r0 = 0) closing the road at s, bulging the way dir points (-1 behind Fresno, +1 past Cambridge)
+function cap(s, dir, r0, r1, lift, pal) {
+  var c = roadX(s), t = roadTanX(s).multiplyScalar(dir), sd = roadSideX(s), P = [], SEG = 28, RG = r0 ? 1 : 3;
+  function at(a, r) { return moveOn(c, t.clone().multiplyScalar(Math.cos(a)).add(sd.clone().multiplyScalar(Math.sin(a))), r); }
+  for (var i = 0; i < SEG; i++) { var a0 = -PI / 2 + PI * i / SEG, a1 = -PI / 2 + PI * (i + 1) / SEG;
+    for (var j = 0; j < RG; j++) { var q0 = lerp(r0, r1, j / RG), q1 = lerp(r0, r1, (j + 1) / RG);
+      if (q0 === 0) P.push(c.clone(), at(a1, q1), at(a0, q1)); else P.push(at(a0, q0), at(a1, q1), at(a0, q1), at(a0, q0), at(a1, q0), at(a1, q1)); } }
+  return flatFrom(P, lift, pal);
+}
+// the lay-bys: each landmark's pad is a bay cut into the roadside, its outer edge easing out and back in (a smoothstep taper)
+var BAY_L = 2.4, BAY_T = 2.8, BAYS = [];
+STOPS.forEach(function (d) {
+  var ps = d.id === 'translation' ? d.s + 9 : d.s, depth = d.id === 'contact' ? 3.3 : 4.2;
+  var b = { d: d, s: ps, side: d.side, depth: depth, s0: ps - BAY_L - BAY_T, s1: ps + BAY_L + BAY_T };
+  b.prof = function (s) { return 1 - smooth((Math.abs(s - ps) - BAY_L) / BAY_T); };
+  b.outer = function (s) { return ROAD_W / 2 + depth * b.prof(s); };
+  d.padS = ps; d.bay = b; BAYS.push(b);
+});
+function paved(n, m) { // is this point on asphalt (the road, its two straight ends and caps, or a lay-by)? m widens it
+  m = m || 0; var nr = nearestRoad(n);
+  if (nr.s > .01 && nr.s < ROAD_LEN - .01) {
+    if (nr.d < ROAD_W / 2 + m) return true;
+    for (var i = 0; i < BAYS.length; i++) { var b = BAYS[i]; if (nr.s < b.s0 || nr.s > b.s1) continue; var sd = n.clone().sub(roadAt(nr.s)).dot(roadSide(nr.s)) * b.side; if (sd > 0 && nr.d < b.outer(nr.s) + m) return true; }
+    return false;
+  }
+  var e = nr.s < 1 ? 0 : 1, c = e ? RN[NS] : RN[0], t = (e ? END1 : END0).clone(), q = n.clone().sub(c).multiplyScalar(R), al = q.dot(t) * (e ? 1 : -1), lat = Math.abs(q.dot(t.clone().cross(c).normalize())), L = e ? STUB1 : STUB0;
+  if (al < 0) return nr.d < ROAD_W / 2 + m;
+  if (al < L) return lat < ROAD_W / 2 + m;
+  return Math.hypot(al - L, lat) < ROAD_W / 2 + m;
+}
+(function laySurfaces() {
+  var RS0 = -STUB0, RS1 = ROAD_LEN + STUB1, EL = ROAD_W / 2 - .26, ER = ROAD_W / 2 - .12;
+  // the asphalt is laid in six strips so it follows the planet's curve across its width (one flat quad sagged below the ground at the centre line)
+  for (var rs = 0; rs < 6; rs++) band(-ROAD_W / 2 + ROAD_W * rs / 6, -ROAD_W / 2 + ROAD_W * (rs + 1) / 6, .045, 2, RS0, RS1, .5);
+  cap(RS0, -1, 0, ROAD_W / 2, .045, 2); cap(RS1, 1, 0, ROAD_W / 2, .045, 2);
+  // the lay-bys, in four strips from the road edge out to the bay's own edge
+  BAYS.forEach(function (b) { for (var k = 0; k < 4; k++) (function (k) { band(function (s) { return b.side * lerp(ROAD_W / 2 - .05, b.outer(s), k / 4); }, function (s) { return b.side * lerp(ROAD_W / 2 - .05, b.outer(s), (k + 1) / 4); }, .045, 2, b.s0, b.s1, .25); })(k); });
+  // edge lines: they run round both caps, and round every lay-by (the road's own line turns to dashes across the bay's mouth)
+  [-1, 1].forEach(function (sg) {
+    var cuts = BAYS.filter(function (b) { return b.side === sg; }).sort(function (a, b) { return a.s0 - b.s0; }), from = RS0;
+    cuts.forEach(function (b) {
+      band(sg * EL, sg * ER, .06, 3, from, b.s0, .5);
+      band(function (s) { return sg * (b.outer(s) - .26); }, function (s) { return sg * (b.outer(s) - .12); }, .06, 3, b.s0, b.s1, .25);
+      band(sg * EL, sg * ER, .058, 3, b.s - BAY_L - BAY_T * .45, b.s + BAY_L + BAY_T * .45, .25, .5, .5);
+      from = b.s1;
+    });
+    band(sg * EL, sg * ER, .06, 3, from, RS1, .5);
+  });
+  cap(RS0, -1, EL, ER, .06, 3); cap(RS1, 1, EL, ER, .06, 3);
+  // centre dashes only between the start line and the finish line (a grid has none)
+  ribbon(-.09, .09, .065, 11, START_S + .9, FINISH_S - .9, .5, 1.6, 1.4);
+  // start and finish: a solid line, then two rows of checks, painted across the lane (Bruno 2025's circuit start line)
+  function checkers(s0, dir) {
+    var P = [], Q = [], sq = .3, n = 10, w = n * sq, o0 = -w / 2;
+    quadSO(P, s0 - dir * .12, s0 - dir * .02, -w / 2, w / 2);
+    for (var row = 0; row < 2; row++) for (var i = 0; i < n; i++) if ((i + row) % 2 === 0) { var a = s0 + dir * row * sq, b = a + dir * sq; quadSO(Q, Math.min(a, b), Math.max(a, b), o0 + i * sq, o0 + (i + 1) * sq); }
+    flatFrom(P, .07, 3); flatFrom(Q, .07, 20);
+    var I = []; for (var row2 = 0; row2 < 2; row2++) for (var j = 0; j < n; j++) if ((j + row2) % 2 === 1) { var a2 = s0 + dir * row2 * sq, b2 = a2 + dir * sq; quadSO(I, Math.min(a2, b2), Math.max(a2, b2), o0 + j * sq, o0 + (j + 1) * sq); }
+    flatFrom(I, .07, 14);
+  }
+  checkers(START_S - .3, 1); checkers(FINISH_S - .3, 1);
+  // the pole slot: four corner brackets round the spot the car starts from (Bruno 2025's grid marks)
+  var B = [], s0 = CAR0.s - 1.55, s1 = CAR0.s + 1.4, hw = 1.12, t = .13, l = .55;
+  [[s0, 1], [s1, -1]].forEach(function (e) { [-1, 1].forEach(function (sg) { var ss = e[0], d = e[1]; quadSO(B, Math.min(ss, ss + d * t), Math.max(ss, ss + d * t), sg < 0 ? -hw : hw - l, sg < 0 ? -hw + l : hw); quadSO(B, Math.min(ss, ss + d * l), Math.max(ss, ss + d * l), sg < 0 ? -hw : hw - t, sg < 0 ? -hw + t : hw); }); });
+  flatFrom(B, .068, 3);
+})();
+var roadEndsN = []; for (var re = 1; re <= STUB0 + 1.5; re += 1) roadEndsN.push(roadX(-re)); for (var re2 = 1; re2 <= STUB1 + 1.5; re2 += 1) roadEndsN.push(roadX(ROAD_LEN + re2));
 
 // ---------------------------------------------------------------- the landmarks (each its own silhouette; +z faces the road)
 var BUILD = {
@@ -950,24 +1083,46 @@ STOPS.forEach(function (d) {
   else if (d.id === 'contact') { circ(0, 0, .95); }
 });
 
-// ---------------------------------------------------------------- the two ends: a Fresno town sign and a Cambridge town sign
-function townSign(s, side, word, sub) {
-  var n = moveOn(roadAt(s), roadSide(s).multiplyScalar(side), ROAD_W / 2 + 2.4), k = new Kit();
-  k.add(G.cyl, 7, -1.6, 0, 0, .16, 3.4, .16).add(G.cyl, 7, 1.6, 0, 0, .16, 3.4, .16);
-  kitAt(k, n, roadTan(s).negate());
-  var tex = canvasTex(512, 200, function (x, w, h) { x.fillStyle = '#1c7a4f'; x.fillRect(0, 0, w, h); x.strokeStyle = '#fff'; x.lineWidth = 9; x.strokeRect(12, 12, w - 24, h - 24); x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle'; fitText(x, word, 400, 88, '"Bungee"', w - 70); x.fillText(word, w / 2, 86); fitText(x, sub, 700, 30, '"Barlow Condensed"', w - 70); x.fillText(sub, w / 2, 152); });
-  var m = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 1.64), new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide, toneMapped: false }));
-  var F = frameAt(n, roadTan(s).negate(), 0); m.applyMatrix4(F); m.translateY(3.1); scene.add(m); signMeshes.push(m);
-  block(n, .8);
+// ---------------------------------------------------------------- the two ends: a gantry over the start line and one over the finish
+// Bruno 2025's circuit hangs its starting lights on a truss across the grid; here the truss also carries the town's name,
+// as a green highway sign (the same green strip the time-trial HUD uses), so the town sign, the start line and "The long way"
+// are one object instead of three. The lights are three lamps under the sign's left end, lit in step with the HUD's lights.
+var signMeshes = [], signDraws = [], startLamps = [];
+function signFace(word, sub, w, h) {
+  var draw = function (x, W, H) {
+    x.clearRect(0, 0, W, H); x.fillStyle = '#1c7a4f'; x.fillRect(0, 0, W, H); x.strokeStyle = '#fff'; x.lineWidth = 8; x.strokeRect(14, 14, W - 28, H - 28);
+    x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    fitText(x, word, 400, 104, '"Bungee"', W - 120); x.fillText(word, W / 2, H * .42);
+    fitText(x, sub, 700, 40, '"Barlow Condensed"', W - 120); x.fillText(sub, W / 2, H * .8);
+  };
+  var tex = canvasTex(1024, 232, draw); signDraws.push({ tex: tex, draw: draw });
+  var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex, toneMapped: false })); return m;
 }
-var signMeshes = [];
+function gantry(s, front, back, lamps) {
+  var n = roadX(s), f = roadTanX(s).negate(), F = frameAt(n, f, 0), W2 = ROAD_W / 2 + .55, k = new Kit(), BY = 4.95, BH = 1.05, BW = 2 * W2 - .42;
+  [-1, 1].forEach(function (sg) {
+    k.add(G.box, 17, sg * W2, 0, 0, .6, .24, .6).add(G.cyl6, 7, sg * W2, 0, 0, .22, BY + BH + .42, .22).add(G.ball, 7, sg * W2, BY + BH + .3, 0, .3, .3, .3);
+    k.add(G.box, 7, sg * (W2 - .38), BY + .18, 0, .62, .07, .07, 0, 0, sg * .8).add(G.box, 7, sg * (W2 - .38), BY + BH - .26, 0, .62, .07, .07, 0, 0, -sg * .8); // braces
+  });
+  k.add(G.box, 7, 0, BY - .16, 0, 2 * W2, .12, .12).add(G.box, 7, 0, BY + BH + .04, 0, 2 * W2, .12, .12); // truss chords
+  k.add(G.box, 19, 0, BY, 0, BW, BH, .16); // the sign board (its faces are drawn on top)
+  if (lamps) k.add(G.box, 14, -W2 + 1.05, BY - .66, .02, 1.26, .46, .26).add(G.box, 7, -W2 + .7, BY - .22, 0, .06, .1, .06).add(G.box, 7, -W2 + 1.4, BY - .22, 0, .06, .1, .06);
+  kitAt(k, n, f);
+  [-1, 1].forEach(function (sg) { block(moveOn(n, roadSideX(s), sg * W2), .3); });
+  [[front, .09, 0], [back, -.09, PI]].forEach(function (fc) { var m = signFace(fc[0][0], fc[0][1], BW - .14, BH - .12); m.rotation.y = fc[2]; m.position.set(0, BY + BH / 2, fc[1]); m.applyMatrix4(F); scene.add(m); signMeshes.push(m); });
+  if (lamps) [-1, 0, 1].forEach(function (i) {
+    var l = new THREE.Mesh(new THREE.CircleGeometry(.15, 20), new THREE.MeshBasicMaterial({ color: '#3a3d48', toneMapped: false }));
+    l.position.set(-W2 + 1.05 + i * .38, BY - .43, .16); l.applyMatrix4(F); scene.add(l); signMeshes.push(l); startLamps.push(l);
+  });
+}
+function setLamps(mode, lit) { startLamps.forEach(function (l, i) { l.material.color.set(mode === 'go' ? '#63e38a' : mode === 'red' && i < lit ? '#ff5a3c' : '#3a3d48'); }); }
 
 // ---------------------------------------------------------------- canvas helpers (tags, road paint, signs)
 function canvasTex(w, h, draw) { var c = doc.createElement('canvas'); c.width = w; c.height = h; var x = c.getContext('2d'); draw(x, w, h); var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t; }
 function fitText(x, text, weight, size, family, maxW) { x.font = weight + ' ' + size + 'px ' + family + ', Impact, Arial, sans-serif'; var w = x.measureText(text).width; if (w > maxW) x.font = weight + ' ' + Math.floor(size * maxW / w) + 'px ' + family + ', Impact, Arial, sans-serif'; }
 
 // ---------------------------------------------------------------- scatter: orchards and gold hills near Fresno, oaks and houses in the middle, brick and maples near Cambridge
-var roadSamples = RN.filter(function (_, i) { return i % 4 === 0; });
+var roadSamples = RN.filter(function (_, i) { return i % 4 === 0; }).concat(roadEndsN);
 function farFromRoad(n, m) { var c = Math.cos(m / R); for (var i = 0; i < roadSamples.length; i++) if (roadSamples[i].dot(n) > c) return false; return true; }
 function farFromSites(n, m) { for (var i = 0; i < STOPS.length; i++) { var d = STOPS[i], r = { bill: 8, speech: 6, translation: 8, n1: 8, triptik: 9, os: 7.5, depths: 10, weeks: 9, everywhere: 13.5, contact: 3 }[d.id]; if (arc(d.site, n) < r + m) return false; } return true; }
 function farFromWater(n, m) { for (var i = 0; i < keepOut.length; i++) if (arc(keepOut[i].n, n) < keepOut[i].r + m) return false; return true; }
@@ -997,9 +1152,9 @@ var SPOTS = { locals: [] };
   for (var q = -8; q <= 8; q += 2) keepOut.push({ n: moveOn(SPOTS.bowl.n, tB, q), r: 2.2 });
   var lo = sideB * (ROAD_W / 2 + 4.4); ribbon(lo - 1.15, lo + 1.15, .05, 28, sB - 7.6, sB + 7.9, .5); ribbon(lo - 1.4, lo - 1.15, .055, 29, sB - 7.6, sB + 7.9, .5); ribbon(lo + 1.15, lo + 1.4, .055, 29, sB - 7.6, sB + 7.9, .5); ribbon(lo - 1.15, lo + 1.15, .06, 13, sB + 2.9, sB + 3.05, .15);
   SPOTS.crates = moveOn(moveOn(startN, startSide.clone().negate(), 6.4), startF, 15.5); keepOut.push({ n: SPOTS.crates, r: 3 });
-  SPOTS.race = moveOn(roadAt(0), roadTan(0), -3.2);
+  SPOTS.race = roadX(RACE_S); // the race box sits on the grid, behind the pole slot
   var LOCALS = [
-    { at: 'start', who: 'Farmer', col: 11, hat: 1, lines: ['Long way to Cambridge. Mind the curves.', 'Honk if you like almonds.'] },
+    { at: 'start', who: 'Farmer', col: 11, hat: 1, lines: ['Long way to Cambridge. Mind the curves.', 'Fancy a race? Back into the green box.', 'Honk if you like almonds.'] },
     { at: 'bill', who: 'Tour guide', col: 12, lines: ['Shh. Somebody in there is drafting something.', 'Big dome. Bigger ideas. Go on in.'] },
     { at: 'speech', who: 'Usher', col: 13, lines: ['Stand up straight. They\u2019re listening.', 'Want the floor? It\u2019s all yours in there.'] },
     { at: 'translation', who: 'Fisher', col: 31, hat: 1, lines: ['Same river, two ways to say it.', 'Try reading it from the other bank.'] },
@@ -1014,8 +1169,8 @@ var SPOTS = { locals: [] };
   ];
   LOCALS.forEach(function (L, i) {
     var n, face;
-    if (L.at === 'start') { n = moveOn(moveOn(startN, startSide, 4.6), startF, 2.6); face = startSide.clone().negate(); }
-    else if (L.at === 'end') { var sE = ROAD_LEN - 12; n = moveOn(roadAt(sE), roadSide(sE), ROAD_W / 2 + 2.6); face = roadSide(sE); }
+    if (L.at === 'start') { n = soPoint(RACE_S + .6, ROAD_W / 2 + 1.5); face = roadSideX(RACE_S).negate(); } // the race marshal, at the kerb of the grid
+    else if (L.at === 'end') { var sE = ROAD_LEN - 12; n = moveOn(roadAt(sE), roadSide(sE).multiplyScalar(-1), ROAD_W / 2 + 2.6); face = roadSide(sE); }
     else {
       var d = byId[L.at], tf = roadTan(d.s), out = d.pad.clone().sub(roadAt(d.s)); out.sub(d.pad.clone().multiplyScalar(out.dot(d.pad))).normalize();
       var tries = [[2.6, 1.2], [2.6, -1.2], [1.4, 3.6], [1.4, -3.6], [3.4, 0]];
@@ -1030,8 +1185,8 @@ var SPOTS = { locals: [] };
   var bs = byId.translation, sv = roadSide(bs.s); for (var q = -22; q <= 22; q += 2.5) keepOut.push({ n: moveOn(bs.site, sv, q), r: 2.6 });
   var dp = byId.depths; keepOut.push({ n: new V3(0, 0, -3.5).applyMatrix4(frameAt(dp.site, dp.face)).normalize(), r: 7 });
   for (var li = 0; li < 10; li++) { var lr = li < 5 ? 0 : 1, lc = lr ? li - 5 : li; keepOut.push({ n: moveOn(moveOn(startN, startSide, 5.4 + lc * 2.15), startF, 7.5 + lr * 3.4), r: 2.2 }); }
-  STOPS.forEach(function (d) { keepOut.push({ n: d.pad, r: 3.4 }); keepOut.push({ n: moveOn(d.pad, roadTan(d.s), -1.6), r: 3 }); keepOut.push({ n: moveOn(d.pad, roadTan(d.s), -6.4), r: 2.6 }); });
-  keepOut.push({ n: startN.clone(), r: 6 });
+  STOPS.forEach(function (d) { keepOut.push({ n: d.pad, r: 3.4 }); keepOut.push({ n: moveOn(d.pad, roadTan(d.s), -1.6), r: 3 }); keepOut.push({ n: moveOn(d.pad, roadTan(d.s), -6.4), r: 2.6 }); for (var u = -4.5; u <= 4.6; u += 1.5) keepOut.push({ n: soPoint(d.padS + u, d.side * (ROAD_W / 2 + d.bay.depth * d.bay.prof(d.padS + u) * .6)), r: 1.6 + d.bay.depth * d.bay.prof(d.padS + u) * .45 }); });
+  keepOut.push({ n: startN.clone(), r: 6 }); keepOut.push({ n: roadX(-3), r: 4.2 }); keepOut.push({ n: roadX(-STUB0), r: 3.6 }); keepOut.push({ n: roadX(ROAD_LEN + STUB1 * .5), r: 3.6 });
   // almond orchard rows near the start
   var s0 = 10, n0 = roadAt(s0);
   for (var row = 0; row < 5; row++) for (var col = 0; col < 7; col++) {
@@ -1063,15 +1218,15 @@ var SPOTS = { locals: [] };
   // lamp posts along the road, alternating sides
   for (var s = 9; s < ROAD_LEN - 6; s += 15) {
     var side = (Math.round(s / 15) % 2) ? 1 : -1, nL = moveOn(roadAt(s), roadSide(s).multiplyScalar(side), ROAD_W / 2 + .9);
-    if (!farFromSites(nL, -2) || STOPS.some(function (d) { return Math.abs(d.s - s) < (d.side === side ? 12 : 8); }) || !farFromWater(nL, .5)) continue;
+    if (!farFromSites(nL, -2) || STOPS.some(function (d) { return Math.abs(d.s - s) < (d.side === side ? 12 : 8); }) || !farFromWater(nL, .5) || paved(nL, .6) || s < START_S + 6 || s > FINISH_S - 6) continue;
     var kl = new Kit(); kl.add(G.cyl6, 14, 0, 0, 0, .16, 3.6, .16).add(G.box, 14, 0, 3.5, -.45, .14, .14, 1.1).add(G.box, 25, 0, 3.3, -.9, .36, .2, .5);
     kitAt(kl, nL, roadSide(s).multiplyScalar(side)); block(nL, .25);
     lampHeads.push(new V3(0, 3.25, -.9).applyMatrix4(frameAt(nL, roadSide(s).multiplyScalar(side))));
   }
 })();
 
-townSign(3.2, -1, 'FRESNO', 'CAMBRIDGE: THE LONG WAY');
-townSign(ROAD_LEN - 22, -1, 'CAMBRIDGE', 'FRESNO: THE LONG WAY BACK');
+gantry(START_S, ['FRESNO', 'START: THE LONG WAY TO CAMBRIDGE'], ['FRESNO', 'BACK WHERE IT STARTED'], true);
+gantry(FINISH_S, ['CAMBRIDGE', 'FINISH: THE LONG WAY'], ['CAMBRIDGE', 'FRESNO: THE LONG WAY BACK'], false);
 
 // ---------------------------------------------------------------- bake: all solids in one mesh + one outline shell; flats in one more
 var solidGeo = merge(solids), flatGeo = merge(flats);
@@ -1128,25 +1283,43 @@ var paintMesh;
     UV.push(L, T, Rr, T, Rr, B, L, T, Rr, B, L, B);
   }
   function paintAt(s, lines) { // first line farthest ahead, so it reads top to bottom from behind the car
-    lines.forEach(function (t, i) { var ss = s - i * 1.25, n = roadAt(ss), f = roadTan(ss).negate(); quad(n, f, ROAD_W - .5, (ROAD_W - .5) * cellH / cellW, paintLine(t)); });
+    lines.forEach(function (t, i) { var ss = s - i * 1.25, n = roadX(ss), f = roadTanX(ss).negate(); quad(n, f, ROAD_W - .5, (ROAD_W - .5) * cellH / cellW, paintLine(t)); });
   }
   STOPS.forEach(function (d) { paintAt(d.s - 4 - (d.id === 'translation' ? 6 : 0), d.paint); });
   // the controls, painted on the road in front of the car (Bruno 2019 draws them on the floor at the start; phones get their own)
-  if (COARSE) paintAt(9.5, ['DRAG THE STICK', 'TO DRIVE']);
-  else { paintAt(9.5, ['ARROWS OR WASD', 'TO DRIVE']); paintAt(15.5, ['SHIFT TO BOOST', 'SPACE TWICE TO HOP']); paintAt(21.5, ['H FOR THE HORN', 'R FOR THE ROAD']); }
+  if (COARSE) { paintAt(9.8, ['THUMB DOWN, PUSH', 'TO DRIVE']); paintAt(16, ['TAP THE CAR', 'TO HONK']); }
+  else { paintAt(9.8, ['ARROWS OR WASD', 'TO DRIVE']); paintAt(15.8, ['SHIFT TO BOOST', 'SPACE TWICE TO HOP']); paintAt(21.8, ['H FOR THE HORN', 'R FOR THE ROAD']); }
+  paintAt(RACE_S - 2.15, ['THE LONG WAY']); // the grid box's name, at the rounded end of the start straight
   var g = new THREE.BufferGeometry().setFromPoints(P); g.setAttribute('uv', new THREE.Float32BufferAttribute(UV, 2));
   var tex = new THREE.CanvasTexture(cv); tex.anisotropy = 8;
   paintMesh = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, color: '#fbf4df', opacity: 0, polygonOffset: true, polygonOffsetFactor: -2, side: THREE.DoubleSide }));
   paintMesh.renderOrder = 2; paintMesh.frustumCulled = false; scene.add(paintMesh);
 })();
 
-// ---------------------------------------------------------------- pads (Bruno's areas): a dashed ring at the roadside that fills while you're on it
-var padMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uTime: U.uTime, uK: { value: 0 }, uCol: { value: new C3('#fbf4df') }, uOp: { value: 0 } },
-  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv * 2. - 1.; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
-  fragmentShader: 'uniform float uTime, uK, uOp; uniform vec3 uCol; varying vec2 vUv; void main(){ float r = length(vUv); float a = atan(vUv.y, vUv.x); float ring = step(.84, r) * step(r, .96) * step(.35, fract(a * 2.546 + uTime * .25)); float fill = step(r, .72 * uK) * .55; float dotc = step(r, .12); float al = max(max(ring, fill), dotc * .8) * uOp; if (al < .01) discard; gl_FragColor = vec4(uCol, al); }' });
+// ---------------------------------------------------------------- pads: a box painted in each lay-by (Bruno 2019's area border: a thin rectangle
+// squared to the ground), with Bruno 2025's interactive-point diamond at its centre. The box breathes while you're away and
+// fills from the middle while you're on it. It is laid on the planet in (along, across) road coordinates, so it follows the curve.
+var padMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, uniforms: { uTime: U.uTime, uK: { value: 0 }, uCol: { value: new C3('#fbf4df') }, uOp: { value: 0 }, uSize: { value: new THREE.Vector2(4, 3) } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
+  fragmentShader: ['uniform float uTime, uK, uOp; uniform vec3 uCol; uniform vec2 uSize; varying vec2 vUv;',
+    'float box(vec2 p, vec2 b, float r){ vec2 q = abs(p) - b + r; return length(max(q, 0.)) + min(max(q.x, q.y), 0.) - r; }',
+    'void main(){ vec2 p = (vUv - .5) * uSize; vec2 hb = uSize * .5 - .06; float d = box(p, hb, .5);',
+    ' float line = step(d, 0.) * step(-.16, d);',
+    ' float breathe = .5 + .5 * sin(uTime * 2.4);',
+    ' float fill = step(box(p, hb * uK, .5 * uK), 0.) * .42;',
+    ' float dm = abs(p.x) + abs(p.y); float dr = .42 + .08 * uK + .04 * breathe * (1. - uK); float dia = step(dm, dr) * step(dr - .14, dm) + step(dm, .16 * uK);',
+    ' float al = max(max(line * mix(.62 + .2 * breathe, 1., uK), fill), dia * .95) * uOp; if (al < .01) discard; gl_FragColor = vec4(uCol, al); }'].join('\n') });
+function padBox(s, off, halfS, halfO, lift, col) {
+  var nx = 14, nz = 8, P = [], UV = [], idx = [];
+  for (var j = 0; j <= nz; j++) for (var i = 0; i <= nx; i++) { var ss = s - halfS + 2 * halfS * i / nx, oo = off - halfO + 2 * halfO * j / nz, v = soPoint(ss, oo).multiplyScalar(R + lift); P.push(v.x, v.y, v.z); UV.push(i / nx, j / nz); }
+  for (var j2 = 0; j2 < nz; j2++) for (var i2 = 0; i2 < nx; i2++) { var a = j2 * (nx + 1) + i2, b = a + 1, c = a + nx + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
+  var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(UV, 2)); g.setIndex(idx);
+  var m = new THREE.Mesh(g, padMat.clone()); m.material.side = THREE.DoubleSide; m.material.uniforms.uTime = U.uTime; m.material.uniforms.uCol.value = new C3(col); m.material.uniforms.uSize.value.set(2 * halfS, 2 * halfO);
+  m.renderOrder = 3; m.frustumCulled = false; scene.add(m); return m;
+}
 STOPS.forEach(function (d) {
-  var m = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 4.4).rotateX(-PI / 2), padMat.clone()); m.material.uniforms.uTime = U.uTime;
-  m.applyMatrix4(frameAt(d.pad, roadTan(d.s), .09)); m.renderOrder = 3; scene.add(m); d.padMesh = m; d.padK = 0;
+  var b = d.bay, inner = ROAD_W / 2 + .3, outer = ROAD_W / 2 + b.depth - .42;
+  d.padMesh = padBox(d.padS, d.side * (inner + outer) / 2, BAY_L - .25, (outer - inner) / 2, .075, '#fbf4df'); d.padK = 0;
 });
 
 // ---------------------------------------------------------------- tags (Bruno 2025): a diamond, and a label that slides out of it
@@ -1236,7 +1409,7 @@ function glyphKit(ch) { // greedy rectangles, so a letter is a few solid slabs r
 // cones on the bends, hay bales in the valley
 (function () {
   var r = rng(5);
-  for (var i = 0; i < 12; i++) { var s = 20 + i * (ROAD_LEN - 40) / 12 + r() * 6; if (SITE_S.some(function (x) { return Math.abs(x - s) < 9; })) continue; var side = r() < .5 ? -1 : 1, n = moveOn(roadAt(s), roadSide(s).multiplyScalar(side), ROAD_W / 2 + .55); var k = new Kit(); k.add(G.box, 14, 0, -.35, 0, .6, .08, .6).add(G.cone, 22, 0, -.3, 0, .46, .85, .46).add(G.cyl, 20, 0, .02, 0, .3, .12, .3); addDyn(meshOf(k), new V3(.3, .35, .3), .25, 'cone', n, roadTan(s), .35); }
+  for (var i = 0; i < 12; i++) { var s = 20 + i * (ROAD_LEN - 40) / 12 + r() * 6; if (SITE_S.some(function (x) { return Math.abs(x - s) < 9; })) continue; var side = r() < .5 ? -1 : 1, n = moveOn(roadAt(s), roadSide(s).multiplyScalar(side), ROAD_W / 2 + .55); if (paved(n, .5)) continue; var k = new Kit(); k.add(G.box, 14, 0, -.35, 0, .6, .08, .6).add(G.cone, 22, 0, -.3, 0, .46, .85, .46).add(G.cyl, 20, 0, .02, 0, .3, .12, .3); addDyn(meshOf(k), new V3(.3, .35, .3), .25, 'cone', n, roadTan(s), .35); }
   for (var j = 0; j < 5; j++) { var n2 = moveOn(moveOn(startN, startSide.clone().negate(), 6 + (j % 2) * 1.4), startF, 4 + j * 1.6); var kb = new Kit(); kb.add(G.box, 11, 0, -.42, 0, 1.3, .84, .84).add(G.box, 23, 0, -.42, 0, 1.34, .1, .88); addDyn(meshOf(kb), new V3(.65, .42, .42), .8, 'hay', n2, startF, .42 + (j > 2 ? .84 : 0)); }
 })();
 
@@ -1327,9 +1500,6 @@ joyEl.addEventListener('touchstart', function (e) { e.preventDefault(); }, { pas
 (function touchButtons() {
   function hold(id, on, off) { var b = $(id); b.addEventListener('touchstart', function (e) { e.preventDefault(); b.classList.add('on'); on(); }, { passive: false }); function up() { b.classList.remove('on'); if (off) off(); } b.addEventListener('touchend', up); b.addEventListener('touchcancel', up); b.addEventListener('click', function () { if (!('ontouchstart' in window)) { on(); if (off) setTimeout(off, 250); } }); }
   hold('tBoost', function () { ctl.boost = true; }, function () { ctl.boost = false; });
-  hold('tHop', function () { hop(1); });
-  hold('tHorn', honk);
-  hold('tReset', function () { if (trial.on) startTrial(); else resetCar(); });
 })();
 addEventListener('touchstart', function () { if (!COARSE) { COARSE = true; html.classList.add('coarse'); } }, { once: true, passive: true });
 // pointer: drag to look around (yaw), wheel/pinch to zoom; in the map, drag to spin the planet; click tags
@@ -1372,15 +1542,16 @@ function clickAt(e) {
   var d = tagUnder(e);
   if (state === 'map') { if (d) { closeMap(); teleport(d.id, true); } return; }
   if (state !== 'play') return;
+  if (tapOnCar(e)) { honk(); return; } // Bruno 2025: a tap on the car makes it jump; here it honks and bounces
   if (d && doorNow() === d) { goIn(d); return; }
   if (e.pointerType === 'touch' && SET.touch === 'tap') { // Tap to go: a sign drives you to its door, the ground drives you to that spot, the car hops
     var g = groundAt(e);
     if (d) { driveTo(d.pad, d); toast(d.name + ': on the way', 1600); return; }
-    if (g && arc(g, car.n) < 1.6) { hop(1); return; }
     if (g) { driveTo(g, null); return; }
   }
   if (d) toast(d.name + ': ' + d.teaser, 3000);
 }
+function tapOnCar(e) { var c = carG.position.clone().add(car.n.clone().multiplyScalar(.6)).project(camera), x = (c.x * .5 + .5) * innerWidth, y = (-c.y * .5 + .5) * innerHeight; return c.z < 1 && Math.hypot(e.clientX - x, e.clientY - y) < Math.max(40, Math.min(innerWidth, innerHeight) * .085); }
 function driveTo(n, d) { auto = { n: n.clone(), d: d, t: 0 }; markDrove(); sfx('pad'); showMarker(n); }
 $('exitGo').addEventListener('click', function () { if (doorNow()) goIn(doorNow()); });
 $('ctxBtn').addEventListener('click', function () { resetCar(); $('ctx').classList.remove('show'); });
@@ -1503,7 +1674,7 @@ function updateCar(dt) {
   if (live && Math.abs(thr) > .5) { stuck.t += dt; stuck.d += arc(prevN, car.n); if (stuck.t > 3) { if (stuck.d < .6 && !stuck.shown) { stuck.shown = true; $('ctx').classList.add('show'); } stuck.t = 0; stuck.d = 0; } }
   if (stuck.shown && Math.abs(car.v) > 3) { stuck.shown = false; $('ctx').classList.remove('show'); }
   // what's underfoot, for dust and the odometer
-  car.road = nearestRoad(car.n); car.offRoad = car.road.d > ROAD_W / 2 + .2;
+  car.road = nearestRoad(car.n); car.offRoad = car.road.d > ROAD_W / 2 + .2 && !paved(car.n, .2);
   odo += Math.abs(car.v) * dt; if (odo > 60 && !got.road) award('road'); if (odo > 1000) award('km');
   if (car.drifting) { driftT += dt; if (driftT > 1.2) award('drift'); } else driftT = 0;
   updateDrop(dt);
@@ -1635,15 +1806,17 @@ function applyTod() {
   var d = new Date(), hh = tod.preview != null || tod.anim != null ? h : d.getHours() + d.getMinutes() / 60;
   var H = Math.floor(hh) % 24, Mi = Math.floor((hh - Math.floor(hh)) * 60);
   var ct = ((H % 12) || 12) + ':' + (Mi < 10 ? '0' : '') + Mi + (H < 12 ? ' AM' : ' PM'), pt = (tod.preview != null ? 'trying: ' : 'your time: ') + phaseName(h);
-  if (ct !== lastClock) { lastClock = ct; $('timeClock').textContent = ct; } if (pt !== lastPhase) { lastPhase = pt; $('timePhase').textContent = pt; }
+  if (ct !== lastClock) { lastClock = ct; $('timeClock').textContent = ct; $('sTodV').textContent = ct; } if (pt !== lastPhase) { lastPhase = pt; $('timePhase').textContent = pt; }
 }
-$('timeBtn').addEventListener('click', function () {
-  var i = PREVIEWS.indexOf(tod.preview); var next = PREVIEWS[(i + 1) % PREVIEWS.length];
+function setPreview(next) {
   var from = hourNow(), to = next == null ? nowH() : next; if (to < from) to += 24;
-  tod.preview = next; if (RM()) { tod.anim = null; applyTod(); return; }
+  tod.preview = next; Array.prototype.forEach.call(doc.querySelectorAll('input[name="sTod"]'), function (r) { r.checked = r.value === (next == null ? 'now' : String(next)); });
+  if (RM()) { tod.anim = null; applyTod(); return; }
   var t0 = performance.now(); (function step() { var k = Math.min(1, (performance.now() - t0) / 1400); tod.anim = lerp(from, to, eio(k)) % 24; if (k < 1) requestAnimationFrame(step); else tod.anim = null; })();
   sfx('pop');
-});
+}
+$('timeBtn').addEventListener('click', function () { var i = PREVIEWS.indexOf(tod.preview); setPreview(PREVIEWS[(i + 1) % PREVIEWS.length]); });
+Array.prototype.forEach.call(doc.querySelectorAll('input[name="sTod"]'), function (r) { r.addEventListener('change', function () { if (r.checked) setPreview(r.value === 'now' ? null : +r.value); }); });
 
 // ---------------------------------------------------------------- sound: synthesized, off until asked for
 var AU = { ctx: null, on: false, master: null, last: {} };
@@ -1669,10 +1842,11 @@ function setVolume(v) {
   var was = AU.on; AU.on = v > 0;
   if (AU.ctx) { AU.master.gain.setTargetAtTime(v / 10 * .8, AU.ctx.currentTime, .05); if (AU.on) AU.ctx.resume(); else { AU.engine.gain.gain.setTargetAtTime(0, AU.ctx.currentTime, .05); AU.wind.gain.setTargetAtTime(0, AU.ctx.currentTime, .1); } }
   $('soundBtn').setAttribute('aria-pressed', AU.on ? 'true' : 'false'); $('soundWord').textContent = AU.on ? 'Sound on' : 'Sound off';
+  $('qSound').setAttribute('aria-pressed', AU.on ? 'true' : 'false'); $('qSoundW').textContent = AU.on ? 'Sound on' : 'Sound off';
   if (AU.on && !was) sfx('pop');
 }
 function toggleSound() { setSetting('vol', SET.vol ? 0 : SET.lastVol || 6); }
-$('soundBtn').addEventListener('click', toggleSound);
+$('soundBtn').addEventListener('click', toggleSound); $('qSound').addEventListener('click', toggleSound);
 doc.addEventListener('visibilitychange', function () { if (AU.ctx) { if (doc.hidden) AU.ctx.suspend(); else if (AU.on) AU.ctx.resume(); } if (doc.hidden) stopLoop(); else startLoop(); });
 function engineSound() {
   if (!AU.on || !AU.engine) return;
@@ -1845,7 +2019,7 @@ function finishIntro() {
   else letters.forEach(function (o) { if (o.fly) { o.fly = null; o.m.scale.setScalar(1); o.dirty = true; } });
   intro = null; U.uRev.value = 10; paintMesh.material.opacity = .85; car.drop = 0; car.dv = 0; carG.visible = true; placeCar(0); snapCam();
   signMeshes.forEach(function (m) { m.visible = true; });
-  if (COARSE) setTimeout(function () { toast(SET.touch === 'tap' ? 'Tap a sign to drive there' : 'Push the stick to drive', 2600); }, 400);
+  if (COARSE && SET.touch === 'tap') setTimeout(function () { toast('Tap a sign to drive there', 2400); }, 400);
 }
 function skipToMap() { startWorld(); if (state === 'intro') finishIntro(); openMap(); }
 
@@ -1868,7 +2042,7 @@ var grass = (function () {
   var MAX = 3600, list = [], m4 = new M4(), q = new Q(), sc = new V3(), p = new V3();
   for (var k = 0; k < 40000 && list.length < MAX; k++) {
     var v = new V3(r() * 2 - 1, r() * 2 - 1, r() * 2 - 1); if (v.lengthSq() > 1 || v.lengthSq() < .01) continue; v.normalize();
-    var nr = nearestRoad(v); if (nr.d < ROAD_W / 2 + .35 || nr.d > (r() < .7 ? 7 : 16)) continue;
+    var nr = nearestRoad(v); if (nr.d < ROAD_W / 2 + .35 || nr.d > (r() < .7 ? 7 : 16) || paved(v, .35)) continue;
     if (!farFromWater(v, .3) || !farFromSites(v, -1.5)) continue;
     var lat = Math.asin(v.y) / DEG, nz = vnoise(v.x * 3.1 + 7, v.y * 3.1, v.z * 3.1) - .5; var pal = lat + nz * 40 < -4 ? 0 : 1; if (lat > 58 + nz * 10) pal = 1;
     list.push([v, pal, r()]);
@@ -2042,7 +2216,7 @@ var locals = [], talk = { who: null, line: 0, shown: 0, t: 0, heard: {} };
 var bubbleEl = $('bubble'), bubbleTxt = $('bubbleTxt'), bubbleWho = $('bubbleWho');
 function updateLocals(dt, now) {
   var best = null, bd = 7.5;
-  if (state === 'play' && !trial.on) locals.forEach(function (o) { var d = arc(car.n, o.L.n); if (d < bd) { bd = d; best = o; } });
+  if (state === 'play' && !trial.on) locals.forEach(function (o) { var d = arc(car.n, o.L.n); if (d < bd && (o === talk.who || !narrowUI() || Math.abs(car.v) < 5)) { bd = d; best = o; } });
   locals.forEach(function (o) {
     var face = 0;
     if (o === best) { var inv = o.g.quaternion.clone().invert(), rel = carG.position.clone().sub(o.g.position).applyQuaternion(inv); face = Math.atan2(rel.x, rel.z); }
@@ -2105,21 +2279,18 @@ var STICKERS = [
   ['tidy', 'Tidy up', 'Put every prop back where it was.', '#fdfbf5'],
   ['konami', 'You know the rest', 'Up, up, down, down…', '#f08a3c']
 ];
-var got = {}, awardQ = [], awardBusy = false, visited = {};
+var got = {}, visited = {};
 function buildStickers() {
   var ul = $('stickers'), h = ''; STICKERS.forEach(function (s, i) { var on = !!got[s[0]]; h += '<li class="stk' + (on ? ' got' : '') + '" style="--r:' + ((i * 37 % 7) - 3) + 'deg;--c:' + s[3] + '"><b>' + s[1] + (on ? '' : '<span class="sr"> (not found yet)</span>') + '</b><span>' + s[2] + '</span></li>'; }); ul.innerHTML = h;
   $('stkCount').textContent = Object.keys(got).length + ' of ' + STICKERS.length + ' found. They last for this visit.';
 }
 function award(id) {
   if (got[id]) return; var s = null; STICKERS.forEach(function (x) { if (x[0] === id) s = x; }); if (!s) return;
-  got[id] = true; awardQ.push(s); buildStickers(); if (!awardBusy) nextAward();
-}
-function nextAward() {
-  var s = awardQ.shift(); if (!s) { awardBusy = false; return; } awardBusy = true;
-  var el = $('award'); $('awardT').textContent = s[1]; $('awardD').textContent = s[2]; $('awardBadge').style.setProperty('--c', s[3]); $('awardBadge').textContent = '★';
-  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
-  sfx('chime'); buzz(40); if (state === 'play') confetti(carG.position.clone().add(car.n.clone().multiplyScalar(1)), 36, 6);
-  setTimeout(function () { el.classList.remove('show'); setTimeout(nextAward, 650); }, 4000);
+  got[id] = true; buildStickers();
+  notice({ el: 'award', ms: narrowUI() ? 2600 : 4000, fill: function () { // the card waits its turn in the notice queue; the chime and confetti come with it
+    $('awardT').textContent = s[1]; $('awardD').textContent = s[2]; $('awardBadge').style.setProperty('--c', s[3]); $('awardBadge').textContent = '\u2605';
+    sfx('chime'); buzz(40); if (state === 'play') confetti(carG.position.clone().add(car.n.clone().multiplyScalar(1)), 36, 6);
+  } });
 }
 buildStickers();
 function checkProps(dt) {
@@ -2139,16 +2310,15 @@ var trial = { on: false, phase: 'off', t: 0, time: 0, gate: 0, best: null, split
     vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
     fragmentShader: 'uniform float uTime, uOn; varying vec2 vUv; void main(){ float s = step(.5, fract((vUv.x * 6. + vUv.y * 2. - uTime * .8))); vec3 c = mix(vec3(.2, 1., .76), vec3(.96, .94, .88), s * .35); float a = (1. - vUv.y) * .75 * uOn; if (a < .01) discard; gl_FragColor = vec4(c, a); }' });
   var n = 9; for (var i = 1; i <= n; i++) {
-    var s = i === n ? ROAD_LEN - 5 : 4 + (ROAD_LEN - 12) * i / n, rn = roadAt(s), tf = roadTan(s), sd = roadSide(s);
-    var g = new THREE.Group(), k = new Kit(); [-1, 1].forEach(function (sg) { k.add(G.cyl, i === n ? 13 : 20, sg * (ROAD_W / 2 + .5), 0, 0, .22, 3.4, .22).add(G.ball, i === n ? 13 : 20, sg * (ROAD_W / 2 + .5), 3.3, 0, .34, .34, .34); });
-    if (i === n) k.add(G.box, 14, 0, 3.05, 0, ROAD_W + 1.2, .5, .12);
-    var posts = meshOf(k, true), F = frameAt(rn, tf, 0); posts.applyMatrix4(F); g.add(posts);
+    var s = i === n ? FINISH_S + .15 : 4 + (ROAD_LEN - 12) * i / n, rn = roadAt(s), tf = roadTan(s), sd = roadSide(s);
+    var g = new THREE.Group(), k = new Kit(), F = frameAt(rn, tf, 0);
+    if (i < n) { [-1, 1].forEach(function (sg) { k.add(G.cyl, 20, sg * (ROAD_W / 2 + .5), 0, 0, .22, 3.4, .22).add(G.ball, 20, sg * (ROAD_W / 2 + .5), 3.3, 0, .34, .34, .34); }); var posts = meshOf(k, true); posts.applyMatrix4(F); g.add(posts); } // the finish needs no posts: it runs under the Cambridge gantry
     var curtain = new THREE.Mesh(new THREE.PlaneGeometry(ROAD_W + 1, 3.1), gateMat.clone()); curtain.material.uniforms.uTime = U.uTime; curtain.position.set(0, 1.55, 0); curtain.applyMatrix4(F); g.add(curtain);
     g.visible = false; scene.add(g); GATES.push({ s: s, n: rn, g: g, cur: curtain, sd: sd });
   }
 })();
 var RACE = { id: 'race', name: 'The long way', teaser: 'Fresno to Cambridge, against the clock.', pad: SPOTS.race, s: 0, index: -1 };
-(function () { var m = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 4.4).rotateX(-PI / 2), padMat.clone()); m.material.uniforms.uTime = U.uTime; m.material.uniforms.uCol.value = new C3('#9fe0b7'); m.applyMatrix4(frameAt(RACE.pad, roadTan(0), .09)); m.renderOrder = 3; scene.add(m); RACE.padMesh = m; RACE.padK = 0; })();
+RACE.padMesh = padBox(RACE_S, 0, 1.55, 1.3, .075, '#9fe0b7'); RACE.padK = 0; RACE.padS = RACE_S;
 function fmtT(t) { var m = Math.floor(t / 60), s = t - m * 60; return m + ':' + (s < 10 ? '0' : '') + s.toFixed(1); }
 var PAR = Math.round(ROAD_LEN / 14.5); // a scripted run with boost does it in about 22 s
 function startTrial() {
@@ -2156,18 +2326,18 @@ function startTrial() {
   trial.on = true; trial.phase = 'lights'; trial.t = 0; trial.time = 0; trial.gate = 0; trial.splits = []; trial.beeps = 0; auto = null; hideMarker();
   var s0 = 1.5; car.n.copy(roadAt(s0)); car.f.copy(roadTan(s0)); car.v = 0; car.hop = 0; car.hv = 0; slide = 0; car.drop = 0; cam.yaw = 0; cam.up.copy(car.n); cam.h.copy(car.f); placeCar(0); snapCam();
   GATES.forEach(function (G2, i) { G2.g.visible = true; G2.cur.material.uniforms.uOn.value = i === 0 ? 1 : .25; });
-  html.classList.add('racing'); $('lights').className = 'lights'; Array.prototype.forEach.call($('lights').children, function (l) { l.className = ''; }); $('trialT').textContent = fmtT(0); $('trialNext').textContent = 'Gate 1 of ' + GATES.length;
+  setLamps('off'); html.classList.add('racing'); $('lights').className = 'lights'; Array.prototype.forEach.call($('lights').children, function (l) { l.className = ''; }); $('trialT').textContent = fmtT(0); $('trialNext').textContent = 'Gate 1 of ' + GATES.length;
   $('exit').classList.remove('show'); bubbleEl.style.visibility = 'hidden';
 }
 function endTrial(finished) {
-  trial.on = false; trial.phase = 'off'; html.classList.remove('racing'); GATES.forEach(function (G2) { G2.g.visible = false; });
+  trial.on = false; trial.phase = 'off'; html.classList.remove('racing'); GATES.forEach(function (G2) { G2.g.visible = false; }); setLamps('off');
   if (!finished) toast('Time trial off', 1400);
 }
 function updateTrial(dt) {
   if (!trial.on) return; trial.t += dt;
   if (trial.phase === 'lights') { // a traffic light: three reds a beat apart, then green (Bruno's circuit counts down the same way)
-    var b = Math.floor(trial.t / .8); if (b > trial.beeps && b <= 3) { trial.beeps = b; $('lights').children[b - 1].className = 'on'; sfx('beep'); }
-    if (trial.t > 3.2) { trial.phase = 'run'; trial.t = 0; $('lights').className = 'lights go'; sfx('go'); buzz(60); }
+    var b = Math.floor(trial.t / .8); if (b > trial.beeps && b <= 3) { trial.beeps = b; $('lights').children[b - 1].className = 'on'; setLamps('red', b); sfx('beep'); }
+    if (trial.t > 3.2) { trial.phase = 'run'; trial.t = 0; $('lights').className = 'lights go'; setLamps('go'); sfx('go'); buzz(60); }
     return;
   }
   if (trial.phase === 'done') { if (trial.t > 3.5) endTrial(true); return; }
@@ -2180,7 +2350,7 @@ function updateTrial(dt) {
       trial.phase = 'done'; trial.t = 0; var t = trial.time, best = trial.best == null || t < trial.best; if (best) trial.best = t;
       $('trialNext').textContent = best ? 'New best!' : 'Best ' + fmtT(trial.best); sfx('fanfare'); buzz(120); award('trial'); if (t < PAR) award('trialfast');
       confetti(carG.position.clone().add(car.n.clone().multiplyScalar(1)), 60, 9);
-      $('trialBest').innerHTML = 'The long way: your best this visit is <b>' + fmtT(trial.best) + '</b>. Par is ' + fmtT(PAR) + '. Press <kbd>T</kbd> or drive onto the green pad behind the Fresno start to race again.';
+      $('trialBest').innerHTML = 'The long way: your best this visit is <b>' + fmtT(trial.best) + '</b>. Par is ' + fmtT(PAR) + '. Press <kbd>T</kbd>, or back into the green box on the Fresno grid, to race again.';
       toast('The long way in ' + fmtT(t) + (t < PAR ? ', under par' : ''), 3200);
     } else { GATES[trial.gate].cur.material.uniforms.uOn.value = 1; if (GATES[trial.gate + 1]) GATES[trial.gate + 1].cur.material.uniforms.uOn.value = .25; $('trialNext').textContent = 'Gate ' + (trial.gate + 1) + ' of ' + GATES.length; }
   }
@@ -2243,17 +2413,18 @@ var lastTitleT = 0;
 function updateTabTitle(now) { lastTitleT = now; var s = nearestRoad(car.n).s / ROAD_LEN, n = 11, k = Math.round(s * (n - 1)), bar = ''; for (var i = 0; i < n; i++) bar += i === k ? '●' : '·'; doc.title = 'Fresno ' + bar + ' Cambridge'; }
 function updateWorldBits(dt, now) {
   // tags: face the camera; labels slide out when you're close (or in the map)
+  var narrow = narrowUI(), nearTag = null, ntd = 1e9; STOPS.forEach(function (d) { var dd = arc(car.n, d.site); if (dd < ntd) { ntd = dd; nearTag = d; } });
   STOPS.forEach(function (d) {
     if (!d.tagR) return;
     var anchor = d.site.clone().multiplyScalar(R + (d.id === 'translation' ? 5 : TAG_H[d.id]) * (state === 'map' ? 1.2 : 1)), sx = anchor.clone().project(camera).x;
     if (!d.flip && sx > .3) d.flip = true; else if (d.flip && sx < .1) d.flip = false;
     d.tag = d.flip ? d.tagL : d.tagR; (d.flip ? d.tagR : d.tagL).visible = false;
     d.tag.quaternion.copy(camera.quaternion);
-    var dist = arc(car.n, d.site), open = state === 'map' ? (hovered ? hovered === d : true) : (state === 'play' && dist < 26) || d === near;
+    var dist = arc(car.n, d.site), open = state === 'map' ? (hovered ? hovered === d : true) : (state === 'play' && dist < (narrow ? 17 : 26) && (!narrow || d === nearTag)) || d === near;
     var vis = state === 'play' || state === 'map' || state === 'enter'; d.tag.visible = vis;
     var target = open ? 0 : 1; var was = d.tagOff; d.tagOff += (target - d.tagOff) * Math.min(1, dt * 7); if (was > .5 && d.tagOff <= .5 && state === 'play') sfx('paper');
     d.tag.material.uniforms.uOff.value = d.tagOff;
-    var sc = state === 'map' ? orbitDist() / 64 : .82 + cam.zoom * 1.1; d.tag.scale.setScalar(sc);
+    var sc = state === 'map' ? orbitDist() / 64 * (narrow ? .8 : 1) : (.82 + cam.zoom * 1.1) * (narrow ? .66 : 1); d.tag.scale.setScalar(sc);
     d.tag.position.copy(anchor);
     d.padMesh.material.uniforms.uOp.value = vis ? .9 : 0;
   });
