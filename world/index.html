@@ -257,6 +257,7 @@ html.has-world .stop-drive{display:inline-block}
   .tab-time{height:42px}
 }
 /* reduced motion: the system setting, or the one in Settings (html.rm) */
+html.rm .joy-knob{animation:none!important}
 html.rm *,html.rm *::before,html.rm *::after{transition-duration:.01ms!important;animation-duration:.01ms!important;transition-delay:0s!important}
 /* ---------- round 4: the settings panel (Bruno 2025's Options: label left, one control right, a one-line hint), in the hub's slabs ---------- */
 .tab-set svg{transition:transform .5s var(--spring)}
@@ -454,6 +455,30 @@ html.coarse .stop-name{padding:10px 0;margin:-10px 0}
   .tbtns{right:max(16px,env(safe-area-inset-right))}
   .atlas-bar{padding:10px max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left))}
 }
+/* round 8: one pointer, only while the next door is off screen (Mario Kart's and Firewatch's "that way", Bruno 2025's point diamond):
+   the folded sign, pinned to the edge of the view and pointing at the landmark. It is also the GPS: press it and the car drives there */
+.gd{position:fixed;left:0;top:0;z-index:21;display:flex;align-items:center;gap:7px;height:40px;padding:0 12px 0 10px;font:400 13px/1 var(--display);color:var(--cream);background:var(--ink);box-shadow:0 0 0 2px var(--cream),0 4px 0 2px var(--ink);opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s;will-change:transform;white-space:nowrap}
+.gd.show{opacity:1;visibility:visible;transition:opacity .35s,visibility 0s}
+.gd-dia{width:13px;height:13px;border:2.5px solid var(--cream);transform:rotate(45deg);flex:none}
+.gd-ar{position:absolute;left:50%;top:50%;width:0;height:0}
+.gd-ar::after{content:"";position:absolute;left:0;top:-8px;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:12px solid var(--ink);filter:drop-shadow(1.5px 0 0 var(--cream))}
+html.coarse .gd{height:44px}
+html.map-open .gd,html.set-open .gd,html.racing .gd,html.exit-on .gd{opacity:0!important;visibility:hidden!important}
+.gd:active{transform-origin:50% 50%}
+/* ---------- round 8: less on screen (Husam: "not so cluttered"). Bruno 2025 keeps one menu tab and a map; Messenger shows one thing at a
+   time. The sound and the clock leave the tab stack (both live in Settings, and the sound sits in its head on every screen) */
+.tabs .tab-sound,.tabs .tab-time{display:none}
+.setp-q#qSound{display:inline-flex}
+/* the boost waits until you've driven (Nintendo: one verb at a time), and steps aside while a door's sign is up */
+html:not(.drove) .tbtns,html.exit-on .tbtns{opacity:0;pointer-events:none}
+.tbtns{transition:opacity .35s}
+/* before the first push the knob leans up and back once in a while: "push this way" without a word (World 1-1's first Goomba) */
+html:not(.drove) .joy:not(.active) .joy-knob{animation:knobNudge 2.6s cubic-bezier(.4,0,.2,1) 1.2s infinite}
+@keyframes knobNudge{0%,55%,100%{transform:none}70%{transform:translateY(-22px)}85%{transform:translateY(-22px)}}
+/* the map remembers where you've been this visit */
+.stop.been .stop-no::after{content:" \2713"}
+.stop.been .stop-name{opacity:.72}
+.stop.next{box-shadow:0 0 0 2.5px var(--ink),0 5px 0 2.5px var(--ink),inset 5px 0 0 var(--yellow)}
 </style>
 </head>
 <body>
@@ -522,6 +547,7 @@ html.coarse .stop-name{padding:10px 0;margin:-10px 0}
   <div class="award" id="award" role="status" aria-live="polite"><span class="award-badge" id="awardBadge" aria-hidden="true"></span><span><span class="award-k">New sticker</span><span class="award-t" id="awardT"></span><span class="award-d" id="awardD"></span></span></div>
   <div class="bubble" id="bubble" aria-live="polite"><span class="bubble-who" id="bubbleWho"></span><span id="bubbleTxt"></span></div>
   <div class="trial" id="trial" aria-live="off"><div class="lights" id="lights" aria-hidden="true"><i></i><i></i><i></i></div><div class="trial-l">The long way<small id="trialNext">to Cambridge</small></div><div class="trial-t" id="trialT">0:00.0</div></div>
+  <button class="gd" id="guide" type="button"><span class="gd-ar" id="guideAr" aria-hidden="true"></span><span class="gd-dia" aria-hidden="true"></span><span class="gd-w" id="guideW"></span><span class="sr" id="guideSr"></span></button>
   <div class="ctx" id="ctx"><button class="act" id="ctxBtn" type="button">Stuck? Back on the road</button></div>
 </div>
 
@@ -554,9 +580,9 @@ html.coarse .stop-name{padding:10px 0;margin:-10px 0}
     </div>
     <div class="setp-page" id="spage-keys" role="tabpanel" aria-labelledby="stab-keys" hidden>
       <h3 class="keys-h">Keyboard</h3>
-      <ul class="keys"><li><span>Drive</span><span><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrows</span></li><li><span>Boost</span><span><kbd>Shift</kbd></span></li><li><span>Brake, slide</span><span><kbd>Space</kbd> (twice to hop)</span></li><li><span>Horn</span><span><kbd>H</kbd></span></li><li><span>Back on the road</span><span><kbd>R</kbd></span></li><li><span>Go in</span><span><kbd>Enter</kbd></span></li><li><span>Map, settings</span><span><kbd>M</kbd> <kbd>O</kbd></span></li><li><span>Time trial</span><span><kbd>T</kbd></span></li><li><span>The plain page</span><span><kbd>P</kbd></span></li></ul>
+      <ul class="keys"><li><span>Drive</span><span><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrows</span></li><li><span>Drive yourself there</span><span>Click a landmark&rsquo;s sign</span></li><li><span>Boost</span><span><kbd>Shift</kbd></span></li><li><span>Brake, slide</span><span><kbd>Space</kbd> (twice to hop)</span></li><li><span>Horn</span><span><kbd>H</kbd></span></li><li><span>Back on the road</span><span><kbd>R</kbd></span></li><li><span>Go in</span><span><kbd>Enter</kbd></span></li><li><span>Map, settings</span><span><kbd>M</kbd> <kbd>O</kbd></span></li><li><span>Time trial</span><span><kbd>T</kbd></span></li><li><span>The plain page</span><span><kbd>P</kbd></span></li></ul>
       <h3 class="keys-h">Touch</h3>
-      <ul class="keys"><li><span>Point</span><span>Put a thumb down on the left half and push the way to go</span></li><li><span>Steer</span><span>Left and right turn, up drives, down brakes</span></li><li><span>Tap to go</span><span>Tap a sign or the ground; the car drives there</span></li><li><span>Horn</span><span>Tap the car</span></li><li><span>Boost</span><span>Hold the &raquo; button</span></li><li><span>Look around</span><span>Drag on the right half; pinch to zoom</span></li></ul>
+      <ul class="keys"><li><span>Point</span><span>Put a thumb down on the left half and push the way to go</span></li><li><span>Steer</span><span>Left and right turn, up drives, down brakes</span></li><li><span>Tap to go</span><span>Tap a sign or the ground; the car drives there</span></li><li><span>Drive yourself there</span><span>Tap a landmark&rsquo;s sign</span></li><li><span>Horn</span><span>Tap the car</span></li><li><span>Boost</span><span>Hold the &raquo; button</span></li><li><span>Look around</span><span>Drag on the right half; pinch to zoom</span></li></ul>
       <h3 class="keys-h">Gamepad</h3>
       <ul class="keys"><li><span>Drive</span><span>Left stick, right trigger</span></li><li><span>Brake, reverse</span><span>Left trigger</span></li><li><span>Boost, hop, horn</span><span>B, Y, left stick click</span></li><li><span>Go in</span><span>A</span></li></ul>
     </div>
@@ -608,7 +634,7 @@ html.coarse .stop-name{padding:10px 0;margin:-10px 0}
       <ol class="stops" id="stops"></ol>
     </section>
     <footer class="atlas-foot">
-      <p>Driving: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrows, <kbd>Shift</kbd> to boost, <kbd>Space</kbd> to brake (twice to hop), <kbd>H</kbd> for the horn, <kbd>R</kbd> to get back on the road, <kbd>Enter</kbd> to go in, <kbd>M</kbd> for this map, <kbd>P</kbd> for the plain page. On a phone, put a thumb down on the left half and push; tap the car to honk.</p>
+      <p>Driving: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or the arrows, <kbd>Shift</kbd> to boost, <kbd>Space</kbd> to brake (twice to hop), <kbd>H</kbd> for the horn, <kbd>R</kbd> to get back on the road, <kbd>Enter</kbd> to go in, <kbd>M</kbd> for this map, <kbd>P</kbd> for the plain page. On a phone, put a thumb down on the left half and push; tap the car to honk. Click or tap any landmark&rsquo;s sign and the car drives itself there.</p>
       <p>The light follows your own clock. A homage to Bruno Simon&rsquo;s folio and Abeto&rsquo;s Messenger; every shape, sound and letter here is drawn in code.</p>
     </footer>
   </div>
@@ -670,6 +696,8 @@ function notice(it) {
   if (!nBusy) nextNotice();
 }
 function nextNotice() {
+  // round 8: a sticker card never lands on top of a door's sign: one thing at a time; it waits until you've rolled off
+  if (NQ[0] && NQ[0].el === 'award' && html.classList.contains('exit-on')) { nBusy = true; html.classList.remove('notice-up'); setTimeout(nextNotice, 700); return; }
   var it = NQ.shift(); html.classList.toggle('notice-up', !!it && narrowUI()); if (!it) { nBusy = false; return; } nBusy = true;
   var el = $(it.el); if (it.fill) it.fill(); el.style.setProperty('--dur', it.ms + 'ms'); el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
   setTimeout(function () { el.classList.add('leaving'); setTimeout(function () { el.classList.remove('show', 'leaving'); nextNotice(); }, 460); }, it.ms);
@@ -1500,10 +1528,19 @@ var paintMesh;
   function paintAt(s, lines) { // first line farthest ahead, so it reads top to bottom from behind the car
     lines.forEach(function (t, i) { var ss = s - i * 1.25, n = roadX(ss), f = roadTanX(ss).negate(); quad(n, f, ROAD_W - .5, (ROAD_W - .5) * cellH / cellW, paintLine(t)); });
   }
-  STOPS.forEach(function (d) { paintAt(d.s - 4 - (d.id === 'translation' ? 6 : 0), d.paint); });
-  // the controls, painted on the road in front of the car (Bruno 2019 draws them on the floor at the start; phones get their own)
-  if (COARSE) { paintAt(9.8, ['THUMB DOWN, PUSH', 'TO DRIVE']); paintAt(16, ['TAP THE CAR', 'TO HONK']); }
-  else { paintAt(9.8, ['ARROWS OR WASD', 'TO DRIVE']); paintAt(15.8, ['SHIFT TO BOOST', 'SPACE TWICE TO HOP']); paintAt(21.8, ['H FOR THE HORN', 'R FOR THE ROAD']); }
+  // round 8: before each exit the lane says one thing, the way a real road does: the name and an arrow to the side the door is on
+  // (Mini Motorways and real lane arrows; Bruno 2025 labels each area once). The teasers stay on the exit sign and in the locals' mouths
+  function exitLine(name, dir) {
+    var cx = (slot % cols) * cellW, cy = Math.floor(slot / cols) * cellH; slot++;
+    fitText(x, name, 800, 96, '"Barlow Condensed"', cellW - 150); var tw = x.measureText(name).width, ax = dir > 0 ? cx + cellW / 2 + tw / 2 + 52 : cx + cellW / 2 - tw / 2 - 52, ay = cy + cellH / 2 + 2;
+    x.fillText(name, cx + cellW / 2, cy + cellH / 2 + 4);
+    x.beginPath(); x.moveTo(ax + dir * 34, ay); x.lineTo(ax - dir * 6, ay - 34); x.lineTo(ax - dir * 6, ay - 13); x.lineTo(ax - dir * 36, ay - 13); x.lineTo(ax - dir * 36, ay + 13); x.lineTo(ax - dir * 6, ay + 13); x.lineTo(ax - dir * 6, ay + 34); x.closePath(); x.fill();
+    return [cx / C, cy / C, (cx + cellW) / C, (cy + cellH) / C];
+  }
+  STOPS.forEach(function (d) { var ss = d.s - 5 - (d.id === 'translation' ? 6 : 0), n = roadX(ss), f = roadTanX(ss).negate(); quad(n, f, ROAD_W - .5, (ROAD_W - .5) * cellH / cellW, exitLine(d.name.replace(/^The /, '').toUpperCase(), d.side)); });
+  // the one control a newcomer needs, painted in front of the car (Bruno 2019 draws it on the floor at the start); the rest are in Settings
+  if (COARSE) paintAt(9.8, ['THUMB DOWN, PUSH', 'TO DRIVE']);
+  else paintAt(9.8, ['ARROWS OR WASD', 'TO DRIVE']);
   paintAt(RACE_S - 2.15, ['THE LONG WAY']); // the grid box's name, at the rounded end of the start straight
   var g = new THREE.BufferGeometry().setFromPoints(P); g.setAttribute('uv', new THREE.Float32BufferAttribute(UV, 2));
   var tex = new THREE.CanvasTexture(cv); tex.anisotropy = COARSE ? 4 : 8;
@@ -1693,7 +1730,8 @@ function hapTick() {
   if (!hapL) { var w = doc.createElement('div'); w.setAttribute('aria-hidden', 'true'); w.style.cssText = 'position:fixed;left:-99px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none'; w.innerHTML = '<input type="checkbox" switch id="hapSw" tabindex="-1"><label for="hapSw" id="hapL">.</label>'; doc.body.appendChild(w); hapL = $('hapL'); }
   var t = performance.now(); if (t - hapT < 70) return; hapT = t; try { hapL.click(); } catch (e) {}
 }
-function buzz(ms) { if (!SET.vib) return; if (navigator.vibrate) try { navigator.vibrate(ms); } catch (e) {} else if (HAP_IOS) hapTick(); }
+function buzz(ms) { if (!SET.vib) return; if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return; // round 8: never before a first tap (Chrome blocks it and says so)
+  if (navigator.vibrate) try { navigator.vibrate(ms); } catch (e) {} else if (HAP_IOS) hapTick(); }
 var KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'], konamiI = 0, konamiN = 0;
 function konamiStep(k) { if (k === KONAMI[konamiI]) { konamiI++; if (konamiI === KONAMI.length || (COARSE && konamiI === 8)) { konamiI = 0; rainOranges(); } } else konamiI = k === KONAMI[0] ? 1 : 0; }
 function onKey(e, down) {
@@ -1785,7 +1823,8 @@ canvas.addEventListener('touchend', function (e) { if (e.touches.length < 2) pin
 function setMouse(e) { var r = canvas.getBoundingClientRect(); mouse.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); raycaster.setFromCamera(mouse, camera); }
 function tagUnder(e) { setMouse(e); var list = STOPS.filter(function (d) { return d.tag && d.tag.visible; }).map(function (d) { return d.tag; }); var hit = raycaster.intersectObjects(list, false)[0]; if (!hit) return null; for (var i = 0; i < STOPS.length; i++) if (STOPS[i].tagR === hit.object || STOPS[i].tagL === hit.object) return STOPS[i]; return null; }
 function groundAt(e) { setMouse(e); var o = raycaster.ray.origin, d = raycaster.ray.direction, b = o.dot(d), c = o.lengthSq() - R * R, disc = b * b - c; if (disc < 0) return null; var t = -b - Math.sqrt(disc); if (t < 0) return null; return o.clone().add(d.clone().multiplyScalar(t)).normalize(); }
-function hoverTag(e) { if (state !== 'play' && state !== 'map') return; var d = tagUnder(e); canvas.classList.toggle('point', !!d); }
+var hoverD = null;
+function hoverTag(e) { if (state !== 'play' && state !== 'map') return; var d = tagUnder(e); hoverD = d; canvas.classList.toggle('point', !!d); } // Bruno 2025: the cursor over a point opens its label
 function clickAt(e) {
   if (state === 'title') return;
   var d = tagUnder(e);
@@ -1795,10 +1834,10 @@ function clickAt(e) {
   if (d && doorNow() === d) { goIn(d); return; }
   if (e.pointerType === 'touch' && SET.touch === 'tap') { // Tap to go: a sign drives you to its door, the ground drives you to that spot, the car hops
     var g = groundAt(e);
-    if (d) { driveTo(d.pad, d); toast(d.name + ': on the way', 1600); return; }
+    if (d) { driveTo(d.pad, d); return; }
     if (g) { driveTo(g, null); return; }
   }
-  if (d) toast(d.name + ': ' + d.teaser, 3000);
+  if (d) driveTo(d.pad, d); // round 8: every sign is a button, on every scheme: tap or click it and the car drives itself along the road to its door (a GPS; Bruno 2025's points are clickable)
 }
 function tapOnCar(e) { var c = carG.position.clone().add(car.n.clone().multiplyScalar(.6)).project(camera), x = (c.x * .5 + .5) * innerWidth, y = (-c.y * .5 + .5) * innerHeight; return c.z < 1 && Math.hypot(e.clientX - x, e.clientY - y) < Math.max(40, Math.min(innerWidth, innerHeight) * .085); }
 function driveTo(n, d) { auto = { n: n.clone(), d: d, t: 0 }; markDrove(); sfx('pad'); showMarker(n); }
@@ -2382,7 +2421,7 @@ function skipToMap() { startWorld(); if (state === 'intro') finishIntro(); openM
 
 // ---------------------------------------------------------------- the map mode
 function onMap(open, focusId) {
-  if (open) { doc.title = 'Husam Sokar'; if (state === 'title' || state === 'intro') finishIntro(); state = 'map'; clearCtl(); cam.mapDir.copy(cam.pos.clone().normalize()); if (Math.abs(cam.mapDir.y) > .85) cam.mapDir.y = Math.sign(cam.mapDir.y) * .85; cam.mapDir.normalize(); cam.mapT = car.n.clone().add(new V3(0, .15, 0)).normalize(); if (focusId) mapFocus(focusId); sfx('paper'); }
+  if (open) { markStops(); doc.title = 'Husam Sokar'; if (state === 'title' || state === 'intro') finishIntro(); state = 'map'; clearCtl(); cam.mapDir.copy(cam.pos.clone().normalize()); if (Math.abs(cam.mapDir.y) > .85) cam.mapDir.y = Math.sign(cam.mapDir.y) * .85; cam.mapDir.normalize(); cam.mapT = car.n.clone().add(new V3(0, .15, 0)).normalize(); if (focusId) mapFocus(focusId); sfx('paper'); }
   else { if (state === 'map') state = 'play'; cam.mapT = null; stopHover(); }
 }
 var hovered = null;
@@ -2576,7 +2615,9 @@ var locals = [], talk = { who: null, line: 0, shown: 0, t: 0, heard: {} };
 var bubbleEl = $('bubble'), bubbleTxt = $('bubbleTxt'), bubbleWho = $('bubbleWho');
 function updateLocals(dt, now) {
   var best = null, bd = 7.5;
-  if (state === 'play' && !trial.on) locals.forEach(function (o) { var d = arc(car.n, o.L.n); if (d < bd && (o === talk.who || !narrowUI() || Math.abs(car.v) < 5)) { bd = d; best = o; } });
+  // round 8: a local speaks when you stop by them (Messenger: you walk up to someone), never over a door's sign, and not before you've
+  // driven: the first seconds belong to the road
+  if (state === 'play' && !trial.on && drove && !doorNow()) locals.forEach(function (o) { var d = arc(car.n, o.L.n); if (d < bd && Math.abs(car.v) < (o === talk.who ? 7 : 4)) { bd = d; best = o; } });
   locals.forEach(function (o) {
     var face = 0;
     if (o === best) { var inv = o.g.quaternion.clone().invert(), rel = carG.position.clone().sub(o.g.position).applyQuaternion(inv); face = Math.atan2(rel.x, rel.z); }
@@ -2588,7 +2629,7 @@ function updateLocals(dt, now) {
     o.talkK = (o.talkK || 0) + ((typing ? 1 : 0) - (o.talkK || 0)) * Math.min(1, dt * 8);
     o.m.scale.set(1.15 * (1 - br * .012), 1.15 * (1 + br * .02 + Math.abs(Math.sin(now * .018)) * .05 * o.talkK), 1.15 * (1 - br * .012));
     o.m.rotation.x = Math.sin(now * .018) * .06 * o.talkK + (o === best && !RM() ? .05 : 0); o.m.position.y += Math.abs(Math.sin(now * .018)) * .05 * o.talkK;
-    o.mark.visible = o.heard < o.L.lines.length && state === 'play'; o.mark.position.y = 2.45 + Math.sin(now * .004 + o.L.index) * .12; o.mark.material.rotation = 0;
+    o.mark.visible = false; // round 8: no diamond over the locals: in this world a diamond means a door (Bruno 2025's interactive points) o.mark.position.y = 2.45 + Math.sin(now * .004 + o.L.index) * .12; o.mark.material.rotation = 0;
   });
   if (best !== talk.who) {
     talk.who = best;
@@ -2656,9 +2697,10 @@ function buildStickers() {
   var ul = $('stickers'), h = ''; STICKERS.forEach(function (s, i) { var on = !!got[s[0]]; h += '<li class="stk' + (on ? ' got' : '') + '" style="--r:' + ((i * 37 % 7) - 3) + 'deg;--c:' + s[3] + '"><b>' + s[1] + (on ? '' : '<span class="sr"> (not found yet)</span>') + '</b><span>' + s[2] + '</span></li>'; }); ul.innerHTML = h;
   $('stkCount').textContent = Object.keys(got).length + ' of ' + STICKERS.length + ' found. They last for this visit.';
 }
-function award(id) {
+function award(id, quiet) {
   if (got[id]) return; var s = null; STICKERS.forEach(function (x) { if (x[0] === id) s = x; }); if (!s) return;
   got[id] = true; buildStickers();
+  if (quiet) return; // round 8: the exit sign already says you made it; the sticker waits quietly in Settings
   notice({ el: 'award', ms: narrowUI() ? 2600 : 4000, fill: function () { // the card waits its turn in the notice queue; the chime and confetti come with it
     $('awardT').textContent = s[1]; $('awardD').textContent = s[2]; $('awardBadge').style.setProperty('--c', s[3]); $('awardBadge').textContent = '\u2605';
     sfx('chime'); buzz(40); if (state === 'play') confetti(carG.position.clone().add(car.n.clone().multiplyScalar(1)), 36, 6);
@@ -2833,21 +2875,33 @@ function updateLife(dt, now) {
 }
 var lastTitleT = 0, cloudLift = 0;
 function updateTabTitle(now) { lastTitleT = now; var s = nearestRoad(car.n).s / ROAD_LEN, n = 11, k = Math.round(s * (n - 1)), bar = ''; for (var i = 0; i < n; i++) bar += i === k ? '●' : '·'; doc.title = 'Fresno ' + bar + ' Cambridge'; }
-var _tagRV = new V3();
+var _tagRV = new V3(), _yUp = new V3(0, 1, 0);
+var guideLine = new THREE.Mesh(new THREE.CylinderGeometry(.045, .045, 1, 6, 1, true), new THREE.MeshBasicMaterial({ color: '#23262e', transparent: true, opacity: .7, depthWrite: false }));
+guideLine.visible = false; guideLine.renderOrder = 5; scene.add(guideLine);
 function updateWorldBits(dt, now) {
   // tags: face the camera; labels slide out when you're close (or in the map)
+  guideLine.visible = false;
+  if (state !== 'play' && gd.on) { gd.on = false; gdEl.classList.remove('show'); }
   var narrow = narrowUI(), nearTag = null, ntd = 1e9; STOPS.forEach(function (d) { var dd = arc(car.n, d.site); if (dd < ntd) { ntd = dd; nearTag = d; } });
   STOPS.forEach(function (d) {
     if (!d.tagR) return;
     var th = (d.id === 'translation' ? 5 : TAG_H[d.id]) * (state === 'map' ? 1.2 : 1), anchor = d.site.clone().multiplyScalar(R + th), pj = anchor.clone().project(camera);
+    // round 8: the next door's sign rises over the curve of the planet while it is still far off, on a thin line from its roof, so a
+    // landmark is always on the skyline to drive toward (Journey's mountain, Breath of the Wild's towers, Firewatch's lookout);
+    // it comes down onto its building as you arrive
+    var rise = state === 'play' && d === guide.d && !doorNow() ? clamp((arc(car.n, d.site) - 12) * .95, 0, 30) : 0;
+    if (rise) { th += rise; pj = d.site.clone().multiplyScalar(R + th).project(camera); }
     // round 6: a tag never hides under the plate or the tabs: near the top of the screen it comes down its building to meet the view
     if (state === 'play' && pj.z < 1 && pj.y > .7) { for (var ti = 0; ti < 4 && pj.y > .7 && th > 2.5; ti++) { th *= .78; pj = d.site.clone().multiplyScalar(R + th).project(camera); } }
-    d.thS = d.thS == null || state !== 'play' ? th : d.thS + (th - d.thS) * Math.min(1, dt * 5); anchor = d.site.clone().multiplyScalar(R + d.thS);
+    d.thS = d.thS == null || state !== 'play' ? th : d.thS + (th - d.thS) * Math.min(1, dt * (rise || d.thS > th + 2 ? 2.2 : 5)); anchor = d.site.clone().multiplyScalar(R + d.thS);
+    if (d === guide.d) { var base = (d.id === 'translation' ? 5 : TAG_H[d.id]) - .9, len = d.thS - .7 - base; guideLine.visible = state === 'play' && len > 1.2; if (guideLine.visible) { guideLine.position.copy(d.site).multiplyScalar(R + base + len / 2); guideLine.quaternion.setFromUnitVectors(_yUp, d.site); guideLine.scale.set(1, len, 1); guideLine.material.opacity = clamp((len - 1.2) / 3, 0, 1) * .7; } }
     var sx = anchor.clone().project(camera).x;
     if (!d.flip && sx > .3) d.flip = true; else if (d.flip && sx < .1) d.flip = false;
     d.tag = d.flip ? d.tagL : d.tagR; (d.flip ? d.tagR : d.tagL).visible = false;
     d.tag.quaternion.copy(camera.quaternion);
-    var dist = arc(car.n, d.site), open = state === 'map' ? (hovered ? hovered === d : true) : (state === 'play' && dist < (narrow ? 17 : 26) && (!narrow || d === nearTag)) || d === near;
+    var dist = arc(car.n, d.site), open = state === 'map' ? (hovered ? hovered === d : true) : (state === 'play' && ((d === guide.d && dist < (narrow ? 46 : 62) && !doorNow()) || (d === nearTag && dist < 12) || d === hoverD)) || d === near;
+    // round 8: one label at a time (Bruno 2025 opens only the point you're at): the next door you haven't been through, from far off
+    // like Journey's mountain; every other door stays a folded diamond on the skyline until you're beside it or point at it
     // a label never slides out half off the screen (that read as a stray black box at the edge): open it on the side that fits, or keep it folded
     if (open && state !== 'map') {
       var tsc = (.82 + cam.zoom * 1.1) * (narrow ? .66 : 1), tw = (d.tagR.geometry.parameters.width || 4) * tsc, rv = _tagRV.setFromMatrixColumn(camera.matrixWorld, 0);
@@ -2885,14 +2939,56 @@ function updateWorldBits(dt, now) {
   plane.dir.applyAxisAngle(ax, RM() ? 0 : dt * .09).normalize();
   var fwd = ax.clone().cross(plane.dir).normalize(); plane.g.position.copy(plane.dir).multiplyScalar(plane.h); plane.g.up.copy(plane.dir); plane.g.lookAt(plane.g.position.clone().add(fwd)); plane.g.rotateZ(.18);
 }
+// round 8: the guide is simply the next door along the road that you haven't been through this visit (behind you only when
+// everything ahead is done). It opens that door's label from afar, and it is what the map marks as "next"
+var guide = { d: null, t: 0 }, backFrom = null;
+function updateGuide() {
+  var cs = nearestRoad(car.n).s, best = null, bc = 1e9;
+  STOPS.forEach(function (d) { if (visited[d.id]) return; var ds = d.s - cs, c = ds >= -4 ? ds : 1e4 - ds; if (c < bc) { bc = c; best = d; } });
+  guide.d = best;
+}
+function markStops() { Array.prototype.forEach.call(doc.querySelectorAll('.stop'), function (li) { var id = li.getAttribute('data-id'); li.classList.toggle('been', !!visited[id]); li.classList.toggle('next', !!guide.d && guide.d.id === id); }); }
+// the pointer: shown only while the next door's sign is off screen; pinned to the edge, clear of the HUD's corners, pointing at it
+var playT = 0, gdEl = $('guide'), gdAr = $('guideAr'), gd = { x: -1, y: -1, on: false, id: null, w: 0 };
+gdEl.addEventListener('click', function () { if (guide.d && state === 'play') { driveTo(guide.d.pad, guide.d); gdEl.classList.remove('show'); gd.on = false; } });
+function onView(n) { var q = n.clone().multiplyScalar(R).project(camera); return q.z <= 1 && Math.abs(q.x) < .85 && q.y < .8 && q.y > -.75; }
+function updatePointer(dt) {
+  if (!playT) playT = performance.now();
+  var d = guide.d, want = !!d && state === 'play' && !trial.on && !doorNow() && !auto && (drove || FROM || performance.now() - playT > 6000);
+  var W = innerWidth, H = innerHeight, x = 0, y = 0, ang = 0;
+  if (want && gd.id !== d.id) { gd.id = d.id; $('guideW').textContent = d.name.replace(/^The /, ''); $('guideSr').textContent = ' is next. Drive there'; gdEl.setAttribute('aria-label', 'Next: ' + d.name + '. Drive there'); gd.w = 0; }
+  if (want && !gd.w) gd.w = gdEl.offsetWidth;
+  if (want) {
+    var p = d.site.clone().multiplyScalar(R + (d.thS || TAG_H[d.id] || 6)).project(camera), px = p.x, py = p.y;
+    if (p.z > 1) { px = -px; py = -py; if (Math.abs(px) < .01 && Math.abs(py) < .01) py = -1; var m = Math.max(Math.abs(px), Math.abs(py)); px /= m; py /= m; }
+    var g0 = d.site.clone().multiplyScalar(R + 1).project(camera);
+    if ((p.z <= 1 && Math.abs(px) < .92 && Math.abs(py) < .9) || (g0.z <= 1 && Math.abs(g0.x) < .9 && Math.abs(g0.y) < .85) || onView(d.pad)) want = false; // the sign or the building is in view: the world does the pointing
+    else {
+      var sx = px * W / 2, sy = -py * H / 2; ang = Math.atan2(sy, sx);
+      var narrow = narrowUI(), top = narrow ? 76 : 70, bot = COARSE ? 176 : 40, side = 16, hw = W / 2 - side - gd.w / 2 - 14, hh0 = H / 2 - top - 26, hh1 = H / 2 - bot - 26;
+      var k = Math.min(Math.abs(sx) > 1e-3 ? hw / Math.abs(sx) : 1e9, Math.abs(sy) > 1e-3 ? (sy < 0 ? hh0 : hh1) / Math.abs(sy) : 1e9);
+      x = W / 2 + sx * k; y = H / 2 + sy * k;
+    }
+  }
+  if (want !== gd.on) { gd.on = want; gdEl.classList.toggle('show', want); if (want) gd.x = -1; }
+  if (!want) return;
+  if (gd.x < 0) { gd.x = x; gd.y = y; } else { var kk = Math.min(1, dt * 6); gd.x += (x - gd.x) * kk; gd.y += (y - gd.y) * kk; }
+  gdEl.style.transform = 'translate(' + (gd.x - gd.w / 2).toFixed(1) + 'px,' + (gd.y - 20).toFixed(1) + 'px)';
+  var ca = Math.abs(Math.cos(ang)), sa = Math.abs(Math.sin(ang)), rr = Math.min(ca > .01 ? gd.w / 2 / ca : 1e4, sa > .01 ? 22 / sa : 1e4);
+  gdAr.style.transform = 'rotate(' + ang.toFixed(3) + 'rad) translateX(' + (rr + 2).toFixed(1) + 'px)';
+}
 function updateNear(dt) {
+  guide.t -= dt; if (guide.t <= 0) { guide.t = .25; updateGuide(); }
+  updatePointer(dt);
   var best = null, bd = 1e9, cands = trial.on ? STOPS : STOPS.concat([RACE]);
   cands.forEach(function (d) { var dd = arc(car.n, d.pad); if (dd < bd) { bd = dd; best = d; } });
-  var n = bd < 2.6 ? best : null;
+  // round 8: back from a district you're parked on its pad; its sign stays down until you've rolled off, so the next door leads
+  if (backFrom && (best !== backFrom || bd > 3.2)) backFrom = null;
+  var n = bd < 2.6 && best !== backFrom ? best : null;
   parkK = n ? clamp(1 - bd / 2.6, 0, 1) : 0; // a gentle stop on a door's pad when you let go (so a first-timer lands on it)
   cands.forEach(function (d) { d.padK += ((d === n ? 1 : 0) - d.padK) * Math.min(1, dt * 6); d.padMesh.material.uniforms.uK.value = d.padK; });
   RACE.padMesh.material.uniforms.uOp.value = trial.on ? 0 : .9;
-  if (n && n !== RACE && !visited[n.id]) { visited[n.id] = 1; award('door'); if (Object.keys(visited).length >= STOPS.length) award('tour'); }
+  if (n && n !== RACE && !visited[n.id]) { visited[n.id] = 1; award('door', true); if (Object.keys(visited).length >= STOPS.length) award('tour'); }
   if (n !== near) {
     if (near && !n) { stickyNear = near; stickyT = performance.now(); }
     near = n;
@@ -2904,7 +3000,7 @@ function doorNow() { if (near) return near; if (stickyNear && performance.now() 
 function showDoor(n) {
   html.classList.add('exit-on');
   $('exitNo').textContent = n === RACE ? 'Start line' : n.id === 'contact' ? 'Last stop' : 'Exit ' + (n.index + 1); $('exitName').textContent = n.name; $('exitLine').textContent = n.teaser;
-  $('exitGoWord').textContent = n === RACE ? 'Race' : n.id === 'contact' ? 'Open' : 'Go in'; $('exit').classList.add('show'); sfx('pad');
+  $('exitGoWord').textContent = n === RACE ? 'Race' : n.id === 'contact' ? 'Open' : 'Go in'; $('exit').classList.add('show'); sfx('pad'); buzz(18); // round 8: a tick in the hand as you arrive
 }
 function hideDoor() { html.classList.remove('exit-on'); $('exit').classList.remove('show'); }
 function startLoop() { if (running) return; running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
@@ -2980,7 +3076,7 @@ fontsReady.then(function () {
   // re-draw the town signs and road paint with the real fonts if they arrived late
   if (FROM && (byId[FROM] || FROM === 'contact')) {
     html.classList.add('ready', 'started'); state = 'play'; lettersHome(true); U.uRev.value = 10; paintMesh.material.opacity = .85;
-    cloudLift = 1; teleport(byId[FROM] ? FROM : 'contact', false); toast('Back on the road', 1800);
+    cloudLift = 1; visited[byId[FROM] ? FROM : 'contact'] = 1; backFrom = byId[FROM] || byId.contact; teleport(byId[FROM] ? FROM : 'contact', false); toast('Back on the road', 1800);
   } else if (FROM) { html.classList.add('ready', 'started'); state = 'play'; lettersHome(true); U.uRev.value = 10; paintMesh.material.opacity = .85; placeCar(0); snapCam(); }
 });
 function onSetting(k, v) {
