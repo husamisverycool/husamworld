@@ -61,6 +61,7 @@ html.loaded .loader{opacity:0;visibility:hidden}
 .ld-word b::after{content:"";position:absolute;inset:0;background:var(--yellow);box-shadow:inset 0 0 0 1px var(--ink);transform:scaleX(0);transform-origin:0 50%;animation:ldTrip 1.1s cubic-bezier(.4,0,.2,1) forwards}
 html.loaded .ld-rider{transform:translateX(75vw)}
 @media (min-width:700px){.ld-scene{width:min(820px,90vw);height:176px}.ld-far{height:88px;bottom:40px}.ld-road{height:34px;bottom:8px}.ld-dashes{margin-top:15.5px;height:3.5px}.ld-rider{bottom:22px;scale:1.45;transform-origin:50% 100%}.ld-word{font-size:17px}.ld-cloud{scale:1.3}}
+@media (max-height:500px){.ld-cloud.c3{top:86%;left:8%}.ld-cloud.c1{top:10%}} /* round 7: on a phone on its side the low cloud would sit on the Fresno-Cambridge line */
 @keyframes ldSlide{to{transform:translateX(-50%)}}
 @keyframes ldDash{to{transform:translateX(-36px)}}
 @keyframes ldSpin{to{transform:rotate(360deg)}}
@@ -106,7 +107,7 @@ html.has-world:not(.ready) .t-alts{visibility:hidden}
 .t-card img{width:64px;height:64px;object-fit:cover;display:block;box-shadow:0 0 0 2px var(--ink)}
 .t-card b{display:block;font:400 15px/1.1 var(--display)}
 .t-card span{display:block;font:600 14px/1.25 var(--text);color:var(--ink-2);margin-top:3px}
-@media (max-width:760px){.t-card{display:none}}
+@media (max-width:760px),(pointer:coarse) and (max-height:500px){.t-card{display:none}}
 @media (max-height:520px){.t-name{font-size:52px}}
 
 /* ---------- HUD ---------- */
@@ -116,7 +117,7 @@ html.has-world .hud{display:block}
 html.started .plate{transform:none}
 html.map-open .plate{transform:translateY(calc(-100% - 40px))}
 html.map-open .exit,html.map-open .toast{visibility:hidden}
-@media (max-width:760px){html.map-open .tabs{visibility:hidden}}
+@media (max-width:760px),(pointer:coarse) and (max-height:500px){html.map-open .tabs{visibility:hidden}}
 .plate-btn{display:block;text-align:left;padding:8px 13px 7px}
 .plate-name{display:block;font:400 19px/1 var(--display);letter-spacing:.01em}
 .plate-sub{display:block;font:600 14px/1.2 var(--text);color:var(--ink-2);margin-top:3px}
@@ -235,10 +236,10 @@ html.has-world .stop-drive{display:inline-block}
 .stop-mail .contact{margin-top:10px}
 .atlas-foot{margin-top:30px;font:500 14px/1.5 var(--text);color:var(--ink-2)}
 .atlas-foot p{margin:0 0 8px}
-@media (max-width:760px){
+@media (max-width:760px),(pointer:coarse) and (max-height:500px){
   html.has-world .atlas{background:radial-gradient(120% 90% at 50% 20%,var(--sky-a),var(--sky-b))}
 }
-@media (max-width:560px){
+@media (max-width:560px),(pointer:coarse) and (max-height:500px){
   body{font-size:16px}
   .card{grid-template-columns:88px 1fr;gap:14px}
   .card-photo img{width:88px;height:88px}
@@ -382,7 +383,7 @@ html.drove .joy.active{opacity:1}
 html:has(.exit.show) .joy:not(.active){opacity:0} /* the idle stick ring never shows through under the exit sign */
 /* one notice at a time, in one place: toasts and sticker cards share a queue */
 .toast{max-width:min(420px,calc(100vw - 32px))}
-@media (max-width:760px){
+@media (max-width:760px),(pointer:coarse) and (max-height:500px){
   .tabs .tab-map,.tabs .tab-sound,.tabs .tab-time{display:none}
   .tab{height:44px;padding:0 12px}
   .plate-btn{padding:7px 11px 6px}
@@ -400,17 +401,17 @@ html:has(.exit.show) .joy:not(.active){opacity:0} /* the idle stick ring never s
   .exit-name{font-size:18px}
   html.coarse .ctx{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px)}
   /* notices drop in under the plate row, full width, one line */
-  .toast,html.coarse .toast{top:calc(max(16px,env(safe-area-inset-top)) + 56px);bottom:auto;font-size:13px;padding:10px 12px 9px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s var(--spring),opacity .25s}
+  .toast,html.coarse .toast{top:calc(max(16px,env(safe-area-inset-top)) + 56px);bottom:auto;font-size:14px;padding:10px 12px 9px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s var(--spring),opacity .25s}
   .toast.show,html.coarse .toast.show{transform:translate(-50%,0);opacity:1}
   /* round 6: a compact card that fits its words, centred under the plate, not a full-width bar */
   .award,html.coarse .award{top:calc(max(16px,env(safe-area-inset-top)) + 56px);left:50%;right:auto;width:max-content;max-width:calc(100vw - 32px);padding:8px 14px 8px 8px;gap:10px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s var(--spring),opacity .25s,visibility 0s .45s}
   .award.show,html.coarse .award.show{transform:translate(-50%,0);opacity:1;transition:transform .45s var(--spring),opacity .25s,visibility 0s}
   .award-badge{width:30px;height:30px;font-size:14px}
   .award-d{display:none}
-  .award-k{font-size:11px}
+  .award-k{font-size:12px}
   .award-t{font-size:15px}
   .bubble{font-size:14px;max-width:min(210px,58vw);padding:8px 11px 7px}
-  .bubble-who{font-size:10px}
+  .bubble-who{font-size:11px}
 }
 html.notice-up .bubble{visibility:hidden!important}
 /* round 6: notices leave the way Bruno 2025's do: they wind up and shrink to nothing (0.45 s, cubic-bezier(.42,0,.47,-.55)) */
@@ -418,6 +419,41 @@ html.notice-up .bubble{visibility:hidden!important}
 /* a settings page arrives with a short rise (Bruno 2025's tab content: 0.15 s out, 0.15 s in) */
 .setp-page:not([hidden]){animation:pageIn .3s cubic-bezier(.2,.8,.2,1)}
 @keyframes pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* round 7: touch hygiene, as Bruno 2025's general.styl does it: no grey tap flash, no double-tap zoom (touch-action: manipulation),
+   no text selection or long-press callout on the game's own UI; the map's words and the letter stay selectable */
+*{-webkit-tap-highlight-color:transparent}
+html.has-world{touch-action:manipulation;overscroll-behavior:none} /* no pull-to-refresh or rubber band behind the world */
+html.has-world .hud,html.has-world .title,html.has-world #gl,.loader,.setp-head,.setp-tabs,.seg,.sw,.act,.tbtn,.joy,.exit,.toast,.award,.bubble,.trial,.ctx{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+/* Apple's HIG: every tap target at least 44 x 44 pt */
+html.coarse .plate-btn{min-height:44px;display:flex;flex-direction:column;justify-content:center}
+html.coarse .setp-x,html.coarse .setp-q{min-width:44px;height:44px}
+html.coarse .setp-tab{min-height:44px}
+html.coarse .stop-drive{min-height:44px;display:inline-flex;align-items:center}
+html.coarse .t-alts .t-map{padding:12px 2px}
+html.coarse .stop-name{padding:10px 0;margin:-10px 0}
+@media (max-width:380px){ /* the narrowest phones: the sheet's head drops its words to icons so the close button keeps its size */
+  .setp-q .q-word{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .setp-q{justify-content:center;padding:0}
+  .setp-head{gap:6px}
+}
+/* round 7: a phone on its side. Alto's Odyssey and Mini Motorways keep a landscape phone's HUD in the four corners and the middle for
+   the game; the notch and the home bar take a side each, so every corner respects its safe area */
+@media (pointer:coarse) and (max-height:500px){
+  html.js:not(.no-world):not(.from) .title{padding:10px max(16px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));gap:8px}
+  .t-go{min-height:52px;padding:12px 22px 10px;font-size:20px}
+  .plate{left:max(12px,env(safe-area-inset-left));top:max(10px,env(safe-area-inset-top))}
+  .tabs{right:env(safe-area-inset-right);top:max(10px,env(safe-area-inset-top))}
+  .setp{left:auto;right:env(safe-area-inset-right);top:0;bottom:0;width:min(380px,48vw);max-height:none;box-shadow:-2.5px 0 0 var(--ink);transform:translateX(40px);transform-origin:100% 50%}
+  .setp-head{padding-top:max(10px,env(safe-area-inset-top))}
+  .setp-body{flex:1;padding-bottom:max(16px,env(safe-area-inset-bottom))}
+  .exit,html.coarse .exit{width:min(460px,calc(100vw - 2 * max(12px,env(safe-area-inset-left)) - 300px));bottom:max(10px,env(safe-area-inset-bottom))}
+  html.coarse .ctx{bottom:max(12px,env(safe-area-inset-bottom))}
+  .toast,html.coarse .toast,.award,html.coarse .award{top:max(10px,env(safe-area-inset-top))}
+  .trial{top:max(10px,env(safe-area-inset-top))}
+  .joy{left:max(12px,env(safe-area-inset-left))}
+  .tbtns{right:max(16px,env(safe-area-inset-right))}
+  .atlas-bar{padding:10px max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left))}
+}
 </style>
 </head>
 <body>
@@ -490,7 +526,7 @@ html.notice-up .bubble{visibility:hidden!important}
 </div>
 
 <section class="setp" id="setPanel" role="dialog" aria-modal="false" aria-labelledby="setH" tabindex="-1">
-  <div class="setp-head"><h2 class="setp-h" id="setH">Settings</h2><button class="setp-q" id="qSound" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path class="q-wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span id="qSoundW">Sound off</span></button><button class="setp-q" id="qMap" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span>Map</span></button><button class="setp-x" id="setX" type="button" aria-label="Close settings">&times;</button></div>
+  <div class="setp-head"><h2 class="setp-h" id="setH">Settings</h2><button class="setp-q" id="qSound" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path class="q-wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span class="q-word" id="qSoundW">Sound off</span></button><button class="setp-q" id="qMap" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span class="q-word">Map</span></button><button class="setp-x" id="setX" type="button" aria-label="Close settings">&times;</button></div>
   <div class="setp-tabs" role="tablist" aria-label="Settings sections">
     <button class="setp-tab" role="tab" id="stab-drive" aria-controls="spage-drive" aria-selected="true" type="button">Driving</button>
     <button class="setp-tab" role="tab" id="stab-world" aria-controls="spage-world" aria-selected="false" tabindex="-1" type="button">World</button>
@@ -603,6 +639,7 @@ var FROM = HASH.indexOf('#from-') === 0 ? HASH.slice(6).replace(/\.html$/, '') :
 var mqRM = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : null;
 function RM() { return typeof SET === 'object' ? SET.rm : !!(mqRM && mqRM.matches); }
 var COARSE = !!(window.matchMedia && matchMedia('(pointer: coarse)').matches && ('ontouchstart' in window || navigator.maxTouchPoints > 0));
+var HAP_IOS = !('vibrate' in navigator) && typeof HTMLInputElement !== 'undefined' && 'switch' in HTMLInputElement.prototype; // round 7: see hapTick
 if (COARSE) html.classList.add('coarse');
 var byId = {}; STOPS.forEach(function (d, i) { d.index = i; byId[d.id] = d; });
 
@@ -625,7 +662,8 @@ var byId = {}; STOPS.forEach(function (d, i) { d.index = i; byId[d.id] = d; });
 (function photos() { var src = $('photo').getAttribute('src'); Array.prototype.forEach.call(doc.querySelectorAll('img.ph'), function (im) { if (!im.getAttribute('src')) im.setAttribute('src', src); }); })();
 // one notice at a time (Bruno 2025's Notifications: a queue, one card on screen): toasts and sticker cards wait their turn
 var NQ = [], nBusy = false;
-function narrowUI() { return innerWidth <= 760; }
+function narrowUI() { return innerWidth <= 760 || phoneLand(); }
+function phoneLand() { return COARSE && innerHeight <= 500 && innerWidth > innerHeight; } // round 7: a phone on its side gets the phone's quiet HUD, laid out for landscape
 function notice(it) {
   if (it.msg && NQ.some(function (q) { return q.msg === it.msg; })) return;
   NQ.push(it); while (NQ.length > 3) { var k = -1; for (var i = 0; i < NQ.length; i++) if (NQ[i].el === 'toast') { k = i; break; } NQ.splice(k < 0 ? 0 : k, 1); }
@@ -680,7 +718,7 @@ $('stops').addEventListener('focusin', function (e) { var li = e.target.closest(
 doc.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.hud button'); if (b && e.detail > 0 && b.id !== 'exitGo') setTimeout(function () { b.blur(); }, 0); });
 // ---------------------------------------------------------------- settings (round 4): they live for the visit only (no storage, a site rule)
 // Presented like Bruno 2025's Options (label left, one control right, one-line hint), in the hub's own slabs.
-var SET = { sens: 3, speed: 'normal', touch: 'point', assist: true, cam: 'mid', autoCam: true, vib: false, vol: 0, lastVol: 6, qual: 'auto', wx: 'live', rm: html.classList.contains('rm') };
+var SET = { sens: 3, speed: 'normal', touch: 'point', assist: true, cam: 'mid', autoCam: true, vib: COARSE && ('vibrate' in navigator || HAP_IOS), /* round 7: on by default on phones, like a native game's haptics */ vol: 0, lastVol: 6, qual: 'auto', wx: 'live', rm: html.classList.contains('rm') };
 function RMset() { return SET.rm; }
 var setOpen = false, setFocusBack = null;
 var TOUCH_HINT = { point: 'Push the stick the way you want to go on screen. Straight up follows the road.', steer: 'Left and right turn the wheel; up drives, down brakes and backs up.', tap: 'Tap a sign or a spot on the ground and the car drives itself there.' };
@@ -725,11 +763,11 @@ function setSetting(k, v) {
   syncSettingsUI(); if (W && W.onSetting) W.onSetting(k, v);
 }
 (function wireSettings() {
-  if (!('vibrate' in navigator)) { $('sVib').disabled = true; $('sVibH').textContent = 'This device can’t vibrate.'; }
+  if (!('vibrate' in navigator) && !HAP_IOS) { $('sVib').disabled = true; $('sVibH').textContent = 'This device can’t vibrate.'; }
   $('sSens').addEventListener('input', function () { setSetting('sens', +this.value); });
   $('sVol').addEventListener('input', function () { setSetting('vol', +this.value); if (+this.value) SET.lastVol = +this.value; });
   [['sSpeed', 'speed'], ['sTouch', 'touch'], ['sCam', 'cam'], ['sQual', 'qual'], ['sWx', 'wx']].forEach(function (p) { Array.prototype.forEach.call(doc.querySelectorAll('input[name="' + p[0] + '"]'), function (r) { r.addEventListener('change', function () { if (r.checked) setSetting(p[1], r.value); }); }); });
-  [['sAssist', 'assist'], ['sAuto', 'autoCam'], ['sVib', 'vib'], ['sRM', 'rm']].forEach(function (p) { $(p[0]).addEventListener('change', function () { setSetting(p[1], this.checked); if (p[1] === 'vib' && this.checked) try { navigator.vibrate(30); } catch (e) {} }); });
+  [['sAssist', 'assist'], ['sAuto', 'autoCam'], ['sVib', 'vib'], ['sRM', 'rm']].forEach(function (p) { $(p[0]).addEventListener('change', function () { setSetting(p[1], this.checked); if (p[1] === 'vib' && this.checked) buzz(30); }); });
   $('sRoad').addEventListener('click', function () { closeSettings(); if (W && W.resetCar) W.resetCar(); });
   $('sTidy').addEventListener('click', function () { if (W && W.tidy) W.tidy(); });
   html.classList.add('scheme-' + SET.touch);
@@ -808,7 +846,8 @@ var U = {
   // outlines that thin out with distance (Messenger's uOutlineFade), and see-through foliage round the car (Bruno 2025 Foliage.seeThrough)
   uFogC: { value: new C3() }, uFog: { value: new THREE.Vector2(20, 1 / 45) }, uOF: { value: new THREE.Vector2(18, 90) },
   uG0: { value: new C3() }, uG1: { value: new C3() }, uG2: { value: new C3() }, uG3: { value: new C3() },
-  uCarS: { value: new V3(.5, .5, 30) }, uAsp: { value: 1 }, uSee: { value: 0 }
+  uCarS: { value: new V3(.5, .5, 30) }, uAsp: { value: 1 }, uSee: { value: 0 },
+  uHitP: { value: new THREE.Vector4(0, 0, 0, 0) }, uHitD: { value: new V3() }
 };
 // GLSL shared by the solid, outline and ground shaders. The fog is worked out per vertex (it varies slowly; that keeps phones fast)
 var FOGV_GLSL = 'uniform vec3 uCam; uniform vec2 uFog; varying float vFog;\nfloat fogK(float d){ float x = max(0., d - uFog.x) * uFog.y; return (1. - exp(-x * x)) * .92; }\n' +
@@ -824,14 +863,14 @@ var ATMO_GLSL = [
   'bool seeThru(){ return vKeep < .999 && ign(gl_FragCoord.xy) > vKeep; }'].join('\n');
 
 // one shared wind (Bruno 2025, Wind.js: two scrolling noises along one direction) for tree canopies and grass tips
-var WIND_GLSL = 'uniform vec3 uWind; uniform float uWindT, uWindS, uR;\nfloat wn(vec3 p, float t){ return sin(p.x * .23 + t * 1.9) * sin(p.z * .19 + p.y * .11 + t * 1.3) * .6 + sin(dot(p, vec3(.07, .05, .09)) + t * .7) * .4; }\nvec3 sway(vec3 w, float amt){ vec3 n = normalize(w); float h = max(length(w) - uR, 0.); vec3 d = uWind - n * dot(uWind, n); return w + d * wn(w, uWindT) * uWindS * amt * h; }\n';
+var WIND_GLSL = 'uniform vec3 uWind; uniform float uWindT, uWindS, uR;\nfloat wn(vec3 p, float t){ return sin(p.x * .23 + t * 1.9) * sin(p.z * .19 + p.y * .11 + t * 1.3) * .6 + sin(dot(p, vec3(.07, .05, .09)) + t * .7) * .4; }\nuniform vec4 uHitP; uniform vec3 uHitD;\n// round 7: the object you just hit (a tree, a lamp) shakes: its whole kit leans from the ground up, on a damped spring set from JS\nvec3 wob(vec3 w, vec3 oc){ vec3 e = oc - uHitP.xyz; if (uHitP.w <= 0. || dot(e, e) > 1e-7) return w; return w + uHitD * max(length(w) - uR, 0.); }\nvec3 sway(vec3 w, float amt){ vec3 n = normalize(w); float h = max(length(w) - uR, 0.); vec3 d = uWind - n * dot(uWind, n); return w + d * wn(w, uWindT) * uWindS * amt * h; }\n';
 var TOON_V = [WIND_GLSL, FOGV_GLSL,
   'attribute float pal; attribute vec3 oc; varying float vPal; varying vec3 vN; varying vec3 vW; varying float vSw;',
   '#ifdef GROUND', 'attribute vec3 gv; varying vec3 vG;', '#endif',
   'void main(){ float sw = step(63.5, pal); vSw = sw; vPal = pal - sw * 64.; vec4 p = vec4(position, 1.); vec3 n = normal;',
   '#ifdef GROUND', ' vG = gv;', '#endif',
   '#ifdef USE_INSTANCING', ' p = instanceMatrix * p; n = mat3(instanceMatrix) * n;', '#endif',
-  ' vec4 w = modelMatrix * p; if (sw > .5) w.xyz = sway(w.xyz, .075); vW = w.xyz;', '#ifdef LOWQ', ' vFog = 0.;', '#else', ' vFog = fogK(length(uCam - w.xyz));', '#endif', ' vN = normalize(mat3(modelMatrix) * n); gl_Position = projectionMatrix * viewMatrix * w; vKeep = keepK(w.xyz, gl_Position, sw);', '#ifndef GROUND', ' if (dot(oc, oc) > .5 && dot(oc, normalize(uCam)) < uR / length(uCam) - .3) gl_Position = vec4(0., 0., 2., 1.);', '#endif', '}'].join('\n'); // round 6: whatever stands over the horizon is never rasterised (whole objects, by where they stand)
+  ' vec4 w = modelMatrix * p; if (sw > .5) w.xyz = sway(w.xyz, .075); w.xyz = wob(w.xyz, oc); vW = w.xyz;', '#ifdef LOWQ', ' vFog = 0.;', '#else', ' vFog = fogK(length(uCam - w.xyz));', '#endif', ' vN = normalize(mat3(modelMatrix) * n); gl_Position = projectionMatrix * viewMatrix * w; vKeep = keepK(w.xyz, gl_Position, sw);', '#ifndef GROUND', ' if (dot(oc, oc) > .5 && dot(oc, normalize(uCam)) < uR / length(uCam) - .3) gl_Position = vec4(0., 0., 2., 1.);', '#endif', '}'].join('\n'); // round 6: whatever stands over the horizon is never rasterised (whole objects, by where they stand)
 var TOON_F = [
   'uniform sampler2D uPal; uniform vec3 uL, uLight, uShadow, uRim, uCam, uRevDir, uRevCol, uPaper; uniform float uEmis, uRev; uniform float uR;',
   ATMO_GLSL,
@@ -885,7 +924,7 @@ var OUT_V = [WIND_GLSL, FOGV_GLSL,
   'void main(){ vec4 p = vec4(position, 1.); vec3 n = onormal; vSw = step(63.5, pal);',
   '#ifdef USE_INSTANCING', ' p = instanceMatrix * p; n = mat3(instanceMatrix) * n;', '#endif',
   // Messenger fades its outlines with distance (uOutlineFade 5..80): far off the line thins to half, so the limb and the title planet stay clean
-  ' vec4 w = modelMatrix * p; if (pal > 63.5) w.xyz = sway(w.xyz, .075); vW = w.xyz;', '#ifdef LOWQ', ' vFog = 0.;', '#else', ' vFog = fogK(length(uCam - w.xyz));', '#endif', ' vec4 mv = viewMatrix * w; vec3 vn = normalize(mat3(viewMatrix) * mat3(modelMatrix) * n);',
+  ' vec4 w = modelMatrix * p; if (pal > 63.5) w.xyz = sway(w.xyz, .075); w.xyz = wob(w.xyz, oc); vW = w.xyz;', '#ifdef LOWQ', ' vFog = 0.;', '#else', ' vFog = fogK(length(uCam - w.xyz));', '#endif', ' vec4 mv = viewMatrix * w; vec3 vn = normalize(mat3(viewMatrix) * mat3(modelMatrix) * n);',
   ' float z = -mv.z; mv.xyz += vn * clamp(uOW * z * mix(1., .5, smoothstep(uOF.x, uOF.y, z)), .008, .4); gl_Position = projectionMatrix * mv; vKeep = keepK(w.xyz, gl_Position, vSw);', ' if (dot(oc, oc) > .5 && (dot(oc, normalize(uCam)) < uR / length(uCam) - .3 || fogK(length(uCam - oc * uR)) > .6)) gl_Position = vec4(0., 0., 2., 1.);', // over the horizon, or lost in the haze
   '}'].join('\n');
 var OUT_F = ['uniform vec3 uOutline, uCam;', ATMO_GLSL, 'varying vec3 vW; varying float vSw;',
@@ -1004,7 +1043,11 @@ var statics = [], solids = [], sways = [], flats = [], shades = [];
 // round 6: contact shadows (Bruno 2019's Shadows.js: a soft rounded patch under every object, coloured, sine-faded at the rim).
 // They never flicker or acne, and cost one draw call for the whole planet.
 function shade(n, f, rx, rz, a, round, h) { shades.push({ n: n.clone().normalize(), f: f ? f.clone() : null, rx: rx, rz: rz, a: a == null ? .32 : a, rr: round == null ? 1 : round, h: h || 0 }); }
-function block(n, r, tag) { statics.push({ n: n.clone().normalize(), r: r, tag: tag || null }); }
+// round 7: statics are solid where you can see them (Bruno 2025 gives every tree, lamp, bench and building a fixed collider).
+// A static is a disc (r) or, for anything square, an oriented box (f, hw, hd) on the ground's tangent plane; r is then the box's
+// bounding radius. `pr` keeps the old footprint for placing the scatter, so the world is laid out exactly as before.
+function block(n, r, tag, o) { var s = { n: n.clone().normalize(), r: r, tag: tag || null, pr: r }; if (o) Object.assign(s, o); statics.push(s); return s; }
+function blockBox(n, f, hw, hd, tag, o) { var nn = n.clone().normalize(), ff = f.clone().sub(nn.clone().multiplyScalar(f.dot(nn))).normalize(); return block(nn, Math.hypot(hw, hd), tag, Object.assign({ f: ff, hw: hw, hd: hd, kind: 'box' }, o || {})); }
 function kitAt(kit, n, f, lift) { var parts = kit.bake(frameAt(n, f, lift)); parts.forEach(function (g) { (g.attributes.pal.array[0] > 63.5 ? sways : solids).push(g); }); }
 function localToN(n, f, x, z) { var F = frameAt(n, f); var p = new V3(x, 0, z).applyMatrix4(F); return p.normalize(); }
 
@@ -1220,6 +1263,19 @@ STOPS.forEach(function (d) {
   else if (d.id === 'everywhere') { circ(-2.8, -2.4, 2.3); circ(2.8, -2.4, 2.3); circ(6, -3, 1.3); circ(-9, -3.4, 1.1); circ(-9, -.6, 1); circ(-11, -2.4, .6); circ(-7, -2.4, .6); circ(3.4, 1.6, .5); }
   else if (d.id === 'weeks') { circ(0, -6.6, 1.1); }
   else if (d.id === 'contact') { circ(0, 0, .95); }
+  // round 7: the square parts are boxes, so their corners are solid too (the discs above round them off); benches and lamps on the
+  // plaza and the bridge's parapets had no collider at all. pr -99: none of these move the scatter
+  var fz = new V3(0, 0, 1).applyMatrix4(F).sub(new V3().applyMatrix4(F));
+  function bx(x, z, w, dd) { blockBox(new V3(x, 0, z).applyMatrix4(F), fz, w / 2 + .05, dd / 2 + .05, d.id, { pr: -99 }); }
+  function post(x, z, r) { block(new V3(x, 0, z).applyMatrix4(F), r, d.id, { pr: -99, kind: 'lamp', wob: .5, top: 3.4 }); }
+  if (d.id === 'bill') { bx(0, 0, 9, 6.4); bx(0, 3.4, 4, 1); }
+  else if (d.id === 'speech') bx(0, 0, 3.2, 2.4);
+  else if (d.id === 'n1') { bx(0, -1, 6, 4.2); bx(-4.6, 1.6, 1.7, 1.3); bx(2.1, 2.6, 1.2, 1); }
+  else if (d.id === 'triptik') { bx(-2.8, -1.4, 4, 3.4); bx(.9, .6, .7, .6); bx(2.7, .6, .7, .6); bx(5.4, 2.4, 2.2, .3); }
+  else if (d.id === 'os') bx(0, -1, 6.6, 5);
+  else if (d.id === 'everywhere') bx(0, -2.4, 9, 3.4);
+  else if (d.id === 'weeks') { bx(-6, -2, .8, 2.4); bx(6, 2, .8, 2.4); bx(0, -6.6, 1.7, 1.7); post(-6, 4, .2); post(6, -4, .2); }
+  else if (d.id === 'translation') [-1, 1].forEach(function (sd) { bx(sd * (ROAD_W / 2 + .45), 0, .7, 10.2); });
 });
 
 // ---------------------------------------------------------------- the two ends: a gantry over the start line and one over the finish
@@ -1265,7 +1321,10 @@ var roadSamples = RN.filter(function (_, i) { return i % 4 === 0; }).concat(road
 function farFromRoad(n, m) { var c = Math.cos(m / R); for (var i = 0; i < roadSamples.length; i++) if (roadSamples[i].dot(n) > c) return false; return true; }
 function farFromSites(n, m) { for (var i = 0; i < STOPS.length; i++) { var d = STOPS[i], r = { bill: 8, speech: 6, translation: 8, n1: 8, triptik: 9, os: 7.5, depths: 10, weeks: 9, everywhere: 13.5, contact: 3 }[d.id]; if (arc(d.site, n) < r + m) return false; } return true; }
 function farFromWater(n, m) { for (var i = 0; i < keepOut.length; i++) if (arc(keepOut[i].n, n) < keepOut[i].r + m) return false; return true; }
-function farFromStatics(n, m) { for (var i = 0; i < statics.length; i++) if (arc(statics[i].n, n) < statics[i].r + m) return false; return true; }
+function farFromStatics(n, m) { for (var i = 0; i < statics.length; i++) if (arc(statics[i].n, n) < statics[i].pr + m) return false; return true; }
+// round 7: a tree is solid out to its canopy at the car's height (the canopies hang low enough to meet the bonnet), not just its
+// thin trunk, so it can never be driven into; e = the canopy ellipsoid (radius across, radius up, centre height)
+function canopyAt(e, y0, y1) { var best = 0; for (var y = y0; y <= y1; y += .1) { var t = (y - e[2]) / e[1]; if (Math.abs(t) < 1) best = Math.max(best, e[0] * Math.sqrt(1 - t * t)); } return best; }
 function tree(n, kind, h, rot) {
   var k = new Kit(), W = 64; // canopy palette + 64: the vertex shader sways those parts in the wind (Bruno 2025's Wind.js)
   if (kind === 'almond') { k.add(G.cyl6, 6, 0, 0, 0, .28, h * .45, .28).add(G.blob, 21 + W, 0, h * .38, 0, h * .95, h * .7, h * .95).add(G.blob, 24 + W, .2, h * .55, .1, h * .6, h * .45, h * .6); }
@@ -1273,14 +1332,17 @@ function tree(n, kind, h, rot) {
   else if (kind === 'pine') { k.add(G.cyl6, 6, 0, 0, 0, .28, h * .3, .28).add(G.cone, 9 + W, 0, h * .2, 0, h * .7, h * .6, h * .7).add(G.cone, 9 + W, 0, h * .5, 0, h * .55, h * .55, h * .55); }
   else if (kind === 'maple') { k.add(G.cyl6, 6, 0, 0, 0, .3, h * .5, .3).add(G.ball, (h > 2.4 ? 26 : 22) + W, 0, h * .4, 0, h, h * .95, h).add(G.ball, 11 + W, -h * .2, h * .55, h * .1, h * .5, h * .45, h * .5); }
   kitAt(k, n, new V3(Math.cos(rot), 0, Math.sin(rot))); shade(n, null, h * (kind === 'pine' ? .4 : .52), h * (kind === 'pine' ? .4 : .52), .4, 1, h * .75);
-  block(n, .45);
+  var body = kind === 'pine' ? .35 * h * (1 - (Math.max(.3, .2 * h) - .2 * h) / (.6 * h)) // a cone: widest at its skirt, which sits under the bonnet
+    : canopyAt(kind === 'almond' ? [.475 * h, .35 * h, .73 * h] : kind === 'oak' ? [.55 * h, .475 * h, .855 * h] : [.5 * h, .475 * h, .875 * h], .3, 1.45);
+  var cr = kind === 'almond' ? .475 * h : kind === 'oak' ? .55 * h : kind === 'pine' ? .35 * h : .5 * h;
+  block(n, Math.max(.3, Math.min(1.35, body * .9)), null, { kind: 'tree', pr: .45, wob: cr, leaf: kind === 'almond' ? 21 : kind === 'oak' ? 8 : kind === 'pine' ? 9 : 22, top: h });
 }
 function house(n, f, brick, w, d, h) {
   var k = new Kit(), wall = brick ? 18 : 4;
   k.add(G.box, wall, 0, 0, 0, w, h, d).add(G.wedge, brick ? 14 : 5, 0, h, 0, w + .5, h * .55, d + .3);
   k.add(G.box, 15, -w * .25, h * .35, d / 2 + .02, w * .22, h * .3, .06).add(G.box, 15, w * .25, h * .35, d / 2 + .02, w * .22, h * .3, .06).add(G.box, brick ? 20 : 6, 0, 0, d / 2 + .02, w * .18, h * .55, .06);
   if (brick) k.add(G.box, 18, w * .3, h, -d * .1, .4, h * .75, .4);
-  kitAt(k, n, f); block(n, Math.max(w, d) * .6); shade(n, f, w * .6 + .15, d * .6 + .15, .38, .45, h * .8);
+  kitAt(k, n, f); blockBox(n, f, w / 2 + .06, d / 2 + .06, null, { pr: Math.max(w, d) * .6, kind: 'house' }); shade(n, f, w * .6 + .15, d * .6 + .15, .38, .45, h * .8);
 }
 var lampHeads = [], keepOut = [];
 // round 4: places kept clear for the new things: a bowling lane (Bruno 2019), a crate stack, the race line, and the locals (Messenger)
@@ -1313,7 +1375,7 @@ var SPOTS = { locals: [] };
     else {
       var d = byId[L.at], tf = roadTan(d.s), out = d.pad.clone().sub(roadAt(d.s)); out.sub(d.pad.clone().multiplyScalar(out.dot(d.pad))).normalize();
       var tries = [[2.6, 1.2], [2.6, -1.2], [1.4, 3.6], [1.4, -3.6], [3.4, 0]];
-      for (var k = 0; k < tries.length; k++) { n = moveOn(moveOn(d.pad, out, tries[k][0]), tf, tries[k][1]); var ok = true; for (var j = 0; j < statics.length; j++) if (arc(statics[j].n, n) < statics[j].r + .6) ok = false; if (ok) break; }
+      for (var k = 0; k < tries.length; k++) { n = moveOn(moveOn(d.pad, out, tries[k][0]), tf, tries[k][1]); var ok = true; for (var j = 0; j < statics.length; j++) if (arc(statics[j].n, n) < statics[j].pr + .6) ok = false; if (ok) break; }
       face = out.clone().negate();
     }
     L.n = n; L.face = face; L.index = i; SPOTS.locals.push(L); keepOut.push({ n: n, r: 1.4 });
@@ -1351,7 +1413,7 @@ var SPOTS = { locals: [] };
     placed++;
     var roll = r();
     if (roll < .1) { var near = nearestRoad(v), f = v.clone().sub(roadAt(near.s)).normalize().negate(); house(v, f, lat > 40, 2.6 + r(), 2.6 + r(), 2 + r() * .8); }
-    else if (roll < .16) { var kk = new Kit(); kk.add(G.blob, 17, 0, -.2, 0, 1 + r(), .8 + r() * .6, 1 + r(), r() * 3); kitAt(kk, v, null); block(v, .6); shade(v, null, .85, .85, .32, 1, .5); }
+    else if (roll < .16) { var kk = new Kit(), rx = 1 + r(), ry = .8 + r() * .6, rz = 1 + r(); kk.add(G.blob, 17, 0, -.2, 0, rx, ry, rz, r() * 3); kitAt(kk, v, null); block(v, Math.max(rx, rz) * .44, null, { pr: .6, kind: 'rock' }); shade(v, null, .85, .85, .32, 1, .5); } // round 7: a rock is as wide as it looks
     else { var kind = lat < -30 ? (r() < .5 ? 'almond' : 'oak') : lat > 38 ? (r() < .6 ? 'maple' : 'pine') : (r() < .75 ? 'oak' : 'pine'); tree(v, kind, 1.6 + r() * 1.5, r() * TAU); }
   }
   // lamp posts along the road, alternating sides
@@ -1359,7 +1421,7 @@ var SPOTS = { locals: [] };
     var side = (Math.round(s / 15) % 2) ? 1 : -1, nL = moveOn(roadAt(s), roadSide(s).multiplyScalar(side), ROAD_W / 2 + .9);
     if (!farFromSites(nL, -2) || STOPS.some(function (d) { return Math.abs(d.s - s) < (d.side === side ? 12 : 8); }) || !farFromWater(nL, .5) || paved(nL, .6) || s < START_S + 6 || s > FINISH_S - 6) continue;
     var kl = new Kit(); kl.add(G.box, 17, 0, 0, 0, .34, .22, .34).add(G.cyl6, 7, 0, 0, 0, .13, 3.6, .13).add(G.box, 7, 0, 3.5, -.42, .1, .1, 1).add(G.box, 14, 0, 3.36, -.9, .4, .16, .56).add(G.box, 25, 0, 3.28, -.9, .32, .08, .46); // round 6: a slim grey post on a footing, the lamp under a dark hood (it used to read as a heavy black 7)
-    kitAt(kl, nL, roadSide(s).multiplyScalar(side)); block(nL, .25); shade(nL, null, .3, .3, .3, 1, .2);
+    kitAt(kl, nL, roadSide(s).multiplyScalar(side)); block(nL, .25, null, { kind: 'lamp', wob: .6, top: 3.6 }); shade(nL, null, .3, .3, .3, 1, .2);
     lampHeads.push(new V3(0, 3.25, -.9).applyMatrix4(frameAt(nL, roadSide(s).multiplyScalar(side))));
   }
 })();
@@ -1523,16 +1585,22 @@ var GRAV = 16;
 pw.addEventListener('preStep', function () { for (var i = 0; i < dyn.length; i++) { var b = dyn[i].b; if (!b || b.sleepState === CANNON.Body.SLEEPING) continue; groundUnder(dyn[i]); var p = b.position, l = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z) || 1, g = GRAV * b.mass / l; b.force.x -= p.x * g; b.force.y -= p.y * g; b.force.z -= p.z * g; if (l < R - 2 || l > R + 60) { dyn[i].lost = true; } pushOffStatics(b, l); } });
 // rocks, trees, houses, lamps and landmarks are solid to everything that tumbles (the letters, crates, pins), not just to the car:
 // the same push-out the car gets, done in the step so bodies slide off them instead of passing through
-var _sn = new V3(), _sa = new V3();
+var _sn = new V3(), _sa = new V3(), _sf = new V3(), _ss = new V3();
 function pushOffStatics(b, l) {
   if (l - R > 4.5) return; // flying over the rooftops
   var p = b.position, rad = Math.min(1.6, (b.boundingRadius || .6) * .7);
   _sn.set(p.x / l, p.y / l, p.z / l);
   for (var k = 0; k < statics.length; k++) {
-    var s = statics[k], min = s.r + rad; if (_sn.dot(s.n) < Math.cos(min / R)) continue;
-    var d = arc(_sn, s.n); if (d >= min) continue;
-    _sa.copy(_sn).addScaledVector(s.n, -_sn.dot(s.n)); if (_sa.lengthSq() < 1e-8) _sa.set(1, 0, 0); _sa.normalize();
-    var nn = moveOn(s.n, _sa, min); p.set(nn.x * l, nn.y * l, nn.z * l); _sn.copy(nn);
+    var s = statics[k]; if (s.off && s.off()) continue; if (_sn.dot(s.n) < Math.cos((s.r + rad) / R)) continue;
+    // round 7: the same shapes the car collides with (a disc, or a box), grown by the body's radius
+    _sf.set(0, 1, 0).cross(_sn); if (_sf.lengthSq() < 1e-6) _sf.set(1, 0, 0); _sf.normalize(); _ss.copy(_sf).cross(_sn).normalize();
+    var hit = staticPen(s, _sn, _sf, _ss, 0, 0), pen, nrm;
+    if (s.f) { if (!hit) { hit = null; } // a point inside the box: push out; a point outside it, check the rounded margin
+      if (!hit) { _d.copy(s.n).addScaledVector(_sn, -s.n.dot(_sn)).multiplyScalar(R); _bs.copy(s.f).cross(_sn).normalize(); var bx = _d.dot(_bs), bz = _d.dot(s.f), qx = clamp(-bx, -s.hw, s.hw), qz = clamp(-bz, -s.hd, s.hd), ex = -bx - qx, ez = -bz - qz, ed = Math.hypot(ex, ez); if (ed >= rad || ed < 1e-5) continue; pen = rad - ed; _sa.copy(_bs).multiplyScalar(ex / ed).addScaledVector(s.f, ez / ed); }
+      else { pen = hit.pen + rad; _sa.copy(hit.nrm).negate(); }
+    } else { _d.copy(s.n).addScaledVector(_sn, -s.n.dot(_sn)).multiplyScalar(R); var dd = _d.length(); if (dd >= s.r + rad) continue; pen = s.r + rad - dd; if (dd > 1e-5) _sa.copy(_d).multiplyScalar(-1 / dd); else _sa.copy(_sf); }
+    _sa.addScaledVector(_sn, -_sa.dot(_sn)).normalize();
+    var nn = moveOn(_sn, _sa, pen); p.set(nn.x * l, nn.y * l, nn.z * l); _sn.copy(nn);
     var v = b.velocity, into = v.x * _sa.x + v.y * _sa.y + v.z * _sa.z; if (into < 0) { var k2 = into * 1.35; v.x -= _sa.x * k2; v.y -= _sa.y * k2; v.z -= _sa.z * k2; }
   }
 }
@@ -1617,7 +1685,15 @@ var auto = null; // { n: target point, d: stop or null }
 var state = 'boot', near = null, drove = false, lastSpace = 0, stickyNear = null, stickyT = 0;
 var SPEED_K = { calm: .78, normal: 1, fast: 1.25 }, SENS_K = [0, .62, .8, 1, 1.2, 1.42], CAM_Z = { near: 0, mid: .16, far: .46 };
 function playing() { return state === 'play' && !mapIsOpen && !letterOpen && !setOpen; }
-function buzz(ms) { if (SET.vib && navigator.vibrate) try { navigator.vibrate(ms); } catch (e) {} }
+// round 7: haptics. Android has the Vibration API; Safari on iOS never shipped it, but since Safari 17.4 a native switch
+// (<input type=checkbox switch>) ticks the Taptic Engine when it flips, and a click on its label flips it (the ios-haptics
+// technique). It only fires inside a tap on some iOS versions, so it is a bonus there, never relied on
+var hapL = null, hapT = 0;
+function hapTick() {
+  if (!hapL) { var w = doc.createElement('div'); w.setAttribute('aria-hidden', 'true'); w.style.cssText = 'position:fixed;left:-99px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none'; w.innerHTML = '<input type="checkbox" switch id="hapSw" tabindex="-1"><label for="hapSw" id="hapL">.</label>'; doc.body.appendChild(w); hapL = $('hapL'); }
+  var t = performance.now(); if (t - hapT < 70) return; hapT = t; try { hapL.click(); } catch (e) {}
+}
+function buzz(ms) { if (!SET.vib) return; if (navigator.vibrate) try { navigator.vibrate(ms); } catch (e) {} else if (HAP_IOS) hapTick(); }
 var KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'], konamiI = 0, konamiN = 0;
 function konamiStep(k) { if (k === KONAMI[konamiI]) { konamiI++; if (konamiI === KONAMI.length || (COARSE && konamiI === 8)) { konamiI = 0; rainOranges(); } } else konamiI = k === KONAMI[0] ? 1 : 0; }
 function onKey(e, down) {
@@ -1788,8 +1864,41 @@ function autoInput(inp) {
     if (Math.abs(ps - cr.s) > 7) { var dir = Math.sign(ps - cr.s); tgt = roadAt(cr.s + dir * (cr.d > 2.5 ? 3 : 6.5)); }
   }
   var w = tgt.clone().sub(car.n.clone().multiplyScalar(tgt.dot(car.n))); if (w.lengthSq() < 1e-8) return; inp.want = w.normalize();
+  // round 7: Tap to go steers round whatever stands in its lane (a tree between you and the spot you tapped), then carries on
+  var ah = staticAhead(Math.min(dist, 6), .35, inp.want); if (ah && ah.fz < dist * .9) inp.want.applyAxisAngle(car.n, (ah.lx > 0 ? 1 : -1) * clamp(1.4 - ah.fz * .15, .5, 1.2));
   inp.thr = dist < 7 ? clamp(dist / 7, .3, 1) : 1;
   if (dist < 4 && car.v > 4) inp.thr = 0;
+}
+// round 7: collision shapes. The car's footprint is its body out to the wheels (0.86) and bumpers (1.32); statics are discs or boxes
+var CAR_HW = .86, CAR_HL = 1.32, _sx = new V3(), _vel = new V3(), _d = new V3(), _bs = new V3(), _pn = { pen: 0, nrm: new V3() };
+// how far a box (centre n, axes f / sx, half sizes hw / hl; hw = hl = 0 for a point) overlaps static s, and the direction from it to s
+function staticPen(s, n, f, sx, hw, hl) {
+  _d.copy(s.n).addScaledVector(n, -s.n.dot(n)).multiplyScalar(R); // the static's centre, on the tangent plane, in world units
+  if (!s.f) { // a disc: the closest point of the box to its centre
+    var lx = _d.dot(sx), lz = _d.dot(f), qx = clamp(lx, -hw, hw), qz = clamp(lz, -hl, hl), dx = lx - qx, dz = lz - qz, dd = Math.hypot(dx, dz);
+    if (dd >= s.r) return null;
+    if (dd > 1e-4) { _pn.pen = s.r - dd; _pn.nrm.copy(sx).multiplyScalar(dx / dd).addScaledVector(f, dz / dd); }
+    else { var px = hw - Math.abs(lx) + s.r, pz = hl - Math.abs(lz) + s.r; if (px < pz) { _pn.pen = px; _pn.nrm.copy(sx).multiplyScalar(lx < 0 ? -1 : 1); } else { _pn.pen = pz; _pn.nrm.copy(f).multiplyScalar(lz < 0 ? -1 : 1); } }
+  } else { // a box: separating axes (the car's two and the static's two), the least overlap wins
+    _bs.copy(s.f).cross(n).normalize(); var bf = s.f, best = 1e9, bi = null, sg = 1, axes = [sx, f, _bs, bf];
+    for (var k = 0; k < 4; k++) {
+      var a = axes[k], c = _d.dot(a), ext = hw * Math.abs(sx.dot(a)) + hl * Math.abs(f.dot(a)) + s.hw * Math.abs(_bs.dot(a)) + s.hd * Math.abs(bf.dot(a)), ov = ext - Math.abs(c);
+      if (ov <= 0) return null; if (ov < best) { best = ov; bi = a; sg = c < 0 ? -1 : 1; }
+    }
+    _pn.pen = best; _pn.nrm.copy(bi).multiplyScalar(sg);
+  }
+  _pn.nrm.addScaledVector(n, -_pn.nrm.dot(n)).normalize(); return _pn;
+}
+// the first static in the lane ahead of the car (within `look` units, closer than `pad` to either side of the footprint)
+function staticAhead(look, pad, dir) {
+  var fw = dir || car.f, sx = fw.clone().cross(car.n).normalize(), best = null;
+  for (var i = 0; i < statics.length; i++) {
+    var s = statics[i]; if (s.off && s.off()) continue; if (car.n.dot(s.n) < Math.cos((look + s.r + 2) / R)) continue;
+    _d.copy(s.n).addScaledVector(car.n, -s.n.dot(car.n)).multiplyScalar(R); var fz = _d.dot(fw), lx = _d.dot(sx);
+    if (fz < 0 || fz > look + s.r) continue; if (Math.abs(lx) > CAR_HW + s.r + pad) continue;
+    if (!best || fz < best.fz) best = { s: s, fz: fz, lx: lx };
+  }
+  return best;
 }
 var _ax = new V3(), _qq = new Q(), lastHit = 0, travel = new V3(), stuck = { d: 0, t: 0, shown: false }, slide = 0;
 function updateCar(dt) {
@@ -1815,7 +1924,7 @@ function updateCar(dt) {
   // road assist: driving straight on the road, the nose follows the road's curve
   if (SET.assist && v > 1.5 && Math.abs(car.steer) < .06 && !inp.want) {
     var rn = nearestRoad(car.n);
-    if (rn.d < ROAD_W / 2 + 1.2) { var tf = roadTan(rn.s); if (tf.dot(car.f) < 0) tf.negate(); var ra = sAng(car.f, tf, car.n), lim = touch || inp.straight ? .42 : .2; if (Math.abs(ra) < lim) { var off = car.n.clone().sub(roadAt(rn.s)).dot(tf.clone().cross(car.n)) * R; yaw += clamp((ra + clamp(off * .3, -.3, .3)) * 2.6, -.9, .9); } } // hold the nose to the curve, and ease back toward the middle
+    if (rn.d < ROAD_W / 2 + 1.2) { var tf = roadTan(rn.s); if (tf.dot(car.f) < 0) tf.negate(); var ra = sAng(car.f, tf, car.n), lim = touch || inp.straight ? .42 : .2; if (Math.abs(ra) < lim) { var off = car.n.clone().sub(roadAt(rn.s)).dot(tf.clone().cross(car.n)) * R, ay = clamp((ra + clamp(off * .3, -.3, .3)) * 2.6, -.9, .9); if (!staticAhead(3 + v * .45, .2, car.f.clone().applyAxisAngle(car.n, ay * .5))) yaw += ay; } } // round 7: the assist never turns you toward a post, a tree or a gate // hold the nose to the curve, and ease back toward the middle
   }
   _qq.setFromAxisAngle(car.n, yaw * dt); car.f.applyQuaternion(_qq);
   // slip: the direction of travel lags the nose; grip pulls it back (much less while drifting)
@@ -1825,14 +1934,21 @@ function updateCar(dt) {
   var prevN = car.n.clone();
   _ax.copy(car.n).cross(travel).normalize(); _qq.setFromAxisAngle(_ax, car.v * dt / R); car.n.applyQuaternion(_qq).normalize(); car.f.applyQuaternion(_qq);
   car.f.sub(car.n.clone().multiplyScalar(car.f.dot(car.n))).normalize();
-  // statics: push out and slide along; head-on loses the speed, a glance keeps most of it
+  // statics (round 7): the car is its real footprint (a box to the wheels and bumpers), every static is a disc or a box, and a hit is a
+  // collision, not a slow squeeze: the part of the velocity going into the object goes (and a little bounces back), the part along it
+  // stays, so a glance slides by and a head-on stop is a stop. Bruno 2025: trees, poles and benches are fixed colliders you bump off.
+  _sx.copy(car.f).cross(car.n).normalize();
   for (var i = 0; i < statics.length; i++) {
-    var s = statics[i], c = Math.cos((s.r + 1.15) / R); if (car.n.dot(s.n) < c) continue;
-    var dist = arc(car.n, s.n), min = s.r + 1.15, away = car.n.clone().sub(s.n.clone().multiplyScalar(car.n.dot(s.n))); if (away.lengthSq() < 1e-8) away = car.f.clone().negate(); away.normalize();
-    car.n.copy(moveOn(car.n, away, min - dist)); car.f.sub(car.n.clone().multiplyScalar(car.f.dot(car.n))).normalize();
-    var head = -away.dot(travel), into = head * car.v;
-    if (into > 3 && performance.now() - lastHit > 300) { lastHit = performance.now(); sfx('carHit', into); kickCam(into * .012); car.pv -= into * .15; car.hyv -= into * .05; buzz(Math.min(60, into * 5)); }
-    if (into > 0) { car.v *= 1 - clamp(head, 0, 1) * Math.min(1, dt * 12); slide *= .9; }
+    var s = statics[i]; if (s.off && s.off()) continue;
+    if (car.n.dot(s.n) < Math.cos((s.r + 1.7) / R)) continue;
+    var hit = staticPen(s, car.n, car.f, _sx, CAR_HW, CAR_HL); if (!hit) continue;
+    car.n.copy(moveOn(car.n, hit.nrm, -hit.pen)); car.f.sub(car.n.clone().multiplyScalar(car.f.dot(car.n))).normalize(); _sx.copy(car.f).cross(car.n).normalize();
+    _vel.copy(travel).multiplyScalar(car.v); var into = _vel.dot(hit.nrm);
+    if (into > 0) {
+      var e = into > 3 ? .22 : 0; _vel.addScaledVector(hit.nrm, -into * (1 + e)); // restitution: a hard hit rocks you back a touch
+      car.v = _vel.dot(car.f); slide *= .5;
+      if (into > 2.2 && performance.now() - (s.hitT || 0) > 350) { s.hitT = performance.now(); bumpStatic(s, into, hit.nrm); }
+    }
     if (s.tag === 'contact') bumpMailbox(Math.abs(into) + 1);
   }
   // hop and landing
@@ -1916,6 +2032,29 @@ function bumpMailbox(v) { mailBump = Math.min(1, mailBump + v * .1); if (perform
 // ---------------------------------------------------------------- camera: follows and keeps the ground under it; the Map is the planet from orbit
 // Messenger: it swings behind the car on its own, but only while moving. While a thumb points somewhere, it holds still (no circling).
 function kickCam(a) { if (RM()) return; cam.rollV += (Math.random() < .5 ? -1 : 1) * a * 6; }
+// round 7: a bump you feel (Bruno 2025's hitDefault on every fixed collider, plus the car's own springs): the thud scales with the
+// speed into it, the camera rocks, the body pitches and heaves, the phone buzzes; a tree shakes and drops a burst of its leaves,
+// a lamp post rings like a spring
+var wobS = { s: null, t: 0, amp: 0, dir: new V3() };
+function bumpStatic(s, into, nrm) {
+  lastHit = performance.now(); var k = clamp(into / 12, 0, 1);
+  sfx('carHit', into); kickCam(.02 + k * .05); car.pv -= into * .16; car.hyv -= into * .07; buzz(Math.round(18 + k * 50));
+  if (s.wob && !RM()) { wobS.s = s; wobS.t = 0; wobS.amp = (s.kind === 'lamp' ? .05 : .09) * (.35 + k); wobS.dir.copy(nrm); }
+  if (s.kind === 'tree') leafBurst(s, k);
+  else if (s.kind === 'rock' || s.kind === 'house' || s.f) dustAt(moveOn(car.n, nrm, CAR_HL * .8), 3 + Math.round(k * 4), .6);
+  if (into > 7 && s.kind === 'tree') award('bonk');
+}
+function updateWob(dt) {
+  if (!wobS.s) { U.uHitP.value.w = 0; return; }
+  wobS.t += dt; if (wobS.t > 1.6) { wobS.s = null; U.uHitP.value.w = 0; return; }
+  var a = wobS.amp * Math.sin(wobS.t * 17) * Math.exp(-wobS.t * 3.6); // a damped spring, about 2.7 swings a second
+  U.uHitP.value.set(wobS.s.n.x, wobS.s.n.y, wobS.s.n.z, 1); U.uHitD.value.copy(wobS.dir).multiplyScalar(a);
+}
+function leafBurst(s, k) {
+  if (RM()) return; var i = s.leaf * 4, col = new C3(palData[i] / 255, palData[i + 1] / 255, palData[i + 2] / 255);
+  var top = s.n.clone().multiplyScalar(R + Math.max(1.2, (s.top || 2) * .7));
+  confetti(top, 8 + Math.round(k * 14), 2.2 + k * 2, [col, col.clone().multiplyScalar(.82), col.clone().lerp(new C3(1, 1, 1), .25)], { drag: 3.2, g: 5, spread: .8 + (s.wob || 1) * .5 });
+}
 function aspectK() { return camera.aspect < 1 ? Math.pow(1 / camera.aspect, .55) : 1; }
 function playPose(dt, out) {
   out.dt = dt;
@@ -1970,7 +2109,7 @@ function updateCamera(dt, t) {
     cam.pos.lerp(pose.pos, Math.min(1, kp)); cam.tgt.lerp(pose.tgt, Math.min(1, kt)); camUp.lerp(pose.up, Math.min(1, dt * 5)).normalize();
   }
   // panels: the map sits on the left on wide screens (shift the planet right); the settings sheet covers a phone's lower half (lift the car)
-  var wantX = state === 'map' && innerWidth > 760 ? Math.min(560, innerWidth * .4) / 2 : 0, wantY = setOpen && innerWidth <= 760 ? innerHeight * .24 : 0;
+  var land = phoneLand(), wantX = state === 'map' && innerWidth > 760 ? Math.min(560, innerWidth * .4) / 2 : setOpen && land ? -Math.min(380, innerWidth * .48) / 2 : 0, wantY = setOpen && innerWidth <= 760 && !land ? innerHeight * .24 : 0; // round 7: on a phone on its side the sheet is on the right, so the car moves left
   cam.offX += (wantX - cam.offX) * Math.min(1, dt * 5); cam.offY += (wantY - cam.offY) * Math.min(1, dt * 5);
   if (Math.abs(cam.offX) > .5 || Math.abs(cam.offY) > .5) camera.setViewOffset(innerWidth, innerHeight, -cam.offX, cam.offY, innerWidth, innerHeight); else if (camera.view && camera.view.enabled) camera.clearViewOffset();
   applyCam(cam.pos.clone(), cam.tgt, camUp);
@@ -1982,6 +2121,7 @@ var PREVIEWS = [null, 6.8, 12.5, 18.6, 22.5];
 function nowH() { var d = new Date(); return d.getHours() + d.getMinutes() / 60 + d.getSeconds() / 3600; }
 function hourNow() { return tod.anim != null ? tod.anim : tod.preview != null ? tod.preview : nowH(); }
 function phaseName(h) { return h < 5.2 || h >= 21 ? 'night' : h < 7.6 ? 'dawn' : h < 17.4 ? 'day' : h < 19.6 ? 'dusk' : 'night'; }
+var themeMeta = doc.querySelector('meta[name=theme-color]');
 var blend = { cols: PAL_BASE.map(function (c) { return new C3(c); }), light: new C3(), shadow: new C3(), rim: new C3(), outline: new C3(), reveal: new C3(), paint: new C3(), paper: new C3(), sky: [new C3(), new C3()], emis: 0, stars: 0 };
 function sampleTod(h) {
   h = ((h % 24) + 24) % 24; var a = KEYS[0], b = KEYS[1];
@@ -2004,7 +2144,7 @@ function applyTod() {
   stars.visible = blend.stars > .01; lampGlow.visible = car.beam.visible = blend.emis > .01; // round 6: nothing invisible is drawn
   paintMesh.material.color.copy(blend.paint);
   var key = blend.sky[0].getHexString() + blend.sky[1].getHexString();
-  if (key !== lastTodKey) { lastTodKey = key; html.style.setProperty('--sky-a', '#' + blend.sky[0].getHexString()); html.style.setProperty('--sky-b', '#' + blend.sky[1].getHexString()); }
+  if (key !== lastTodKey) { lastTodKey = key; html.style.setProperty('--sky-a', '#' + blend.sky[0].getHexString()); html.style.setProperty('--sky-b', '#' + blend.sky[1].getHexString()); if (themeMeta) themeMeta.setAttribute('content', '#' + blend.sky[1].getHexString()); } // round 7: the phone's status bar and toolbar take the sky's colour, so a night drive isn't framed in daylight blue
   var d = new Date(), hh = tod.preview != null || tod.anim != null ? h : d.getHours() + d.getMinutes() / 60;
   var H = Math.floor(hh) % 24, Mi = Math.floor((hh - Math.floor(hh)) * 60);
   var ct = ((H % 12) || 12) + ':' + (Mi < 10 ? '0' : '') + Mi + (H < 12 ? ' AM' : ' PM'), pt = (tod.preview != null ? 'trying: ' : 'your time: ') + phaseName(h);
@@ -2049,7 +2189,9 @@ function setVolume(v) {
 }
 function toggleSound() { setSetting('vol', SET.vol ? 0 : SET.lastVol || 6); }
 $('soundBtn').addEventListener('click', toggleSound); $('qSound').addEventListener('click', toggleSound);
-doc.addEventListener('visibilitychange', function () { if (AU.ctx) { if (doc.hidden) AU.ctx.suspend(); else if (AU.on) AU.ctx.resume(); } if (doc.hidden) stopLoop(); else startLoop(); });
+doc.addEventListener('visibilitychange', function () { if (AU.ctx) { if (doc.hidden) AU.ctx.suspend(); else if (AU.on) AU.ctx.resume(); } if (doc.hidden) { stopLoop(); clearCtl(); } else startLoop(); }); // round 7: a thumb or a key that was down when the tab went away is let go (a car never drives off on its own on return)
+addEventListener('pagehide', function () { if (AU.ctx) AU.ctx.suspend(); stopLoop(); });
+addEventListener('pageshow', function (e) { if (e.persisted && !doc.hidden) { if (AU.ctx && AU.on) AU.ctx.resume(); startLoop(); } }); // back-forward cache: the world comes back running
 function engineSound() {
   if (!AU.on || !AU.engine) return;
   var e = AU.engine, c = AU.ctx, t = c.currentTime, target = clamp(Math.abs(car.v) / 14 + Math.abs((car.input && car.input.thr) || 0) * .25 + (car.boost ? .15 : 0), 0, 1.3); // Bruno 2025: pitch follows the throttle as well as the speed
@@ -2145,9 +2287,10 @@ var intro = null;
 function layoutTitleLetters() {
   var vf = camera.fov * DEG, dz = 30, vh = 2 * dz * Math.tan(vf / 2), vw = vh * camera.aspect;
   var lw = 5 * BLK, gap = .9 * BLK, rg = 1.4 * BLK, rowW = 5 * lw + 4 * gap, colH = 2 * lw + rg;
-  var sc = Math.min(vw * .78 / rowW, vh * .4 / colH);
+  var short = innerHeight <= 500 && innerWidth > innerHeight; // round 7: a phone on its side: the name sits in the top 60%, clear of the start button
+  var sc = short ? Math.min(vw * .56 / rowW, vh * .4 / colH) : Math.min(vw * .78 / rowW, vh * .4 / colH), lift = short ? .18 : .05;
   letters.forEach(function (o) {
-    var x = (o.col - 2) * (lw + gap) * sc, y = (o.row ? -1 : 1) * (lw + rg) / 2 * sc + vh * .05;
+    var x = (o.col - 2) * (lw + gap) * sc, y = (o.row ? -1 : 1) * (lw + rg) / 2 * sc + vh * lift;
     o.title = { pos: new V3(x, y, -dz), scale: sc };
   });
 }
@@ -2295,15 +2438,16 @@ function updatePuffs(dt) {
   puffGeo.attributes.position.needsUpdate = true; puffGeo.attributes.aSize.needsUpdate = true; puffGeo.attributes.aAlpha.needsUpdate = true;
 }
 var CONF = 150, conf = [], confI = 0, confMesh = new THREE.InstancedMesh(new THREE.BoxGeometry(.14, .03, .22), new THREE.MeshBasicMaterial({ color: '#ffffff' }), CONF), confCols = ['#e0533d', '#f2c23a', '#4a86cf', '#3fa7a1', '#fdfbf5', '#f08a3c'].map(function (c) { return new C3(c); });
-(function () { var z = new M4().makeScale(0, 0, 0); for (var i = 0; i < CONF; i++) { confMesh.setMatrixAt(i, z); confMesh.setColorAt(i, confCols[i % confCols.length]); conf.push({ p: new V3(), v: new V3(), q: new Q(), w: new V3(), life: 1, max: 1 }); } confMesh.frustumCulled = false; scene.add(confMesh); })();
-function confetti(at, count, up) {
-  if (RM()) return; var n = at.clone().normalize();
-  for (var i = 0; i < count; i++) { var o = conf[confI++ % CONF], side = new V3(Math.random() - .5, Math.random() - .5, Math.random() - .5); side.sub(n.clone().multiplyScalar(side.dot(n))).normalize(); o.p.copy(at); o.v.copy(n).multiplyScalar((up || 7) * (.7 + Math.random() * .6)).addScaledVector(side, 1.5 + Math.random() * 3); o.q.setFromEuler(new THREE.Euler(Math.random() * 6, Math.random() * 6, Math.random() * 6)); o.w.set(Math.random() - .5, Math.random() - .5, Math.random() - .5).multiplyScalar(12); o.life = 0; o.max = 1.8 + Math.random(); }
+(function () { var z = new M4().makeScale(0, 0, 0); for (var i = 0; i < CONF; i++) { confMesh.setMatrixAt(i, z); confMesh.setColorAt(i, confCols[i % confCols.length]); conf.push({ p: new V3(), v: new V3(), q: new Q(), w: new V3(), life: 1, max: 1, g: 14, drag: 1.6, spread: 1 }); } confMesh.frustumCulled = false; scene.add(confMesh); })();
+function confetti(at, count, up, cols, opt) { // round 7: also leaves (their own colours, lighter and slower: they flutter down)
+  if (RM()) return; var n = at.clone().normalize(); opt = opt || {};
+  for (var i = 0; i < count; i++) { var ci = confI % CONF, o = conf[confI++ % CONF]; confMesh.setColorAt(ci, cols ? cols[i % cols.length] : confCols[ci % confCols.length]); o.drag = opt.drag || 1.6; o.g = opt.g || 14; o.spread = opt.spread || 1; var side = new V3(Math.random() - .5, Math.random() - .5, Math.random() - .5); side.sub(n.clone().multiplyScalar(side.dot(n))).normalize(); o.p.copy(at); o.v.copy(n).multiplyScalar((up || 7) * (.7 + Math.random() * .6)).addScaledVector(side, (1.5 + Math.random() * 3) * o.spread); if (opt.spread) o.p.addScaledVector(side, Math.random() * o.spread); o.q.setFromEuler(new THREE.Euler(Math.random() * 6, Math.random() * 6, Math.random() * 6)); o.w.set(Math.random() - .5, Math.random() - .5, Math.random() - .5).multiplyScalar(12); o.life = 0; o.max = 1.8 + Math.random(); }
+  if (confMesh.instanceColor) confMesh.instanceColor.needsUpdate = true;
 }
 var _cm = new M4(), _cs = new V3(1, 1, 1), _cz = new V3(0, 0, 0), _cq = new Q(), _ce = new THREE.Euler();
 function updateConfetti(dt) {
   var any = false;
-  for (var i = 0; i < CONF; i++) { var o = conf[i]; if (o.life >= o.max) continue; any = true; o.life += dt; var l = o.p.length(); o.v.addScaledVector(o.p, -14 * dt / l); o.v.multiplyScalar(1 - 1.6 * dt); o.p.addScaledVector(o.v, dt); if (o.p.length() < R + .03) { o.p.setLength(R + .03); o.v.multiplyScalar(0); o.w.multiplyScalar(0); } _ce.set(o.w.x * dt, o.w.y * dt, o.w.z * dt); o.q.multiply(_cq.setFromEuler(_ce)); _cm.compose(o.p, o.q, o.life >= o.max ? _cz : _cs); confMesh.setMatrixAt(i, _cm); }
+  for (var i = 0; i < CONF; i++) { var o = conf[i]; if (o.life >= o.max) continue; any = true; o.life += dt; var l = o.p.length(); o.v.addScaledVector(o.p, -o.g * dt / l); o.v.multiplyScalar(1 - o.drag * dt); o.p.addScaledVector(o.v, dt); if (o.p.length() < R + .03) { o.p.setLength(R + .03); o.v.multiplyScalar(0); o.w.multiplyScalar(0); } _ce.set(o.w.x * dt, o.w.y * dt, o.w.z * dt); o.q.multiply(_cq.setFromEuler(_ce)); _cm.compose(o.p, o.q, o.life >= o.max ? _cz : _cs); confMesh.setMatrixAt(i, _cm); }
   if (any || confMesh.userData.any) confMesh.instanceMatrix.needsUpdate = true; confMesh.visible = any || confMesh.userData.any; confMesh.userData.any = any;
 }
 // rain (streaks falling to the centre) and snow (flakes) in a box that follows the camera's target
@@ -2490,6 +2634,7 @@ var STICKERS = [
   ['cones', 'Cone zone', 'Send five cones flying.', '#f08a3c'],
   ['strike', 'Strike', 'Knock down all ten pins at the lane.', '#4a86cf'],
   ['drift', 'Sideways', 'Slide the car for a second (brake while turning).', '#b98ad0'],
+  ['bonk', 'Knock on wood', 'Drive into a tree, hard. It will shake it off.', '#7cc06a'],
   ['door', 'Knock knock', 'Stop on a landmark’s pad.', '#9fe0b7'],
   ['tour', 'Every door', 'Stop on all ten pads.', '#9fe0b7'],
   ['mail', 'Special delivery', 'Bump the mailbox.', '#4a86cf'],
@@ -2539,7 +2684,7 @@ var trial = { on: false, phase: 'off', t: 0, time: 0, gate: 0, best: null, split
   var n = 9; for (var i = 1; i <= n; i++) {
     var s = i === n ? FINISH_S + .15 : 4 + (ROAD_LEN - 12) * i / n, rn = roadAt(s), tf = roadTan(s), sd = roadSide(s);
     var g = new THREE.Group(), k = new Kit(), F = frameAt(rn, tf, 0);
-    if (i < n) { [-1, 1].forEach(function (sg) { k.add(G.cyl, 20, sg * (ROAD_W / 2 + .5), 0, 0, .22, 3.4, .22).add(G.ball, 20, sg * (ROAD_W / 2 + .5), 3.3, 0, .34, .34, .34); }); var posts = meshOf(k, true); posts.applyMatrix4(F); g.add(posts); } // the finish needs no posts: it runs under the Cambridge gantry
+    if (i < n) { [-1, 1].forEach(function (sg) { k.add(G.cyl, 20, sg * (ROAD_W / 2 + .5), 0, 0, .22, 3.4, .22).add(G.ball, 20, sg * (ROAD_W / 2 + .5), 3.3, 0, .34, .34, .34); }); var posts = meshOf(k, true); posts.applyMatrix4(F); g.add(posts); [-1, 1].forEach(function (sg) { block(moveOn(rn, sd, sg * (ROAD_W / 2 + .5)), .16, 'gate', { pr: -99, off: function () { return !trial.on; } }); }); } // round 7: the gate posts are solid while the race is on // the finish needs no posts: it runs under the Cambridge gantry
     var curtain = new THREE.Mesh(new THREE.PlaneGeometry(ROAD_W + 1, 3.1), gateMat.clone()); curtain.material.uniforms.uTime = U.uTime; curtain.position.set(0, 1.55, 0); curtain.applyMatrix4(F); g.add(curtain);
     g.visible = false; scene.add(g); GATES.push({ s: s, n: rn, g: g, cur: curtain, sd: sd });
   }
@@ -2603,8 +2748,15 @@ function applyQuality() {
 
 // ---------------------------------------------------------------- per frame
 var running = false, raf = 0, last = 0, fpsAcc = 0, fpsN = 0, titleSteps = 0, perf = { cpu: 0, n: 0 };
+// round 7: battery and heat on phones (Three.js Journey's performance lesson: render only what you need; Bruno 2025 caps its
+// pixel ratio and its step). A 120 Hz phone would draw twice as many frames as anyone can use, so touch screens draw at most 60;
+// parked with nothing touched for 8 s, the world ticks over at 30 until the next touch
+var lastInputT = 0, capMs = 0;
+['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach(function (ev) { addEventListener(ev, function () { lastInputT = performance.now(); }, { passive: true, capture: true }); });
+function idleNow(now) { return state === 'play' && !joy.on && !auto && !trial.on && Math.abs(car.v) < .05 && car.hop === 0 && now - lastInputT > 8000 && !gp.on; }
 function frame(now) {
   raf = requestAnimationFrame(frame);
+  capMs = COARSE ? (idleNow(now) ? 31 : 13.5) : 0; if (now - last < capMs) return;
   var c0 = performance.now();
   var dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
   U.uTime.value = now / 1000;
@@ -2631,7 +2783,7 @@ function frame(now) {
   else renderer.render(scene, camera);
   perf.cpu += performance.now() - c0; perf.n++;
   // adaptive quality (Jesse Zhou): under Auto, step down a tier while frames run long; the outline goes last
-  if (state === 'play' && SET.qual === 'auto') { fpsAcc += dt; fpsN++; if (fpsN >= 90) { var avg = fpsAcc / fpsN; fpsAcc = 0; fpsN = 0; if (avg > .03 && quality.level > 0) { quality.auto = quality.level - 1; applyQuality(); } else if (avg > .045 && quality.level === 0) outlineMesh.visible = leafLine.visible = planetLine.visible = false; } }
+  if (state === 'play' && SET.qual === 'auto' && capMs < 20) { fpsAcc += dt; fpsN++; if (fpsN >= 90) { var avg = fpsAcc / fpsN; fpsAcc = 0; fpsN = 0; if (avg > .03 && quality.level > 0) { quality.auto = quality.level - 1; applyQuality(); } else if (avg > .045 && quality.level === 0) outlineMesh.visible = leafLine.visible = planetLine.visible = false; } }
 }
 // round 6: the air between the camera and the limb (Messenger addFog / Bruno 2025 Fog), outline thinning, and the car's spot on screen for see-through foliage
 var _cs = new V3(), _db = new THREE.Vector2();
@@ -2676,7 +2828,7 @@ function updateLife(dt, now) {
   grass.mat.uniforms.uCarP.value.copy(carG.position);
   flies.material.uniforms.uNight.value = smooth((nightK - .45) / .4) * (RM() ? .6 : 1); flies.visible = quality.level > 0 && flies.material.uniforms.uNight.value > .005;
   headPool.material.opacity = smooth((nightK - .3) / .5) * .55; car.beam.material.opacity = nightK * .11;
-  updateWeather(dt, now); updateBirds(dt, now); updatePuffs(dt); updateConfetti(dt); updateMarker(now);
+  updateWeather(dt, now); updateBirds(dt, now); updatePuffs(dt); updateConfetti(dt); updateWob(dt); updateMarker(now);
   if (state === 'play' || state === 'map') updateLocals(dt, now); else bubbleEl.style.visibility = 'hidden';
 }
 var lastTitleT = 0, cloudLift = 0;
@@ -2763,7 +2915,15 @@ function resize() {
   if (post) { var s = renderer.getDrawingBufferSize(new THREE.Vector2()); post.rt.setSize(s.x, s.y); }
   if (state === 'title') { layoutTitleLetters(); letters.forEach(function (o) { if (o.inTitle) { o.m.position.copy(o.title.pos); o.m.scale.setScalar(o.title.scale); } }); }
 }
-addEventListener('resize', resize);
+// round 7: the address bar sliding in and out fires resize every frame on a phone; the canvas follows once per frame, not per event
+// (Bruno 2025's Viewport throttles its heavy work the same way), and after a rotation it measures again once the browser has settled
+var resizeQ = 0; function queueResize() { if (resizeQ) return; resizeQ = requestAnimationFrame(function () { resizeQ = 0; resize(); }); }
+addEventListener('resize', queueResize);
+function afterTurn() { queueResize(); setTimeout(resize, 350); setTimeout(resize, 800); }
+addEventListener('orientationchange', afterTurn); if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', afterTurn);
+// no pinch-zooming the page while driving (iOS ignores touch-action for a pinch that lands on the HUD); the map and the letter still zoom
+['gesturestart', 'gesturechange'].forEach(function (ev) { doc.addEventListener(ev, function (e) { if (state === 'play' && !mapIsOpen && !letterOpen) e.preventDefault(); }, { passive: false }); });
+canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); }); // a long press on the world is a held thumb, not a menu
 
 // ---------------------------------------------------------------- boot: fonts, tags, then the title (or straight onto the road when coming back)
 // ---------------------------------------------------------------- round 6: contact shadows, baked (statics) and live (the car, every prop)
