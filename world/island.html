@@ -463,7 +463,7 @@ html.coarse .stop-name{padding:10px 0;margin:-10px 0}
 .gd-dia{width:13px;height:13px;border:2.5px solid var(--cream);transform:rotate(45deg);flex:none}
 .gd-ar{position:absolute;left:50%;top:50%;width:0;height:0}
 .gd-ar::after{content:"";position:absolute;left:0;top:-8px;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:12px solid var(--ink);filter:drop-shadow(1.5px 0 0 var(--cream))}
-html.coarse .gd{height:44px}
+html.coarse .gd{height:44px;pointer-events:none} /* round 10: on touch the canvas hit-tests it, so a finger on it can still grow into the ring */
 html.map-open .gd,html.set-open .gd,html.racing .gd,html.exit-on .gd{opacity:0!important;visibility:hidden!important}
 .gd:active{transform-origin:50% 50%}
 /* ---------- round 8: less on screen (Husam: "not so cluttered"). Bruno 2025 keeps one menu tab and a map; Messenger shows one thing at a
@@ -1978,13 +1978,22 @@ canvas.addEventListener('pointerdown', function (e) {
   if (state !== 'play') return;
   if (e.pointerType === 'touch') {
     if (nPtr() === 1) {
-      var d = tagUnder(e);
-      if (d || (SET.touch === 'tap')) { drag.on = true; drag.id = e.pointerId; drag.moved = 0; drag.t = performance.now(); drag.mouse = false; return; }
-      nip.active = true; nip.id = e.pointerId; nip.x = e.clientX; nip.y = e.clientY; nipUpdateFromPointer(true); auto = null; hideMarker(); markDrove();
-      setTimeout(function () { if (nip.active) view.tracking = true; }, 80); // Bruno waits a few frames in case it is a two-finger gesture
-    } else { nip.active = false; nip.inLow = false; drag.on = false; var k = Object.keys(ptrs); pinch.d0 = Math.hypot(ptrs[k[0]].x - ptrs[k[1]].x, ptrs[k[0]].y - ptrs[k[1]].y); }
+      var d = tagUnder(e) || guideUnder(e);
+      if (d || (SET.touch === 'tap')) {
+        drag.on = true; drag.id = e.pointerId; drag.moved = 0; drag.t = performance.now(); drag.mouse = false;
+        // a finger that lands on a sign and stays (or slides) is still driving: after 220 ms it becomes the ring (signs never eat the ring)
+        if (d && SET.touch !== 'tap') { var pid = e.pointerId; drag.hold = setTimeout(function () { if (drag.on && drag.id === pid && ptrs[pid] && nPtr() === 1) nipFromDrag(pid); }, 220); }
+        return;
+      }
+      nipStart(e.pointerId, e.clientX, e.clientY, true);
+    } else { clearTimeout(drag.hold); drag.hold = 0; nip.active = false; nip.inLow = false; drag.on = false; var k = Object.keys(ptrs); pinch.d0 = Math.hypot(ptrs[k[0]].x - ptrs[k[1]].x, ptrs[k[0]].y - ptrs[k[1]].y); }
   } else { drag.on = true; drag.id = e.pointerId; drag.x = e.clientX; drag.y = e.clientY; drag.moved = 0; drag.t = performance.now(); drag.mouse = true; }
 });
+function nipStart(id, x, y, fresh) {
+  nip.active = true; nip.id = id; nip.x = x; nip.y = y; nipUpdateFromPointer(fresh); auto = null; hideMarker(); markDrove();
+  setTimeout(function () { if (nip.active) view.tracking = true; }, 80); // Bruno waits a few frames in case it is a two-finger gesture
+}
+function nipFromDrag(id) { clearTimeout(drag.hold); drag.hold = 0; drag.on = false; nip.inLow = false; var p = ptrs[id]; if (p && state === 'play') nipStart(id, p.x, p.y, false); }
 canvas.addEventListener('pointermove', function (e) {
   var p = ptrs[e.pointerId]; if (!p) { hoverTag(e); return; }
   var dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
@@ -1995,12 +2004,12 @@ canvas.addEventListener('pointermove', function (e) {
     if (state === 'play') { panBy(dx / 2, dy / 2); if (pinch.d0) { view.zoomBase = clamp(view.zoomBase + (d - pinch.d0) * .005, 0, 1); pinch.d0 = d; } }
     return;
   }
-  if (drag.on && e.pointerId === drag.id) { drag.moved += Math.abs(dx) + Math.abs(dy); if (state === 'play' && drag.mouse && drag.moved > 4) { panBy(dx, dy); canvas.classList.add('grabbing'); } }
+  if (drag.on && e.pointerId === drag.id) { drag.moved += Math.abs(dx) + Math.abs(dy); if (!drag.mouse && drag.hold && drag.moved > 12 && nPtr() === 1 && state === 'play') { nipFromDrag(e.pointerId); return; } if (state === 'play' && drag.mouse && drag.moved > 4) { panBy(dx, dy); canvas.classList.add('grabbing'); } }
 });
 function endPtr(e) {
   var p = ptrs[e.pointerId]; delete ptrs[e.pointerId];
   if (nip.active && e.pointerId === nip.id) { nip.active = false; if (nip.inLow && state === 'play') tapJump(); nip.inLow = false; nip.progress = 0; return; }
-  if (drag.on && e.pointerId === drag.id) { drag.on = false; canvas.classList.remove('grabbing'); if (drag.moved < 10 && performance.now() - drag.t < 600) clickAt(e); }
+  if (drag.on && e.pointerId === drag.id) { clearTimeout(drag.hold); drag.hold = 0; drag.on = false; canvas.classList.remove('grabbing'); if (drag.moved < 10 && performance.now() - drag.t < 600) clickAt(e); }
   if (nPtr() < 2) pinch.d0 = 0;
 }
 canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr);
@@ -2012,6 +2021,7 @@ function panBy(dx, dy) { // View.setMapControls: the drag, turned by -theta, sca
 }
 function setMouse(e) { var r = canvas.getBoundingClientRect(); _ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1); _ray.setFromCamera(_ndc, camera); }
 function tagUnder(e) { setMouse(e); var list = STOPS.filter(function (d) { return d.tag && d.tag.visible; }).map(function (d) { return d.tag; }); var hit = _ray.intersectObjects(list, false)[0]; if (!hit) return null; for (var i = 0; i < STOPS.length; i++) if (STOPS[i].tagR === hit.object || STOPS[i].tagL === hit.object) return STOPS[i]; return null; }
+function guideUnder(e) { if (!gd.on || !guide.d) return null; var r = gdEl.getBoundingClientRect(); return e.clientX >= r.left - 6 && e.clientX <= r.right + 6 && e.clientY >= r.top - 6 && e.clientY <= r.bottom + 6 ? guide.d : null; }
 var hoverD = null;
 function hoverTag(e) { if (state !== 'play' && state !== 'map') return; var d = tagUnder(e); hoverD = d; canvas.classList.toggle('point', !!d); }
 function tapOnCar(e) { var c = car.pos.clone().project(camera), x = (c.x * .5 + .5) * innerWidth, y = (-c.y * .5 + .5) * innerHeight; return c.z < 1 && Math.hypot(e.clientX - x, e.clientY - y) < Math.max(40, Math.min(innerWidth, innerHeight) * .07); }
@@ -2021,6 +2031,7 @@ function clickAt(e) {
   if (state === 'map') { if (d) { closeMap(); respawnAt(d.spawn); } return; } // Bruno's map: clicking a spot respawns you there
   if (state !== 'play') return;
   if (tapOnCar(e)) { if (e.pointerType === 'touch') tapJump(); else honk(); return; }
+  if (!d && e.pointerType === 'touch' && guideUnder(e)) { gdEl.click(); return; }
   if (d && doorNow() === d) { goIn(d); return; }
   if (d) { driveTo(d.pad, d); return; } // every sign is a button: the car drives itself there (ours)
   if (e.pointerType === 'touch' && SET.touch === 'tap') { var g = screenToGround(e.clientX, e.clientY, 0); if (g) driveTo(g, null); }
@@ -2147,6 +2158,7 @@ function makeTags() {
 
 // ---------------------------------------------------------------- road paint: before each exit the lane names it with an arrow to its side (Bruno 2019's floor text)
 var paintMesh;
+function paintFlip(s) { var t = roadTan(s); return t.x + t.z > 0; } // the fixed camera looks toward -x -z: text whose top points at it would read upside down
 function makePaint() {
   var C = 2048, cv = doc.createElement('canvas'); cv.width = cv.height = C; var x = cv.getContext('2d'); x.fillStyle = '#fff'; x.textAlign = 'center'; x.textBaseline = 'middle';
   var cellW = 512, cellH = 112, cols = C / cellW, slot = 0, P = [], UV = [];
@@ -2159,12 +2171,13 @@ function makePaint() {
     return [cx / C, cy / C, (cx + cellW) / C, (cy + cellH) / C];
   }
   function q(s, w, uv) { // lies across the lane at s, reading along the direction of travel
-    var c = roadAt(s), t = roadTan(s), r = roadRight(s), h = w * cellH / cellW;
+    var c = roadAt(s), t = roadTan(s).clone(), r = roadRight(s).clone(), h = w * cellH / cellW;
+    if (paintFlip(s)) { t.negate(); r.negate(); } // the camera never turns (View.js), so floor text faces it, not the direction of travel
     var p = [c.clone().addScaledVector(r, -w / 2).addScaledVector(t, -h / 2), c.clone().addScaledVector(r, w / 2).addScaledVector(t, -h / 2), c.clone().addScaledVector(r, w / 2).addScaledVector(t, h / 2), c.clone().addScaledVector(r, -w / 2).addScaledVector(t, h / 2)];
     p.forEach(function (v) { v.y = .05; }); P.push(p[0], p[1], p[2], p[0], p[2], p[3]);
     var L = uv[0], Rr = uv[2], T = 1 - uv[1], B = 1 - uv[3]; UV.push(L, B, Rr, B, Rr, T, L, B, Rr, T, L, T);
   }
-  STOPS.forEach(function (d) { q(d.padS - 14, ROAD_W - 1.4, exitLine(d.name.replace(/^The /, '').toUpperCase(), d.side)); });
+  STOPS.forEach(function (d) { var s = d.padS - 14; q(s, ROAD_W - 1.4, exitLine(d.name.replace(/^The /, '').toUpperCase(), paintFlip(s) ? -d.side : d.side)); });
   q(CAR0_S + 9, ROAD_W - 1.4, text(COARSE ? 'TOUCH THE GROUND TO DRIVE' : 'ARROWS OR WASD TO DRIVE')); // the one control a newcomer needs, on the floor (Bruno 2019)
   q(RACE_S - 3.4, ROAD_W - 3, text('THE LONG WAY'));
   var g = new THREE.BufferGeometry().setFromPoints(P); g.setAttribute('uv', new THREE.Float32BufferAttribute(UV, 2));
