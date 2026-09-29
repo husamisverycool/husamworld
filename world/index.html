@@ -139,6 +139,7 @@ html.started .tab:nth-child(4){transition-delay:.18s}
 .exit.show{transform:translate(-50%,0)}
 .exit{visibility:hidden;transition:transform .55s var(--spring),visibility 0s .55s}
 .exit.show{visibility:visible;transition:transform .55s var(--spring),visibility 0s}
+.exit{pointer-events:none}.exit .exit-go{pointer-events:auto} /* round 9: only its button takes a touch; a thumb anywhere else on the sign reaches the world under it */
 .exit-sign{position:relative;display:flex;align-items:center;gap:14px;background:var(--green);color:#fff;padding:14px 14px 13px 18px;box-shadow:0 0 0 2.5px var(--ink),0 5px 0 2.5px var(--ink),inset 0 0 0 3px var(--green),inset 0 0 0 5px #fff}
 .exit-tab{position:absolute;left:14px;bottom:calc(100% + 2px);background:var(--cream);color:var(--ink);font:400 13px/1 var(--display);padding:6px 9px 5px;box-shadow:0 0 0 2.5px var(--ink)}
 .exit-body{flex:1;min-width:0}
@@ -396,11 +397,11 @@ html:has(.exit.show) .joy:not(.active){opacity:0} /* the idle stick ring never s
   .setp-head{gap:8px;padding:12px 12px 0 14px}
   /* the exit sign: one row, the teaser stays on the road paint and in the locals' mouths */
   .exit{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px)}
-  html.coarse .exit{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px)}
+  html.coarse .exit{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 150px)} /* round 9: clear of the stick (its ring's top is 144px up): the sign used to cover the ring's upper half, so a thumb landing there hit the sign and the car didn't move */
   .exit-line{display:none}
   .exit-sign{padding:11px 10px 10px 14px}
   .exit-name{font-size:18px}
-  html.coarse .ctx{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 84px)}
+  html.coarse .ctx{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 150px)} /* round 9: clear of the stick too */
   /* notices drop in under the plate row, full width, one line */
   .toast,html.coarse .toast{top:calc(max(16px,env(safe-area-inset-top)) + 56px);bottom:auto;font-size:14px;padding:10px 12px 9px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s var(--spring),opacity .25s}
   .toast.show,html.coarse .toast.show{transform:translate(-50%,0);opacity:1}
@@ -1620,6 +1621,9 @@ function groundUnder(o) { var p = o.b.position, l = Math.sqrt(p.x * p.x + p.y * 
 var dyn = [];
 var GRAV = 16;
 pw.addEventListener('preStep', function () { for (var i = 0; i < dyn.length; i++) { var b = dyn[i].b; if (!b || b.sleepState === CANNON.Body.SLEEPING) continue; groundUnder(dyn[i]); var p = b.position, l = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z) || 1, g = GRAV * b.mass / l; b.force.x -= p.x * g; b.force.y -= p.y * g; b.force.z -= p.z * g; if (l < R - 2 || l > R + 60) { dyn[i].lost = true; } pushOffStatics(b, l); } });
+// round 9: nothing is flung faster than a hard boost can throw it (a light crate caught between the car and the stack could leave at
+// twice the car's speed, sail off the planet and blink back to its start)
+pw.addEventListener('postStep', function () { for (var i = 0; i < dyn.length; i++) { var b = dyn[i].b; if (!b || b.sleepState === CANNON.Body.SLEEPING) continue; var v = b.velocity, sp = Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z); if (sp > 18) { v.x *= 18 / sp; v.y *= 18 / sp; v.z *= 18 / sp; } } });
 // rocks, trees, houses, lamps and landmarks are solid to everything that tumbles (the letters, crates, pins), not just to the car:
 // the same push-out the car gets, done in the step so bodies slide off them instead of passing through
 var _sn = new V3(), _sa = new V3(), _sf = new V3(), _ss = new V3();
@@ -1683,7 +1687,8 @@ function glyphKit(ch) { // greedy rectangles, so a letter is a few solid slabs r
 (function () {
   var r = rng(5);
   for (var i = 0; i < 12; i++) { var s = 20 + i * (ROAD_LEN - 40) / 12 + r() * 6; if (SITE_S.some(function (x) { return Math.abs(x - s) < 9; })) continue; var side = r() < .5 ? -1 : 1, n = moveOn(roadAt(s), roadSide(s).multiplyScalar(side), ROAD_W / 2 + .55); if (paved(n, .5)) continue; var k = new Kit(); k.add(G.box, 14, 0, -.35, 0, .6, .08, .6).add(G.cone, 22, 0, -.3, 0, .46, .85, .46).add(G.cyl, 20, 0, .02, 0, .3, .12, .3); addDyn(meshOf(k), new V3(.3, .35, .3), .25, 'cone', n, roadTan(s), .35); }
-  for (var j = 0; j < 5; j++) { var n2 = moveOn(moveOn(startN, startSide.clone().negate(), 6 + (j % 2) * 1.4), startF, 4 + j * 1.6); var kb = new Kit(); kb.add(G.box, 11, 0, -.42, 0, 1.3, .84, .84).add(G.box, 23, 0, -.42, 0, 1.34, .1, .88); addDyn(meshOf(kb), new V3(.65, .42, .42), .8, 'hay', n2, startF, .42 + (j > 2 ? .84 : 0)); }
+  // round 9: a little pyramid, three on the ground and two resting on them (the top two used to hang in the air over a gap)
+  for (var j = 0; j < 5; j++) { var n2 = moveOn(moveOn(startN, startSide.clone().negate(), 6.7), startF, j > 2 ? 4.44 + (j - 3) * .88 : 4 + j * .88); var kb = new Kit(); kb.add(G.box, 11, 0, -.42, 0, 1.3, .84, .84).add(G.box, 23, 0, -.42, 0, 1.34, .1, .88); addDyn(meshOf(kb), new V3(.65, .42, .42), .8, 'hay', n2, startF, .42 + (j > 2 ? .85 : 0)); }
 })();
 
 // ---------------------------------------------------------------- the car: kinematic on the sphere (Messenger's maths), Bruno's feel (antenna, lights, hop)
@@ -1790,7 +1795,7 @@ joyEl.addEventListener('touchstart', function (e) { e.preventDefault(); }, { pas
 })();
 addEventListener('touchstart', function () { if (!COARSE) { COARSE = true; html.classList.add('coarse'); } }, { once: true, passive: true });
 // pointer: drag to look around (yaw), wheel/pinch to zoom; in the map, drag to spin the planet; click tags
-var cam = { up: startN.clone(), h: startF.clone(), yaw: 0, zoom: CAM_Z.mid, zoomT: CAM_Z.mid, roll: 0, rollV: 0, pos: new V3(), tgt: new V3(), mapDir: new V3(0, -.3, 1).normalize(), mapT: null, offX: 0, offY: 0, latch: false, fr: new V3(), fw: 0 };
+var cam = { up: startN.clone(), h: startF.clone(), yaw: 0, zoom: CAM_Z.mid, zoomT: CAM_Z.mid, pos: new V3(), tgt: new V3(), mapDir: new V3(0, -.3, 1).normalize(), mapT: null, offX: 0, offY: 0, latch: false, hv: 0, sp: 0, blend: 1, fs: null };
 var drag = { on: false, x: 0, y: 0, moved: 0, id: null, t: 0 }, pinch = { on: false, d0: 0, z0: 0 };
 var raycaster = new THREE.Raycaster(), mouse = new THREE.Vector2();
 canvas.addEventListener('pointerdown', function (e) {
@@ -1907,6 +1912,11 @@ function autoInput(inp) {
   var ah = staticAhead(Math.min(dist, 6), .35, inp.want); if (ah && ah.fz < dist * .9) inp.want.applyAxisAngle(car.n, (ah.lx > 0 ? 1 : -1) * clamp(1.4 - ah.fz * .15, .5, 1.2));
   inp.thr = dist < 7 ? clamp(dist / 7, .3, 1) : 1;
   if (dist < 4 && car.v > 4) inp.thr = 0;
+  // round 9: a wide turn is taken slowly (at speed the circle is too big and it used to orbit the pad into a wall), and if it has
+  // nosed into something it backs off for a moment, wheel turned the other way, then tries again
+  var ha = sAng(car.f, inp.want, car.n); if (Math.abs(ha) > .7 && car.v > 3.5) inp.thr = 0;
+  if (auto.back > 0) { auto.back -= 1 / 60; inp.thr = -1; inp.steer = -Math.sign(ha || 1); inp.want = null; return; }
+  if (inp.thr > .2 && Math.abs(car.v) < .6) { auto.stk = (auto.stk || 0) + 1 / 60; if (auto.stk > .8) { auto.stk = 0; auto.back = .9; } } else auto.stk = 0;
 }
 // round 7: collision shapes. The car's footprint is its body out to the wheels (0.86) and bumpers (1.32); statics are discs or boxes
 var CAR_HW = .86, CAR_HL = 1.32, _sx = new V3(), _vel = new V3(), _d = new V3(), _bs = new V3(), _pn = { pen: 0, nrm: new V3() };
@@ -1952,18 +1962,22 @@ function updateCar(dt) {
   if (inp.brake) v = approach(v, 0, (Math.abs(inp.steer) > .3 && Math.abs(v) > 5 ? 9 : 26) * dt);
   else if (thr > .04) { if (v < -.5) v = approach(v, 0, 24 * dt); else if (v < top) v += thr * (touch ? 11.5 : 14) * spd * (boost ? 1.45 : 1) * (1 - Math.pow(Math.max(0, v) / top, 2) * .85) * dt; else v = approach(v, top, 6 * dt); }
   else if (thr < -.04) { if (v > .5) v = approach(v, 0, 24 * dt); else v = approach(v, -5.5 * Math.abs(thr), 9 * dt); }
-  else v = approach(v, 0, (2.1 + Math.abs(v) * .32 + (parkK > .05 ? 12 + 12 * parkK : 0) + (!near && doorNow() ? 12 : 0)) * dt); // idle brake (Bruno), plus a gentle stop on a door's pad
+  else v = approach(v, 0, (2.1 + Math.abs(v) * .32 + (parkK > .05 ? 12 + 12 * parkK : 0)) * dt); // idle brake (Bruno), plus a gentle stop on a door's pad (round 9: only on the pad itself; rolling off it no longer slams the brakes on)
   car.v = v;
   // steering: ease the wheel, then the bicycle model with a grip cap
-  var st = clamp(inp.steer, -1, 1), rate = inp.src === 'key' ? (st === 0 ? 11 : 6.5) : 12;
+  var st = clamp(inp.steer, -1, 1), rate = inp.src === 'key' ? (st === 0 ? 12 : 10) : 12; // round 9: the wheel answers a key in a tenth of a second (Bruno 2019's ramp is ~20 ms; 2025's is instant)
   car.steer = approach(car.steer, st, rate * (.75 + .25 * sens) * dt);
   var drift = (inp.brake || boost) && Math.abs(v) > 5.5 && Math.abs(car.steer) > .45;
   var yaw = v * Math.tan(car.steer * .5 * sens) / 1.55, cap = 12.5 * (.85 + .15 * sens) / Math.max(2.2, Math.abs(v)) * (drift ? 1.55 : 1);
   yaw = clamp(yaw, -cap, cap);
-  // road assist: driving straight on the road, the nose follows the road's curve
-  if (SET.assist && v > 1.5 && Math.abs(car.steer) < .06 && !inp.want) {
+  // road assist: driving straight on the road, the nose follows the road's curve. Round 9: it never fights the player. It lets go
+  // the instant a key or the stick steers, and only takes hold again after the hands have been off the wheel for a moment
+  // (0.45 s on keys, 0.2 s on touch), easing in over half a second, so letting go of a turn doesn't snap the nose back
+  if (Math.abs(inp.steer) > .01 || inp.want || inp.brake || v <= 1.5) car.freeT = 0; else car.freeT = (car.freeT || 0) + dt;
+  var aK = smooth((car.freeT - (touch || inp.straight ? .2 : .45)) / .5);
+  if (SET.assist && aK > 0 && Math.abs(car.steer) < .06) {
     var rn = nearestRoad(car.n);
-    if (rn.d < ROAD_W / 2 + 1.2) { var tf = roadTan(rn.s); if (tf.dot(car.f) < 0) tf.negate(); var ra = sAng(car.f, tf, car.n), lim = touch || inp.straight ? .42 : .2; if (Math.abs(ra) < lim) { var off = car.n.clone().sub(roadAt(rn.s)).dot(tf.clone().cross(car.n)) * R, ay = clamp((ra + clamp(off * .3, -.3, .3)) * 2.6, -.9, .9); if (!staticAhead(3 + v * .45, .2, car.f.clone().applyAxisAngle(car.n, ay * .5))) yaw += ay; } } // round 7: the assist never turns you toward a post, a tree or a gate // hold the nose to the curve, and ease back toward the middle
+    if (rn.d < ROAD_W / 2 + 1.2) { var tf = roadTan(rn.s); if (tf.dot(car.f) < 0) tf.negate(); var ra = sAng(car.f, tf, car.n), lim = touch || inp.straight ? .42 : .2; if (Math.abs(ra) < lim) { var off = car.n.clone().sub(roadAt(rn.s)).dot(tf.clone().cross(car.n)) * R, ay = clamp((ra + clamp(off * .3, -.3, .3)) * 2.6, -.9, .9) * aK; if (!staticAhead(3 + v * .45, .2, car.f.clone().applyAxisAngle(car.n, ay * .5))) yaw += ay; } } // round 7: the assist never turns you toward a post, a tree or a gate // hold the nose to the curve, and ease back toward the middle
   }
   _qq.setFromAxisAngle(car.n, yaw * dt); car.f.applyQuaternion(_qq);
   // slip: the direction of travel lags the nose; grip pulls it back (much less while drifting)
@@ -2012,7 +2026,7 @@ var odo = 0, driftT = 0, parkK = 0;
 function updateDrop(dt) {
   if (car.drop <= 0) return;
   car.dv -= 26 * dt; car.drop += car.dv * dt;
-  if (car.drop <= 0) { var hit = -car.dv; car.drop = 0; car.dv = 0; car.pv -= Math.min(.8, hit * .05); car.hyv -= Math.min(3.2, hit * .2); if (hit > 4) { kickCam(.015); sfx('carHit', hit * .6); dustAt(car.n, 8, 1); buzz(25); } }
+  if (car.drop <= 0) { var hit = -car.dv; car.drop = 0; car.dv = 0; car.pv -= Math.min(.8, hit * .05); car.hyv -= Math.min(3.2, hit * .2); if (hit > 4) { sfx('carHit', hit * .6); dustAt(car.n, 8, 1); buzz(25); } }
 }
 var dustT = 0;
 function placeCar(dt) {
@@ -2070,15 +2084,14 @@ function bumpMailbox(v) { mailBump = Math.min(1, mailBump + v * .1); if (perform
 
 // ---------------------------------------------------------------- camera: follows and keeps the ground under it; the Map is the planet from orbit
 // Messenger: it swings behind the car on its own, but only while moving. While a thumb points somewhere, it holds still (no circling).
-function kickCam(a) { if (RM()) return; cam.rollV += (Math.random() < .5 ? -1 : 1) * a * 6; }
 // round 7: a bump you feel (Bruno 2025's hitDefault on every fixed collider, plus the car's own springs): the thud scales with the
-// speed into it, the camera rocks, the body pitches and heaves, the phone buzzes; a tree shakes and drops a burst of its leaves,
-// a lamp post rings like a spring
+// speed into it, the body pitches and heaves, the phone buzzes; a tree shakes and drops a burst of its leaves,
+// a lamp post rings like a spring. Round 9: the camera no longer rocks on a hit; the view stays level
 var wobS = { s: null, t: 0, amp: 0, dir: new V3() };
 function bumpStatic(s, into, nrm) {
   lastHit = performance.now(); var k = clamp(into / 12, 0, 1);
-  sfx('carHit', into); kickCam(.02 + k * .05); car.pv -= into * .16; car.hyv -= into * .07; buzz(Math.round(18 + k * 50));
-  if (s.wob && !RM()) { wobS.s = s; wobS.t = 0; wobS.amp = (s.kind === 'lamp' ? .05 : .09) * (.35 + k); wobS.dir.copy(nrm); }
+  sfx('carHit', into); car.pv -= into * .16; car.hyv -= into * .07; buzz(Math.round(18 + k * 50));
+  if (s.wob && !RM() && !(wobS.s && wobS.s !== s && wobS.t < .6)) { wobS.s = s; wobS.t = 0; wobS.amp = (s.kind === 'lamp' ? .05 : .09) * (.35 + k); wobS.dir.copy(nrm); }
   if (s.kind === 'tree') leafBurst(s, k);
   else if (s.kind === 'rock' || s.kind === 'house' || s.f) dustAt(moveOn(car.n, nrm, CAR_HL * .8), 3 + Math.round(k * 4), .6);
   if (into > 7 && s.kind === 'tree') award('bonk');
@@ -2095,31 +2108,40 @@ function leafBurst(s, k) {
   confetti(top, 8 + Math.round(k * 14), 2.2 + k * 2, [col, col.clone().multiplyScalar(.82), col.clone().lerp(new C3(1, 1, 1), .25)], { drag: 3.2, g: 5, spread: .8 + (s.wob || 1) * .5 });
 }
 function aspectK() { return camera.aspect < 1 ? Math.pow(1 / camera.aspect, .55) : 1; }
+// round 9: the play camera is worked out exactly, every frame, from three smoothed numbers and nothing else (it used to be a pose
+// that was then lerped again for position, target and up, each at its own rate, plus a lean toward landmarks, a roll kick on hits
+// and a swing back after a held thumb: on a turn those fought and the horizon tipped and the view lurched). The references:
+// - Bruno 2025 View.js: one smoothed focus point (lerp dt*10) and a fixed offset from it; the camera never yaws and never rolls.
+// - Messenger: camera.up is the surface normal (so the horizon is level on a sphere) and the view re-centres behind the walker
+//   slowly, and only while moving.
+// So: the focus is the car's spot on the ground, smoothed at dt*10; up is exactly the normal there; the heading turns toward the
+// car's nose at a turn rate that is itself eased (it can never jump) and capped, and only while the car moves. Position and target
+// both hang off those, so the horizon is level by construction and nothing else can pull on the view.
+var _cf = new V3(), _ch = new V3();
 function playPose(dt, out) {
-  out.dt = dt;
-  var k = Math.min(1, dt * 4); cam.up.lerp(car.n, k).normalize();
-  var follow = SET.autoCam && !cam.latch && !drag.on;
-  if (follow && Math.abs(car.v) > .6) cam.h.lerp(car.f, Math.min(1, dt * (1.1 + Math.abs(car.v) * .12)));
-  cam.h.sub(cam.up.clone().multiplyScalar(cam.h.dot(cam.up))); if (cam.h.lengthSq() < 1e-6) cam.h.copy(car.f); cam.h.normalize();
-  if (follow && !drag.on && Math.abs(car.v) > 1) cam.yaw *= Math.pow(.25, dt);
-  var h = cam.h.clone().applyAxisAngle(cam.up, cam.yaw);
+  _cf.copy(car.n).multiplyScalar(R + (car.hop + car.drop) * .35); // the car's spot, lifted only a little by a hop or a drop
+  if (dt >= 1 || !cam.fs) { cam.fs = _cf.clone(); cam.hv = 0; } else cam.fs.lerp(_cf, 1 - Math.exp(-10 * dt));
+  var up = cam.fs.clone().normalize(); cam.up.copy(up);
+  cam.h.addScaledVector(up, -cam.h.dot(up)); if (cam.h.lengthSq() < 1e-6) cam.h.copy(car.f); cam.h.normalize();
+  _ch.copy(car.f).addScaledVector(up, -car.f.dot(up)); if (_ch.lengthSq() > 1e-6) _ch.normalize(); else _ch.copy(cam.h);
+  var follow = SET.autoCam && !cam.latch && !drag.on ? smooth((Math.abs(car.v) - .4) / 3) : 0;
+  if (dt >= 1) { if (SET.autoCam) cam.h.copy(_ch); }
+  else {
+    var err = sAng(cam.h, _ch, up), want = clamp(err * 2.2, -1.8, 1.8) * follow; // a turn rate toward the nose, at most 1.8 rad/s
+    cam.hv = approach(cam.hv || 0, want, 6 * dt); // eased: the view's turn rate changes by at most 6 rad/s each second
+    cam.h.applyAxisAngle(up, cam.hv * dt);
+  }
+  if (drag.on) cam.dragT = 0; else cam.dragT = (cam.dragT || 0) + dt;
+  if (!drag.on && cam.dragT > 1.2 && Math.abs(car.v) > 1) cam.yaw *= Math.pow(.4, dt); // a look around with the mouse settles back once you drive on, a moment after you let go
+  cam.yawS = dt >= 1 ? cam.yaw : (cam.yawS || 0) + (cam.yaw - (cam.yawS || 0)) * Math.min(1, dt * 7); // a drag looks round smoothly (Bruno 2025 eases its pan)
+  var h = cam.h.clone().applyAxisAngle(up, cam.yawS);
   cam.zoom += (cam.zoomT - cam.zoom) * Math.min(1, dt * 6);
-  var sp = RM() ? 0 : smooth((Math.abs(car.v) - 4) / 14) * .18; // Bruno 2025: pull back as the speed builds
-  var Z = (1 + cam.zoom * 2.6) * aspectK() * (1 + sp);
-  var base = carG.position.clone();
-  out.tgt = base.clone().add(h.clone().multiplyScalar(2.2)).add(cam.up.clone().multiplyScalar(.6));
-  // round 6: near a landmark the view leans toward it so the building is in frame, not cut off at the edge (Bruno 2019 tweens its
-  // camera to another angle in the projects area over 2 s, power1.inOut; here a slow ease toward the site)
-  var fd = null, fdd = 1e9; if (state === 'play') for (var si = 0; si < STOPS.length; si++) { var dd = arc(car.n, STOPS[si].pad); if (dd < fdd) { fdd = dd; fd = STOPS[si]; } }
-  var fw = fd && fd.id !== 'translation' ? smooth((15 - fdd) / 9) : 0, tl = clamp((1 / camera.aspect - 1) / 1.1, 0, 1); _fr.set(0, 0, 0);
-  if (fw > 0) { _fr.copy(fd.site).multiplyScalar(R).sub(base); _fr.addScaledVector(cam.up, -_fr.dot(cam.up)); var fl = _fr.length(); if (fl > .01) _fr.multiplyScalar(Math.min(fl, 7) * (.46 + .2 * tl) * fw / fl); }
-  cam.fr.lerp(_fr, Math.min(1, (out.dt || .016) * 1.4)); cam.fw += (fw * tl - cam.fw) * Math.min(1, (out.dt || .016) * 1.4); out.tgt.add(cam.fr);
-  // round 6: on a tall phone screen the camera also tilts further down (Bruno 2025 only pulls back for portrait, ratioOverflow; Messenger frames its phone view from higher), so the road fills the frame instead of the sky
-  var tall = clamp((1 / camera.aspect - 1) / 1.1, 0, 1);
-  Z *= 1 + cam.fw * .2; // and on a phone it also steps back a little, so the car and the building both fit
-  out.pos = base.clone().add(cam.up.clone().multiplyScalar(12.5 * Z * (1 + .22 * tall))).sub(h.clone().multiplyScalar(13 * Z * (1 - .16 * tall)));
-  out.pos.addScaledVector(cam.fr, .55);
-  out.up = cam.up.clone();
+  var spT = RM() ? 0 : smooth((Math.abs(car.v) - 4) / 14) * .16; cam.sp = dt >= 1 ? spT : (cam.sp || 0) + (spT - (cam.sp || 0)) * Math.min(1, dt * 1.2); // Bruno 2025: pull back as the speed builds (eased, so a bump doesn't zoom)
+  var tall = clamp((1 / camera.aspect - 1) / 1.1, 0, 1); // on a tall phone screen the camera sits higher and looks further down, so the road fills the frame
+  var Z = (1 + cam.zoom * 2.6) * aspectK() * (1 + cam.sp);
+  out.tgt = cam.fs.clone().add(h.clone().multiplyScalar(2.2)).add(up.clone().multiplyScalar(.6));
+  out.pos = cam.fs.clone().add(up.clone().multiplyScalar(12.5 * Z * (1 + .22 * tall))).sub(h.clone().multiplyScalar(13 * Z * (1 - .16 * tall)));
+  out.up = up.clone();
 }
 function orbitDist() { var vf = camera.fov * DEG / 2, hf = Math.atan(Math.tan(vf) * camera.aspect), a = Math.min(vf, hf); return (R + 7) / Math.sin(a * .86); }
 function titlePose(t, out) {
@@ -2131,21 +2153,22 @@ function mapPose(dt, out) {
   if (cam.mapT) cam.mapDir.lerp(cam.mapT, Math.min(1, dt * 3)).normalize();
   out.pos = cam.mapDir.clone().multiplyScalar(orbitDist() * .95); out.tgt = new V3(); out.up = new V3(0, 1, 0);
 }
-var pose = { pos: new V3(), tgt: new V3(), up: new V3() }, camUp = new V3(0, 1, 0), _fr = new V3();
+var pose = { pos: new V3(), tgt: new V3(), up: new V3() }, camUp = new V3(0, 1, 0);
 function applyCam(pos, tgt, up) {
   var l = pos.length(); if (l < R + 3) pos.multiplyScalar((R + 3) / l);
   camera.position.copy(pos); camera.up.copy(up); camera.lookAt(tgt);
-  if (cam.roll) camera.rotateZ(cam.roll);
 }
-function snapCam() { playPose(1, pose); cam.pos.copy(pose.pos); cam.tgt.copy(pose.tgt); camUp.copy(pose.up); applyCam(cam.pos.clone(), cam.tgt, camUp); }
+function snapCam() { playPose(1, pose); cam.blend = 1; cam.pos.copy(pose.pos); cam.tgt.copy(pose.tgt); camUp.copy(pose.up); applyCam(cam.pos.clone(), cam.tgt, camUp); }
 function updateCamera(dt, t) {
-  cam.rollV += (-cam.roll * 90 - cam.rollV * 8) * dt; cam.roll += cam.rollV * dt;
   if (state === 'title' || state === 'boot') { titlePose(t, pose); cam.pos.copy(pose.pos); cam.tgt.copy(pose.tgt); camUp.copy(pose.up); }
   else if (state === 'intro') return; // the intro drives the camera itself
   else {
-    if (state === 'map') mapPose(dt, pose); else playPose(dt, pose);
-    var kp = state === 'map' ? dt * 3.2 : dt * 6, kt = state === 'map' ? dt * 3.2 : dt * 10; // Bruno 2025 follows at dt*10
-    cam.pos.lerp(pose.pos, Math.min(1, kp)); cam.tgt.lerp(pose.tgt, Math.min(1, kt)); camUp.lerp(pose.up, Math.min(1, dt * 5)).normalize();
+    if (state === 'map') { mapPose(dt, pose); cam.blend = 0; } else playPose(dt, pose);
+    if (state === 'map' || cam.blend < 1) { // from orbit (or back from a district) the view glides in, then locks onto the exact pose
+      if (state !== 'map') cam.blend = Math.min(1, (cam.blend || 0) + dt * .8);
+      var kb = Math.min(1, dt * 3.2 + (state === 'map' ? 0 : Math.pow(cam.blend, 3)));
+      cam.pos.lerp(pose.pos, kb); cam.tgt.lerp(pose.tgt, kb); camUp.lerp(pose.up, kb).normalize();
+    } else { cam.pos.copy(pose.pos); cam.tgt.copy(pose.tgt); camUp.copy(pose.up); }
   }
   // panels: the map sits on the left on wide screens (shift the planet right); the settings sheet covers a phone's lower half (lift the car)
   var land = phoneLand(), wantX = state === 'map' && innerWidth > 760 ? Math.min(560, innerWidth * .4) / 2 : setOpen && land ? -Math.min(380, innerWidth * .48) / 2 : 0, wantY = setOpen && innerWidth <= 760 && !land ? innerHeight * .24 : 0; // round 7: on a phone on its side the sheet is on the right, so the car moves left
@@ -2301,7 +2324,7 @@ function goIn(d) {
   if (d === RACE) { startTrial(); return; }
   if (d.id === 'contact') { bumpMailbox(4); return; }
   if (state !== 'play' || entering) return;
-  entering = { d: d, t: 0 }; state = 'enter'; clearCtl(); $('exit').classList.remove('show'); sfx('whoosh');
+  entering = { d: d, t: 0 }; state = 'enter'; cam.blend = 0; clearCtl(); $('exit').classList.remove('show'); sfx('whoosh');
   if (!RM()) { car.hyv -= 2.4; d.tagT = 0; d.tagFrom = d.tagOff; } // Bruno 2025's interact pulse: the point springs again (elastic.out) as you use it; the car dips on its springs
   var p = d.site.clone().multiplyScalar(R + 3).project(camera), wx = (p.x * .5 + .5) * 100, wy = (-p.y * .5 + .5) * 100;
   var w = $('wipe'); w.style.setProperty('--wx', clamp(wx, 5, 95) + '%'); w.style.setProperty('--wy', clamp(wy, 5, 95) + '%'); w.style.setProperty('--wipe-bg', d.bg); w.style.setProperty('--wipe-ink', d.ink); $('wipeName').textContent = d.name;
@@ -2391,6 +2414,9 @@ function updateIntro(dt) {
   var up = I.from.up.clone().applyQuaternion(new Q().slerp(I.qUp, eio(T / 2.4))), vd = tgt.clone().sub(p).normalize();
   up.addScaledVector(vd, -up.dot(vd)); if (up.lengthSq() < 1e-4) up.copy(I.lastUp || I.to.up); up.normalize(); I.lastUp = up.clone();
   cam.pos.copy(p); cam.tgt.copy(tgt); camUp.copy(up); applyCam(p, tgt, up);
+  // round 9: aiming at a moving target whipped the view round at up to 25 rad/s about 1.4 s in (on a phone); the view now turns
+  // toward that aim at most 3 rad/s (more once it's close to landing), so it lags a beat and catches up well before the hand-over
+  if (!I.q) I.q = camera.quaternion.clone(); else { I.q.rotateTowards(camera.quaternion, dt * (3 + Math.max(0, T - 2.2) * 12)); camera.quaternion.copy(I.q); }
   // letters fly down and become bricks
   letters.forEach(function (o, i) {
     var lt = clamp((T - .15 - i * .045) / 1.55, 0, 1), e = eio(lt);
@@ -2469,7 +2495,7 @@ var puffMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, u
 var puffPts = new THREE.Points(puffGeo, puffMat); puffPts.frustumCulled = false; puffPts.renderOrder = 4; scene.add(puffPts);
 function dustAt(n, count, size) {
   puffPts.visible = true;
-  for (var i = 0; i < count; i++) { var o = puffs[puffI++ % PUFFS], j = new V3(Math.random() - .5, Math.random() - .5, Math.random() - .5).multiplyScalar(.9); o.p.copy(n).multiplyScalar(R + .25).add(j); o.v.copy(n).multiplyScalar(.6 + Math.random() * .6).add(j.multiplyScalar(1.4)); o.life = 0; o.max = .7 + Math.random() * .5; o.s = (size || .6) * (.8 + Math.random() * .5); }
+  for (var i = 0; i < count; i++) { var o = puffs[puffI++ % PUFFS], j = new V3(Math.random() - .5, Math.random() - .5, Math.random() - .5).multiplyScalar(.9); j.addScaledVector(n, Math.abs(j.dot(n)) - j.dot(n)); o.p.copy(n).multiplyScalar(R + .25).add(j); /* round 9: the jitter never pushes a puff into the ground */ o.v.copy(n).multiplyScalar(.6 + Math.random() * .6).add(j.multiplyScalar(1.4)); o.life = 0; o.max = .7 + Math.random() * .5; o.s = (size || .6) * (.8 + Math.random() * .5); }
 }
 function updatePuffs(dt) {
   for (var i = 0; i < PUFFS; i++) { var o = puffs[i]; if (o.life >= o.max) { puffA[i] = 0; continue; } o.life += dt; var k = o.life / o.max; o.p.addScaledVector(o.v, dt); o.v.multiplyScalar(1 - dt * 2.5); puffPos[i * 3] = o.p.x; puffPos[i * 3 + 1] = o.p.y; puffPos[i * 3 + 2] = o.p.z; puffSize[i] = o.s * (.5 + k * 1.1); puffA[i] = (1 - k) * .85; }
@@ -2483,10 +2509,10 @@ function confetti(at, count, up, cols, opt) { // round 7: also leaves (their own
   for (var i = 0; i < count; i++) { var ci = confI % CONF, o = conf[confI++ % CONF]; confMesh.setColorAt(ci, cols ? cols[i % cols.length] : confCols[ci % confCols.length]); o.drag = opt.drag || 1.6; o.g = opt.g || 14; o.spread = opt.spread || 1; var side = new V3(Math.random() - .5, Math.random() - .5, Math.random() - .5); side.sub(n.clone().multiplyScalar(side.dot(n))).normalize(); o.p.copy(at); o.v.copy(n).multiplyScalar((up || 7) * (.7 + Math.random() * .6)).addScaledVector(side, (1.5 + Math.random() * 3) * o.spread); if (opt.spread) o.p.addScaledVector(side, Math.random() * o.spread); o.q.setFromEuler(new THREE.Euler(Math.random() * 6, Math.random() * 6, Math.random() * 6)); o.w.set(Math.random() - .5, Math.random() - .5, Math.random() - .5).multiplyScalar(12); o.life = 0; o.max = 1.8 + Math.random(); }
   if (confMesh.instanceColor) confMesh.instanceColor.needsUpdate = true;
 }
-var _cm = new M4(), _cs = new V3(1, 1, 1), _cz = new V3(0, 0, 0), _cq = new Q(), _ce = new THREE.Euler();
+var _cm = new M4(), _cfs = new V3(1, 1, 1), /* round 9: its own name; it shared _cs with the see-through, so confetti was scaled by the car's spot on screen */ _cz = new V3(0, 0, 0), _cq = new Q(), _ce = new THREE.Euler();
 function updateConfetti(dt) {
   var any = false;
-  for (var i = 0; i < CONF; i++) { var o = conf[i]; if (o.life >= o.max) continue; any = true; o.life += dt; var l = o.p.length(); o.v.addScaledVector(o.p, -o.g * dt / l); o.v.multiplyScalar(1 - o.drag * dt); o.p.addScaledVector(o.v, dt); if (o.p.length() < R + .03) { o.p.setLength(R + .03); o.v.multiplyScalar(0); o.w.multiplyScalar(0); } _ce.set(o.w.x * dt, o.w.y * dt, o.w.z * dt); o.q.multiply(_cq.setFromEuler(_ce)); _cm.compose(o.p, o.q, o.life >= o.max ? _cz : _cs); confMesh.setMatrixAt(i, _cm); }
+  for (var i = 0; i < CONF; i++) { var o = conf[i]; if (o.life >= o.max) continue; any = true; o.life += dt; var l = o.p.length(); o.v.addScaledVector(o.p, -o.g * dt / l); o.v.multiplyScalar(1 - o.drag * dt); o.p.addScaledVector(o.v, dt); if (o.p.length() < R + .03) { o.p.setLength(R + .03); o.v.multiplyScalar(0); o.w.multiplyScalar(0); } _ce.set(o.w.x * dt, o.w.y * dt, o.w.z * dt); o.q.multiply(_cq.setFromEuler(_ce)); var ek = clamp((o.max - o.life) / .35, 0, 1); _cm.compose(o.p, o.q, ek <= 0 ? _cz : _cfs.set(ek, ek, ek)); /* round 9: a piece shrinks away over its last third of a second instead of blinking out */ confMesh.setMatrixAt(i, _cm); }
   if (any || confMesh.userData.any) confMesh.instanceMatrix.needsUpdate = true; confMesh.visible = any || confMesh.userData.any; confMesh.userData.any = any;
 }
 // rain (streaks falling to the centre) and snow (flakes) in a box that follows the camera's target
@@ -2618,6 +2644,9 @@ function updateLocals(dt, now) {
   // round 8: a local speaks when you stop by them (Messenger: you walk up to someone), never over a door's sign, and not before you've
   // driven: the first seconds belong to the road
   if (state === 'play' && !trial.on && drove && !doorNow()) locals.forEach(function (o) { var d = arc(car.n, o.L.n); if (d < bd && Math.abs(car.v) < (o === talk.who ? 7 : 4)) { bd = d; best = o; } });
+  // round 9: once someone starts talking they finish their first words (a bubble used to pop up and vanish a fifth of a second later
+  // when you rolled past at walking pace)
+  if (talk.who && best !== talk.who && state === 'play' && !trial.on && !doorNow() && talk.t < 1.5 && arc(car.n, talk.who.L.n) < 9) best = talk.who;
   locals.forEach(function (o) {
     var face = 0;
     if (o === best) { var inv = o.g.quaternion.clone().invert(), rel = carG.position.clone().sub(o.g.position).applyQuaternion(inv); face = Math.atan2(rel.x, rel.z); }
@@ -2795,6 +2824,7 @@ var running = false, raf = 0, last = 0, fpsAcc = 0, fpsN = 0, titleSteps = 0, pe
 // parked with nothing touched for 8 s, the world ticks over at 30 until the next touch
 var lastInputT = 0, capMs = 0;
 ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach(function (ev) { addEventListener(ev, function () { lastInputT = performance.now(); }, { passive: true, capture: true }); });
+function quietNow(now) { return !joy.on && !auto && !trial.on && Math.abs(car.v) < .05 && car.hop === 0 && now - lastInputT > 1500 && !gp.on && !ctl.up && !ctl.down && !ctl.left && !ctl.right; }
 function idleNow(now) { return state === 'play' && !joy.on && !auto && !trial.on && Math.abs(car.v) < .05 && car.hop === 0 && now - lastInputT > 8000 && !gp.on; }
 function frame(now) {
   raf = requestAnimationFrame(frame);
@@ -2807,7 +2837,9 @@ function frame(now) {
   if (state === 'play' || state === 'map') updateCar(dt);
   if (state === 'enter') updateEnter(dt);
   if (state !== 'title') pw.step(1 / 60, dt, 3);
-  for (var i = 0; i < dyn.length; i++) { var o = dyn[i]; if (o.inTitle || o.fly) continue; if (o.lost) { o.lost = false; var sp = o.start.p, sq = o.start.q; o.b.position.set(sp.x, sp.y, sp.z); o.b.quaternion.set(sq.x, sq.y, sq.z, sq.w); o.b.velocity.set(0, 0, 0); o.b.angularVelocity.set(0, 0, 0); o.dirty = true; } if (o.b.sleepState !== CANNON.Body.SLEEPING || o.dirty !== false) { o.m.position.copy(o.b.position); o.m.quaternion.copy(o.b.quaternion); o.dirty = o.b.sleepState !== CANNON.Body.SLEEPING; } }
+  for (var i = 0; i < dyn.length; i++) { var o = dyn[i]; if (o.inTitle || o.fly) continue; if (o.lost) { o.lost = false; var sp = o.start.p, sq = o.start.q; o.b.position.set(sp.x, sp.y, sp.z); o.b.quaternion.set(sq.x, sq.y, sq.z, sq.w); o.b.velocity.set(0, 0, 0); o.b.angularVelocity.set(0, 0, 0); o.dirty = true; } if (o.b.sleepState !== CANNON.Body.SLEEPING || o.dirty !== false) { o.m.position.copy(o.b.position); o.m.quaternion.copy(o.b.quaternion); o.dirty = o.b.sleepState !== CANNON.Body.SLEEPING; }
+    // round 9: a prop that has all but stopped (creeping against a tree or another prop) is put to sleep after 2.5 s, so it settles
+    if (o.b.sleepState !== CANNON.Body.SLEEPING && !o.orange) { o.slowT = o.b.velocity.lengthSquared() < .3 && o.b.angularVelocity.lengthSquared() < .5 ? (o.slowT || 0) + dt : 0; if (o.slowT > 2.5) { o.slowT = 0; o.b.velocity.set(0, 0, 0); o.b.angularVelocity.set(0, 0, 0); o.b.sleep(); } } }
   if (state !== 'enter') updateCamera(dt, now);
   updateShadows();
   // light from the camera's upper left, so every side of the planet reads (Messenger's "smart" light)
@@ -2824,8 +2856,11 @@ function frame(now) {
   if (post && post.amt > .001) { post.mat.uniforms.uAmt.value = post.amt; renderer.setRenderTarget(post.rt); renderer.clear(); renderer.render(scene, camera); renderer.setRenderTarget(null); renderer.render(post.scene, post.cam); }
   else renderer.render(scene, camera);
   perf.cpu += performance.now() - c0; perf.n++;
-  // adaptive quality (Jesse Zhou): under Auto, step down a tier while frames run long; the outline goes last
-  if (state === 'play' && SET.qual === 'auto' && capMs < 20) { fpsAcc += dt; fpsN++; if (fpsN >= 90) { var avg = fpsAcc / fpsN; fpsAcc = 0; fpsN = 0; if (avg > .03 && quality.level > 0) { quality.auto = quality.level - 1; applyQuality(); } else if (avg > .045 && quality.level === 0) outlineMesh.visible = leafLine.visible = planetLine.visible = false; } }
+  // adaptive quality (Jesse Zhou): under Auto, step down a tier while frames run long; the outline goes last. Round 9: the step is
+  // only decided while driving and only applied once the car is parked and untouched (or the map is open): a change of pixel
+  // ratio resizes the canvas and a tier change recompiles shaders, a visible hitch that used to land in the middle of a turn
+  if (state === 'play' && SET.qual === 'auto' && capMs < 20) { fpsAcc += dt; fpsN++; if (fpsN >= 90) { var avg = fpsAcc / fpsN; fpsAcc = 0; fpsN = 0; if (avg > .03 && quality.level > 0) quality.want = quality.level - 1; else if (avg > .045 && quality.level === 0) quality.want = -1; } }
+  if (quality.want != null && SET.qual === 'auto' && (state === 'map' || (state === 'play' && quietNow(now)))) { var qw = quality.want; quality.want = null; fpsAcc = fpsN = 0; if (qw < 0) outlineMesh.visible = leafLine.visible = planetLine.visible = false; else { quality.auto = qw; applyQuality(); } }
 }
 // round 6: the air between the camera and the limb (Messenger addFog / Bruno 2025 Fog), outline thinning, and the car's spot on screen for see-through foliage
 var _cs = new V3(), _db = new THREE.Vector2();
@@ -2885,6 +2920,7 @@ function updateWorldBits(dt, now) {
   var narrow = narrowUI(), nearTag = null, ntd = 1e9; STOPS.forEach(function (d) { var dd = arc(car.n, d.site); if (dd < ntd) { ntd = dd; nearTag = d; } });
   STOPS.forEach(function (d) {
     if (!d.tagR) return;
+    var flip0 = !!d.flip, tNow = performance.now();
     var th = (d.id === 'translation' ? 5 : TAG_H[d.id]) * (state === 'map' ? 1.2 : 1), anchor = d.site.clone().multiplyScalar(R + th), pj = anchor.clone().project(camera);
     // round 8: the next door's sign rises over the curve of the planet while it is still far off, on a thin line from its roof, so a
     // landmark is always on the skyline to drive toward (Journey's mountain, Breath of the Wild's towers, Firewatch's lookout);
@@ -2897,6 +2933,7 @@ function updateWorldBits(dt, now) {
     if (d === guide.d) { var base = (d.id === 'translation' ? 5 : TAG_H[d.id]) - .9, len = d.thS - .7 - base; guideLine.visible = state === 'play' && len > 1.2; if (guideLine.visible) { guideLine.position.copy(d.site).multiplyScalar(R + base + len / 2); guideLine.quaternion.setFromUnitVectors(_yUp, d.site); guideLine.scale.set(1, len, 1); guideLine.material.opacity = clamp((len - 1.2) / 3, 0, 1) * .7; } }
     var sx = anchor.clone().project(camera).x;
     if (!d.flip && sx > .3) d.flip = true; else if (d.flip && sx < .1) d.flip = false;
+    if (state === 'play' && !!d.flip !== flip0) { if (tNow - (d.flipAt || 0) < 700) d.flip = flip0; else d.flipAt = tNow; } // round 9: a side swap holds for a moment
     d.tag = d.flip ? d.tagL : d.tagR; (d.flip ? d.tagR : d.tagL).visible = false;
     d.tag.quaternion.copy(camera.quaternion);
     var dist = arc(car.n, d.site), open = state === 'map' ? (hovered ? hovered === d : true) : (state === 'play' && ((d === guide.d && dist < (narrow ? 46 : 62) && !doorNow()) || (d === nearTag && dist < 12) || d === hoverD)) || d === near;
@@ -2906,10 +2943,15 @@ function updateWorldBits(dt, now) {
     if (open && state !== 'map') {
       var tsc = (.82 + cam.zoom * 1.1) * (narrow ? .66 : 1), tw = (d.tagR.geometry.parameters.width || 4) * tsc, rv = _tagRV.setFromMatrixColumn(camera.matrixWorld, 0);
       var ax = anchor.clone().project(camera).x, rx = anchor.clone().addScaledVector(rv, tw).project(camera).x, lx = anchor.clone().addScaledVector(rv, -tw).project(camera).x;
-      var fitsR = ax > -.96 && rx < .96, fitsL = ax < .96 && lx > -.96;
+      var fm = d.tagOpen ? 1.01 : .95, fitsR = ax > -fm && rx < fm, fitsL = ax < fm && lx > -fm; // round 9: a label already open keeps a little slack before it folds
       if (d.flip && !fitsL && fitsR) { d.flip = false; } else if (!d.flip && !fitsR && fitsL) { d.flip = true; }
       if (!(d.flip ? fitsL : fitsR)) open = false;
       if (open) { d.tag = d.flip ? d.tagL : d.tagR; (d.flip ? d.tagR : d.tagL).visible = false; d.tag.quaternion.copy(camera.quaternion); }
+    }
+    // round 9: a label that just opened or closed holds that for a moment (it used to blink when its sign sat on an edge of the
+    // view: open, shut, open, a frame apart, each time restarting its slide)
+    if (state === 'play') {
+      if (!!open !== !!d.tagOpen && d.tagT < .6) open = !!d.tagOpen;
     }
     var vis = state === 'play' || state === 'map' || state === 'enter'; d.tag.visible = vis;
     // round 6: Bruno 2025's interactive points: the label slides out with power2.out (0.6 s, 0.2 s late) while the diamond springs
@@ -2962,7 +3004,9 @@ function updatePointer(dt) {
     var p = d.site.clone().multiplyScalar(R + (d.thS || TAG_H[d.id] || 6)).project(camera), px = p.x, py = p.y;
     if (p.z > 1) { px = -px; py = -py; if (Math.abs(px) < .01 && Math.abs(py) < .01) py = -1; var m = Math.max(Math.abs(px), Math.abs(py)); px /= m; py /= m; }
     var g0 = d.site.clone().multiplyScalar(R + 1).project(camera);
-    if ((p.z <= 1 && Math.abs(px) < .92 && Math.abs(py) < .9) || (g0.z <= 1 && Math.abs(g0.x) < .9 && Math.abs(g0.y) < .85) || onView(d.pad)) want = false; // the sign or the building is in view: the world does the pointing
+    var e = gd.on ? .9 : 1; // round 9: hysteresis, so a sign sitting on the edge of the view doesn't make the pointer blink on and off; and a building
+    // only counts as pointing the way when it is well inside the view (at the very edge, with its sign cut off, there was nothing to press)
+    if ((p.z <= 1 && Math.abs(px) < .92 * e && Math.abs(py) < .9 * e) || (g0.z <= 1 && Math.abs(g0.x) < .7 * e && Math.abs(g0.y) < .7 * e) || onView(d.pad)) want = false; // the sign or the building is in view: the world does the pointing
     else {
       var sx = px * W / 2, sy = -py * H / 2; ang = Math.atan2(sy, sx);
       var narrow = narrowUI(), top = narrow ? 76 : 70, bot = COARSE ? 176 : 40, side = 16, hw = W / 2 - side - gd.w / 2 - 14, hh0 = H / 2 - top - 26, hh1 = H / 2 - bot - 26;
@@ -2970,7 +3014,8 @@ function updatePointer(dt) {
       x = W / 2 + sx * k; y = H / 2 + sy * k;
     }
   }
-  if (want !== gd.on) { gd.on = want; gdEl.classList.toggle('show', want); if (want) gd.x = -1; }
+  if (want !== gd.on && want && performance.now() - (gd.ct || 0) < 500) want = false; // and once hidden it stays hidden for half a second
+  if (want !== gd.on) { gd.on = want; gd.ct = performance.now(); gdEl.classList.toggle('show', want); if (want) gd.x = -1; }
   if (!want) return;
   if (gd.x < 0) { gd.x = x; gd.y = y; } else { var kk = Math.min(1, dt * 6); gd.x += (x - gd.x) * kk; gd.y += (y - gd.y) * kk; }
   gdEl.style.transform = 'translate(' + (gd.x - gd.w / 2).toFixed(1) + 'px,' + (gd.y - 20).toFixed(1) + 'px)';
@@ -3081,10 +3126,9 @@ fontsReady.then(function () {
 });
 function onSetting(k, v) {
   if (k === 'cam') cam.zoomT = CAM_Z[v];
-  if (k === 'qual') { quality.auto = null; applyQuality(); }
+  if (k === 'qual') { quality.auto = null; quality.want = null; applyQuality(); }
   if (k === 'vol') setVolume(v);
   if (k === 'touch') { endJoy(); auto = null; hideMarker(); }
-  if (k === 'rm' && v) { cam.roll = cam.rollV = 0; }
 }
 function onPanel(open) { clearCtl(); if (open) sfx('paper'); }
 applyQuality();
