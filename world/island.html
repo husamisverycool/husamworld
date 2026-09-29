@@ -1584,7 +1584,7 @@ STOPS.forEach(function (d, i) {
   if (d.id === 'contact' || d.id === 'translation') return;
   var p = d.plaza.clone().addScaledVector(d.tan, (i % 2 ? 1 : -1) * (d.pw / 2 - 2)).addScaledVector(d.face, -d.depth * .1);
   var o = addDyn(propMesh(boomKit()), new V3(.45, .45, .45), .5, 'brick', p.x, .45, p.z, d.rot + .4); o.boom = true; booms.push(o);
-  o.onCar = function (v) { if (v > 2.5 && !o.gone) explode(o); };
+  o.onCar = function (v) { if (v > 2.5 && !o.gone && pendingBoom.indexOf(o) < 0) pendingBoom.push(o); }; // explode after the step: cannon must not lose a body mid-narrowphase
 });
 // cones on the insides of the tightest bends, hay bales by the start, benches on the plazas
 (function () {
@@ -2202,6 +2202,7 @@ function bumpStatic(s, v) {
 }
 // the explosive crate (Bruno 2025 Explosions.js): everything near is thrown outward and up, the camera rolls
 var FIRE = (function () { var m = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 2), new THREE.MeshBasicMaterial({ color: '#ffd23a', transparent: true, depthWrite: false })); m.visible = false; scene.add(m); return m; })();
+var pendingBoom = [];
 function explode(o) {
   o.gone = true; var p = o.b.position, c = new V3(p.x, p.y, p.z);
   pw.removeBody(o.b); o.m.visible = false; o.b.sleep();
@@ -2827,6 +2828,7 @@ function physicsTick() {
   if (tapJumpT > 0) tapJumpT -= DT; if (honkT > 0) honkT -= DT;
   if (state === 'play' || state === 'map' || state === 'enter' || state === 'intro') { playerInput(); if (state !== 'play') { player.acc = 0; player.steer = 0; player.boost = 0; } vehiclePre(); }
   pw.step(DTS); elapsed += DT;
+  while (pendingBoom.length) { var pb = pendingBoom.shift(); if (!pb.gone) explode(pb); }
   vehiclePost(elapsed);
 }
 function frame(now) {
