@@ -1313,9 +1313,8 @@ var PIER = STOPS.filter(function (d) { return d.id === 'depths'; })[0];
 function coastR(ang) { var c = Math.abs(Math.cos(ang)), s = Math.abs(Math.sin(ang)), n = 3.2, r = Math.pow(Math.pow(c, n) + Math.pow(s, n), -1 / n); return ISLAND * .97 * r + (fbm(Math.cos(ang) * 2.3 + 4, Math.sin(ang) * 2.3 - 2) - .5) * 16; }
 function landK(x, z) { // > 0 on land, < 0 at sea (metres from the coast, roughly)
   var r = Math.hypot(x, z), a = Math.atan2(z, x), k = coastR(a) - r;
-  var px = PIER.plaza.x, pz = PIER.plaza.z, pd = Math.hypot(x - px, z - pz); // the Pier's bay: the sea comes up to the plaza
-  var toPier = PIER.site.clone(); k = Math.min(k, pd - 0 < 999 ? k : k);
-  var bay = Math.hypot(x - (toPier.x + PIER.rgt.x * PIER.side * 8), z - (toPier.z + PIER.rgt.z * PIER.side * 8)) - 13; k = Math.min(k, bay);
+  // the Pier's bay: the sea comes up to the plaza (round 15: the same sum without a new vector per call; the mask asks a million times)
+  var bay = Math.hypot(x - (PIER.site.x + PIER.rgt.x * PIER.side * 8), z - (PIER.site.z + PIER.rgt.z * PIER.side * 8)) - 13; k = Math.min(k, bay);
   return k;
 }
 var CH_N = 512, CH_C = WORLD / CH_N, chanDist = new Float32Array(CH_N * CH_N).fill(1e4);
@@ -1336,7 +1335,11 @@ function channelK(x, z) { // < 0 inside a channel or pond (metres, roughly), wit
   return d - (fbm(x * .08, z * .08) - .5) * 1.6;
 }
 function roundRectD(x, z, cx, cz, ux, uz, hw, hd, r) { var dx = x - cx, dz = z - cz, a = dx * ux + dz * uz, b = dx * -uz + dz * ux, qx = Math.abs(b) - hw + r, qz = Math.abs(a) - hd + r; return Math.hypot(Math.max(qx, 0), Math.max(qz, 0)) + Math.min(Math.max(qx, qz), 0) - r; }
-function plazaK(x, z) { var best = 1e9; STOPS.forEach(function (d) { var e = roundRectD(x, z, d.plaza.x, d.plaza.z, d.face.x, d.face.z, d.pw / 2, d.depth / 2 + 1, 2.5); if (e < best) best = e; }); return best; }
+// (round 15) for the mask painter: the same as plazaK wherever it is under 40 m; past that it is only known to be 40 or more, which is all the
+// mask can use (every term it feeds is already settled 36 m out). A stop whose centre is farther than its half-diagonal plus the best so far
+// can't be nearer, so its rounded rectangle isn't measured
+function plazaK40(x, z) { var best = 40; for (var i = 0; i < STOPS.length; i++) { var d = STOPS[i]; if (!d.hdiag) d.hdiag = Math.hypot(d.pw / 2, d.depth / 2 + 1); if (Math.hypot(x - d.plaza.x, z - d.plaza.z) - d.hdiag >= best) continue; var e = roundRectD(x, z, d.plaza.x, d.plaza.z, d.face.x, d.face.z, d.pw / 2, d.depth / 2 + 1, 2.5); if (e < best) best = e; } return best; }
+function plazaK(x, z) { var best = 1e9; for (var i = 0; i < STOPS.length; i++) { var d = STOPS[i], e = roundRectD(x, z, d.plaza.x, d.plaza.z, d.face.x, d.face.z, d.pw / 2, d.depth / 2 + 1, 2.5); if (e < best) best = e; } return best; }
 // tiled paths across the middle, plaza to plaza (Bruno's areas are linked by paths)
 var PATHS = [[[-10, 64], [-8, 44], [8, 28], [30, 22], [48, 30], [62, 42]], [[8, 28], [4, 10], [-14, 2], [-40, 8], [-58, 22]], [[-14, 2], [-12, -30], [2, -46], [24, -52], [48, -58]], [[-12, -30], [-40, -40], [-58, -52]]];
 function pathK(x, z) { var best = 1e9; PATHS.forEach(function (p) { for (var i = 0; i < p.length - 1; i++) { var d = segDist(x, z, p[i][0], p[i][1], p[i + 1][0], p[i + 1][1]) - 1.6; if (d < best) best = d; } }); return best; }
@@ -1381,7 +1384,7 @@ function nameK(x, z) { if (x < NAME_BB[0] - 4 || x > NAME_BB[1] + 4 || z < NAME_
     if (ch < 0 && !onRoad) dep = Math.max(dep, clamp(.2 + (-ch) / 2.2, 0, .92));
     var shoreSoft = land >= 0 ? clamp(1 - land / 2.2, 0, 1) * .12 : 0; if (ch >= 0 && ch < 1.6) shoreSoft = Math.max(shoreSoft, (1 - ch / 1.6) * .14);
     if (!onRoad) dep = Math.max(dep, shoreSoft);
-    var plz = plazaK(wx2, wz2), road0 = clamp(.5 + (ROAD_W / 2 - rd) / 2, 0, 1);
+    var plz = plazaK40(wx2, wz2), road0 = clamp(.5 + (ROAD_W / 2 - rd) / 2, 0, 1);
     // (round 15) open water away from the plazas: no slabs (it is deeper than 0.2) and no grass (the land term is under -1.6), so the noise
     // below can't change a thing there; skipping it is most of the sea, a good part of the load
     if (land < 0 && plz >= 3) { mask[k2 * 4] = 0; mask[k2 * 4 + 1] = 0; mask[k2 * 4 + 2] = dep * 255; mask[k2 * 4 + 3] = road0 * 255; depthF[k2] = dep; continue; }
