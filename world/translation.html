@@ -873,9 +873,13 @@ if(!location.hash) window.scrollTo(0,0);
         var ahead = P(road(t + .004), .02), ang = Math.atan2(ahead[1] - q[1], ahead[0] - q[0]), L = rad * this.o.car, W = L * .66, hop = extra.hop || 0;
         x.save(); x.translate(q[0], q[1] - hop * L * .9); x.rotate(ang); x.scale(1 + hop * .08, 1 - hop * .08);
         x.fillStyle = 'rgba(35,38,46,.28)'; x.fillRect(-L / 2 + 1, -W / 2 + 1.5 + hop * L * .9, L, W);
-        x.fillStyle = '#e0533d'; x.strokeStyle = INK; x.lineWidth = lw * .8; x.beginPath(); x.rect(-L / 2, -W / 2, L, W); x.fill(); x.stroke();
-        x.fillStyle = '#2b2f3b'; x.fillRect(L * .02, -W * .34, L * .2, W * .68);
-        x.fillStyle = '#f2c23a'; x.fillRect(-L * .32, -W * .1, L * .3, W * .2);
+        // the hub's car (round 11): a tomato wagon, cream roof, the trip's luggage on top, nose along the road
+        var rr = function (x0, y0, w0, h0, r0) { x.beginPath(); x.moveTo(x0 + r0, y0); x.arcTo(x0 + w0, y0, x0 + w0, y0 + h0, r0); x.arcTo(x0 + w0, y0 + h0, x0, y0 + h0, r0); x.arcTo(x0, y0 + h0, x0, y0, r0); x.arcTo(x0, y0, x0 + w0, y0, r0); x.closePath(); };
+        x.fillStyle = '#e8483a'; x.strokeStyle = INK; x.lineWidth = lw * .8; rr(-L / 2, -W / 2, L, W, W * .28); x.fill(); x.stroke();
+        x.fillStyle = '#3b5a78'; x.fillRect(L * .14, -W * .36, L * .1, W * .72);
+        x.fillStyle = '#fff4dc'; x.fillRect(-L * .44, -W * .36, L * .58, W * .72);
+        x.fillStyle = '#c7672e'; x.fillRect(-L * .36, -W * .3, L * .22, W * .34);
+        x.fillStyle = '#2fa39a'; x.fillRect(-L * .08, -W * .32, L * .1, W * .64);
         x.restore();
       }
     }
@@ -895,7 +899,7 @@ if(!location.hash) window.scrollTo(0,0);
       var hereSite = SITE[here] || [0, -64, 23];
       var rows = DISTRICTS.map(function (d) {
         var inner = '<i class="dia" aria-hidden="true"></i><b>' + d[1] + '</b><span>' + d[2] + '</span>';
-        if (d[0] === here) return '<li><span class="row here" aria-current="page" data-id="' + d[0] + '"><svg class="car" viewBox="0 0 20 14" aria-hidden="true"><rect x="1.5" y="1.5" width="17" height="11" fill="#e0533d" stroke="#23262e" stroke-width="2"/><rect x="10.5" y="3.5" width="3.5" height="7" fill="#2b2f3b"/><rect x="4" y="6" width="5" height="2" fill="#f2c23a"/></svg><b>' + d[1] + '</b><span>' + d[2] + '</span></span></li>';
+        if (d[0] === here) return '<li><span class="row here" aria-current="page" data-id="' + d[0] + '"><svg class="car" viewBox="0 0 20 14" aria-hidden="true"><rect x="1.5" y="1.5" width="17" height="11" rx="3" fill="#e8483a" stroke="#23262e" stroke-width="2"/><rect x="12.2" y="3.4" width="2" height="7.2" fill="#3b5a78"/><rect x="3" y="3.4" width="9" height="7.2" fill="#fff4dc"/><rect x="4" y="4" width="3.6" height="3.4" fill="#c7672e"/><rect x="8.6" y="3.8" width="2" height="6.4" fill="#2fa39a"/></svg><b>' + d[1] + '</b><span>' + d[2] + '</span></span></li>';
         return '<li><a class="row" href="' + d[0] + '.html" data-id="' + d[0] + '">' + inner + '</a></li>';
       }).join('');
       var pins = DISTRICTS.map(function (d) {

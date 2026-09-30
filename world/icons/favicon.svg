@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- husam.world: the tiny planet from the hub, its road, and the red car parked on top -->
+  <!-- husam.world: the tiny planet from the hub, its road, and the road-trip wagon parked on top -->
   <defs>
     <clipPath id="p"><circle cx="32" cy="35" r="25"/></clipPath>
   </defs>
@@ -14,9 +14,13 @@
     <circle cx="47" cy="17" r="3.6" fill="#3f8a55" stroke="#23262e" stroke-width="1.4"/>
   </g>
   <circle cx="32" cy="35" r="25" fill="none" stroke="#23262e" stroke-width="3.2"/>
-  <g transform="rotate(-8 32 11)">
-    <rect x="21" y="4" width="22" height="13" rx="2" fill="#e0533d" stroke="#23262e" stroke-width="2.6"/>
-    <rect x="26" y="6.5" width="12" height="5" rx="1" fill="#23262e"/>
-    <rect x="30" y="5" width="4" height="3" fill="#f2c23a"/>
+  <!-- round 11: the hub's own car, the road-trip wagon, luggage on its roof -->
+  <g transform="translate(17 .5) rotate(-6 15 10)" stroke="#23262e" stroke-linejoin="round">
+    <rect x="6" y="1.2" width="9" height="4.6" rx="1" fill="#c7672e" stroke-width="1.8"/>
+    <rect x="15.4" y="1.9" width="6.4" height="3.9" rx="1.9" fill="#2fa39a" stroke-width="1.8"/>
+    <path d="M1.6 15.2v-3.6q0-1.5 1.5-1.8l1.7-.3.7-3.1q.3-1 1.3-1h14.6q1 0 1.6.7l2.9 3.3 3.9.5q1.8.3 1.8 1.9v3.4z" fill="#e8483a" stroke-width="2.4"/>
+    <path d="M6.6 7.4h4.8v2.3H6.2zM13 7.4h4.6v2.3H13zM19.2 7.4h2.7l2 2.3h-4.7z" fill="#3b5a78" stroke="none"/>
+    <circle cx="8.3" cy="15.6" r="3.4" fill="#23262e" stroke="none"/><circle cx="23.6" cy="15.6" r="3.4" fill="#23262e" stroke="none"/>
+    <circle cx="8.3" cy="15.6" r="1.4" fill="#f6f1e6" stroke="none"/><circle cx="23.6" cy="15.6" r="1.4" fill="#f6f1e6" stroke="none"/>
   </g>
 </svg>
