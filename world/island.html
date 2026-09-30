@@ -2364,7 +2364,8 @@ function clickAt(e) {
   if (e.pointerType === 'touch' && SET.touch === 'tap') { var g = screenToGround(e.clientX, e.clientY, 0); if (g) driveTo(g, null); }
 }
 function driveTo(p, d) { auto = { x: p.x, z: p.z, d: d, t: 0, back: 0, stk: 0 }; markDrove(); sfx('pad'); showMarker(p); view.tracking = true; }
-$('exitGo').addEventListener('click', function () { if (doorNow()) goIn(doorNow()); });
+var lastDoor = null, lastDoorT = 0, shownDoor = null; // the sign slides out over 0.55 s: a tap on its button while it is still on screen still counts
+$('exitGo').addEventListener('click', function () { var d = doorNow() || (lastDoor && performance.now() - lastDoorT < 600 ? lastDoor : null); if (d) goIn(d); });
 $('ctxBtn').addEventListener('click', function () { respawnNearest(); $('ctx').classList.remove('show'); });
 // the autopilot: along the loop toward the stop, then off it onto the pad; it steers the real car with the same inputs a player has
 function blockedDir(ang, look) {
@@ -2380,19 +2381,25 @@ function autoInput() {
   var cr = nearestRoad(car.pos.x, car.pos.z), ts = A.d ? A.d.padS : nearestRoad(A.x, A.z).s, ds = wrapA((ts - cr.s) / ROAD_LEN * TAU) / TAU * ROAD_LEN;
   // a driver's route: off the road and not beside the goal, join the road first (never straight through a building); then follow it
   if (A.d && cr.d > ROAD_W / 2 + 2 && (dist > 10 || Math.abs(ds) > 10)) { var j = roadAt(cr.s + Math.sign(ds || 1) * Math.min(Math.abs(ds), 5)); tx = j.x; tz = j.z; }
-  else if (dist > 14 && Math.abs(ds) > 12) { var la = cr.s + Math.sign(ds) * Math.min(Math.abs(ds), 7 + car.speed * 1.2), p = roadAt(la); tx = p.x; tz = p.z; }
+  else if (dist > 9 && Math.abs(ds) > 7) { var la = cr.s + Math.sign(ds) * Math.min(Math.abs(ds), 7 + car.speed * 1.2), p = roadAt(la); tx = p.x; tz = p.z; }
   var want = Math.atan2(tz - car.pos.z, tx - car.pos.x), head = Math.atan2(car.fwd.z, car.fwd.x);
   // steer round whatever stands in the way: the first heading, nearest the wanted one, whose next few metres are clear of every
   // building, tree and post (their colliders' footprints), like a driver picking a gap
   var look = Math.min(dist, 9);
   if (blockedDir(want, look)) { for (var k = 1; k <= 6; k++) { var a1 = want + k * .35, a2 = want - k * .35, b1 = blockedDir(a1, look), b2 = blockedDir(a2, look); if (!b1 && (b2 || Math.abs(wrapA(a1 - head)) <= Math.abs(wrapA(a2 - head)))) { want = a1; break; } if (!b2) { want = a2; break; } } }
   var da = wrapA(want - head);
-  if (A.back > 0) { A.back -= DT; player.acc = -1; player.steer = A.backSteer; return; }
+  if (A.back > 0) { A.back -= DT; player.acc = -1; player.steer = A.backSteer; if (A.kturn && Math.abs(da) < .9) A.back = 0; return; }
+  // a driver parked facing away from where they're going (on a pad, nose to the landmark) backs out in a K-turn rather than grinding
+  // forward on full lock into whatever is in front; only when the way behind is clear
+  if (Math.abs(da) > 1.9 && car.speed < 2 && !A.kDone && !blockedDir(head + PI, 3.5)) { A.kDone = true; A.kturn = true; A.back = 1.6; A.backSteer = Math.sign(da || 1); player.acc = -1; player.steer = A.backSteer; return; }
+  A.kturn = false;
   player.steer = clamp(-da / .5, -1, 1);
   player.acc = dist < 10 ? clamp(dist / 12, .25, .6) : 1;
   if (Math.abs(da) > 1.2 && car.speed > 3) player.acc = 0;
   if (dist < 6 && car.speed > 3) { player.acc = 0; player.brake = 0; }
-  if (player.acc > .2 && car.speed < .3) { A.stk += DT; if (A.stk > 1) { A.stk = 0; A.back = 1.2; A.backSteer = Math.sign(da || 1); A.tries = (A.tries || 0) + 1; } /* back up, the wheel turned so the nose swings toward the gap */ } else A.stk = 0;
+  // stuck: not only stopped dead, but pushing without getting any closer (sliding along a wall or a local at a crawl) for 1.5 s
+  if (A.pd == null || dist < A.pd - .5) { A.pd = dist; A.pt = 0; } else if (player.acc > .2) A.pt += DT;
+  if (player.acc > .2 && (car.speed < .3 || A.pt > 1.5)) { A.stk += car.speed < .3 ? DT : 1; if (A.stk > 1) { A.stk = 0; A.pt = 0; A.pd = null; A.back = 1.2; A.backSteer = (A.tries || 0) % 2 ? 0 : Math.sign(da || 1); A.tries = (A.tries || 0) + 1; } /* back up, the wheel turned so the nose swings toward the gap (every other try straight back) */ } else A.stk = 0;
 }
 
 // ============================================================================ the camera: Bruno 2025 View.js, ported as is
@@ -3252,7 +3259,10 @@ function updateNear(dt) {
   var best = null, bd = 1e9, cands = trial.on ? STOPS : STOPS.concat([RACE]);
   cands.forEach(function (d) { var dd = Math.hypot(car.pos.x - d.pad.x, car.pos.z - d.pad.z); if (dd < bd) { bd = dd; best = d; } });
   if (backFrom && (best !== backFrom || bd > 4)) backFrom = null;
-  var n = bd < (best === RACE ? 3 : 3.2) && best !== backFrom && car.xzSpeed < 12 ? best : null;
+  // hysteresis: a pad is reached within 3.2 m of its centre and kept until the car is 5 m away, so a car that rolls to a stop on the pad's
+  // edge (it stops about 3.5 m out when the finger lifts the moment the sign appears) keeps its door (round 10: the phone newcomer's 1-in-6)
+  var keepR = best === near ? (best === RACE ? 4.6 : 5) : (best === RACE ? 3 : 3.2);
+  var n = bd < keepR && best !== backFrom && car.xzSpeed < 12 ? best : null;
   cands.forEach(function (d) { d.padK += ((d === n ? 1 : 0) - d.padK) * Math.min(1, dt * 6); d.padMesh.material.uniforms.uK.value = d.padK; });
   RACE.padMesh.material.uniforms.uOp.value = trial.on ? 0 : .9;
   if (n && n !== RACE && !visited[n.id]) { visited[n.id] = 1; award('door', true); if (Object.keys(visited).length >= STOPS.length) award('tour'); }
@@ -3261,11 +3271,12 @@ function updateNear(dt) {
 }
 function doorNow() { if (near) return near; if (stickyNear && performance.now() - stickyT < 2200 && Math.hypot(car.pos.x - stickyNear.pad.x, car.pos.z - stickyNear.pad.z) < 10) return stickyNear; return null; }
 function showDoor(n) {
+  shownDoor = n;
   html.classList.add('exit-on');
   $('exitNo').textContent = n === RACE ? 'Start line' : n.id === 'contact' ? 'Last stop' : 'Exit ' + (n.index + 1); $('exitName').textContent = n.name; $('exitLine').textContent = n.teaser;
   $('exitGoWord').textContent = n === RACE ? 'Race' : n.id === 'contact' ? 'Open' : 'Go in'; $('exit').classList.add('show'); sfx('pad'); buzz(18);
 }
-function hideDoor() { html.classList.remove('exit-on'); $('exit').classList.remove('show'); }
+function hideDoor() { if ($('exit').classList.contains('show')) { lastDoor = shownDoor; lastDoorT = performance.now(); } html.classList.remove('exit-on'); $('exit').classList.remove('show'); }
 var lastTitleT = 0;
 function updateTabTitle(now) { lastTitleT = now; var s = wrapS(nearestRoad(car.pos.x, car.pos.z).s - START_S) / (FINISH_S - START_S), n = 11, k = clamp(Math.round(s * (n - 1)), 0, n - 1), bar = ''; for (var i = 0; i < n; i++) bar += i === k ? '●' : '·'; doc.title = 'Fresno ' + bar + ' Cambridge'; }
 
