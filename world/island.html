@@ -113,7 +113,7 @@ html.started .title{opacity:0;visibility:hidden;transition:opacity .45s,visibili
 /* with the 3D world the only name is the red 3D one: the page title stays for screen readers, never drawn */
 html.has-world .t-name{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;opacity:1}
 .t-go{pointer-events:auto;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-width:236px;min-height:60px;padding:15px 26px 13px 20px;font:400 21px/1 var(--display);letter-spacing:.01em}
-.t-go::before{content:"";width:30px;height:18px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 18'%3E%3Cpath d='M2 12.5V9.3c0-1 .6-1.7 1.6-1.9l3.2-.6 3-3.6c.5-.5 1.1-.8 1.8-.8h9.6c.8 0 1.4.4 1.8 1l2 3.3 2 .4c.9.2 1.5 1 1.5 1.9v3.5z' fill='%231d1724'/%3E%3Crect x='10' y='0' width='9' height='3' rx='1' fill='%231d1724'/%3E%3Ccircle cx='8' cy='14' r='3.4' fill='%231d1724'/%3E%3Ccircle cx='22' cy='14' r='3.4' fill='%231d1724'/%3E%3Ccircle cx='8' cy='14' r='1.3' fill='%23ffc85a'/%3E%3Ccircle cx='22' cy='14' r='1.3' fill='%23ffc85a'/%3E%3C/svg%3E") center/contain no-repeat}
+.t-go::before{content:"";width:34px;height:20px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 20'%3E%3Crect x='9' y='.5' width='8' height='4.2' rx='1' fill='%231d1724'/%3E%3Crect x='18' y='1.2' width='6.2' height='3.5' rx='1.7' fill='%231d1724'/%3E%3Crect x='7' y='4.6' width='19' height='1.2' fill='%231d1724'/%3E%3Cpath d='M1 15.2v-4.1q0-1.4 1.4-1.7l2-.4 1.1-3.3q.4-1 1.4-1h16.3q1 0 1.7.8l3 3.5 4 .5q1.9.3 1.9 2v3.7z' fill='%231d1724'/%3E%3Ccircle cx='8' cy='15.6' r='3.8' fill='%231d1724'/%3E%3Ccircle cx='25' cy='15.6' r='3.8' fill='%231d1724'/%3E%3Ccircle cx='8' cy='15.6' r='1.5' fill='%23ffc85a'/%3E%3Ccircle cx='25' cy='15.6' r='1.5' fill='%23ffc85a'/%3E%3C/svg%3E") center/contain no-repeat}
 .t-go:hover{transform:translateY(-2px)}
 .t-go[disabled]{visibility:hidden}
 html.has-world:not(.ready) .t-map{visibility:hidden}
@@ -252,6 +252,7 @@ html.coarse .exit,html.coarse .ctx{bottom:calc(max(12px,env(safe-area-inset-bott
 .letter-head img{width:72px;height:72px;object-fit:cover;border-radius:12px;flex:none}
 .letter h2{font:400 28px/.95 var(--display);margin:0}
 .letter p{margin:0 0 16px}
+.letter .email{flex:1 1 100%}.letter .email-addr{flex:1;font-size:14.5px}
 .x,.letter-x,.setp-x,.atlas-close{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--kerb);color:#fff;box-shadow:inset 0 -3px 0 var(--kerb-2);font:400 20px/1 var(--display);transition:transform .15s var(--spring)}
 .letter-x{position:absolute;right:14px;top:20px}
 .letter-x:active,.setp-x:active,.atlas-close:active{transform:scale(.93)}
@@ -338,6 +339,10 @@ html.has-world .imap{display:block}
 .imap-car{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--kerb);box-shadow:0 0 0 2.5px var(--cream),0 0 0 4px var(--night),0 0 0 9px rgba(232,72,58,.25);animation:carPing 1.6s ease-out infinite}
 @keyframes carPing{0%{box-shadow:0 0 0 2.5px var(--cream),0 0 0 4px var(--night),0 0 0 4px rgba(232,72,58,.5)}100%{box-shadow:0 0 0 2.5px var(--cream),0 0 0 4px var(--night),0 0 0 16px rgba(232,72,58,0)}}
 @media (max-width:420px){.imap-w{font-size:9.5px;padding:4px 5px 3px}}
+/* a wide screen shows the island itself beside the panel (the camera flies up over it and its labels take you there): the picture
+   would only repeat it, so the panel keeps the card and the road */
+@media (min-width:1100px) and (hover:hover){html.has-world .imap{display:none}}
+html.map-open .tabs .tab-map{visibility:hidden}
 
 /* ---------- Settings: Bruno 2025's tabbed menu (icon tabs on a dark panel, a red close), docked so the world stays in view ---------- */
 .setp{position:fixed;z-index:45;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));width:min(400px,calc(100vw - 32px));max-height:calc(100% - 32px);display:flex;flex-direction:column;background:var(--glass);color:var(--cream);border-radius:18px;box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift);visibility:hidden;opacity:0;transform:translateX(24px) scale(.98);transform-origin:100% 0;transition:transform .45s var(--spring),opacity .2s,visibility 0s .45s}
@@ -2356,20 +2361,21 @@ function buildCar(kind) {
     k.add(RB(.16, .14, 1.68, .06), CHROME, 1.5, -.72, 0).add(RB(.16, .14, 1.68, .06), CHROME, -1.54, -.72, 0);
     k.add(G.box, INK, 1.5, -.58, 0, .04, .2, .62); [-.2, -.1, 0, .1, .2].forEach(function (z) { k.add(G.box, CHROME, 1.515, -.58, z, .02, .2, .025); });
     roundLight(1.48, -.48, .56, .12, LAMP); roundLight(1.48, -.48, -.56, .12, LAMP);
-    k.add(G.box, TAIL, -1.525, -.56, .64, .03, .2, .18).add(G.box, TAIL, -1.525, -.56, -.64, .03, .2, .18).add(G.box, CREAM, -1.525, -.6, 0, .02, .12, .36);
+    k.add(G.box, 39, -1.525, -.64, .64, .03, .26, .2).add(G.box, 39, -1.525, -.64, -.64, .03, .26, .2).add(G.box, CREAM, -1.525, -.6, 0, .02, .12, .36); // the tail lamps, dark until they light
     k.add(G.cyl8, CHROME, -1.5, -.8, .42, .1, .22, .1, 0, 0, PI / 2);
-    ref.stop = [[-1.535, -.53, .64, .03, .12, .19], [-1.535, -.53, -.64, .03, .12, .19]]; ref.rev = [[-1.535, -.64, .64, .03, .06, .18], [-1.535, -.64, -.64, .03, .06, .18]];
-    ref.blinkF = [[1.52, -.66, .7, .04, .06, .1], [1.52, -.66, -.7, .04, .06, .1]]; ref.blinkR = [[-1.535, -.53, .76, .03, .12, .06], [-1.535, -.53, -.76, .03, .12, .06]];
+    ref.stop = [[-1.545, -.46, .64, .03, .12, .2], [-1.545, -.46, -.64, .03, .12, .2]]; ref.rev = [[-1.545, -.58, .64, .03, .09, .2], [-1.545, -.58, -.64, .03, .09, .2]];
+    ref.blinkF = [[1.52, -.66, .7, .04, .06, .1], [1.52, -.66, -.7, .04, .06, .1]]; ref.blinkR = [[-1.545, -.46, .77, .03, .12, .07], [-1.545, -.46, -.77, .03, .12, .07]];
     ref.trail = [new V3(-1.56, -.45, -.66), new V3(-1.56, -.45, .66)]; ref.pipe = new V3(-1.62, -.8, .42); ref.ant = new V3(-1.28, -.26, -.74); ref.lug = top;
   }
   var bodyM = meshOf(k); body.add(bodyM); carParts.body = bodyM;
   var lug = new THREE.Group(), lugM = meshOf(top); lug.add(lugM); body.add(lug); carParts.lug = lug; // the luggage hops on its own
-  function lamp(col, a) { var m = new THREE.Mesh(new THREE.BoxGeometry(a[3], a[4], a[5]), new THREE.MeshBasicMaterial({ color: col, toneMapped: false })); m.position.set(a[0], a[1], a[2]); m.visible = false; body.add(m); return m; }
-  carParts.stop = ref.stop.map(function (a) { return lamp('#ff3a2a', a); }); carParts.rev = ref.rev.map(function (a) { return lamp('#fff8e8', a); });
+  function lamp(col, a, k2) { var m = new THREE.Mesh(new THREE.BoxGeometry(a[3], a[4], a[5]), new THREE.MeshBasicMaterial({ color: new THREE.Color(col).multiplyScalar(k2 || 2.2), toneMapped: false })); m.position.set(a[0], a[1], a[2]); m.visible = false; body.add(m); return m; } // above 1: they bloom
+  carParts.stop = ref.stop.map(function (a) { return lamp('#ff2a1a', a, 2.6); }); carParts.rev = ref.rev.map(function (a) { return lamp('#fff8e8', a, 1.8); });
   carParts.blinkL = [lamp('#ffb52e', ref.blinkF[1]), lamp('#ffb52e', ref.blinkR[1])]; carParts.blinkR = [lamp('#ffb52e', ref.blinkF[0]), lamp('#ffb52e', ref.blinkR[0])]; // -z is the car's left
   // boost: the tail pipe glows and spits a pink-to-white flame (ours; Bruno's truck raised energy cells)
-  var fl = new THREE.Mesh(new THREE.ConeGeometry(.13, .7, 8).rotateZ(PI / 2).translate(-.35, 0, 0), new THREE.MeshBasicMaterial({ color: '#ff7ad9', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
-  fl.position.copy(ref.pipe); fl.visible = false; body.add(fl); carParts.flame = fl;
+  var fl = new THREE.Mesh(new THREE.ConeGeometry(.2, 1.1, 10).rotateZ(PI / 2).translate(-.55, 0, 0), new THREE.MeshBasicMaterial({ color: new THREE.Color('#ff5ad0').multiplyScalar(2.2), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+  var core = new THREE.Mesh(new THREE.ConeGeometry(.09, .55, 8).rotateZ(PI / 2).translate(-.28, 0, 0), new THREE.MeshBasicMaterial({ color: new THREE.Color('#fff4fb').multiplyScalar(2.5), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+  fl.add(core); fl.position.copy(ref.pipe); fl.visible = false; body.add(fl); carParts.flame = fl;
   // the antenna: a whip on a spring with a crimson pennant (Bruno's whip and ball, re-made)
   var ant = new THREE.Group(), ak = new Kit(); ak.add(G.cyl6, INK, 0, 0, 0, .035, 1.1, .035).add(G.ball, 61, 0, 1.08, 0, .07, .07, .07);
   var pen = new THREE.Shape(); pen.moveTo(0, 0); pen.lineTo(-.46, -.1); pen.lineTo(0, -.24); pen.lineTo(0, 0); var pg = new THREE.ShapeGeometry(pen); pg.translate(0, 1.04, 0);
@@ -2651,7 +2657,7 @@ canvas.addEventListener('pointermove', function (e) {
   if (state !== 'play' && state !== 'map') return;
   if (nPtr() >= 2) { // two fingers: pan with the midpoint, pinch to zoom
     var k = Object.keys(ptrs), a = ptrs[k[0]], b = ptrs[k[1]], d = Math.hypot(a.x - b.x, a.y - b.y);
-    if (state === 'play') { panBy(dx / 2, dy / 2); if (pinch.d0) { view.zoomBase = clamp(view.zoomBase + (d - pinch.d0) * .005, 0, 1); pinch.d0 = d; } }
+    if (state === 'play') { panBy(dx / 2, dy / 2); if (pinch.d0) { view.settle = null; view.zoomBase = clamp(view.zoomBase + (d - pinch.d0) * .005, 0, 1); pinch.d0 = d; } }
     return;
   }
   if (drag.on && e.pointerId === drag.id) { drag.moved += Math.abs(dx) + Math.abs(dy); if (!drag.mouse && drag.hold && drag.moved > 12 && nPtr() === 1 && state === 'play') { nipFromDrag(e.pointerId); return; } if (state === 'play' && drag.mouse && drag.moved > 4) { panBy(dx, dy); canvas.classList.add('grabbing'); } }
@@ -2664,7 +2670,7 @@ function endPtr(e) {
 }
 canvas.addEventListener('pointerup', endPtr); canvas.addEventListener('pointercancel', endPtr);
 function tapJump() { tapJumpT = .2; nipJump(); sfx('piston'); award('hop'); buzz(12); } // Bruno: a tap inside the inner circle = all four wheels high for 200 ms
-canvas.addEventListener('wheel', function (e) { e.preventDefault(); if (state === 'play') view.zoomBase = clamp(view.zoomBase - Math.sign(e.deltaY) * Math.min(3, Math.abs(e.deltaY) / 40) * .05, 0, 1); }, { passive: false }); // Bruno: zoom -= wheel * 0.05
+canvas.addEventListener('wheel', function (e) { e.preventDefault(); if (state === 'play') view.settle = null, view.zoomBase = clamp(view.zoomBase - Math.sign(e.deltaY) * Math.min(3, Math.abs(e.deltaY) / 40) * .05, 0, 1); }, { passive: false }); // Bruno: zoom -= wheel * 0.05
 function panBy(dx, dy) { // View.setMapControls: the drag, turned by -theta, scaled by the shorter side
   view.tracking = false; var m = new V2(dx, dy).rotateAround(new V2(), -view.theta), s = Math.min(innerWidth, innerHeight); m.multiplyScalar(10 / s * 2);
   view.focus.x -= m.x; view.focus.z -= m.y; award('look');
@@ -2750,6 +2756,7 @@ function updateView(dt) {
   else { var mx = car.pos.x - view.focus.x, mz = car.pos.z - view.focus.z, md = Math.hypot(mx, mz) * .25; view.focus.x += md * mx * dt; view.focus.z += md * mz * dt; } // the magnet
   var e = dt ? Math.min(1, dt * 10) : 1, nx = lerp(view.smoothed.x, view.focus.x, e), nz = lerp(view.smoothed.z, view.focus.z, e);
   var fs = dt ? Math.hypot(nx - view.smoothed.x, nz - view.smoothed.z) / dt : 0; view.smoothed.set(nx, 0, nz); view.focusSpeed = fs;
+  if (view.settle) { var S = view.settle; S.t += dt; var sx = clamp(S.t / 1.75, 0, 1), be = sx * sx * (2.5 * sx - 1.5); view.zoomBase = S.z0 * (1 - be); if (sx >= 1) { view.zoomBase = 0; view.settle = null; } }
   view.zoomRatio = view.zoomBase; if (view.tracking && quality.level === 2 && !RM()) view.zoomRatio += -.4 * sstep(5, 40, fs);
   view.zoomSmoothed = dt ? lerp(view.zoomSmoothed, view.zoomRatio, Math.min(1, dt * 10)) : view.zoomRatio;
   var phiT = PI * (quality.level === 0 ? .27 : .31); view.phi = dt ? view.phi + (phiT - view.phi) * Math.min(1, dt * 1.5) : phiT; // a tier change eases the angle over about a second (never a cut)
@@ -3469,7 +3476,7 @@ function startWorld() {
   html.classList.add('started'); $('goBtn').blur();
   if (RM()) { finishIntro(); return; }
   state = 'intro';
-  moveCarTo(SPAWN0.x, SPAWN0.z, SPAWN0.rot, 9); snapView(); applyPlayCam();
+  moveCarTo(SPAWN0.x, SPAWN0.z, SPAWN0.rot, 9); view.zoomBase = .32; snapView(); applyPlayCam(); // it lands a little close, then settles out (below)
   var to = { pos: camera.position.clone(), q: camera.quaternion.clone() };
   titlePose(performance.now()); camera.updateMatrixWorld(); var from = { pos: camera.position.clone(), q: camera.quaternion.clone() };
   // round 11: the letters leave from where they hang in front of the camera, and that place moves with the camera; they used to be let go
@@ -3501,6 +3508,7 @@ function finishIntro() {
   state = 'play'; html.classList.add('started');
   if (!intro) lettersHome(); else letters.forEach(function (o) { if (o.fly) { o.fly = null; o.m.scale.setScalar(1); o.m.position.set(o.home.x, 2.5 * BLK, o.home.z); o.m.quaternion.setFromAxisAngle(new V3(0, 1, 0), o.home.ry); o.b.position.set(o.home.x, 2.5 * BLK, o.home.z); o.b.quaternion.set(o.m.quaternion.x, o.m.quaternion.y, o.m.quaternion.z, o.m.quaternion.w); } });
   if (!intro) moveCarTo(SPAWN0.x, SPAWN0.z, SPAWN0.rot);
+  if (intro && !RM()) view.settle = { t: 0, z0: view.zoomBase }; else view.zoomBase = 0; // Bruno's Reveal: the view pulls out to its rest with back.in(1.5) over 1.75 s
   intro = null; U.uBend.value = 0; setTitleLook(false); carG.visible = true; snapView();
   if (COARSE && SET.touch === 'tap') setTimeout(function () { toast('Tap a sign to drive there', 2400); }, 400);
 }
@@ -3990,7 +3998,7 @@ function artFrame(dt, now) {
   U.uCar.value.copy(car.pos); U.uCarV.value.set(car.vel.x / DTS, 0, car.vel.z / DTS);
   // see-through: the car's place on screen, and the radius (3 / R .. 15 / R)
   // (none on the globe: the hidden car's place used to cut holes in the crowns round it; it opens up as the camera lands)
-  var seeK = state === 'title' || state === 'boot' && !FROM ? 0 : state === 'intro' && intro ? smooth((intro.t - 1.6) / .9) : 1;
+  var seeK = state === 'title' || state === 'boot' && !FROM ? 0 : state === 'intro' && intro ? smooth((intro.t - 1.6) / .9) : state === 'enter' && entering ? 1 - smooth(entering.t / .35) : 1; // (going in, the landmark closes up again)
   _cs.copy(car.pos).applyMatrix4(camera.matrixWorldInverse); U.uCarD.value = -_cs.z;
   _cs.copy(car.pos).project(camera); U.uCarS.value.set(_cs.x * .5 + .5, _cs.y * .5 + .5, Math.max(1e-5, seeK) / Math.max(10, view.radius));
   if (flat && (state === 'play' || state === 'map' || state === 'enter' || state === 'boot')) { updateLeaves(Math.min(dt, .05)); updateTrackRT(dt); }
