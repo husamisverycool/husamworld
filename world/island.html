@@ -3354,7 +3354,7 @@ function updateTitleLetters(now) {
 }
 function setTitleLook(on) { // the flat overlays (signs, paint, pads, labels) are drawn by three's own materials and never bend: hidden on the globe
   signMeshes.forEach(function (m) { m.visible = !on; }); if (paintMesh) paintMesh.visible = !on; STOPS.concat([RACE]).forEach(function (d) { d.padMesh.visible = !on; });
-  trackMesh.visible = !on; carG.visible = !on || !!intro; sun.castShadow = sunD.castShadow = !on; shadowDirty = true; camera.far = on ? 2400 : 220; camera.updateProjectionMatrix();
+  trackMesh.visible = !on; carG.visible = !on || !!intro; sun.castShadow = !on; sunD.castShadow = !on && quality.level === 0; shadowDirty = true; camera.far = on ? 2400 : 220; camera.updateProjectionMatrix();
 }
 function globeLeaves() { // the title globe: the fallen leaves lie over the whole island (they gather round the view once it lands)
   var L = leaves, n = L.count; for (var i = 0; i < n; i++) { var o = L.list[i], x, z, t = 0; do { x = (Math.random() * 2 - 1) * 96; z = (Math.random() * 2 - 1) * 96; t++; } while (t < 20 && (landK(x, z) < 1 || maskAt(x, z, 3) > .3)); o.p.set(x, leafFloor(x, z), z); o.v.set(0, 0, 0); o.moving = false; _lq.setFromEuler(_le.set(o.tilt.x * .25, o.ry, o.tilt.y * .25)); _ls.setScalar(o.s); _lm.compose(o.p, _lq, _ls); L.mesh.setMatrixAt(i, _lm); }
@@ -3942,6 +3942,9 @@ function applyQuality() {
   var cap = lvl === 0 ? 1 : lvl === 1 ? Math.min(1.5, DPR_MAX) : DPR_MAX; dpr = Math.min(window.devicePixelRatio || 1, cap) * (lvl === 0 ? (SOFTGL ? .6 : .8) : 1); renderer.setPixelRatio(dpr); // the low tier also draws fewer pixels
   var sm = lvl === 2 ? (LOWDEV ? 1024 : 2048) : lvl === 1 ? 1024 : 512; // Bruno Quality.js: 2048, 512 on low
   if (sun.shadow.mapSize.x !== sm) { sun.shadow.mapSize.set(sm, sm); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
+  // the split (a scenery map re-drawn on demand plus a small live one) pays on the low tier, where a shadow pass is dear; the other tiers
+  // draw one map every frame, everything in it, as before
+  var split = lvl === 0; sunD.castShadow = split && sun.castShadow; sun.shadow.autoUpdate = !split; if (split) SC.layers.set(1); else { SC.layers.enable(1); SC.layers.enable(2); }
   var smd = lvl === 2 ? 1024 : lvl === 1 ? 512 : 256, ext = lvl === 2 ? 20 : lvl === 1 ? 14 : 10; SCD.left = SCD.bottom = -ext; SCD.right = SCD.top = ext; SCD.updateProjectionMatrix(); // the living things' map: round the car
   if (sunD.shadow.mapSize.x !== smd) { sunD.shadow.mapSize.set(smd, smd); if (sunD.shadow.map) { sunD.shadow.map.dispose(); sunD.shadow.map = null; } }
   shadowDirty = true;
