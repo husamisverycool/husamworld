@@ -4183,13 +4183,18 @@ var PB = (function () {
 })();
 function propBatch(all) {
   var cx = view.smoothed.x + area.base.x, cz = view.smoothed.z + area.base.z, R = area.radius + 6, i, o; // the view's footprint and a margin for the shadows cast into it
+  var ext = PB.dirty || all !== PB.all; // (a change from outside: a prop gone, sent home, tidied; or the globe's whole-island batch)
   if (all !== PB.all || Math.hypot(cx - PB.cx, cz - PB.cz) > 3) {
     PB.all = all; PB.cx = cx; PB.cz = cz; PB.list = [];
     for (i = 0; i < dyn.length; i++) { o = dyn[i]; if (!o.pk) continue; var q = o.b.position; if (all || Math.abs(q.x - cx) < R && Math.abs(q.z - cz) < R) PB.list.push(o); }
     PB.dirty = true;
   }
-  if (!PB.dirty) for (i = 0; i < PB.list.length; i++) { o = PB.list[i]; if (o.b.sleepState !== CANNON.Body.SLEEPING && !o.gone) { PB.dirty = true; break; } }
+  var awake = false; for (i = 0; i < PB.list.length; i++) { o = PB.list[i]; if (o.b.sleepState !== CANNON.Body.SLEEPING && !o.gone) { awake = PB.dirty = true; break; } }
   if (!PB.dirty) return; PB.dirty = false;
+  // (round 15) a batch re-made only because the view moved on changes nothing the scenery's shadow map needs at once: the props that come
+  // in are at the footprint's far margin, and the map's own 3 m step re-draws them within a few frames. It used to force a re-draw of the
+  // whole map on frames of their own (as many again as the 3 m steps). A prop that moved (or was sent home) still re-draws it.
+  var shNeed = awake || ext;
   var P = PB.P, N = PB.N, A = PB.A, v = 0;
   for (i = 0; i < PB.list.length; i++) {
     o = PB.list[i]; if (o.gone) continue; var d = o.pk, n = d.n; if (v + n > PB.cap) break;
@@ -4202,7 +4207,7 @@ function propBatch(all) {
     }
     A.set(d.A, v); v += n;
   }
-  var g = PB.mesh.geometry; g.setDrawRange(0, v); PB.n = v; shadowDirty = true; window.__pbN = (window.__pbN || 0) + 1;
+  var g = PB.mesh.geometry; g.setDrawRange(0, v); PB.n = v; if (shNeed) shadowDirty = true; window.__pbN = (window.__pbN || 0) + 1;
   ['position', 'normal'].forEach(function (k) { var at = g.attributes[k]; at.updateRange.offset = 0; at.updateRange.count = v * 3; at.needsUpdate = true; });
   g.attributes.pal.updateRange.offset = 0; g.attributes.pal.updateRange.count = v; g.attributes.pal.needsUpdate = true;
 }
