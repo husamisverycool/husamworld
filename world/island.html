@@ -1339,6 +1339,10 @@ function bedK(x, z) { var best = 1e9; for (var i = 0; i < STOPS.length; i++) { v
 var MASK_N = LOWDEV ? 512 : 1024, MPX = WORLD / MASK_N;
 var mask = new Uint8Array(MASK_N * MASK_N * 4), depthF = new Float32Array(MASK_N * MASK_N);
 var roadDist = new Float32Array(MASK_N * MASK_N);
+// round 13: the name stands on a strip of slabs let into the verge (Bruno's name stands on his landing area's paving, not in long grass)
+var NAME_S = CAR0_S + 7, NAME_OFF = ROAD_W / 2 + 2.9, NAME_PTS = []; for (var nsi = -10; nsi <= 10; nsi++) NAME_PTS.push(roadPt(NAME_S + nsi, NAME_OFF));
+var NAME_BB = NAME_PTS.reduce(function (a, p) { return [Math.min(a[0], p.x), Math.max(a[1], p.x), Math.min(a[2], p.z), Math.max(a[3], p.z)]; }, [1e9, -1e9, 1e9, -1e9]);
+function nameK(x, z) { if (x < NAME_BB[0] - 4 || x > NAME_BB[1] + 4 || z < NAME_BB[2] - 4 || z > NAME_BB[3] + 4) return 1e9; var best = 1e9; for (var i = 0; i < NAME_PTS.length - 1; i++) { var d = segDist(x, z, NAME_PTS[i].x, NAME_PTS[i].z, NAME_PTS[i + 1].x, NAME_PTS[i + 1].z); if (d < best) best = d; } return best - 1.25; }
 (function paintMask() {
   // distance to the road's centre line, stamped round each road sample (fast)
   roadDist.fill(1e4);
@@ -1362,9 +1366,10 @@ var roadDist = new Float32Array(MASK_N * MASK_N);
     var n1 = fbm(wx2 * .07 + 11, wz2 * .07 - 4), n2 = fbm(wx2 * .11 - 3, wz2 * .11 + 8);
     var plz = plazaK(wx2, wz2), path = pathK(wx2, wz2); if (plz > -3.5 && plz < 3) plz += (fbm(wx2 * .19 + 7, wz2 * .19 - 5) - .45) * 2.6; // a wobbly edge: the grass bites into the slabs (Bruno's areas)
     // slabs: plazas solid, the paths a looser trail of tiles (the shader breaks them up with noise)
-    var slab = Math.max(clamp((.6 - plz) / 1.2, 0, 1), clamp((.2 - path) / 1.2, 0, 1) * .72 * (land > 1 ? 1 : 0)); if (dep > .2) slab = 0;
+    var nmk = nameK(wx2, wz2); if (nmk < 3) nmk += (fbm(wx2 * .23 + 3, wz2 * .23 + 9) - .45) * 1.4; // wobbly, as the plazas' edges
+    var slab = Math.max(clamp((.6 - plz) / 1.2, 0, 1), clamp((.2 - path) / 1.2, 0, 1) * .72 * (land > 1 ? 1 : 0), clamp((.3 - nmk) / 1.1, 0, 1)); if (dep > .2) slab = 0;
     // grass: everywhere on land except a dirt margin round the road, the plazas, the paths, the shore and the banks, and a few bare patches
-    var e = Math.min(land - (1.6 + 2.4 * n1), ch - (.5 + 1.5 * n2), rd - (ROAD_W / 2 + .7 + 1.9 * n1), plz - (1 + 3 * n2), path - (.5 + 1.8 * n1), (.74 - fbm(wx2 * .035 + 40, wz2 * .035 - 13)) * 30);
+    var e = Math.min(land - (1.6 + 2.4 * n1), ch - (.5 + 1.5 * n2), rd - (ROAD_W / 2 + .7 + 1.9 * n1), plz - (1 + 3 * n2), path - (.5 + 1.8 * n1), nmk - (.5 + 1.2 * n2), (.74 - fbm(wx2 * .035 + 40, wz2 * .035 - 13)) * 30);
     var grass = clamp(e / 1.3, 0, 1);
     if (plz < 1) { var bk = bedK(wx2, wz2); if (bk < .6) { grass = Math.max(grass, clamp((-bk + .3) / .9, 0, 1)); slab *= clamp((bk + .1) / .7, 0, 1); } } // the plazas' grass beds
     var road = clamp(.5 + (ROAD_W / 2 - rd) / 2, 0, 1); // +-1 m of distance round the edge in 0..1
@@ -1834,7 +1839,7 @@ STOPS.forEach(function (d, i) {
   var side = i % 2 ? 1 : -1; for (var j = 0; j < 3; j++) { var u = side * (d.pw / 2 - 3 - j * 2.05), v = d.depth / 2 + .6; if (Math.abs(u) > 4.5 && pzFree(d, u, v, .1)) PZ_DYN.push({ kind: 'fence', p: pzAt(d, u, v), ry: d.rot + PI / 2 }); }
 });
 
-var LETTERS_MID = roadPt(CAR0_S + 7, ROAD_W / 2 + 2.9); // as SPOTS.letters, set later (round 13: the verge beside the car at the start)
+var LETTERS_MID = roadPt(NAME_S, NAME_OFF); // as SPOTS.letters, set later (round 13: the verge beside the car at the start)
 function nearLetters(x, z, m) { return Math.hypot(x - LETTERS_MID.x, z - LETTERS_MID.z) < m; } // the name's lawn stays open
 // round 10 B: the loop's roadside, dressed the way Bruno lines his circuit: bush clumps just past the kerbs, lanterns in pairs, tyre stacks
 // on the outsides of bends, a run of fence here and there; and a busier Fresno start. Nothing on the road, a plaza, a pad or the water.
@@ -2146,7 +2151,7 @@ var SPOTS = {};
 (function () {
   var s0 = START_S - 6, n = roadRight(s0).negate(); // north of the start straight (left of travel)
   var p = roadAt(s0).addScaledVector(n, ROAD_W / 2 + 7);
-  var ls = CAR0_S + 7, lp = roadPt(ls, ROAD_W / 2 + 2.9); SPOTS.letters = { x: lp.x, z: lp.z, s: ls, off: ROAD_W / 2 + 2.9, turn: .31 }; // the name, on the verge beside the car (round 13)
+  var ls = NAME_S, lp = roadPt(ls, NAME_OFF); SPOTS.letters = { x: lp.x, z: lp.z, s: ls, off: NAME_OFF, turn: .31 }; // the name, on the verge beside the car (round 13)
   var cp = roadPt(START_S + 22, ROAD_W / 2 + 5.5); SPOTS.crates = { x: cp.x, z: cp.z };  // south of the straight, near the camera
   var bl = roadPt(STOPS[5].s - 22, -(ROAD_W / 2 + 9)); SPOTS.bowl = { x: bl.x, z: bl.z, f: roadTan(STOPS[5].s - 22) };
   SPOTS.race = roadAt(RACE_S);
@@ -2794,18 +2799,32 @@ function autoInput() {
 // It never turns with the car: a fixed spherical offset (theta 0.25 pi, phi 0.31 pi; 0.27 pi on the low tier) from a smoothed
 // focus point on the ground. Radius lerp(15, 30 + overflow * 9, 1 - zoom), overflow = max(1, (16/9) / aspect) - 1 (a phone pulls
 // back so the same width of world fits); speed pull-back -0.4 over 5..40 m/s; focus lerp dt * 10; focus y = 0; roll on a spring.
-var view = { theta: PI * .25, phi: PI * .31, focus: new V3(), smoothed: new V3(), tracking: true, zoomBase: 0, zoomRatio: 0, zoomSmoothed: 0, radius: 31,
+var view = { theta: PI * .25, phi: PI * .31, focus: new V3(), smoothed: new V3(), tracking: true, hold: null, glide: 1, zoomBase: 0, zoomRatio: 0, zoomSmoothed: 0, radius: 31,
   roll: 0, rollSpeed: 0, overflow: 0, offset: new V3(), pos: new V3(), speedLines: 0, blend: 1 };
 function viewOverflow() { view.overflow = Math.max(1, (16 / 9) / (innerWidth / innerHeight)) - 1; }
 function rollKick(s) { if (!RM()) view.rollSpeed = (s || 1) * (Math.random() < .5 ? -1 : 1); }
-function snapView() { view.leadN.set(0, 0); view.leadT.set(0, 0); view.lead.set(0, 0, 0); view.focus.set(car.pos.x, 0, car.pos.z); view.smoothed.copy(view.focus); view.tracking = true; view.zoomSmoothed = view.zoomBase; updateView(0); }
+// round 13: the landing frames the name. Bruno's spawn looks at his car with his name standing in front of it; ours is longer (11 letters
+// of a wide face on the diagonal verge), so the flight comes down onto the name's middle with the car above it, and the view holds there
+// until the first touch of a key, the ring or a sign (or 6 s), then glides to the car (the focus eases in over 1.3 s)
+var NAME_FOCUS = null;
+function nameHold() {
+  if (!NAME_FOCUS) { NAME_FOCUS = new V3(); letters.forEach(function (o) { NAME_FOCUS.x += o.home.x / letters.length; NAME_FOCUS.z += o.home.z / letters.length; }); }
+  var p = new V3(car.pos.x, 0, car.pos.z).lerp(NAME_FOCUS, .72);
+  view.hold = { p: p, until: performance.now() + 8000 }; view.tracking = false; view.focus.copy(p); view.smoothed.copy(p); view.glide = 1; updateView(0);
+}
+function snapView() { view.hold = null; view.glide = 1; view.leadN.set(0, 0); view.leadT.set(0, 0); view.lead.set(0, 0, 0); view.focus.set(car.pos.x, 0, car.pos.z); view.smoothed.copy(view.focus); view.tracking = true; view.zoomSmoothed = view.zoomBase; updateView(0); }
 var _vq = new Q(), _vd = new V3();
 function updateView(dt) {
   if (gp.on !== undefined && (Math.abs(gp.rx) > 0 || Math.abs(gp.ry) > 0) && state === 'play') { view.tracking = false; var mv = new V2(gp.rx, gp.ry).rotateAround(new V2(), -view.theta).multiplyScalar(20 * dt); view.focus.x += mv.x; view.focus.z += mv.y; }
   leadUpdate(dt);
+  if (view.hold && (view.tracking || performance.now() > view.hold.until || state !== 'play' && state !== 'intro')) { view.hold = null; view.tracking = true; view.glide = 0; } // any drive input (it sets tracking) lets go
   if (view.tracking) { view.focus.x = car.pos.x + view.lead.x; view.focus.z = car.pos.z + view.lead.z; }
+  else if (view.hold) { view.focus.copy(view.hold.p); }
   else { var mx = car.pos.x - view.focus.x, mz = car.pos.z - view.focus.z, md = Math.hypot(mx, mz) * .25; view.focus.x += md * mx * dt; view.focus.z += md * mz * dt; } // the magnet
-  var e = dt ? Math.min(1, dt * 10) : 1, nx = lerp(view.smoothed.x, view.focus.x, e), nz = lerp(view.smoothed.z, view.focus.z, e);
+  var e = dt ? Math.min(1, dt * 10) : 1;
+  if (view.glide < 1 && dt) { view.glide = Math.min(1, view.glide + dt / 1.3); e *= lerp(.12, 1, view.glide * view.glide); } // from the name back to the car: eased in, not snapped
+  var nx = lerp(view.smoothed.x, view.focus.x, e), nz = lerp(view.smoothed.z, view.focus.z, e);
+  if (view.glide < 1 && dt) { var gs = Math.hypot(nx - view.smoothed.x, nz - view.smoothed.z), gm = 1.6 + car.speed * 2 * dt; if (gs > gm) { nx = view.smoothed.x + (nx - view.smoothed.x) * gm / gs; nz = view.smoothed.z + (nz - view.smoothed.z) * gm / gs; } } // never more than 1.6 m a frame beyond the car's own step, even on a slow frame
   var fs = dt ? Math.hypot(nx - view.smoothed.x, nz - view.smoothed.z) / dt : 0; view.smoothed.set(nx, 0, nz); view.focusSpeed = fs;
   if (view.settle) { var S = view.settle; S.t += dt; var sx = clamp(S.t / 1.75, 0, 1), be = sx * sx * (2.5 * sx - 1.5); view.zoomBase = S.z0 * (1 - be); if (sx >= 1) { view.zoomBase = 0; view.settle = null; } }
   view.zoomRatio = view.zoomBase; if (view.tracking && quality.level === 2 && !RM()) view.zoomRatio += -.4 * sstep(5, 40, fs);
@@ -3532,21 +3551,18 @@ function lettersHome() {
   });
 }
 // round 13: the pop-in. It was an elastic scale (1600 ms, 42% overshoot): for a few frames on a wide screen every letter grew into its
-// neighbours (SP/r13/pop-before-desktop: 54 px of overlap, 53 of 75 frames). Now each letter drops in from above like a block set down
-// (Bruno's letters are physical and fall into place): a fall with gravity's ease, a squash on landing that keeps its width within 4%
-// (the tracking leaves 8%), a small rebound; nothing ever grows sideways into the next letter.
-function letterPop(t) { // -> [y offset in letter heights, scale x, scale y]
-  if (t <= 0) return [3, 1, 0]; if (t < .28) { var f = t / .28; return [3 * (1 - f * f), .92, 1.1]; } // the fall, a little stretched
-  var u = t - .28; if (u < .12) { var q = Math.sin(u / .12 * PI); return [0, 1 + .04 * q, 1 - .16 * q]; } // the squash
-  var w = u - .12, bo = Math.exp(-w * 7) * Math.sin(w * 15); return [Math.max(0, bo) * .09, 1 - .02 * bo, 1 + .06 * bo]; // the rebound
-}
+// neighbours (SP/r13/pop-before2-desktop: up to 16 px of overlap over 18 frames; 6 px on a phone). Now each letter stands up on its own
+// base like a hinged roadside sign swung upright (Bruno's letters are physical and stand on the ground): it turns about its bottom edge
+// from lying flat to upright, on a spring that overshoots a few degrees and settles. A turn about the letter's own base line never
+// changes its width, and it rises inside its own row, so no letter ever crosses another (SP/r13/pop-t4-*: 0 px, 0 frames).
+function letterPop(t) { if (t <= 0) return -PI / 2; if (t > 2.2) return 0; return -PI / 2 * Math.exp(-t * 6.5) * Math.cos(t * 10.5); } // the hinge angle
 function updateTitleLetters(now) {
   var rm = RM();
   letters.forEach(function (o) {
-    if (!o.inTitle || !o.title) return; var t = rm ? 9 : (now - (o.pop0 || 0)) / 1000, P = letterPop(t), ph = now * .0014 + o.col * .7 + o.row * 1.9, sc = o.title.scale;
-    var g0 = t <= 0 ? .001 : Math.min(1, t / .06); // it appears over the first 60 ms of its fall
-    o.m.scale.set(sc * P[1] * g0, sc * Math.max(.001, P[2]) * g0, sc * P[1] * g0); o.m.position.copy(o.title.pos); o.m.position.y += (P[0] * LET_H + (P[2] - 1) * o.gh / 2) * sc; // squashes on its base
-    if (!rm && t > .8) { var k = Math.min(1, (t - .8) / .8); o.m.position.y += Math.sin(ph) * .05 * sc * k; o.m.rotation.set(Math.sin(ph * .8 + 1) * .035 * k, Math.sin(ph * .6) * .05 * k, 0); } else o.m.rotation.set(0, 0, 0);
+    if (!o.inTitle || !o.title) return; var t = rm ? 9 : (now - (o.pop0 || 0)) / 1000, a = letterPop(t), ph = now * .0014 + o.col * .7 + o.row * 1.9, sc = o.title.scale, hh = o.gh / 2 * sc;
+    var k = !rm && t > 1.2 ? Math.min(1, (t - 1.2) / .8) : 0, bob = Math.sin(ph) * .05 * sc * k;
+    o.m.scale.setScalar(t <= 0 ? .001 : sc); o.m.rotation.set(a + Math.sin(ph * .8 + 1) * .035 * k, Math.sin(ph * .6) * .05 * k, 0);
+    o.m.position.set(o.title.pos.x, o.title.pos.y - hh + hh * Math.cos(a) + bob, o.title.pos.z + hh * Math.sin(a)); // turning about the base line
   });
 }
 function setTitleLook(on) { // round 11: everything bends onto the globe now (signs, paint, pads too), so nothing is hidden there and nothing pops in
@@ -3569,7 +3585,7 @@ function startWorld() {
   html.classList.add('started'); $('goBtn').blur();
   if (RM()) { finishIntro(); return; }
   state = 'intro';
-  moveCarTo(SPAWN0.x, SPAWN0.z, SPAWN0.rot, 9); view.zoomBase = .32; snapView(); applyPlayCam(); // it lands a little close, then settles out (below)
+  moveCarTo(SPAWN0.x, SPAWN0.z, SPAWN0.rot, 9); view.zoomBase = .32; snapView(); nameHold(); applyPlayCam(); // it lands a little close, then settles out (below)
   var to = { pos: camera.position.clone(), q: camera.quaternion.clone() };
   titlePose(performance.now()); camera.updateMatrixWorld(); var from = { pos: camera.position.clone(), q: camera.quaternion.clone() };
   // round 11: the letters leave from where they hang in front of the camera, and that place moves with the camera; they used to be let go
@@ -3602,7 +3618,7 @@ function finishIntro() {
   if (!intro) lettersHome(); else letters.forEach(function (o) { if (o.fly) { o.fly = null; o.m.scale.setScalar(1); o.m.position.set(o.home.x, o.home.y, o.home.z); o.m.quaternion.setFromAxisAngle(new V3(0, 1, 0), o.home.ry); o.b.position.set(o.home.x, o.home.y, o.home.z); o.b.quaternion.set(o.m.quaternion.x, o.m.quaternion.y, o.m.quaternion.z, o.m.quaternion.w); } });
   if (!intro) moveCarTo(SPAWN0.x, SPAWN0.z, SPAWN0.rot);
   if (intro && !RM()) view.settle = { t: 0, z0: view.zoomBase }; else view.zoomBase = 0; // Bruno's Reveal: the view pulls out to its rest with back.in(1.5) over 1.75 s
-  intro = null; U.uBend.value = 0; setTitleLook(false); carG.visible = true; snapView();
+  var held = !!view.hold; intro = null; U.uBend.value = 0; setTitleLook(false); carG.visible = true; snapView(); if (held) nameHold();
   if (COARSE && SET.touch === 'tap') setTimeout(function () { toast('Tap a sign to drive there', 2400); }, 400);
 }
 function skipToMap() { startWorld(); if (state === 'intro') finishIntro(); openMap(); }
