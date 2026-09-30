@@ -4310,7 +4310,14 @@ function precompileTiers() {
   mats.forEach(function (m, i) { if (had[i]) m.defines.LOWQ = 1; else delete m.defines.LOWQ; m.needsUpdate = true; });
   var nm = fxOut.defines.NM, dof = fxOut.defines.DOF, q0 = fxq.q.material; fxq.q.material = fxOut;
   [[2, 0], [5, 1], [5, 0], [2, 1]].forEach(function (v) { fxOut.defines.NM = v[0]; fxOut.defines.DOF = v[1]; fxOut.needsUpdate = true; renderer.compile(fxq.sc, fxq.cam); });
-  fxOut.defines.NM = nm; fxOut.defines.DOF = dof; fxOut.needsUpdate = true; fxq.q.material = q0;
+  fxOut.defines.NM = nm; fxOut.defines.DOF = dof; fxOut.needsUpdate = true;
+  [fxHigh].concat(fxBlur).forEach(function (m) { fxq.q.material = m; renderer.compile(fxq.sc, fxq.cam); }); fxq.q.material = q0;
+  // the shadow passes' depth programs for the casters only the upper tiers switch on (the leaf cards, the fallen leaves, the pebbles):
+  // one draw of both maps with every caster on, into a 4 px target
+  var cs = [leaves.mesh].concat(foliage.meshes, pebbles.meshes || []), was = cs.map(function (m) { return m.castShadow; }), rt = new THREE.WebGLRenderTarget(4, 4), au = sunD.shadow.autoUpdate;
+  cs.forEach(function (m) { m.castShadow = true; }); sun.shadow.needsUpdate = true; sunD.shadow.needsUpdate = true;
+  renderer.setRenderTarget(rt); renderer.render(scene, camera); renderer.setRenderTarget(null); rt.dispose();
+  cs.forEach(function (m, i) { m.castShadow = was[i]; }); sunD.shadow.autoUpdate = au; shadowDirty = true;
 }
 // Auto while driving: frame times over about 2 s against a 60 fps budget. Long frames step down the SHED ladder (then, at its end, ask for
 // the tier below at the next stop); a run of short ones steps back up, more and more reluctantly if it keeps bouncing (drei's flipflops).
@@ -4338,13 +4345,13 @@ function govern(dtMs, cpuMs, now) {
   if (avg < 17.6 && quality.shed > 0) { gov.good += 2; if (gov.good >= gov.upHold) { gov.good = 0; gov.lastUp = now; gov.log.push(['up', avg, cpu, quality.shed - 1]); applyShed(quality.shed - 1); govReset(now, 600); } }
   else gov.good = 0;
 }
-// the title's timing: once the letters are up, the median of 45 frames; slow on this tier, start one lower (the title is still up, so the
+// the title's timing: once the letters are up and the shaders compiled, the median of 45 frames; slow on this tier, start one lower (the title is still up, so the
 // change can't catch anyone mid-drive)
 var bench = { t0: 0, dts: [], done: SOFTGL, compiled: SOFTGL };
 function benchTitle(dtMs, now) {
   if (state !== 'title') return; if (!html.classList.contains('loaded')) { bench.t0 = now; return; }
-  if (!bench.compiled && now - bench.t0 > 900) { bench.compiled = true; try { precompileTiers(); } catch (e) {} bench.t0 = now; return; }
-  if (bench.done || now - bench.t0 < 2600) return;
+  if (!bench.compiled && now - bench.t0 > 3300) { bench.compiled = true; try { precompileTiers(); } catch (e) {} bench.t0 = now; return; } // (once the letters have stood up)
+  if (bench.done || !bench.compiled || now - bench.t0 < 700) return;
   bench.dts.push(dtMs); if (bench.dts.length < 45) return; bench.done = true;
   var m = bench.dts.slice().sort(function (a, b) { return a - b; })[22]; quality.bench = +m.toFixed(1);
   if (SET.qual === 'auto' && m > 24 && quality.level > 0) { quality.auto = quality.level - 1; applyQuality(); }
