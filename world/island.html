@@ -10,81 +10,90 @@
 <link rel="preload" href="lib/three.min.js" as="script"><link rel="preload" href="lib/cannon.min.js" as="script">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Barlow+Condensed:wght@700;800&family=Barlow:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Nunito:wght@400;700;900&family=Bungee&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
 <style>
 /* ============================================================================================================================
-   Round 11: the UI re-thought for the island (it was the planet's cream slabs with ink outlines, ten rounds of patches deep).
-   One material, taken from the references and the island itself:
-   - Bruno 2025 (Menu.js, Modals, the map UI, Notifications): dark translucent panels, square icon buttons top right, icon tabs on a
-     panel, a red close square, notices as a small dark card with a coloured title and a thin timer bar, a full-size map with diamonds;
-   - the island: night-asphalt panels (the road's own colour), a cream painted edge line, the slab gold of the plazas for what you
-     press, the kerb red for closing, the lawn mint for "on", the sky's fog gradient behind the title and the loader;
-   - Messenger: white rounded speech bubbles; the road signs of the world (the gantries' green) stay green for the exits.
-   Type: Bungee for names and labels, Barlow for words. Every control keeps a 44 px touch target and a visible focus ring.
+   Round 13: the UI re-made in Bruno Simon's folio-2025 visual language, piece by piece, from his running app (SP/r13/bui/*.png) and
+   his stylesheets (sources/style/*.styl; MIT). Round 11's own system (translucent night cards, gold pills, rounded chips) is gone.
+   What his UI is made of, and what we take:
+   - one panel: radial-gradient(ellipse at top left, #251f2b, #1d1721), SQUARE corners, no drop shadow, and a 1px white hairline
+     inset 3px at 35% opacity (menu.styl .previews::after / .button-inner::after) - our .bx frame;
+   - titles in Amatic SC 700 (general.styl .title: 2.5rem), every other word in Nunito (400 / 700 / 900);
+   - the triggers: crimson squares radial-gradient(ellipse at top right, #C21515, #46123B), 44 x 44, flush on the right edge at top
+     20 and 70 px, sliding out of the edge; hover moves them 4 px (menu.styl .menu-trigger, map.styl .map-trigger);
+   - folder tabs sitting on top of the panel, 50 x 44, icons in #ffceca at 55%, the open one #241e2a (menu.styl .navigation), and the
+     same tab in crimson with a white cross to close (menu.styl .close);
+   - buttons: 1px white (80%) outline, radius 8px, 58 px tall; dashed when off (general.styl .button); keys: 1px #ffffff33, radius 4px,
+     bold (controls.styl .key); tooltips: #141414 with a #ffceca hairline (tooltips.styl);
+   - notices: top centre, 350 px, the panel, a 2 px time bar on top, in with cubic-bezier(0.4, 1.6, 0.65, 1) 0.6 s, out shrinking to
+     nothing with cubic-bezier(0.42, 0, 0.47, -0.55) 0.45 s; achievements titled in Amatic, #d5ff95 (notifications.styl);
+   - achievements: an Amatic title in #ffceca (#d5ff95 once done), the text, a bold "n / m", a 18 px outlined bar (achievements.styl);
+   - the interaction: a big Amatic word at the bottom over a fade to #1D172199 (interactiveButtons.styl .touch-buttons), and in the
+     world a diamond with a band of #251f2b behind white Amatic (InteractivePoints.js), speech as a #222 band of white Amatic (Bubble.js).
+   Where Bruno has nothing (our loader's road, the letter from the mailbox), the same material is used and the reference is named.
+   Every control keeps a 44 px target and a visible focus ring (#ffceca, his accent).
    ============================================================================================================================ */
 :root{
-  --night:#1d1724; --night-2:#2a2233; --night-3:#3a3046; --glass:rgba(29,23,36,.93);
-  --edge:rgba(255,238,210,.16); --edge-2:rgba(255,238,210,.3);
-  --cream:#fbf4df; --muted:rgba(251,244,223,.68); --faint:rgba(251,244,223,.42);
-  --gold:#ffc85a; --gold-2:#c98a2c; --kerb:#e8483a; --kerb-2:#a92b21; --mint:#8fe3c2; --teal:#5bc2b9; --sea:#13375f; --lilac:#b9a7ff;
-  --road:#2e2533; --sign:#1c7a4f; --sign-2:#12583a;
+  --bg:#1d1721; --bg2:#251f2b; --tabon:#241e2a;
+  --panel:radial-gradient(ellipse at top left,#251f2b,#1d1721);
+  --red:radial-gradient(ellipse at top right,#c21515,#46123b);
+  --pink:#ffceca; --green:#d5ff95; --amber:#ffc67b; --danger:#ff6a7c;
+  --w80:rgba(255,255,255,.8); --w65:rgba(255,255,255,.65); --w50:rgba(255,255,255,.5); --line:rgba(255,255,255,.35); --key:rgba(255,255,255,.2);
+  --title:'Amatic SC','Arial Narrow',sans-serif;
+  --text:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --display:var(--title); --cond:var(--text);
+  --pop:cubic-bezier(.4,1.6,.65,1); --leave:cubic-bezier(.42,0,.47,-.55); --spring:cubic-bezier(.34,1.56,.64,1); --out:cubic-bezier(.2,.8,.2,1);
   --sky:radial-gradient(140% 120% at 0% 0%,#3ff2ff 0%,#78d8ff 38%,#a08cff 100%);
-  --ink:#1d1724; --paper:#fbf6ea;
-  --display:'Bungee','Arial Black',Impact,sans-serif;
-  --cond:'Barlow Condensed','Arial Narrow',Arial,sans-serif;
-  --text:'Barlow','Helvetica Neue',Arial,sans-serif;
-  --spring:cubic-bezier(.34,1.56,.64,1); --out:cubic-bezier(.2,.8,.2,1);
-  --lift:0 14px 34px -12px rgba(22,6,44,.55),0 2px 0 rgba(12,6,20,.45);
-  --r:14px;
+  --kerb:#e8483a; --sign:#1c7a4f; --road:#2e2533; --night:#1d1721; --cream:#ffffff; --gold:#ffceca; --paper:#fbf6ea;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{background:#a08cff;-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100%;color:var(--ink);font-family:var(--text);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;background:var(--sky) fixed,#a08cff}
+body{margin:0;min-height:100%;color:#fff;font-family:var(--text);font-size:17px;line-height:1.45;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;overflow-x:hidden;background:var(--sky) fixed,#a08cff}
 a{color:inherit}
 button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
 :focus{outline:none}
-:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+::selection{color:#251f2b;background:#fff} /* menu.styl *::selection */
 .sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
-kbd{display:inline-block;min-width:1.7em;font:700 .8em/1 var(--cond);letter-spacing:.03em;text-align:center;color:var(--cream);background:var(--night-3);border-radius:5px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.35),0 0 0 1px var(--edge);padding:4px 5px 3px;white-space:nowrap}
-.skip{position:fixed;left:16px;top:-80px;z-index:95;background:var(--night);color:var(--cream);border-radius:10px;box-shadow:0 0 0 2px var(--gold);padding:10px 14px;font:400 15px var(--display);text-decoration:none}
-.skip:focus-visible{top:16px} /* only for keyboard users; a tap or a restored focus never flashes it */
-/* the panel material: night asphalt, a painted edge line, a soft lift */
-.panel,.slab{background:var(--glass);color:var(--cream);border-radius:var(--r);box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift)}
-.slab-btn{transition:transform .18s var(--spring),background .2s}
-.slab-btn:hover{transform:translateY(-2px)}
-.slab-btn:active{transform:translateY(1px) scale(.98)}
-/* what you press: plaza gold with a kerb-like lip */
-.go-btn,.t-go,.exit-go,.act,.copy{background:var(--gold);color:var(--night);border-radius:12px;box-shadow:inset 0 -4px 0 var(--gold-2),0 3px 0 rgba(12,6,20,.35);transition:transform .15s var(--spring),box-shadow .15s,background .2s}
-.t-go:active,.exit-go:active,.act:active,.copy:active{transform:translateY(2px);box-shadow:inset 0 -1px 0 var(--gold-2),0 1px 0 rgba(12,6,20,.35)}
+/* keys (controls.styl .key): a hairline box, bold */
+kbd{display:inline-block;min-width:1.5em;padding:1px 5px;border:1px solid var(--key);border-radius:4px;font:700 .82em/1.3 var(--text);text-align:center;color:#fff;white-space:nowrap;background:none}
+.skip{position:fixed;left:16px;top:-80px;z-index:95;background:var(--panel);color:#fff;padding:12px 16px;font:700 16px var(--text);text-decoration:none}
+.skip:focus-visible{top:16px}
+/* the panel material, and its hairline frame (menu.styl): a class for anything that is a panel */
+.bx{position:relative;background:var(--panel);color:#fff;border-radius:0}
+.bx::after{content:"";position:absolute;inset:3px;border:1px solid #fff;opacity:.35;pointer-events:none}
+/* Bruno's .button: a white hairline, radius 8, 58 px (50 / 45 on narrow screens); dashed = off */
+.bbtn,.act,.copy,.btn,.stop-drive{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 16px;border:1px solid var(--w80);border-radius:8px;color:var(--w80);font:400 16px/1 var(--text);white-space:nowrap;text-decoration:none;background:none;transition:border-color .15s,color .15s}
+.bbtn:hover,.act:hover,.copy:hover,.btn:hover,.stop-drive:hover{border-color:#fff;color:#fff}
+.act:active,.copy:active,.btn:active,.bbtn:active{transform:translateY(1px)}
 
-/* ---------- loading: the long way, in one line, under the title's own sky ---------- */
+/* ---------- loading: Bruno's first screen is his island's spawn on a dark floor ruled with small purple crosses (SP/r13/bui/*-intro);
+   ours keeps its road-trip line (the wagon, the landmarks going by) on that floor, and the words in Amatic ---------- */
 .loader{display:none}
-html.has-world:not(.from) .loader{display:flex;position:fixed;inset:0;z-index:31;flex-direction:column;align-items:center;justify-content:center;gap:24px;overflow:hidden;background:var(--sky);transition:opacity .45s ease .35s,visibility 0s .8s}
+html.has-world:not(.from) .loader{display:flex;position:fixed;inset:0;z-index:31;flex-direction:column;align-items:center;justify-content:center;gap:26px;overflow:hidden;background:radial-gradient(farthest-side at 50% 45%,#2d2336,#1d1721);transition:opacity .45s ease .35s,visibility 0s .8s}
 html.loaded .loader{opacity:0;visibility:hidden}
-.ld-sky{position:absolute;inset:0;pointer-events:none}
-.ld-cloud{position:absolute;width:78px;height:22px;border-radius:14px;background:rgba(255,255,255,.85);box-shadow:20px -10px 0 -3px rgba(255,255,255,.85);animation:ldDrift 14s linear infinite}
-.ld-cloud.c1{top:18%;left:8%}.ld-cloud.c2{top:30%;left:62%;transform:scale(.7);animation-duration:19s}.ld-cloud.c3{top:72%;left:30%;transform:scale(.85);animation-duration:23s}
+.ld-sky{position:absolute;left:-50%;right:-50%;top:30%;bottom:-20%;pointer-events:none;opacity:.7;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M17 17l6 6M23 17l-6 6' stroke='%238b4fe0' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") 0 0/40px 40px;transform:perspective(500px) rotateX(58deg);transform-origin:50% 0;-webkit-mask-image:linear-gradient(transparent,#000 30%);mask-image:linear-gradient(transparent,#000 30%)} /* his floor's crosses (World/Grid.js), in perspective */
+.ld-cloud{display:none}
 .ld-scene{position:relative;width:min(560px,92vw);height:128px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
-.ld-far{position:absolute;left:0;right:0;bottom:30px;height:60px;overflow:hidden}
+.ld-far{position:absolute;left:0;right:0;bottom:30px;height:60px;overflow:hidden;opacity:.9}
 .ld-track{width:200%;height:100%;animation:ldSlide 4.2s linear infinite}
 .ld-marks{display:block;width:100%;height:100%}
-/* the circuit's own road: asphalt between red-and-white kerbs */
 .ld-road{position:absolute;left:0;right:0;bottom:6px;height:26px;background:var(--road);overflow:hidden}
 .ld-road::before,.ld-road::after{content:"";position:absolute;left:0;width:200%;height:4px;background:repeating-linear-gradient(90deg,var(--kerb) 0 14px,#f7f1e6 14px 28px);animation:ldDash .6s linear infinite}
 .ld-road::before{top:0}.ld-road::after{bottom:0}
-.ld-dashes{width:200%;height:2px;margin-top:12px;background:repeating-linear-gradient(90deg,rgba(251,244,223,.7) 0 16px,transparent 16px 34px);animation:ldDash2 .36s linear infinite}
+.ld-dashes{width:200%;height:2px;margin-top:12px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.7) 0 16px,transparent 16px 34px);animation:ldDash2 .36s linear infinite}
 .ld-rider{position:absolute;left:calc(50% - 42px);bottom:15px;width:84px;height:48px;transition:transform .7s cubic-bezier(.55,0,.8,.2)}
 .ld-car2{display:block;width:100%;height:100%;overflow:visible}
 .ld-body{animation:ldBounce .26s ease-in-out infinite alternate;transform-origin:42px 34px}
 .ld-bag{animation:ldBag .26s ease-in-out infinite alternate;transform-origin:40px 12px}
 .ld-wheel{transform-box:fill-box;transform-origin:center;animation:ldSpin .36s linear infinite}
 .ld-dust{position:absolute;left:-10px;bottom:4px;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.8);animation:ldPuff .52s ease-out infinite}
-.ld-word{display:flex;align-items:center;gap:12px;margin:0;padding:9px 16px 8px;border-radius:999px;background:var(--glass);box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift);font:400 13px/1 var(--display);letter-spacing:.04em;color:var(--cream)}
-.ld-word b{position:relative;width:min(150px,30vw);height:4px;background:rgba(251,244,223,.18);border-radius:2px;overflow:hidden}
-.ld-word b::after{content:"";position:absolute;inset:0;background:var(--gold);transform:scaleX(0);transform-origin:0 50%;animation:ldTrip 1.1s cubic-bezier(.4,0,.2,1) forwards}
+/* the words: Amatic, and the loading bar as Bruno's achievement bar (an outlined 18 px bar, the fill inset 4 px) */
+.ld-word{position:relative;display:flex;align-items:center;gap:16px;margin:0;font:700 34px/1 var(--title);color:#fff}
+.ld-word b{position:relative;width:min(170px,32vw);height:18px;border:1px solid var(--line)}
+.ld-word b::after{content:"";position:absolute;inset:4px;background:var(--pink);transform:scaleX(0);transform-origin:0 50%;animation:ldTrip 1.1s cubic-bezier(.4,0,.2,1) forwards}
 html.loaded .ld-rider{transform:translateX(75vw)}
-@media (min-width:700px){.ld-scene{width:min(820px,90vw);height:176px}.ld-far{height:88px;bottom:40px}.ld-road{height:34px;bottom:8px}.ld-dashes{margin-top:16px}.ld-rider{bottom:21px;scale:1.45;transform-origin:50% 100%}.ld-word{font-size:15px}.ld-cloud{scale:1.3}}
-@media (max-height:500px){.ld-cloud.c3{top:86%;left:8%}.ld-cloud.c1{top:10%}}
+@media (min-width:700px){.ld-scene{width:min(820px,90vw);height:176px}.ld-far{height:88px;bottom:40px}.ld-road{height:34px;bottom:8px}.ld-dashes{margin-top:16px}.ld-rider{bottom:21px;scale:1.45;transform-origin:50% 100%}.ld-word{font-size:44px}}
 @keyframes ldSlide{to{transform:translateX(-50%)}}
 @keyframes ldDash{to{transform:translateX(-28px)}}
 @keyframes ldDash2{to{transform:translateX(-34px)}}
@@ -92,7 +101,6 @@ html.loaded .ld-rider{transform:translateX(75vw)}
 @keyframes ldBounce{to{transform:translateY(-1.6px) rotate(-.6deg)}}
 @keyframes ldBag{to{transform:translateY(-1.2px)}}
 @keyframes ldPuff{0%{transform:translate(0,0) scale(.5);opacity:.9}100%{transform:translate(-26px,-8px) scale(1.2);opacity:0}}
-@keyframes ldDrift{to{translate:-40px 0}}
 @keyframes ldTrip{to{transform:scaleX(.92)}}
 html.loaded .ld-word b::after{animation:none;transform:scaleX(1);transition:transform .3s}
 @media (prefers-reduced-motion:reduce){.loader *,.loader *::before,.loader *::after{animation:none!important}.ld-word b::after{transform:scaleX(.6)}}
@@ -106,394 +114,387 @@ html.has-world body{position:fixed;inset:0;overscroll-behavior:none}
 
 /* ---------- the title: the globe, the red 3D name, one button ---------- */
 .title{display:none}
-html.js:not(.no-world):not(.from) .title{display:flex;position:fixed;inset:0;z-index:30;flex-direction:column;align-items:center;justify-content:flex-end;gap:14px;padding:16px 16px max(30px,env(safe-area-inset-bottom));pointer-events:none;text-align:center}
+html.js:not(.no-world):not(.from) .title{display:flex;position:fixed;inset:0;z-index:30;flex-direction:column;align-items:center;justify-content:flex-end;gap:14px;padding:16px 16px max(28px,env(safe-area-inset-bottom));pointer-events:none;text-align:center}
 html.started .title{opacity:0;visibility:hidden;transition:opacity .45s,visibility 0s .45s}
-.t-name{position:absolute;left:16px;right:16px;top:50%;transform:translateY(-58%);margin:0;font:400 clamp(58px,14vw,178px)/.84 var(--display);color:var(--kerb);text-transform:uppercase}
+.t-name{position:absolute;left:16px;right:16px;top:50%;transform:translateY(-58%);margin:0;font:700 clamp(58px,14vw,178px)/.84 var(--title);color:var(--kerb);text-transform:uppercase}
 .t-name span{display:block}
-/* with the 3D world the only name is the red 3D one: the page title stays for screen readers, never drawn */
 html.has-world .t-name{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;opacity:1}
-.t-go{pointer-events:auto;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-width:236px;min-height:60px;padding:15px 26px 13px 20px;font:400 21px/1 var(--display);letter-spacing:.01em}
-.t-go::before{content:"";width:34px;height:20px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 20'%3E%3Crect x='9' y='.5' width='8' height='4.2' rx='1' fill='%231d1724'/%3E%3Crect x='18' y='1.2' width='6.2' height='3.5' rx='1.7' fill='%231d1724'/%3E%3Crect x='7' y='4.6' width='19' height='1.2' fill='%231d1724'/%3E%3Cpath d='M1 15.2v-4.1q0-1.4 1.4-1.7l2-.4 1.1-3.3q.4-1 1.4-1h16.3q1 0 1.7.8l3 3.5 4 .5q1.9.3 1.9 2v3.7z' fill='%231d1724'/%3E%3Ccircle cx='8' cy='15.6' r='3.8' fill='%231d1724'/%3E%3Ccircle cx='25' cy='15.6' r='3.8' fill='%231d1724'/%3E%3Ccircle cx='8' cy='15.6' r='1.5' fill='%23ffc85a'/%3E%3Ccircle cx='25' cy='15.6' r='1.5' fill='%23ffc85a'/%3E%3C/svg%3E") center/contain no-repeat}
-.t-go:hover{transform:translateY(-2px)}
+/* "Start the car": a folder tab of Bruno's menu grown into the one thing to press (the panel, its hairline, the 4 px lift on hover),
+   the words in Amatic as his in-world "press to start" label */
+.t-go{pointer-events:auto;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:14px;min-width:250px;min-height:64px;padding:6px 30px 4px 24px;background:var(--panel);color:#fff;font:700 38px/1 var(--title);transition:transform .15s}
+.t-go::after{content:"";position:absolute;inset:3px;border:1px solid #fff;opacity:.35;pointer-events:none;transition:opacity .15s}
+.t-go::before{content:"";width:34px;height:20px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 20'%3E%3Crect x='9' y='.5' width='8' height='4.2' rx='1' fill='%23ffceca'/%3E%3Crect x='18' y='1.2' width='6.2' height='3.5' rx='1.7' fill='%23ffceca'/%3E%3Crect x='7' y='4.6' width='19' height='1.2' fill='%23ffceca'/%3E%3Cpath d='M1 15.2v-4.1q0-1.4 1.4-1.7l2-.4 1.1-3.3q.4-1 1.4-1h16.3q1 0 1.7.8l3 3.5 4 .5q1.9.3 1.9 2v3.7z' fill='%23ffceca'/%3E%3Ccircle cx='8' cy='15.6' r='3.8' fill='%23ffceca'/%3E%3Ccircle cx='25' cy='15.6' r='3.8' fill='%23ffceca'/%3E%3Ccircle cx='8' cy='15.6' r='1.5' fill='%231d1721'/%3E%3Ccircle cx='25' cy='15.6' r='1.5' fill='%231d1721'/%3E%3C/svg%3E") center/contain no-repeat}
+.t-go:hover{transform:translateY(-4px)}.t-go:hover::after{opacity:.8}
+.t-go:active{transform:translateY(0)}
 .t-go[disabled]{visibility:hidden}
 html.has-world:not(.ready) .t-map{visibility:hidden}
-/* ready: the button pops like Bruno 2025's "press to start" label (elastic.out) */
+/* ready: it pops like Bruno's interactive points open (elastic.out) */
 html.ready .t-go:not([disabled]){animation:goPop .9s linear}
 @keyframes goPop{0%{transform:scale(.82)}22%{transform:scale(1.09)}42%{transform:scale(.97)}62%{transform:scale(1.02)}82%{transform:scale(.995)}100%{transform:scale(1)}}
-.t-map{pointer-events:auto;font:600 16px/1 var(--text);color:var(--cream);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;padding:10px 8px}
-/* the quiet line under the button: on a night pill, so it reads on any sky */
-.t-alts{pointer-events:auto;display:inline-block;max-width:100%;margin:4px auto 0;padding:5px 16px 6px;border-radius:999px;background:var(--glass);box-shadow:inset 0 0 0 1.5px var(--edge);text-align:center;font:600 clamp(14px,3.9vw,16px)/1.5 var(--text);color:var(--muted)}
-.t-alts .t-map{display:inline;margin:0;padding:6px 2px;font:inherit;color:var(--cream);text-decoration-color:var(--gold);text-decoration-thickness:2px;text-underline-offset:5px}
-.t-alts .t-map:hover{text-decoration-thickness:3.5px;color:var(--gold)}
+.t-map{pointer-events:auto;font:700 16px/1 var(--text);color:#fff;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px;padding:10px 8px}
+/* the quiet line: Nunito on the panel, links underlined as his menu text (general.styl .text a) */
+.t-alts{pointer-events:auto;position:relative;display:inline-block;max-width:100%;margin:2px auto 0;padding:8px 16px 9px;background:var(--panel);text-align:center;font:400 clamp(14px,3.9vw,16px)/1.5 var(--text);color:var(--w80)}
+.t-alts .t-map{display:inline;margin:0;padding:6px 2px;font:700 1em/1.5 var(--text);color:#fff}
+.t-alts .t-map:hover{color:var(--pink)}
 html.has-world:not(.ready) .t-alts{visibility:hidden}
-.t-card{position:absolute;left:24px;bottom:28px;display:flex;align-items:center;gap:12px;padding:10px 16px 10px 10px;text-align:left;pointer-events:auto;background:var(--glass);color:var(--cream);border-radius:var(--r);box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift)}
-.t-card img{width:58px;height:58px;object-fit:cover;display:block;border-radius:10px}
-.t-card b{display:block;font:400 15px/1.1 var(--display)}
-.t-card span{display:block;font:600 14px/1.25 var(--text);color:var(--gold);margin-top:3px}
+/* the name card (round 13): a panel as Bruno's notices are, the photo square in its own hairline like his rewards, the name in Amatic */
+.t-card{position:absolute;left:24px;bottom:28px;display:flex;align-items:center;gap:14px;padding:12px 22px 12px 12px;text-align:left;pointer-events:auto}
+.t-card img{position:relative;width:64px;height:64px;object-fit:cover;display:block;outline:1px solid var(--line);outline-offset:2px}
+.t-card b{display:block;font:700 34px/.95 var(--title);color:#fff}
+.t-card span{display:block;font:400 15px/1.3 var(--text);color:var(--w80);margin-top:2px}
 @media (max-width:760px),(pointer:coarse) and (max-height:500px){.t-card{display:none}}
 @media (max-height:520px){.t-name{font-size:52px}}
 
-/* ---------- the HUD: a name plate top left; square buttons top right (Bruno 2025: menu and map) ---------- */
+/* ---------- the HUD: Bruno's two crimson triggers on the right edge (menu, map); nothing else until it's needed ---------- */
 .hud{display:none}
 html.has-world .hud{display:block}
-.plate{position:fixed;left:max(16px,env(safe-area-inset-left));top:max(16px,env(safe-area-inset-top));z-index:25;transform:translateY(calc(-100% - 40px));transition:transform .6s var(--spring)}
-html.started .plate{transform:none}
-html.map-open .plate{transform:translateY(calc(-100% - 40px))}
-html.map-open .exit,html.map-open .toast{visibility:hidden}
-.plate-btn{display:flex;flex-direction:column;justify-content:center;min-height:48px;text-align:left;padding:8px 16px 8px 14px}
-.plate-name{display:flex;align-items:center;gap:8px;font:400 17px/1 var(--display);letter-spacing:.01em}
-.plate-sub{display:flex;align-items:center;gap:7px;font:700 12px/1 var(--text);letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin-top:5px}
-.plate-sub::before{content:"";width:18px;height:2px;background:repeating-linear-gradient(90deg,var(--gold) 0 4px,transparent 4px 7px)}
-.plate-map{display:none;width:17px;height:17px;flex:none;color:var(--gold)}
-.tabs{position:fixed;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));z-index:25;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
-.tab{position:relative;display:grid;place-items:center;width:48px;height:48px;padding:0;border-radius:13px;background:var(--glass);color:var(--cream);box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift);transform:translateX(90px);transition:transform .5s var(--spring),background .2s,color .2s}
+.plate{display:none}
+.tabs{position:fixed;right:0;top:0;z-index:25;width:48px;height:0}
+.tab{position:absolute;right:0;width:44px;height:44px;padding:0;color:#fff;-webkit-user-select:none;user-select:none;transform:translateX(100%);transition:transform .15s .15s}
+.tab-set{top:max(20px,env(safe-area-inset-top))}
+.tab-map{top:calc(max(20px,env(safe-area-inset-top)) + 50px)}
 html.started .tab{transform:none}
-html.started .tab:nth-child(2){transition-delay:.06s}
-html.started .tab:hover{transform:translateY(-2px);color:var(--gold)}
-.tab:active{transform:scale(.94)!important}
-.tab svg{width:22px;height:22px}
+html.set-open .tab,html.map-open .tab,html:not(.started) .tab{transform:translateX(100%);transition-delay:0s}
+.tab-in{position:absolute;inset:0 -4px 0 0;display:grid;place-items:center;padding-left:3px;background:var(--red);transition:transform .15s}
+.tab-in::after{content:"";position:absolute;top:3px;right:0;bottom:3px;left:3px;border:1px solid #fff;border-right:none;opacity:.35;transition:opacity .15s}
+@media (hover:hover){.tab:hover .tab-in{transform:translateX(-4px)}.tab:hover .tab-in::after{opacity:.8}}
+.tab svg{position:relative;width:20px;height:20px}
 .tab .tab-word{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
-.tab[aria-expanded="true"]{background:var(--gold);color:var(--night)}
-.tab-set svg{transition:transform .5s var(--spring)}
-.tab-set[aria-expanded="true"] svg{transform:rotate(90deg)}
-.tab::after{content:attr(data-tip);position:absolute;right:calc(100% + 10px);top:50%;transform:translate(6px,-50%);opacity:0;pointer-events:none;background:var(--night);color:var(--cream);border-radius:8px;box-shadow:inset 0 0 0 1px var(--edge);font:400 12px/1 var(--display);padding:7px 9px 6px;white-space:pre;transition:opacity .15s,transform .15s}
-@media (hover:hover){.tab:hover::after,.tab:focus-visible::after{opacity:1;transform:translate(0,-50%)}}
-/* sound and the clock live in Settings (round 8: one thing at a time) */
+/* the key hint: Bruno's tooltip (#141414, a #ffceca hairline, radius 6, an arrow), to the left of the trigger */
+.tab::after{content:attr(data-tip);position:absolute;right:calc(100% + 12px);top:50%;transform:translateY(-50%);opacity:0;pointer-events:none;padding:8px 12px;background:#141414;border:1px solid var(--pink);border-radius:6px;font:400 15px/1 var(--text);color:#fff;white-space:pre;transition:opacity .15s}
+@media (hover:hover){.tab:hover::after,.tab:focus-visible::after{opacity:1}}
 .tabs .tab-sound,.tabs .tab-time{display:none}
-.time-clock{font:400 15px/1 var(--display)}
-.time-phase{font:600 13px/1 var(--text);color:var(--muted)}
+.time-clock,.time-phase{font:400 14px/1 var(--text)}
 
-/* ---------- the exit sign: the gantries' own green road sign, with a gold button ---------- */
-.exit{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom));z-index:24;width:min(560px,calc(100vw - 32px));transform:translate(-50%,calc(100% + 70px));visibility:hidden;pointer-events:none;transition:transform .55s var(--spring),visibility 0s .55s}
-.exit.show{transform:translate(-50%,0);visibility:visible;transition:transform .55s var(--spring),visibility 0s}
-.exit .exit-go{pointer-events:auto} /* round 9: only its button takes a touch; a thumb anywhere else reaches the world under it */
-.exit-sign{position:relative;display:flex;align-items:center;gap:14px;background:var(--sign);color:#fff;padding:14px 14px 14px 20px;border-radius:12px;box-shadow:inset 0 0 0 3px var(--sign),inset 0 0 0 5px rgba(255,255,255,.95),0 5px 0 var(--sign-2),var(--lift)}
-.exit-tab{position:absolute;left:18px;bottom:calc(100% - 4px);background:var(--gold);color:var(--night);font:400 12px/1 var(--display);letter-spacing:.03em;padding:6px 10px 8px;border-radius:8px 8px 0 0}
-.exit-body{flex:1;min-width:0}
-.exit-name{font:400 24px/1 var(--display)}
-.exit-line{font:500 16px/1.35 var(--text);margin-top:6px;opacity:.92}
-.exit-go{flex:none;display:flex;align-items:center;gap:8px;font:400 16px/1 var(--display);padding:14px 16px 13px}
-.exit-go kbd{background:rgba(29,23,36,.14);color:var(--night);box-shadow:none}
+/* ---------- the door: Bruno's interaction (touch-buttons): at the bottom, over a fade to #1D172199, one big Amatic word ---------- */
+.exit{position:fixed;left:0;right:0;bottom:0;z-index:24;display:flex;justify-content:center;padding:0 16px max(10px,env(safe-area-inset-bottom));visibility:hidden;pointer-events:none;opacity:0;transition:opacity .3s,visibility 0s .3s}
+.exit::before{content:"";position:absolute;inset:auto 0 0 0;height:max(150px,22vh);background:linear-gradient(#1d172100,#1d172199);pointer-events:none}
+.exit.show{visibility:visible;opacity:1;transition:opacity .3s,visibility 0s}
+.exit .exit-go{pointer-events:auto}
+.exit-sign{position:relative;display:flex;flex-direction:column;align-items:center;gap:0;text-align:center;transform:translateY(24px);transition:transform .6s var(--pop)}
+.exit.show .exit-sign{transform:none}
+.exit-tab{order:1;font:400 14px/1.2 var(--text);color:var(--w80)}
+.exit-body{order:2;min-width:0}
+.exit-name{font:700 30px/1 var(--title);color:#fff}
+.exit-line{font:400 15px/1.3 var(--text);color:var(--w80);margin-top:2px;max-width:40ch}
+/* the word itself, with Bruno's "open" arrow drawn after it; the key as his key box */
+.exit-go{order:3;display:flex;align-items:center;justify-content:center;gap:14px;min-height:78px;padding:0 7vw;font:700 64px/1 var(--title);color:#fff;text-shadow:0 2px 12px rgba(29,23,33,.45)}
+.exit-go::after{content:"";width:30px;height:30px;flex:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30' fill='none' stroke='%23fff' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 21L21 9M11 9h10v10'/%3E%3C/svg%3E") center/contain no-repeat}
+.exit-go kbd{font-size:15px;align-self:center;margin-left:-4px}
+html.coarse .exit-go kbd{display:none}
 
-/* ---------- notices: one at a time, in one place (Bruno 2025 Notifications) ---------- */
-.toast{position:fixed;left:50%;top:max(18px,env(safe-area-inset-top));z-index:50;display:flex;align-items:center;gap:10px;max-width:min(420px,calc(100vw - 200px));transform:translate(-50%,calc(-100% - 40px));visibility:hidden;background:var(--glass);color:var(--cream);border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift);font:400 14px/1.2 var(--display);letter-spacing:.01em;padding:11px 18px 10px 14px;transition:transform .5s var(--spring);pointer-events:none;text-align:left}
-.toast::before{content:"";width:10px;height:10px;flex:none;background:var(--gold);transform:rotate(45deg);border-radius:2px}
-.toast.show{transform:translate(-50%,0);visibility:visible}
-.award{position:fixed;left:50%;top:max(16px,env(safe-area-inset-top));z-index:52;width:min(360px,calc(100vw - 32px));display:flex;gap:14px;align-items:center;padding:13px 16px 15px 14px;background:var(--glass);color:var(--cream);border-radius:var(--r);box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift);transform:translate(-50%,calc(-100% - 40px));visibility:hidden;transition:transform .6s var(--spring),visibility 0s .6s;pointer-events:none;overflow:hidden}
-.award.show{transform:translate(-50%,0);visibility:visible;transition:transform .6s var(--spring),visibility 0s}
-.award::before{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--gold);transform-origin:0 50%;transform:scaleX(0)}
-.award.show::before{animation:awardBar var(--dur,4s) linear}
-@keyframes awardBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
-.award-badge{flex:none;position:relative;width:44px;height:44px;display:grid;place-items:center;font:400 18px/1 var(--display);color:var(--night)}
-.award-badge::before{content:"";position:absolute;inset:6px;background:var(--c,var(--gold));border-radius:6px;transform:rotate(45deg);box-shadow:0 0 0 3px var(--night),0 0 0 4.5px var(--c,var(--gold))}
-.award-badge{z-index:0}.award-badge::before{z-index:-1}
-.award-k{display:block;font:700 11px/1.2 var(--text);letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
-.award-t{display:block;font:400 17px/1.1 var(--display);margin-top:3px}
-.award-d{display:block;font:500 14px/1.3 var(--text);margin-top:3px;color:var(--muted)}
-/* notices leave the way Bruno 2025's do: they wind up and shrink to nothing (0.45 s, cubic-bezier(.42,0,.47,-.55)) */
-.toast.leaving,.award.leaving{transform:translate(-50%,0) scale(.01)!important;transition:transform .45s cubic-bezier(.42,0,.47,-.55),opacity .45s,visibility 0s .45s!important;transform-origin:50% 30%}
+/* ---------- notices (Bruno's Notifications): top centre, the panel, a 2 px bar that runs out, in on a spring, out to nothing ---------- */
+.toast,.award{position:fixed;left:50%;top:20px;z-index:50;width:min(350px,calc(100vw - 40px));margin-left:calc(min(350px,calc(100vw - 40px)) / -2);padding:12px 20px 15px 15px;background:var(--panel);color:#fff;font:400 16px/1.3 var(--text);text-align:left;pointer-events:none;visibility:hidden;transform:translateY(calc(-100% - 20px));transition:transform .6s var(--pop),visibility 0s .6s}
+html.coarse .toast,html.coarse .award{width:min(350px,calc(100vw - 88px));margin-left:calc(min(350px,calc(100vw - 88px)) / -2)}
+.toast.show,.award.show{transform:translateY(0);visibility:visible;transition:transform .6s var(--pop),visibility 0s}
+.toast::after,.award::after{content:"";position:absolute;left:0;top:0;width:100%;height:2px;background:var(--pink);transform-origin:100% 0;transform:scaleX(0)}
+.award::after{background:var(--green)}
+.toast.show::after,.award.show::after{animation:timeBar var(--dur,4s) linear}
+@keyframes timeBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.toast.leaving,.award.leaving{transform:translateY(calc(-100% + 20px)) scale(0)!important;transition:transform .45s var(--leave),visibility 0s .45s!important}
+/* an achievement: the Amatic title in #d5ff95, a bold tick and count, the description (notifications.styl .is-achievement) */
+.award{display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 10px}
+.award-badge{display:none}
+.award>span:not(.award-badge){display:contents}
+.award-t{grid-row:1;grid-column:1;font:700 1.7rem/1 var(--title);color:var(--green);margin-bottom:.2em}
+.award-k{grid-row:1;grid-column:2;display:flex;align-items:center;gap:8px;font:700 15px/1 var(--text);color:var(--green)}
+.award-k::before{content:"";width:17px;height:13px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 13' fill='none' stroke='%23d5ff95' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 7l4.5 4.5L15 2'/%3E%3C/svg%3E") center/contain no-repeat}
+.award-d{grid-row:2;grid-column:1/-1;font:400 16px/1.2 var(--text);color:#fff}
 
-/* ---------- speech bubbles (Messenger): white, round, a tail ---------- */
-.bubble{position:fixed;left:0;top:0;z-index:22;max-width:min(250px,64vw,calc(100vw - 150px));padding:10px 14px 10px;background:#fff;color:var(--night);font:600 15px/1.3 var(--text);border-radius:16px;box-shadow:0 8px 20px -8px rgba(22,6,44,.5),0 2px 0 rgba(29,23,36,.25);transform-origin:50% 100%;pointer-events:none;visibility:hidden;will-change:transform}
-.bubble::after{content:"";position:absolute;left:calc(50% - 8px);bottom:-7px;width:16px;height:16px;background:#fff;border-radius:3px;transform:rotate(45deg)}
-.bubble-who{display:block;font:400 10.5px/1 var(--display);letter-spacing:.03em;color:#8a6a2a;margin-bottom:4px}
+/* ---------- speech: Bruno's Bubble.js (his whispers): a #222 band, white Amatic, no tail; the speaker's name is the small tilted card
+   his bubbles carry above them (a flag there, a name here) ---------- */
+.bubble{position:fixed;left:0;top:0;z-index:22;max-width:min(320px,70vw,calc(100vw - 120px));padding:6px 14px 4px;background:#222;color:#fff;font:700 26px/1.05 var(--title);transform-origin:50% 100%;pointer-events:none;visibility:hidden;will-change:transform}
+.bubble-who{position:absolute;left:-6px;bottom:calc(100% - 4px);padding:3px 8px 2px;background:var(--pink);color:#251f2b;font:700 12px/1.2 var(--text);transform:rotate(-8.6deg);transform-origin:0 100%;white-space:nowrap}
 html.map-open .bubble,html.set-open .bubble,html.notice-up .bubble{visibility:hidden!important}
 
-/* ---------- the time trial: a night strip, the clock in gold, a start light ---------- */
-.trial{position:fixed;left:50%;top:max(16px,env(safe-area-inset-top));z-index:26;display:none;align-items:stretch;overflow:hidden;transform:translateX(-50%);background:var(--glass);color:var(--cream);border-radius:var(--r);box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift)}
+/* ---------- the time trial: a notice-sized panel; the time in Amatic (Bruno's circuit board is his in-world clock) ---------- */
+.trial{position:fixed;left:50%;top:20px;z-index:26;display:none;align-items:center;gap:0;transform:translateX(-50%)}
 html.racing .trial{display:flex}
-.trial-l{padding:10px 14px 9px 16px;font:400 13px/1.15 var(--display)}
-.trial-l small{display:block;font:600 13px/1.1 var(--text);color:var(--muted)}
-.trial-t{min-width:112px;padding:12px 16px 10px;font:400 22px/1 var(--display);font-variant-numeric:tabular-nums;background:rgba(0,0,0,.25);color:var(--gold);text-align:right}
-.lights{display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(0,0,0,.25)}
-.lights i{width:16px;height:16px;border-radius:50%;background:#3a3046;box-shadow:inset 0 0 0 2px #15101b}
-.lights i.on{background:#ff5a3c;box-shadow:0 0 10px #ff5a3c}.lights.go i{background:#63e38a;box-shadow:0 0 10px #63e38a}
-html.racing .plate,html.racing .toast{visibility:hidden}
+.trial-l{padding:8px 16px 8px 18px;font:700 26px/1 var(--title)}
+.trial-l small{display:block;font:400 14px/1.1 var(--text);color:var(--w80)}
+.trial-t{min-width:120px;padding:8px 18px 6px 12px;font:700 40px/1 var(--title);font-variant-numeric:tabular-nums;color:var(--amber);text-align:right}
+.lights{display:flex;align-items:center;gap:6px;padding:0 6px 0 16px}
+.lights i{width:14px;height:14px;border-radius:50%;border:1px solid var(--line)}
+.lights i.on{background:var(--danger);border-color:var(--danger);box-shadow:0 0 10px var(--danger)}.lights.go i{background:var(--green);border-color:var(--green);box-shadow:0 0 10px var(--green)}
+html.racing .toast{visibility:hidden}
 
-/* ---------- contextual help (Bruno 2025 shows "Unstuck" only when you are stuck), the pointer to the next door ---------- */
-.ctx{position:fixed;left:50%;bottom:calc(max(20px,env(safe-area-inset-bottom)) + 4px);z-index:24;transform:translate(-50%,160%);visibility:hidden;transition:transform .5s var(--spring),visibility 0s .5s}
-.ctx.show{transform:translate(-50%,0);visibility:visible;transition:transform .5s var(--spring),visibility 0s}
+/* ---------- stuck: Bruno's "Unstuck", the same big word at the bottom (touch-buttons .unstuck) ---------- */
+.ctx{position:fixed;left:0;right:0;bottom:0;z-index:24;display:flex;justify-content:center;padding-bottom:max(10px,env(safe-area-inset-bottom));visibility:hidden;opacity:0;pointer-events:none;transition:opacity .3s,visibility 0s .3s}
+.ctx::before{content:"";position:absolute;inset:auto 0 0 0;height:max(130px,18vh);background:linear-gradient(#1d172100,#1d172199);pointer-events:none}
+.ctx.show{visibility:visible;opacity:1;transition:opacity .3s,visibility 0s}
+.ctx .act{position:relative;pointer-events:auto;min-height:78px;padding:0 7vw;border:0;font:700 56px/1 var(--title);color:#fff;text-shadow:0 2px 12px rgba(29,23,33,.45)}
 html.exit-on .ctx{visibility:hidden}
-.gd{position:fixed;left:0;top:0;z-index:21;display:flex;align-items:center;gap:8px;height:40px;padding:0 14px 0 12px;font:400 13px/1 var(--display);color:var(--cream);background:var(--glass);border-radius:999px;box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift);opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s;will-change:transform;white-space:nowrap}
+/* the pointer to the next door: an interactive point's label (a #251f2b band, white Amatic) with its diamond */
+.gd{position:fixed;left:0;top:0;z-index:21;display:flex;align-items:center;gap:10px;height:40px;padding:0 14px 0 10px;font:700 24px/1 var(--title);color:#fff;background:#251f2b;opacity:0;visibility:hidden;transition:opacity .35s,visibility 0s .35s;will-change:transform;white-space:nowrap}
 .gd.show{opacity:1;visibility:visible;transition:opacity .35s,visibility 0s}
-.gd-dia{width:12px;height:12px;border:2.5px solid var(--gold);border-radius:2px;transform:rotate(45deg);flex:none}
+.gd-dia{position:relative;width:15px;height:15px;background:#251f2b;border:2px solid #fff;transform:rotate(45deg);flex:none;box-shadow:0 0 0 2px #251f2b}
 .gd-ar{position:absolute;left:50%;top:50%;width:0;height:0}
-.gd-ar::after{content:"";position:absolute;left:0;top:-7px;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid var(--night)}
-html.coarse .gd{height:44px;pointer-events:none} /* round 10: on touch the canvas hit-tests it, so a finger on it can still grow into the ring */
+.gd-ar::after{content:"";position:absolute;left:0;top:-7px;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid #251f2b}
+html.coarse .gd{height:44px;pointer-events:none}
 html.map-open .gd,html.set-open .gd,html.racing .gd,html.exit-on .gd{opacity:0!important;visibility:hidden!important}
 
-/* ---------- touch: one round boost button, after the first drive; no stick (Bruno's ring is drawn on the ground) ---------- */
+/* ---------- touch: the boost, a crimson trigger square (Bruno has no boost on touch; his triggers lend it their look) ---------- */
 .pad{display:none}
 html.coarse.started .pad{display:block}
 .joy{display:none!important}
-.tbtns{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:23;display:block;transition:opacity .35s}
-.tbtn{width:64px;height:64px;display:grid;place-items:center;border-radius:50%;background:var(--glass);color:var(--gold);box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift);touch-action:none;-webkit-user-select:none;user-select:none;transition:transform .12s,background .15s}
+.tbtns{position:fixed;right:0;bottom:max(24px,env(safe-area-inset-bottom));z-index:23;display:block;transition:opacity .35s}
+.tbtn{position:relative;width:64px;height:64px;display:grid;place-items:center;padding-left:3px;background:var(--red);color:#fff;touch-action:none;-webkit-user-select:none;user-select:none;transition:transform .12s}
+.tbtn::after{content:"";position:absolute;top:3px;right:0;bottom:3px;left:3px;border:1px solid #fff;border-right:none;opacity:.35}
 .tbtn svg{width:26px;height:26px}
-.tbtn.on{transform:scale(.94);background:var(--gold);color:var(--night)}
+.tbtn.on{transform:translateX(-4px)}.tbtn.on::after{opacity:.8}
 html:not(.drove) .tbtns,html.exit-on .tbtns,html.scheme-tap .tbtns{opacity:0;pointer-events:none}
-html.coarse .exit,html.coarse .ctx{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 88px)}
+html.coarse .exit{padding-bottom:calc(max(10px,env(safe-area-inset-bottom)) + 4px)}
 
 /* ---------- going in: the chromatic split happens in WebGL; then this mask in the district's own colour ---------- */
 .wipe{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;pointer-events:none;visibility:hidden;background:var(--wipe-bg,#f4f1ea);color:var(--wipe-ink,#151515);clip-path:circle(0px at var(--wx,50%) var(--wy,50%))}
 .wipe.go{visibility:visible;clip-path:circle(150vmax at var(--wx,50%) var(--wy,50%));transition:clip-path .75s cubic-bezier(.7,0,.2,1)}
-.wipe-name{font:400 clamp(40px,9vw,120px)/.9 var(--display);text-align:center;padding:0 16px;transform:translateY(20px);opacity:0;transition:transform .5s .28s var(--spring),opacity .3s .28s}
+.wipe-name{font:700 clamp(56px,11vw,150px)/.9 var(--title);text-align:center;padding:0 16px;transform:translateY(20px);opacity:0;transition:transform .5s .28s var(--spring),opacity .3s .28s}
 .wipe.go .wipe-name{transform:none;opacity:1}
-/* a respawn: the sky closes over the view and opens again (Bruno's overlay) */
-.fade{position:fixed;inset:0;z-index:60;background:var(--sky);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s,visibility 0s .35s}
+/* a respawn: Bruno's overlay closes over the view in his panel's colour and opens again */
+.fade{position:fixed;inset:0;z-index:60;background:var(--panel);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s,visibility 0s .35s}
 .fade.on{opacity:1;visibility:visible;transition:opacity .35s}
 
-/* ---------- the letter (mailbox): an airmail card ---------- */
-.letter{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(29,23,36,.5)}
+/* ---------- the letter (mailbox): Bruno's modal (modals.styl .content: the panel, 25/40/40 padding, a cross at 65%) ---------- */
+.letter{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(29,23,33,.45)}
 .letter.open{display:flex}
-.letter-card{position:relative;width:min(470px,100%);padding:30px 24px 22px;background:var(--paper);color:var(--night);border-radius:var(--r);overflow:hidden;box-shadow:var(--lift);animation:letterIn .55s var(--spring)}
-.letter-card::before{content:"";position:absolute;left:0;right:0;top:0;height:10px;background:repeating-linear-gradient(135deg,var(--kerb) 0 12px,var(--paper) 12px 20px,#3f6fcf 20px 32px,var(--paper) 32px 40px)}
-@keyframes letterIn{from{transform:translateY(40px) rotate(-3deg);opacity:0}to{transform:none;opacity:1}}
-.letter-head{display:flex;gap:14px;align-items:center;margin:4px 0 14px;padding-right:44px}
-.letter-head img{width:72px;height:72px;object-fit:cover;border-radius:12px;flex:none}
-.letter h2{font:400 28px/.95 var(--display);margin:0}
-.letter p{margin:0 0 16px}
-.letter .email{flex:1 1 100%}.letter .email-addr{flex:1;font-size:14.5px}
-.x,.letter-x,.setp-x,.atlas-close{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--kerb);color:#fff;box-shadow:inset 0 -3px 0 var(--kerb-2);font:400 20px/1 var(--display);transition:transform .15s var(--spring)}
-.letter-x{position:absolute;right:14px;top:20px}
-.letter-x:active,.setp-x:active,.atlas-close:active{transform:scale(.93)}
-/* contact bits */
+.letter-card{position:relative;width:min(500px,100%);padding:25px 40px 40px;background:var(--panel);color:#fff;animation:letterIn .3s ease-out}
+.letter-card::after{content:"";position:absolute;inset:3px;border:1px solid #fff;opacity:.35;pointer-events:none}
+@keyframes letterIn{from{opacity:0}to{opacity:1}}
+.letter-head{display:flex;gap:16px;align-items:center;margin:4px 0 12px;padding-right:44px}
+.letter-head img{width:72px;height:72px;object-fit:cover;flex:none;outline:1px solid var(--line);outline-offset:2px}
+.letter h2{font:700 2.5rem/1 var(--title);margin:0}
+.letter p{margin:0 0 18px;font-size:17px}
+.letter .email{flex:1 1 100%}.letter .email-addr{flex:1}
+.letter-x{position:absolute;right:28px;top:28px;z-index:1;display:grid;place-items:center;width:44px;height:44px;opacity:.65;font:400 34px/1 var(--text);color:#fff}
+.letter-x:hover{opacity:1}
+@media (max-width:520px){.letter-card{padding:20px 22px 26px}.letter-x{right:14px;top:14px}}
+/* contact bits: Bruno's buttons; the address as his input group (a 1px #555 box, the button closing it off, radius 8) */
 .contact{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
-.btn{display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:12px 16px 11px;border-radius:12px;background:#0a66c2;color:#fff;font:400 14px/1 var(--display);text-decoration:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25)}
-.btn:hover{background:#0b74dc}
-.email{display:inline-flex;align-items:stretch;min-height:46px;max-width:100%;border-radius:12px;overflow:hidden;background:#fff;color:var(--night);box-shadow:inset 0 0 0 1.5px rgba(29,23,36,.2)}
-.email-addr{display:flex;align-items:center;min-width:0;padding:0 12px 0 14px;font:600 clamp(13px,3.9vw,16px)/1.2 var(--text);overflow-wrap:anywhere}
-.copy{min-width:78px;padding:0 14px;border-radius:0;box-shadow:none;font:400 13px/1 var(--display)}
-.copy.done{background:var(--mint)}
+.btn{color:#fff;border-color:#fff;font-weight:700}
+.email{display:inline-flex;align-items:stretch;min-height:50px;max-width:100%;border:1px solid #555;border-radius:8px;overflow:hidden}
+.email-addr{display:flex;align-items:center;min-width:0;padding:0 12px 0 14px;font:400 clamp(14px,3.9vw,16px)/1.2 var(--text);color:#fff;overflow-wrap:anywhere}
+.copy{min-height:48px;min-width:78px;border:0;border-left:1px solid #555;border-radius:0;color:var(--pink);font-weight:700}
+.copy.done{color:var(--green)}
 
-/* ---------- the map: the island from above with its doors, and the road as a list (also the whole page with no 3D) ---------- */
-.atlas{position:relative;min-height:100vh;color:var(--cream)}
-html:not(.has-world) .atlas{background:var(--night)}
+/* ---------- the map: Bruno's map modal (the island from above, diamonds on it, a crimson close tab on the panel's top edge), with
+   our road beside it as his achievements list: each stop an Amatic title and a line ---------- */
+.atlas{position:relative;min-height:100vh;color:#fff}
+html:not(.has-world) .atlas{background:#1d1721}
 html.has-world .atlas{position:fixed;inset:0;z-index:40;overflow-y:auto;overscroll-behavior:contain;visibility:hidden;pointer-events:none}
 html.has-world.map-open .atlas{visibility:visible}
-/* touch screens: the panel scrolls itself (iOS won't scroll a layer that ignores touches) */
-html.has-world.coarse .atlas-panel{height:calc(100% - 72px);min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+html.has-world.coarse .atlas-panel{height:calc(100% - 64px);min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 html.has-world.coarse .atlas{overflow:hidden}
-.atlas-bar{position:sticky;top:0;z-index:3;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;pointer-events:none}
+.atlas-bar{position:sticky;top:0;z-index:3;display:flex;justify-content:flex-end;align-items:flex-end;height:64px;padding:0 0 0 16px;pointer-events:none;width:min(540px,100%)}
+html.has-world .atlas-bar{margin-left:16px;width:min(524px,calc(100% - 26px))}
 .atlas-bar>*{pointer-events:auto}
-.atlas-kicker{margin:0;display:flex;align-items:center;gap:9px;font:400 15px/1 var(--display);background:var(--glass);color:var(--cream);padding:12px 16px 11px 14px;border-radius:12px;box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift)}
-.atlas-kicker::before{content:"";width:11px;height:11px;border:2.5px solid var(--gold);border-radius:2px;transform:rotate(45deg)}
-.atlas-close{display:none;width:auto;gap:10px;padding:0 14px 0 16px;font-size:14px}
-.atlas-close kbd{background:rgba(0,0,0,.2);box-shadow:none;color:#fff}
-html.has-world .atlas-close{display:inline-flex;align-items:center}
-.atlas-panel{pointer-events:auto;width:min(540px,100%);padding:18px 18px 40px;transform:translateX(-30px);opacity:0;transition:transform .5s var(--spring),opacity .3s}
-html.map-open .atlas-panel,html:not(.has-world) .atlas-panel{transform:none;opacity:1}
+.atlas-kicker{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+/* the close: his crimson tab, 50 x 44, standing on the panel's top edge, right 10 px */
+.atlas-close,.setp-x{position:relative;display:none;width:50px;height:44px;margin-right:10px;color:#fff;transition:transform .15s}
+html.has-world .atlas-close{display:block}
+.atlas-close .x-in,.setp-x .x-in{position:absolute;inset:0 0 -4px 0;display:grid;place-items:center;padding:0 3px 4px;background:var(--red)}
+.atlas-close .x-in::after,.setp-x .x-in::after{content:"";position:absolute;top:3px;right:3px;bottom:0;left:3px;border:1px solid #fff;border-bottom:none;opacity:.35;transition:opacity .15s}
+@media (hover:hover){.atlas-close:hover,.setp-x:hover{transform:translateY(-4px)}.atlas-close:hover .x-in::after,.setp-x:hover .x-in::after{opacity:.8}}
+.x-in svg{position:relative;width:18px;height:18px}
+.atlas-close kbd,.atlas-close .x-word{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.atlas-panel{position:relative;pointer-events:auto;width:min(540px,100%);padding:25px 28px 40px;background:var(--panel);opacity:0;transition:opacity .3s}
+.atlas-panel::after{content:"";position:absolute;inset:3px;border:1px solid #fff;opacity:.35;pointer-events:none}
+html.map-open .atlas-panel,html:not(.has-world) .atlas-panel{opacity:1}
 html:not(.has-world) .atlas-panel{margin:0 auto;width:min(760px,100%)}
-html.has-world .atlas-panel{margin:0 0 16px 16px;min-height:calc(100% - 88px);background:var(--glass);border-radius:18px;box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift)}
-.card{position:relative;padding:4px 2px 0;margin:0 0 22px;display:grid;grid-template-columns:96px 1fr;gap:14px 16px;align-items:center;background:none;box-shadow:none;border-radius:0}
+html.has-world .atlas-panel{margin:0 0 16px 16px;min-height:calc(100% - 80px)}
+.card{position:relative;padding:0;margin:0 0 26px;display:grid;grid-template-columns:96px 1fr;gap:14px 18px;align-items:center}
 .card-photo{margin:0}
-.card-photo img{display:block;width:96px;height:96px;object-fit:cover;border-radius:16px;box-shadow:0 0 0 3px var(--night),0 0 0 4.5px var(--gold)}
-.card-name{margin:0;font:400 clamp(32px,5.4vw,44px)/.92 var(--display);color:var(--cream)}
-.card-route{margin:8px 0 0;font:700 13px/1.2 var(--text);letter-spacing:.07em;text-transform:uppercase;color:var(--gold)}
+.card-photo img{display:block;width:96px;height:96px;object-fit:cover;outline:1px solid var(--line);outline-offset:3px}
+.card-name{margin:0;font:700 clamp(44px,7vw,56px)/.9 var(--title);color:#fff}
+.card-route{margin:6px 0 0;font:400 16px/1.2 var(--text);color:var(--w80)}
 .card .contact{grid-column:1/-1}
-.card-note{grid-column:1/-1;margin:0;padding:12px 14px;border-radius:12px;background:rgba(255,200,90,.14);box-shadow:inset 0 0 0 1.5px rgba(255,200,90,.4);font:500 15px/1.45 var(--text)}
+.card-note{grid-column:1/-1;margin:0;padding:12px 14px;border:1px dashed var(--line);font:400 15px/1.45 var(--text)}
 .card-note button{text-decoration:underline;text-underline-offset:3px;font-weight:700}
-.card-plain{grid-column:1/-1;margin:-2px 0 0;font:500 15px/1.45 var(--text);color:var(--muted)}
-.card-plain a{color:var(--cream);font-weight:700;text-decoration:underline;text-decoration-color:var(--gold);text-decoration-thickness:2px;text-underline-offset:3px}
-.route-h{margin:0 0 6px;font:400 22px/1 var(--display)}
-.route-sub{margin:0 0 18px;font:500 15px/1.45 var(--text);color:var(--muted);max-width:46ch}
-/* the list is the road: an asphalt strip with a dashed centre line, each stop a door off it */
-.stops{list-style:none;margin:0;padding:0 0 0 34px;position:relative}
-.stops::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:12px;border-radius:6px;background:var(--road);box-shadow:inset 0 0 0 1.5px var(--edge)}
-.stops::after{content:"";position:absolute;left:13px;top:14px;bottom:14px;width:2px;background:repeating-linear-gradient(var(--gold) 0 8px,transparent 8px 16px)}
-.stops li{position:relative;margin:0 0 12px}
-.city{display:inline-block;padding:8px 12px 7px;border-radius:8px;background:var(--sign);color:#fff;font:400 16px/1 var(--display);box-shadow:inset 0 0 0 2px var(--sign),inset 0 0 0 3.5px #fff}
-.stop{display:block;padding:12px 14px;border-radius:12px;background:rgba(255,238,210,.05);color:var(--cream);box-shadow:inset 0 0 0 1.5px var(--edge);transition:background .15s}
-.stop::before{content:"";position:absolute;left:-26px;top:20px;width:10px;height:10px;border-radius:2px;background:var(--night);box-shadow:0 0 0 2px var(--gold);transform:rotate(45deg)}
-.stop:hover,.stop.is-hover{background:rgba(255,238,210,.11)}
+.card-plain{grid-column:1/-1;margin:-2px 0 0;font:400 15px/1.45 var(--text);color:var(--w80)}
+.card-plain a{color:#fff;font-weight:700}
+.route-h{margin:0 0 4px;font:700 2.5rem/1 var(--title);text-align:center}
+.route-sub{margin:0 auto 20px;font:400 15px/1.45 var(--text);color:var(--w80);max-width:46ch;text-align:center}
+/* the road, as Bruno's achievements: a thin line down the side joins the stops (his bars, stood up) */
+.stops{list-style:none;margin:0;padding:0 0 0 26px;position:relative}
+.stops::before{content:"";position:absolute;left:7px;top:10px;bottom:10px;width:1px;background:var(--line)}
+.stops li{position:relative;margin:0 0 16px}
+.city{position:relative;display:inline-block;font:700 1.7rem/1 var(--title);color:var(--amber)}
+.city::before{content:"";position:absolute;left:-25px;top:calc(50% - 6px);width:11px;height:11px;background:var(--amber);transform:rotate(45deg)}
+.stop{display:block;position:relative}
+.stop::before{content:"";position:absolute;left:-25px;top:10px;width:11px;height:11px;background:#1d1721;border:1.5px solid #fff;transform:rotate(45deg)}
 .stop-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
-.stop-no{flex:none;font:400 11px/1 var(--display);letter-spacing:.03em;color:var(--night);background:var(--gold);padding:5px 7px 4px;border-radius:6px}
-.stop-name{display:block;font:400 19px/1.08 var(--display);text-decoration:none}
-.stop-name::after{content:" \2192";font-family:var(--text);font-weight:700;color:var(--gold)}
+.stop-no{flex:none;font:700 15px/1 var(--text);color:var(--pink)}
+.stop-name{display:block;font:700 1.7rem/1 var(--title);color:var(--pink);text-decoration:none}
+.stop-name:hover{color:#fff}
+.stop-name::after{content:" \2197";font:700 .6em/1 var(--text)}
 .stop-name.no-arrow::after{content:none}
-.stop-line{display:block;margin-top:4px;font:500 15px/1.4 var(--text);color:var(--muted)}
-.stop-drive{display:none;margin-top:10px;font:700 14px/1 var(--text);padding:9px 12px 8px;border-radius:9px;color:var(--cream);background:var(--night-3);box-shadow:inset 0 0 0 1px var(--edge)}
-.stop-drive:hover{background:var(--gold);color:var(--night)}
-html.has-world .stop-drive{display:inline-flex;align-items:center;gap:6px}
-.stop-drive::before{content:"";width:8px;height:8px;border-radius:1px;background:currentColor;transform:rotate(45deg)}
-.stop-mail{background:rgba(63,111,207,.18)}
+.stop-line{display:block;margin-top:2px;font:400 15px/1.35 var(--text);color:#fff}
+.stop-drive{display:none;margin-top:8px;min-height:40px;font-size:15px}
+html.has-world .stop-drive{display:inline-flex}
 .stop-mail .contact{margin-top:10px}
-.stop.been .stop-no::after{content:" \2713"}
-.stop.been .stop-name{opacity:.72}
-.stop.been::before{background:var(--mint);box-shadow:0 0 0 2px var(--mint)}
-.stop.next{box-shadow:inset 0 0 0 2px var(--gold)}
-.atlas-foot{margin-top:28px;font:500 14px/1.5 var(--text);color:var(--faint)}
+.stop.been .stop-name{color:var(--green)}
+.stop.been .stop-no{color:var(--green)}
+.stop.been .stop-no::before{content:"\2713  "}
+.stop.been::before{background:var(--green);border-color:var(--green)}
+.stop.next::before{background:var(--pink);border-color:var(--pink)}
+.stop:hover::before,.stop.is-hover::before{background:#fff}
+.atlas-foot{margin-top:30px;font:400 14px/1.5 var(--text);color:var(--w65)}
 .atlas-foot p{margin:0 0 8px}
-.atlas-foot kbd{font-size:.78em}
-/* the map picture: Bruno 2025's top-down island with pins; a pin takes you there */
-.imap{position:relative;display:none;margin:0 0 22px;aspect-ratio:1;border-radius:16px;background:var(--sea);box-shadow:inset 0 0 0 1.5px var(--edge),0 10px 26px -12px rgba(0,0,0,.6);overflow:hidden}
+.atlas-foot a{color:#fff}
+/* the map picture: his map (Map.js), square; the diamonds are his interactive points (a #251f2b diamond inside a white line) */
+.imap{position:relative;display:none;margin:0 0 24px;aspect-ratio:1;background:#13375f;overflow:hidden}
+.imap::after{content:"";position:absolute;inset:3px;border:1px solid #fff;opacity:.35;pointer-events:none}
 html.has-world .imap{display:block}
 .imap canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .imap-pins{position:absolute;inset:0}
-.imap-pin{position:absolute;display:flex;align-items:center;gap:5px;transform:translate(-8px,-50%);padding:0;font:400 11px/1 var(--display);color:var(--cream);white-space:nowrap;min-height:28px}
-.imap-dia{width:14px;height:14px;flex:none;border-radius:2px;background:var(--night);box-shadow:0 0 0 2px var(--cream);transform:rotate(45deg);transition:transform .2s var(--spring)}
-.imap-w{background:var(--glass);padding:5px 7px 4px;border-radius:6px;box-shadow:inset 0 0 0 1px var(--edge)}
-.imap-pin:hover .imap-dia,.imap-pin.on .imap-dia{transform:rotate(45deg) scale(1.25)}
-.imap-pin:hover .imap-w,.imap-pin.on .imap-w,.imap-pin:focus-visible .imap-w{background:var(--gold);color:var(--night)}
-.imap-pin.been .imap-dia{background:var(--mint)}
+.imap-pin{position:absolute;display:flex;align-items:center;gap:6px;transform:translate(-8px,-50%);padding:0;font:700 17px/1 var(--title);color:#fff;white-space:nowrap;min-height:28px}
+.imap-dia{width:13px;height:13px;flex:none;background:#251f2b;border:2px solid #fff;transform:rotate(45deg);box-shadow:0 0 0 1.5px #251f2b;transition:transform .2s var(--spring)}
+.imap-w{background:#251f2b;padding:3px 7px 2px}
+.imap-pin:hover .imap-dia,.imap-pin.on .imap-dia{transform:rotate(45deg) scale(1.3)}
+.imap-pin:hover .imap-w,.imap-pin.on .imap-w,.imap-pin:focus-visible .imap-w{background:#fff;color:#251f2b}
+.imap-pin.been .imap-dia{border-color:var(--green)}
 .imap-pin.flip{flex-direction:row-reverse;transform:translate(calc(-100% + 8px),-50%)}
-.imap-car{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--kerb);box-shadow:0 0 0 2.5px var(--cream),0 0 0 4px var(--night),0 0 0 9px rgba(232,72,58,.25);animation:carPing 1.6s ease-out infinite}
-@keyframes carPing{0%{box-shadow:0 0 0 2.5px var(--cream),0 0 0 4px var(--night),0 0 0 4px rgba(232,72,58,.5)}100%{box-shadow:0 0 0 2.5px var(--cream),0 0 0 4px var(--night),0 0 0 16px rgba(232,72,58,0)}}
-@media (max-width:420px){.imap-w{font-size:9.5px;padding:4px 5px 3px}}
-/* a wide screen shows the island itself beside the panel (the camera flies up over it and its labels take you there): the picture
-   would only repeat it, so the panel keeps the card and the road */
+.imap-car{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--kerb);box-shadow:0 0 0 2px #fff,0 0 0 8px rgba(232,72,58,.25);animation:carPing 1.6s ease-out infinite}
+@keyframes carPing{0%{box-shadow:0 0 0 2px #fff,0 0 0 2px rgba(232,72,58,.5)}100%{box-shadow:0 0 0 2px #fff,0 0 0 16px rgba(232,72,58,0)}}
+@media (max-width:420px){.imap-w{font-size:15px;padding:2px 5px 1px}}
 @media (min-width:1100px) and (hover:hover){html.has-world .imap{display:none}}
-html.map-open .tabs .tab-map{visibility:hidden}
 
-/* ---------- Settings: Bruno 2025's tabbed menu (icon tabs on a dark panel, a red close), docked so the world stays in view ---------- */
-.setp{position:fixed;z-index:45;right:max(16px,env(safe-area-inset-right));top:max(16px,env(safe-area-inset-top));width:min(400px,calc(100vw - 32px));max-height:calc(100% - 32px);display:flex;flex-direction:column;background:var(--glass);color:var(--cream);border-radius:18px;box-shadow:inset 0 0 0 1.5px var(--edge),var(--lift);visibility:hidden;opacity:0;transform:translateX(24px) scale(.98);transform-origin:100% 0;transition:transform .45s var(--spring),opacity .2s,visibility 0s .45s}
-html.set-open .setp{visibility:visible;opacity:1;transform:none;transition:transform .45s var(--spring),opacity .2s,visibility 0s}
-html.set-open .tabs{visibility:hidden}
-.setp-head{display:flex;align-items:center;gap:8px;padding:14px 14px 0 18px}
-.setp-h{margin:0;flex:1;font:400 20px/1 var(--display)}
-.setp-q{display:inline-flex;align-items:center;gap:6px;height:44px;padding:0 12px;border-radius:12px;font:400 11.5px/1 var(--display);background:var(--night-3);color:var(--cream);box-shadow:inset 0 0 0 1px var(--edge);white-space:nowrap}
-.setp-q svg{width:18px;height:18px;flex:none}
-.setp-q[aria-pressed="true"]{background:var(--mint);color:var(--night)}
-.setp-q:not([aria-pressed="true"]) .q-wave{opacity:.25}
-.setp-q:active{transform:scale(.95)}
-#qMap{display:none}
-/* the tabs: square icon tabs with a word under each (Bruno's Menu tabs); the chosen one is lit gold */
-.setp-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:14px 14px 4px;padding:5px;border-radius:14px;background:rgba(0,0,0,.22)}
-.setp-tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:56px;padding:8px 4px 7px;border-radius:10px;font:400 10.5px/1 var(--display);letter-spacing:.02em;color:var(--muted);transition:background .15s,color .15s}
-.setp-tab svg{width:22px;height:22px}
-.setp-tab:hover{color:var(--cream);background:rgba(255,238,210,.06)}
-.setp-tab[aria-selected="true"]{background:var(--gold);color:var(--night)}
-.setp-body{overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:4px 18px 16px}
+/* ---------- the menu (was "Settings"): Bruno's menu (menu.styl). His is two halves, a preview and the words; ours keeps the words
+   half docked on the right and lets the live island be the preview (a round-4 rule: the menu never hides the world). Folder tabs
+   stand on its top edge, the crimson close at the right; the first tab is "home", as his "Bruno's Home" ---------- */
+.setp{position:fixed;z-index:45;right:16px;top:calc(max(16px,env(safe-area-inset-top)) + 44px);bottom:16px;width:min(470px,calc(100vw - 32px));display:flex;flex-direction:column;background:var(--panel);color:#fff;visibility:hidden;opacity:0;transition:opacity .3s,visibility 0s .3s}
+.setp::after{content:"";position:absolute;inset:3px;border:1px solid #fff;opacity:.35;pointer-events:none}
+html.set-open .setp{visibility:visible;opacity:1;transition:opacity .3s,visibility 0s}
+.setp-head{position:absolute;left:0;right:0;bottom:100%;height:44px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 0 0 10px;pointer-events:none}
+.setp-head>*{pointer-events:auto}
+.setp-h{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+.setp-q,#qMap{display:none}
+.setp-x{display:block;order:3}
+/* the tabs: 50 x 44, the panel with its hairline (no bottom), pink icons at 55%; the open one #241e2a at 100%; hover lifts 4 px */
+.setp-tabs{display:flex;gap:3px;order:1}
+.setp-tab{position:relative;width:50px;height:44px;color:var(--pink);transition:transform .15s}
+.setp-tab::before{content:"";position:absolute;inset:0 0 -4px 0;background:var(--panel)}
+.setp-tab::after{content:"";position:absolute;top:3px;right:3px;bottom:0;left:3px;border:1px solid #fff;border-bottom:none;opacity:.35;transition:opacity .15s}
+.setp-tab svg{position:relative;width:21px;height:21px;margin:1px auto 0;display:block;opacity:.55;transition:opacity .15s}
+.setp-tab span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.setp-tab[aria-selected="true"]::before{background:var(--tabon)}
+.setp-tab[aria-selected="true"] svg{opacity:1}
+@media (hover:hover){.setp-tab:hover{transform:translateY(-4px)}.setp-tab:hover::after{opacity:.8}.setp-tab:hover svg{opacity:1}}
+.setp-tab:focus-visible{outline-offset:-3px}
+.setp-body{position:relative;flex:1;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:25px 36px 34px}
 .setp-page[hidden]{display:none}
-.setp-page:not([hidden]){animation:pageIn .3s var(--out)}
-@keyframes pageIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:6px 14px;padding:13px 0;border-bottom:1px solid var(--edge)}
-.row:last-child{border-bottom:0}
-.row-l{font:700 16px/1.2 var(--text)}
-.row-h{grid-column:1/-1;margin:-1px 0 0;font:500 14px/1.35 var(--text);color:var(--muted)}
+.setp-page:not([hidden]){animation:pageIn .3s ease-out}
+@keyframes pageIn{from{opacity:0}to{opacity:1}}
+.page-t{margin:0 0 .5em;font:700 2.5rem/1 var(--title);text-align:center}
+/* rows: his options table (a label, then its control; 10 px between rows) */
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:4px 18px;padding:9px 0}
+.row-l{font:400 16px/1.25 var(--text)}
+.row-h{grid-column:1/-1;margin:0;font:400 14px/1.35 var(--text);color:var(--w65)}
 .row-wide{grid-template-columns:1fr}
 .row-wide .row-l{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-.row-val{font:400 12px/1 var(--display);color:var(--gold)}
-/* segmented choices: a dark track, the chosen one a gold chip */
-.seg{display:flex;gap:3px;padding:3px;border-radius:12px;background:rgba(0,0,0,.28);box-shadow:inset 0 0 0 1px var(--edge)}
+.row-val{font:700 15px/1 var(--text);color:var(--pink)}
+/* a choice is a row of his buttons: the chosen one lit (a white line, #ffceca words), the others quieter */
+.seg{display:flex;gap:6px}
 .seg label{position:relative;flex:1;display:block;cursor:pointer}
 .seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.seg span{display:grid;place-items:center;min-height:40px;padding:10px 8px 9px;border-radius:9px;text-align:center;font:400 12px/1.1 var(--display);color:var(--muted);white-space:nowrap;transition:background .15s,color .15s}
-.seg label:hover span{color:var(--cream)}
-.seg input:checked+span{background:var(--gold);color:var(--night)}
-.seg input:focus-visible+span{outline:3px solid var(--cream);outline-offset:-3px}
-.seg5 span{padding-left:3px;padding-right:3px}
-/* switches: a pill that slides; the word stays inside for screen readers and sighted readers alike */
+.seg span{display:grid;place-items:center;min-height:44px;padding:0 8px;border:1px solid var(--line);border-radius:8px;text-align:center;font:400 15px/1.1 var(--text);color:var(--w65);white-space:nowrap;transition:border-color .15s,color .15s}
+.seg label:hover span{border-color:var(--w80);color:#fff}
+.seg input:checked+span{border-color:#fff;color:var(--pink);font-weight:700;background:rgba(255,206,202,.07)}
+.seg input:focus-visible+span{outline:2px solid var(--pink);outline-offset:2px}
+.seg5{gap:4px}.seg5 span{padding:0 3px;font-size:14px}
+/* on / off: his audio button in Options (one outlined button that says what it is) */
 .sw{position:relative;display:inline-flex;align-items:center;cursor:pointer}
 .sw input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:1}
-.sw span{position:relative;display:flex;align-items:center;justify-content:flex-end;width:72px;height:36px;padding:0 11px 0 0;border-radius:999px;font:400 11px/1 var(--display);color:var(--muted);background:rgba(0,0,0,.3);box-shadow:inset 0 0 0 1px var(--edge);transition:background .2s,color .2s}
-.sw span::before{content:"";position:absolute;left:4px;top:4px;width:28px;height:28px;border-radius:50%;background:var(--cream);box-shadow:0 2px 4px rgba(0,0,0,.35);transition:transform .3s var(--spring)}
-.sw input:checked+span{justify-content:flex-start;padding:0 0 0 12px;background:var(--mint);color:var(--night)}
-.sw input:checked+span::before{transform:translateX(36px)}
-.sw input:focus-visible+span{outline:3px solid var(--gold);outline-offset:3px}
+.sw span{display:grid;place-items:center;min-width:88px;min-height:44px;padding:0 14px;border:1px dashed var(--line);border-radius:8px;font:400 15px/1 var(--text);color:var(--w65);transition:border-color .15s,color .15s}
+.sw input:checked+span{border:1px solid #fff;color:var(--green);font-weight:700}
+.sw input:focus-visible+span{outline:2px solid var(--pink);outline-offset:2px}
 .sw input:disabled+span{opacity:.4;cursor:not-allowed}
-/* sliders are a stretch of the island's circuit, and the thumb is the wagon */
-.road{-webkit-appearance:none;appearance:none;width:100%;height:32px;margin:4px 0 0;background:transparent;cursor:pointer}
-.road:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:6px}
-.road::-webkit-slider-runnable-track{height:14px;border-radius:4px;background:repeating-linear-gradient(90deg,rgba(251,244,223,.55) 0 8px,transparent 8px 16px) 0 6px/100% 2px no-repeat,linear-gradient(var(--road),var(--road));box-shadow:0 -3px 0 -1px var(--kerb),0 3px 0 -1px #f7f1e6,inset 0 0 0 1px var(--edge)}
-.road::-moz-range-track{height:14px;border-radius:4px;background:repeating-linear-gradient(90deg,rgba(251,244,223,.55) 0 8px,transparent 8px 16px) 0 6px/100% 2px no-repeat,linear-gradient(var(--road),var(--road));box-shadow:0 -3px 0 -1px var(--kerb),0 3px 0 -1px #f7f1e6}
-.road::-webkit-slider-thumb{-webkit-appearance:none;width:46px;height:30px;margin-top:-9px;border:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 30'%3E%3Crect x='6' y='2' width='24' height='5' rx='1.5' fill='%23c7672e'/%3E%3Crect x='25' y='3' width='8' height='4' rx='2' fill='%232fa39a'/%3E%3Cpath d='M3 22v-6c0-1.4 1-2.4 2.4-2.6l3-.4 4.2-4.4c.6-.6 1.4-1 2.3-1h17.6c1.2 0 2.2.6 2.8 1.6l2.4 4 3.4.6c1.3.3 2.1 1.3 2.1 2.6V22z' fill='%23e8483a'/%3E%3Cpath d='M13 12.4l3.2-3.4h6v3.4zM24.4 9h7.3l2 3.4h-9.3z' fill='%233b5a78'/%3E%3Crect x='6' y='16' width='30' height='2.4' fill='%238a4f2c'/%3E%3Ccircle cx='12' cy='23' r='5' fill='%23262429'/%3E%3Ccircle cx='35' cy='23' r='5' fill='%23262429'/%3E%3Ccircle cx='12' cy='23' r='2.2' fill='%23f6f1e6'/%3E%3Ccircle cx='35' cy='23' r='2.2' fill='%23f6f1e6'/%3E%3C/svg%3E") center/contain no-repeat}
-.road::-moz-range-thumb{width:46px;height:30px;border:0;border-radius:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 46 30'%3E%3Cpath d='M3 22v-6c0-1.4 1-2.4 2.4-2.6l3-.4 4.2-4.4c.6-.6 1.4-1 2.3-1h17.6c1.2 0 2.2.6 2.8 1.6l2.4 4 3.4.6c1.3.3 2.1 1.3 2.1 2.6V22z' fill='%23e8483a'/%3E%3Ccircle cx='12' cy='23' r='5' fill='%23262429'/%3E%3Ccircle cx='35' cy='23' r='5' fill='%23262429'/%3E%3C/svg%3E") center/contain no-repeat}
-.act{min-height:44px;padding:12px 14px 11px;font:400 12.5px/1 var(--display);white-space:nowrap}
-.ctx .act{padding:14px 18px 13px;font-size:14px}
-.setp-note{margin:14px 0 0;font:500 13.5px/1.4 var(--text);color:var(--faint)}
-.keys{margin:6px 0 0;padding:0;list-style:none}
-.keys li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--edge);font:500 15px/1.35 var(--text)}
-.keys li span:first-child{color:var(--muted)}
-.keys li span:last-child{text-align:right}
-.keys-h{margin:18px 0 2px;font:400 12px/1 var(--display);letter-spacing:.06em;color:var(--gold);text-transform:uppercase}
-.keys-h:first-child{margin-top:8px}
-/* stickers: Bruno 2025's achievements list, as the trip's souvenirs: a diamond, a name, how to get it; found ones glow */
-.stickers{display:grid;grid-template-columns:1fr;gap:8px;margin:10px 0 0;padding:0;list-style:none}
-.stk{position:relative;display:grid;grid-template-columns:34px 1fr;gap:2px 12px;align-items:center;padding:10px 12px;border-radius:12px;background:rgba(255,238,210,.05);box-shadow:inset 0 0 0 1px var(--edge)}
-.stk::before{content:"";grid-row:1/3;justify-self:center;width:20px;height:20px;border-radius:4px;transform:rotate(45deg);background:transparent;box-shadow:inset 0 0 0 2px var(--faint)}
-.stk b{display:block;font:400 13.5px/1.15 var(--display);color:var(--muted)}
-.stk span{display:block;font:500 13px/1.3 var(--text);color:var(--faint)}
-.stk.got{background:rgba(255,200,90,.1);box-shadow:inset 0 0 0 1.5px rgba(255,200,90,.38)}
-.stk.got::before{background:var(--c,var(--gold));box-shadow:0 0 0 3px var(--night),0 0 0 4.5px var(--c,var(--gold))}
-.stk.got b{color:var(--cream)}
-.stk.got span{color:var(--muted)}
-.trial-best{margin:14px 0 0;padding:12px 14px;border-radius:12px;background:rgba(28,122,79,.28);box-shadow:inset 0 0 0 1.5px rgba(143,227,194,.35);font:600 14.5px/1.4 var(--text)}
-.setp-note#stkCount{margin-top:8px;color:var(--gold);font-weight:700}
+/* a slider is his achievement bar: an 18 px outlined bar, the fill inset 4 px, in #ffceca; the handle a white block */
+.road{-webkit-appearance:none;appearance:none;width:100%;height:30px;margin:4px 0 0;background:transparent;cursor:pointer;--f:50%}
+.road::-webkit-slider-runnable-track{height:18px;border:1px solid var(--line);background:linear-gradient(90deg,var(--pink) var(--f),transparent var(--f)) 4px 4px/calc(100% - 8px) 8px no-repeat}
+.road::-moz-range-track{height:18px;border:1px solid var(--line);background:none}
+.road::-moz-range-progress{height:8px;background:var(--pink)}
+.road::-webkit-slider-thumb{-webkit-appearance:none;width:10px;height:26px;margin-top:-5px;border:0;background:#fff}
+.road::-moz-range-thumb{width:10px;height:26px;border:0;border-radius:0;background:#fff}
+.road:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+.act{min-height:44px;font-size:15px}
+.setp-note{margin:18px 0 0;font:400 14px/1.4 var(--text);color:var(--w50);text-align:center}
+/* home (his "Bruno's Home": a title, "Welcome!", a few lines, bold where it matters) */
+.home-ph{display:block;width:120px;height:120px;object-fit:cover;margin:4px auto 16px;outline:1px solid var(--line);outline-offset:3px}
+.home-t{text-align:center}
+.home p{margin:0 0 .75em;font:400 16px/1.45 var(--text)}
+.home b{font-weight:700}
+.home .contact{justify-content:center;margin:18px 0 6px}
+/* controls: his three sub-tabs (tabs.styl: an icon, a small bold word, the chosen one on a faint gradient) and his key table */
+.ctabs{display:flex;margin:0 0 18px}
+.ctab{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 0;border-radius:6px;color:#fff}
+.ctab svg{width:30px;height:24px;opacity:.25;transition:opacity .15s}
+.ctab b{font:700 13px/1 var(--text);opacity:.5;transition:opacity .15s}
+.ctab[aria-selected="true"]{background:linear-gradient(to top,rgba(255,255,255,.02),rgba(255,255,255,.06))}
+.ctab[aria-selected="true"] svg,.ctab:hover svg{opacity:.7}.ctab[aria-selected="true"] b,.ctab:hover b{opacity:1}
+.keys{margin:0;padding:0;list-style:none;display:table;border-spacing:0 9px;margin:0 auto}
+.keys[hidden]{display:none}
+.keys li{display:table-row;font:400 15px/1.35 var(--text)}
+.keys li span{display:table-cell;vertical-align:middle}
+.keys li span:first-child{text-align:right;padding-right:15px;font-weight:700;color:#fff}
+.keys li span:last-child{color:var(--w80)}
+.keys-h{display:none}
+/* stickers: his achievements page (a count in #ffceca under the title; each one an Amatic title, its line, n / 1, an outlined bar) */
+.stickers{margin:6px 0 0;padding:0;list-style:none}
+.stk{margin:0 0 1em}
+.stk b{display:block;font:700 1.7rem/1 var(--title);color:var(--pink)}
+.stk>span{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:2px 0 .45em;font:400 15px/1.3 var(--text);color:#fff}
+.stk>span i{flex:none;font:700 15px/1 var(--text);font-style:normal;color:var(--pink)}
+.stk::after{content:"";display:block;height:18px;border:1px solid var(--line);background:linear-gradient(var(--pink),var(--pink)) 4px 4px/0 8px no-repeat}
+.stk.got b,.stk.got>span i{color:var(--green)}
+.stk.got>span i::before{content:"\2713  "}
+.stk.got::after{background:linear-gradient(var(--green),var(--green)) 4px 4px/calc(100% - 8px) 8px no-repeat}
+.trial-best{margin:20px 0 0;font:400 15px/1.45 var(--text);color:var(--w80);text-align:center}
+.setp-note#stkCount{margin:-6px 0 18px;color:var(--pink);font-weight:700;font-size:16px}
 
-/* ---------- narrow screens and phones: one plate, one menu button; the sheet rises from the bottom ---------- */
+/* ---------- narrow screens and phones: Bruno's phone menu (the tabs across the top, the panel the full height under them) ---------- */
 @media (max-width:760px),(pointer:coarse) and (max-height:500px){
-  html.map-open .tabs{visibility:hidden}
-  .tabs .tab-map{display:none}
-  .plate-btn{padding:8px 14px 8px 13px;min-height:46px}
-  .plate-name{font-size:15px}
-  .plate-map{display:block}
-  .plate-sub{display:none}
-  #qMap{display:inline-flex}
-  .setp-h{font-size:18px}
-  .exit{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 88px)}
   .exit-line{display:none}
-  .exit-sign{padding:12px 10px 12px 16px}
-  .exit-name{font-size:18px}
-  /* notices drop in under the plate row */
-  .toast,html.coarse .toast{top:calc(max(16px,env(safe-area-inset-top)) + 58px);bottom:auto;max-width:calc(100vw - 32px);font-size:13px;padding:10px 16px 9px 13px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s var(--spring),opacity .25s}
-  .toast.show,html.coarse .toast.show{transform:translate(-50%,0);opacity:1}
-  .award,html.coarse .award{top:calc(max(16px,env(safe-area-inset-top)) + 58px);width:max-content;max-width:calc(100vw - 32px);padding:9px 16px 11px 10px;gap:10px;transform:translate(-50%,-14px);opacity:0;transition:transform .45s var(--spring),opacity .25s,visibility 0s .45s}
-  .award.show,html.coarse .award.show{transform:translate(-50%,0);opacity:1;transition:transform .45s var(--spring),opacity .25s,visibility 0s}
-  .award-badge{width:32px;height:32px;font-size:13px}
-  .award-badge::before{inset:5px}
-  .award-d{display:none}
-  .award-t{font-size:15px}
-  .bubble{font-size:14px;max-width:min(210px,58vw);padding:8px 12px}
-  .trial-l{display:none}.trial-t{min-width:96px;font-size:20px}
+  .exit-name{font-size:26px}
+  .exit-go{font-size:52px;min-height:70px}
+  .ctx .act{font-size:48px}
+  .toast,.award{top:14px}
+  .bubble{font-size:22px;max-width:min(260px,62vw)}
+  .trial-l{display:none}.trial-t{min-width:100px;font-size:34px}
 }
 @media (max-width:760px){
-  .setp{left:0;right:0;top:auto;bottom:0;width:auto;max-height:62%;border-radius:20px 20px 0 0;transform:translateY(40px);transform-origin:50% 100%;padding-bottom:env(safe-area-inset-bottom)}
-  .setp::before{content:"";position:absolute;left:calc(50% - 20px);top:7px;width:40px;height:4px;border-radius:2px;background:var(--edge-2)}
+  .setp{left:5px;right:5px;width:auto;top:calc(max(10px,env(safe-area-inset-top)) + 44px);bottom:5px;padding-bottom:env(safe-area-inset-bottom)}
+  .setp-head{padding-left:4px}
+  .setp-body{padding:20px 20px 26px}
+  .setp-tabs{gap:1px}
+  .setp-x{margin-right:0}
   html.set-open .pad{visibility:hidden}
-  html.has-world .atlas-panel{margin:0 10px 10px;min-height:calc(100% - 82px)}
-  html.has-world.coarse .atlas-panel{height:calc(100% - 82px)}
-  .atlas{background:linear-gradient(rgba(29,23,36,.35),rgba(29,23,36,.65))}
-}
-@media (max-width:560px),(pointer:coarse) and (max-height:500px){
-  body{font-size:16px}
+  html.has-world .atlas-panel{margin:0 5px 5px;min-height:calc(100% - 69px);padding:20px 18px 32px}
+  html.has-world .atlas-bar{margin-left:5px;width:calc(100% - 10px);height:54px}
+  html.has-world.coarse .atlas-panel{height:calc(100% - 59px)}
+  .atlas{background:rgba(29,23,33,.4)}
   .card{grid-template-columns:78px 1fr;gap:12px 14px}
-  .card-photo img{width:78px;height:78px;border-radius:14px}
-  .tab{width:46px;height:46px}
-  .setp-tab{min-height:52px;font-size:9.5px}
-  .setp-head{padding:16px 12px 0 16px}
+  .card-photo img{width:78px;height:78px}
 }
-@media (max-width:380px){ /* the narrowest phones: the sheet's head drops its words to icons so the close button keeps its size */
-  .setp-q .q-word{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-  .setp-q{justify-content:center;width:44px;padding:0}
-  .setp-head{gap:6px}
-}
-/* a phone on its side: the HUD in the four corners, the sheet down the right side */
+@media (max-width:440px){.setp-tab{width:43px;height:40px}.setp-head{height:40px}.setp{top:calc(max(10px,env(safe-area-inset-top)) + 40px)}.atlas-close,.setp-x{width:43px;height:40px}}
+@media (max-width:560px),(pointer:coarse) and (max-height:500px){body{font-size:16px}}
+/* a phone on its side */
 @media (pointer:coarse) and (max-height:500px){
-  html.js:not(.no-world):not(.from) .title{padding:10px max(16px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));gap:8px}
-  .t-go{min-height:52px;padding:12px 22px 10px 18px;font-size:19px}
-  .plate{left:max(12px,env(safe-area-inset-left));top:max(10px,env(safe-area-inset-top))}
-  .tabs{right:max(12px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top))}
-  .setp{left:auto;right:env(safe-area-inset-right);top:0;bottom:0;width:min(380px,48vw);max-height:none;border-radius:18px 0 0 18px;transform:translateX(40px);transform-origin:100% 50%}
-  .setp-head{padding-top:max(12px,env(safe-area-inset-top))}
-  .setp-body{flex:1;padding-bottom:max(16px,env(safe-area-inset-bottom))}
-  .exit,html.coarse .exit{width:min(460px,calc(100vw - 2 * max(12px,env(safe-area-inset-left)) - 300px));bottom:max(10px,env(safe-area-inset-bottom))}
-  html.coarse .ctx{bottom:max(12px,env(safe-area-inset-bottom))}
-  .toast,html.coarse .toast,.award,html.coarse .award{top:max(10px,env(safe-area-inset-top))}
-  .trial{top:max(10px,env(safe-area-inset-top))}
-  .atlas-bar{padding:10px max(16px,env(safe-area-inset-right)) 10px max(16px,env(safe-area-inset-left))}
+  html.js:not(.no-world):not(.from) .title{padding:10px max(16px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));gap:8px}
+  .t-go{min-height:54px;font-size:32px}
+  .setp{left:auto;right:5px;top:50px;bottom:5px;width:min(420px,52vw)}
+  .exit-go{font-size:44px;min-height:60px}
+  .toast,.award,.trial{top:10px}
+  .atlas-bar{padding:0 max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left))}
 }
-/* reduced motion: the system setting, or the one in Settings (html.rm) */
+/* reduced motion: the system setting, or the one in the menu (html.rm) */
 html.rm *,html.rm *::before,html.rm *::after{transition-duration:.01ms!important;animation-duration:.01ms!important;transition-delay:0s!important}
-/* touch hygiene, as Bruno 2025's general.styl does it: no grey tap flash, no double-tap zoom, no selection or callout on the game's own
-   UI; the map's words and the letter stay selectable */
+/* touch hygiene, as Bruno's general.styl: no tap flash, no double-tap zoom, no selection on the game's own UI */
 *{-webkit-tap-highlight-color:transparent}
 html.has-world{touch-action:manipulation;overscroll-behavior:none}
-html.has-world .hud,html.has-world .title,html.has-world #gl,.loader,.setp-head,.setp-tabs,.seg,.sw,.act,.tbtn,.exit,.toast,.award,.bubble,.trial,.ctx{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-/* Apple's HIG: every tap target at least 44 x 44 pt */
-html.coarse .plate-btn{min-height:46px}
+html.has-world .hud,html.has-world .title,html.has-world #gl,.loader,.setp-head,.seg,.sw,.act,.tbtn,.exit,.toast,.award,.bubble,.trial,.ctx,.ctabs{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html.coarse .stop-drive{min-height:44px}
 html.coarse .t-alts .t-map{padding:12px 2px}
-html.coarse .stop-name{padding:10px 0;margin:-10px 0}
+html.coarse .stop-name{padding:8px 0;margin:-8px 0}
 html.gl-lowq body{background:var(--sky) fixed,#a08cff}
 html.gl-lowq #gl{background:transparent}
 </style>
@@ -519,25 +520,13 @@ html.gl-lowq #gl{background:transparent}
   <h1 class="t-name" id="tName"><span>Husam</span> <span>Sokar</span></h1>
   <button class="t-go" id="goBtn" type="button" disabled>Building the island</button>
   <span class="t-alts">No time? <button class="t-map" type="button" data-open-map>Read the map</button> or <a class="t-map" href="facts.html">get the résumé</a>.</span>
-  <div class="t-card slab" aria-hidden="true"><img class="ph" alt=""><div><b>Husam Sokar</b><span>Fresno &rarr; Cambridge, the long way around</span></div></div>
+  <div class="t-card bx" aria-hidden="true"><img class="ph" alt=""><div><b>Husam Sokar</b><span>Fresno &rarr; Cambridge, the long way around</span></div></div>
 </section>
 
 <div class="hud">
-  <header class="plate">
-    <button class="plate-btn slab slab-btn" id="plateBtn" type="button" aria-controls="atlas">
-      <span class="plate-name">Husam Sokar<svg class="plate-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg></span>
-      <span class="plate-sub">Fresno &rarr; Cambridge</span><span class="sr"> (opens the map)</span>
-    </button>
-  </header>
   <nav class="tabs" aria-label="World">
-    <button class="tab tab-map" id="mapBtn" type="button" aria-controls="atlas" aria-expanded="false" data-tip="Map  M">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M4 10.5c3 1.5 5 1 8-1s5.5-2 8 0M5 16c3-1 5.5 0 8 1.5s4 1 6-1"/></svg>
-      <span class="tab-word">Map</span><kbd class="tab-word" aria-hidden="true">M</kbd>
-    </button>
-    <button class="tab tab-set" id="setBtn" type="button" aria-controls="setPanel" aria-expanded="false" data-tip="Settings  O">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><rect x="13" y="4.5" width="4" height="5"/><rect x="7" y="14.5" width="4" height="5"/></svg>
-      <span class="tab-word">Settings</span><kbd class="tab-word" aria-hidden="true">O</kbd>
-    </button>
+    <button class="tab tab-set" id="setBtn" type="button" aria-controls="setPanel" aria-expanded="false" data-tip="Menu  O"><span class="tab-in"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M0 4h20M0 10h20M0 16h20"/></svg></span><span class="tab-word">Menu</span></button>
+    <button class="tab tab-map" id="mapBtn" type="button" aria-controls="atlas" aria-expanded="false" data-tip="Map  M"><span class="tab-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 21.5s-6.5-6.2-6.5-11.3a6.5 6.5 0 0 1 13 0c0 5.1-6.5 11.3-6.5 11.3z"/><circle cx="12" cy="10.2" r="2.4"/><path d="M4 21.5h16"/></svg></span><span class="tab-word">Map</span></button>
     <button class="tab tab-sound" id="soundBtn" type="button" aria-pressed="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
       <span class="tab-word" id="soundWord">Sound off</span>
@@ -551,7 +540,7 @@ html.gl-lowq #gl{background:transparent}
     <div class="exit-sign">
       <div class="exit-tab" id="exitNo">Exit 1</div>
       <div class="exit-body"><div class="exit-name" id="exitName">The Capitol</div><div class="exit-line" id="exitLine"></div></div>
-      <button class="exit-go" id="exitGo" type="button"><span id="exitGoWord">Go in</span> <kbd aria-hidden="true">&crarr;</kbd></button>
+      <button class="exit-go" id="exitGo" type="button"><span id="exitGoWord">Go in</span> <kbd aria-hidden="true">Enter</kbd></button>
     </div>
   </div>
   <div class="pad" id="pad">
@@ -561,23 +550,38 @@ html.gl-lowq #gl{background:transparent}
     </div>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <div class="award" id="award" role="status" aria-live="polite"><span class="award-badge" id="awardBadge" aria-hidden="true"></span><span><span class="award-k">New sticker</span><span class="award-t" id="awardT"></span><span class="award-d" id="awardD"></span></span></div>
+  <div class="award" id="award" role="status" aria-live="polite"><span class="award-badge" id="awardBadge" aria-hidden="true"></span><span><span class="award-k" id="awardK">New sticker</span><span class="award-t" id="awardT"></span><span class="award-d" id="awardD"></span></span></div>
   <div class="bubble" id="bubble" aria-live="polite"><span class="bubble-who" id="bubbleWho"></span><span id="bubbleTxt"></span></div>
   <div class="trial" id="trial" aria-live="off"><div class="lights" id="lights" aria-hidden="true"><i></i><i></i><i></i></div><div class="trial-l">The long way<small id="trialNext">to Cambridge</small></div><div class="trial-t" id="trialT">0:00.0</div></div>
   <button class="gd" id="guide" type="button"><span class="gd-ar" id="guideAr" aria-hidden="true"></span><span class="gd-dia" aria-hidden="true"></span><span class="gd-w" id="guideW"></span><span class="sr" id="guideSr"></span></button>
-  <div class="ctx" id="ctx"><button class="act" id="ctxBtn" type="button">Stuck? Back on the road</button></div>
+  <div class="ctx" id="ctx"><button class="act" id="ctxBtn" type="button">Back on the road</button></div>
 </div>
 
 <section class="setp" id="setPanel" role="dialog" aria-modal="false" aria-labelledby="setH" tabindex="-1">
-  <div class="setp-head"><h2 class="setp-h" id="setH">Settings</h2><button class="setp-q" id="qSound" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path class="q-wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span class="q-word" id="qSoundW">Sound off</span></button><button class="setp-q" id="qMap" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span class="q-word">Map</span></button><button class="setp-x" id="setX" type="button" aria-label="Close settings">&times;</button></div>
-  <div class="setp-tabs" role="tablist" aria-label="Settings sections">
-    <button class="setp-tab" role="tab" id="stab-drive" aria-controls="spage-drive" aria-selected="true" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.4"/><path d="M3.6 10.5c3 .9 5.8.9 6.4 1.5M20.4 10.5c-3 .9-5.8.9-6.4 1.5M12 14.4V20.5"/></svg><span>Driving</span></button>
+  <div class="setp-head"><h2 class="setp-h" id="setH">Menu</h2><button class="setp-q" id="qSound" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 9.5h3.5L12 5v14l-4.5-4.5H4z"/><path class="q-wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg><span class="q-word" id="qSoundW">Sound off</span></button><button class="setp-q" id="qMap" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></svg><span class="q-word">Map</span></button>
+  <div class="setp-tabs" role="tablist" aria-label="Menu">
+    <button class="setp-tab" role="tab" id="stab-home" aria-controls="spage-home" aria-selected="true" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3.2l9.3 8.3h-2.6v9.2h-5.1v-6h-3.2v6H5.3v-9.2H2.7z"/></svg><span>Home</span></button>
+    <button class="setp-tab" role="tab" id="stab-drive" aria-controls="spage-drive" aria-selected="false" tabindex="-1" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.4"/><path d="M3.6 10.5c3 .9 5.8.9 6.4 1.5M20.4 10.5c-3 .9-5.8.9-6.4 1.5M12 14.4V20.5"/></svg><span>Driving</span></button>
     <button class="setp-tab" role="tab" id="stab-world" aria-controls="spage-world" aria-selected="false" tabindex="-1" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><circle cx="15.5" cy="7.5" r="3"/><path d="M2.5 19c3-4.6 6-6 9-3.6 2-1.8 5-2.4 10 2.1"/><path d="M6.5 12.5v-3M5 10.5l1.5-2.2 1.5 2.2"/></svg><span>World</span></button>
     <button class="setp-tab" role="tab" id="stab-keys" aria-controls="spage-keys" aria-selected="false" tabindex="-1" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round" aria-hidden="true"><path d="M7 7.5h10a4.5 4.5 0 0 1 4.4 5.4l-.8 4a2.4 2.4 0 0 1-4.1 1.1L14 15.5h-4l-2.5 2.5a2.4 2.4 0 0 1-4.1-1.1l-.8-4A4.5 4.5 0 0 1 7 7.5z"/><path d="M7.5 10.5v3M6 12h3" stroke-linecap="round"/><circle cx="16" cy="11" r=".6" fill="currentColor"/><circle cx="17.5" cy="13" r=".6" fill="currentColor"/></svg><span>Controls</span></button>
     <button class="setp-tab" role="tab" id="stab-stk" aria-controls="spage-stk" aria-selected="false" tabindex="-1" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8l9.2 9.2-9.2 9.2L2.8 12z"/><path d="M12 8.2l1.1 2.4 2.6.3-1.9 1.8.5 2.6L12 14l-2.3 1.3.5-2.6-1.9-1.8 2.6-.3z" fill="currentColor" stroke-width="0"/></svg><span>Stickers</span></button>
   </div>
+  <button class="setp-x" id="setX" type="button" aria-label="Close the menu"><span class="x-in"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M2 2l14 14M16 2L2 16"/></svg></span></button></div>
   <div class="setp-body">
-    <div class="setp-page" id="spage-drive" role="tabpanel" aria-labelledby="stab-drive">
+    <div class="setp-page home" id="spage-home" role="tabpanel" aria-labelledby="stab-home">
+      <img class="ph home-ph" alt="Husam Sokar">
+      <h3 class="page-t home-t">Husam&rsquo;s home</h3>
+      <p>Welcome!</p>
+      <p>My name is <b>Husam Sokar</b>. This island is my site: one road from <b>Fresno</b> to <b>Cambridge</b>, the long way around, with a door at every stop.</p>
+      <p>Drive to a landmark and go in, or press a sign and the car drives itself there. And do knock things over.</p>
+      <div class="contact">
+        <a class="btn" href="https://www.linkedin.com/in/husam-sokar-089648227/" target="_blank" rel="noopener">LinkedIn <span aria-hidden="true">&nearr;</span></a>
+        <span class="email"><span class="email-addr">hramadan@college.harvard.edu</span><button class="copy" type="button" data-copy="hramadan@college.harvard.edu">Copy</button></span>
+      </div>
+      <p class="setp-note"><a href="facts.html">Every fact on one plain page</a>, no driving; it prints as a r&eacute;sum&eacute;.</p>
+    </div>
+    <div class="setp-page" id="spage-drive" role="tabpanel" aria-labelledby="stab-drive" hidden>
+      <h3 class="page-t">Driving</h3>
       <div class="row row-wide"><label class="row-l" for="sSens">Steering <span class="row-val" id="sSensV">Normal</span></label><input class="road" id="sSens" type="range" min="1" max="5" step="1" value="3" aria-describedby="sSensH"><p class="row-h" id="sSensH">How far the front wheels turn. Normal is Bruno Simon&rsquo;s own.</p></div>
       <div class="row row-wide"><span class="row-l" id="sSpeedL">Speed</span><div class="seg" role="radiogroup" aria-labelledby="sSpeedL"><label><input type="radio" name="sSpeed" value="calm"><span>Calm</span></label><label><input type="radio" name="sSpeed" value="normal" checked><span>Normal</span></label><label><input type="radio" name="sSpeed" value="fast"><span>Fast</span></label></div></div>
       <div class="row row-wide" id="sTouchRow"><span class="row-l" id="sTouchL">Touch driving</span><div class="seg" role="radiogroup" aria-labelledby="sTouchL" aria-describedby="sTouchH"><label><input type="radio" name="sTouch" value="ring" checked><span>Ring</span></label><label><input type="radio" name="sTouch" value="tap"><span>Tap to go</span></label></div><p class="row-h" id="sTouchH">Touch the ground: the car drives toward your finger.</p></div>
@@ -586,6 +590,7 @@ html.gl-lowq #gl{background:transparent}
       <div class="row"><span class="row-l">I&rsquo;m stuck!</span><button class="act" id="sRoad" type="button">Back on the road</button></div>
     </div>
     <div class="setp-page" id="spage-world" role="tabpanel" aria-labelledby="stab-world" hidden>
+      <h3 class="page-t">The world</h3>
       <div class="row row-wide"><label class="row-l" for="sVol">Sound <span class="row-val" id="sVolV">Off</span></label><input class="road" id="sVol" type="range" min="0" max="10" step="1" value="0"></div>
       <div class="row row-wide"><span class="row-l" id="sQualL">Quality</span><div class="seg" role="radiogroup" aria-labelledby="sQualL" aria-describedby="sQualH"><label><input type="radio" name="sQual" value="auto" checked><span>Auto</span></label><label><input type="radio" name="sQual" value="high"><span>High</span></label><label><input type="radio" name="sQual" value="medium"><span>Mid</span></label><label><input type="radio" name="sQual" value="low"><span>Low</span></label></div><p class="row-h" id="sQualH">Auto lowers the detail if frames run slow. A change waits until the car stops.</p></div>
       <div class="row row-wide"><span class="row-l" id="sWxL">Weather</span><div class="seg" role="radiogroup" aria-labelledby="sWxL" aria-describedby="sWxH"><label><input type="radio" name="sWx" value="live" checked><span>Changing</span></label><label><input type="radio" name="sWx" value="clear"><span>Clear</span></label><label><input type="radio" name="sWx" value="rain"><span>Rain</span></label></div><p class="row-h" id="sWxH">Up north, rain turns to snow.</p></div>
@@ -594,14 +599,21 @@ html.gl-lowq #gl{background:transparent}
       <div class="row"><span class="row-l">Knocked it all over?</span><button class="act" id="sTidy" type="button">Tidy up</button></div>
     </div>
     <div class="setp-page" id="spage-keys" role="tabpanel" aria-labelledby="stab-keys" hidden>
+      <h3 class="page-t">Controls</h3>
+      <div class="ctabs" role="tablist" aria-label="Controls for">
+        <button class="ctab" role="tab" type="button" id="ctab-k" aria-controls="keysK" aria-selected="true"><svg viewBox="0 0 36 22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="1" y="4" width="24" height="16" rx="2"/><path d="M5 9h2M9 9h2M13 9h2M17 9h2M5 13h2M9 13h10M21 13h1M6 17h14"/><rect x="28" y="1" width="7" height="12" rx="3.5"/><path d="M31.5 1v5"/></svg><b>Keyboard</b></button>
+        <button class="ctab" role="tab" type="button" id="ctab-t" aria-controls="keysT" aria-selected="false" tabindex="-1"><svg viewBox="0 0 16 26" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="1" y="1" width="14" height="24" rx="2.5"/><path d="M6 21.5h4"/></svg><b>Touch</b></button>
+        <button class="ctab" role="tab" type="button" id="ctab-g" aria-controls="keysG" aria-selected="false" tabindex="-1"><svg viewBox="0 0 34 22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h16c4 0 6 3 7 7l1 6c.5 3-2 5-4 3l-4-4H9l-4 4c-2 2-4.5 0-4-3l1-6c1-4 3-7 7-7z"/><path d="M9 8v5M6.5 10.5h5"/><circle cx="24" cy="9" r="1" fill="currentColor"/><circle cx="27" cy="12" r="1" fill="currentColor"/></svg><b>Gamepad</b></button>
+      </div>
       <h3 class="keys-h">Keyboard</h3>
-      <ul class="keys"><li><span>Drive</span><span><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrows</span></li><li><span>Boost</span><span><kbd>Shift</kbd></span></li><li><span>Brake</span><span><kbd>B</kbd> or <kbd>Ctrl</kbd></span></li><li><span>Jump (hold for high)</span><span><kbd>Space</kbd></span></li><li><span>Lift a corner</span><span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></span></li><li><span>Horn</span><span><kbd>H</kbd></span></li><li><span>Back on the road</span><span><kbd>R</kbd></span></li><li><span>Go in</span><span><kbd>Enter</kbd> or <kbd>E</kbd></span></li><li><span>Look around</span><span>Drag; the wheel zooms</span></li><li><span>Drive yourself there</span><span>Click a landmark&rsquo;s sign</span></li><li><span>Map, settings</span><span><kbd>M</kbd> <kbd>O</kbd></span></li><li><span>Time trial, plain page</span><span><kbd>T</kbd> <kbd>P</kbd></span></li></ul>
+      <ul class="keys" id="keysK" role="tabpanel" aria-labelledby="ctab-k"><li><span>Drive</span><span><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> or arrows</span></li><li><span>Boost</span><span><kbd>Shift</kbd></span></li><li><span>Brake</span><span><kbd>B</kbd> or <kbd>Ctrl</kbd></span></li><li><span>Jump (hold for high)</span><span><kbd>Space</kbd></span></li><li><span>Lift a corner</span><span><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd></span></li><li><span>Horn</span><span><kbd>H</kbd></span></li><li><span>Back on the road</span><span><kbd>R</kbd></span></li><li><span>Go in</span><span><kbd>Enter</kbd> or <kbd>E</kbd></span></li><li><span>Look around</span><span>Drag; the wheel zooms</span></li><li><span>Drive yourself there</span><span>Click a landmark&rsquo;s sign</span></li><li><span>Map, settings</span><span><kbd>M</kbd> <kbd>O</kbd></span></li><li><span>Time trial, plain page</span><span><kbd>T</kbd> <kbd>P</kbd></span></li></ul>
       <h3 class="keys-h">Touch</h3>
-      <ul class="keys"><li><span>Drive</span><span>Touch the ground: farther from the car is faster, behind it backs up</span></li><li><span>Jump</span><span>Tap the car</span></li><li><span>Boost</span><span>Hold the &raquo; button</span></li><li><span>Drive yourself there</span><span>Tap a landmark&rsquo;s sign</span></li><li><span>Look around</span><span>Two fingers drag; pinch to zoom</span></li></ul>
+      <ul class="keys" id="keysT" role="tabpanel" aria-labelledby="ctab-t" hidden><li><span>Drive</span><span>Touch the ground: farther from the car is faster, behind it backs up</span></li><li><span>Jump</span><span>Tap the car</span></li><li><span>Boost</span><span>Hold the &raquo; button</span></li><li><span>Drive yourself there</span><span>Tap a landmark&rsquo;s sign</span></li><li><span>Look around</span><span>Two fingers drag; pinch to zoom</span></li></ul>
       <h3 class="keys-h">Gamepad</h3>
-      <ul class="keys"><li><span>Drive</span><span>Right trigger, left stick</span></li><li><span>Brake, reverse</span><span>Left trigger</span></li><li><span>Boost, brake, jump</span><span>B, X, Y</span></li><li><span>Horn, look around</span><span>Left stick click, right stick</span></li><li><span>Go in</span><span>A</span></li></ul>
+      <ul class="keys" id="keysG" role="tabpanel" aria-labelledby="ctab-g" hidden><li><span>Drive</span><span>Right trigger, left stick</span></li><li><span>Brake, reverse</span><span>Left trigger</span></li><li><span>Boost, brake, jump</span><span>B, X, Y</span></li><li><span>Horn, look around</span><span>Left stick click, right stick</span></li><li><span>Go in</span><span>A</span></li></ul>
     </div>
     <div class="setp-page" id="spage-stk" role="tabpanel" aria-labelledby="stab-stk" hidden>
+      <h3 class="page-t">Stickers</h3>
       <p class="setp-note" id="stkCount">0 of 0 found. They last for this visit.</p>
       <ul class="stickers" id="stickers"></ul>
       <p class="trial-best" id="trialBest">The long way: drive from the Fresno start line to Cambridge against the clock. Press <kbd>T</kbd>, or back into the green box behind the start line and tap <b>Race</b>.</p>
@@ -628,10 +640,10 @@ html.gl-lowq #gl{background:transparent}
 <main class="atlas" id="atlas" tabindex="-1" aria-labelledby="cardName">
   <div class="atlas-bar">
     <p class="atlas-kicker">The map</p>
-    <button class="atlas-close slab slab-btn" id="atlasClose" type="button">Back to the road <kbd aria-hidden="true">Esc</kbd></button>
+    <button class="atlas-close" id="atlasClose" type="button"><span class="x-in"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M2 2l14 14M16 2L2 16"/></svg></span><span class="x-word">Back to the road</span><kbd aria-hidden="true">Esc</kbd></button>
   </div>
   <div class="atlas-panel">
-    <section class="card slab" aria-labelledby="cardName">
+    <section class="card" aria-labelledby="cardName">
       <figure class="card-photo"><img class="ph" id="photo" alt="Husam Sokar" width="118" height="118" src="data:image/jpeg;base64,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"></figure>
       <div>
         <h2 class="card-name" id="cardName">Husam Sokar</h2>
@@ -754,7 +766,6 @@ $('letterX').addEventListener('click', closeLetter);
 $('letter').addEventListener('click', function (e) { if (e.target === $('letter')) closeLetter(); });
 $('atlasClose').addEventListener('click', closeMap);
 $('mapBtn').addEventListener('click', function () { mapIsOpen ? closeMap() : openMap(); });
-$('plateBtn').addEventListener('click', function () { openMap(); });
 Array.prototype.forEach.call(doc.querySelectorAll('[data-open-map]'), function (b) { b.addEventListener('click', function () { if (W && W.state === 'title') W.skipToMap(); else openMap(); }); });
 $('skipLink').addEventListener('click', function (e) { if (html.classList.contains('has-world')) { e.preventDefault(); if (W && W.state === 'title') W.skipToMap(); else openMap(); } });
 $('stops').addEventListener('click', function (e) { var b = e.target.closest('[data-drive]'); if (b && W) { closeMap(); W.teleport(b.getAttribute('data-drive'), true); } });
@@ -801,7 +812,7 @@ function syncSettingsUI() {
   $('sVib').checked = SET.vib; $('sRM').checked = SET.rm;
   ['sVib', 'sRM'].forEach(function (id) { swLabel($(id)); });
   $('sVol').value = SET.vol; $('sVolV').textContent = SET.vol ? SET.vol * 10 + '%' : 'Off';
-  $('sTouchH').textContent = TOUCH_HINT[SET.touch]; $('sKeysH').textContent = KEYS_HINT[SET.keys];
+  $('sTouchH').textContent = TOUCH_HINT[SET.touch]; $('sKeysH').textContent = KEYS_HINT[SET.keys]; roadFill();
 }
 function setSetting(k, v) {
   SET[k] = v;
@@ -809,6 +820,15 @@ function setSetting(k, v) {
   if (k === 'touch') { html.classList.remove('scheme-ring', 'scheme-tap'); html.classList.add('scheme-' + v); }
   syncSettingsUI(); if (W && W.onSetting) W.onSetting(k, v);
 }
+// round 13: the Controls page's three sub-tabs (Bruno's tabs.styl: keyboard, touch, gamepad) and the sliders' fill (his bars)
+(function wireCtabs() {
+  var tabs = Array.prototype.slice.call(doc.querySelectorAll('.ctab'));
+  function pick(t) { tabs.forEach(function (x) { var on = x === t; x.setAttribute('aria-selected', on ? 'true' : 'false'); x.tabIndex = on ? 0 : -1; $(x.getAttribute('aria-controls')).hidden = !on; }); }
+  tabs.forEach(function (t, i) { t.addEventListener('click', function () { pick(t); }); t.addEventListener('keydown', function (e) { var j = e.key === 'ArrowRight' ? (i + 1) % tabs.length : e.key === 'ArrowLeft' ? (i + tabs.length - 1) % tabs.length : -1; if (j >= 0) { e.preventDefault(); tabs[j].focus(); pick(tabs[j]); } }); });
+  if (COARSE && tabs[1]) pick(tabs[1]);
+})();
+function roadFill() { Array.prototype.forEach.call(doc.querySelectorAll('input.road'), function (r) { var k = (r.value - r.min) / (r.max - r.min || 1); r.style.setProperty('--f', (k * 100).toFixed(1) + '%'); }); }
+doc.addEventListener('input', function (e) { if (e.target && e.target.classList && e.target.classList.contains('road')) roadFill(); });
 (function wireSettings() {
   if (!('vibrate' in navigator) && !HAP_IOS) { $('sVib').disabled = true; $('sVibH').textContent = 'This device can’t vibrate.'; }
   $('sSens').addEventListener('input', function () { setSetting('sens', +this.value); });
@@ -2909,15 +2929,15 @@ function padBox(x, z, ry, w, dpt, col) {
 STOPS.forEach(function (d) { d.padMesh = padBox(d.pad.x, d.pad.z, d.rot, d.id === 'contact' ? 3.4 : 5.2, d.id === 'contact' ? 2.6 : 3.8, '#fbf4df'); d.padK = 0; });
 
 // ---------------------------------------------------------------- the labels (Bruno 2025's interactive points: a diamond, and a label that slides out of it)
-function tagTexture(text, left) {
-  var h = 88, pad = 106, w; var c = doc.createElement('canvas'), x = c.getContext('2d'); x.font = '400 50px "Bungee", Impact, sans-serif'; w = Math.ceil(x.measureText(text).width) + pad + 26;
-  c.width = w; c.height = h; x.font = '400 50px "Bungee", Impact, sans-serif';
+function tagTexture(text, left) { // round 13: Bruno's interactive point, drawn as he draws it (InteractivePoints.js create(): a 64 px canvas
+  // band in his back colour #251f2b, white Amatic SC 700, padded 60 px on the diamond's side; the diamond a #251f2b square turned 45
+  // degrees with a white line inside it, set 17.5% in, 7.5% thick, as his open state); ours at 88 px for a crisper label
+  var h = 88, F = '700 72px "Amatic SC", "Arial Narrow", sans-serif', c = doc.createElement('canvas'), x = c.getContext('2d'); x.font = F;
+  var pad = 96, w = Math.ceil(x.measureText(text).width) + pad + 22; c.width = w; c.height = h; x.font = F;
   var dx = left ? w - 44 : 44;
-  // round 11: the HUD's night panel and gold diamond (was the planet's ink and cream)
-  function rr(x0, y0, ww, hh, r) { x.beginPath(); x.moveTo(x0 + r, y0); x.arcTo(x0 + ww, y0, x0 + ww, y0 + hh, r); x.arcTo(x0 + ww, y0 + hh, x0, y0 + hh, r); x.arcTo(x0, y0 + hh, x0, y0, r); x.arcTo(x0, y0, x0 + ww, y0, r); x.closePath(); }
-  x.fillStyle = '#1d1724'; if (left) rr(0, 10, w - 46, h - 20, 14); else rr(46, 10, w - 46, h - 20, 14); x.fill();
-  x.fillStyle = '#fbf4df'; x.textBaseline = 'middle'; x.fillText(text, left ? 24 : pad - 14, h / 2 + 3);
-  x.save(); x.translate(dx, 44); x.rotate(PI / 4); x.fillStyle = '#1d1724'; rr(-29, -29, 58, 58, 8); x.fill(); x.strokeStyle = '#ffc85a'; x.lineWidth = 6; x.strokeRect(-16, -16, 32, 32); x.restore();
+  x.fillStyle = '#251f2b'; if (left) x.fillRect(0, 14, w - 44, h - 28); else x.fillRect(44, 14, w - 44, h - 28);
+  x.fillStyle = '#ffffff'; x.textBaseline = 'middle'; x.fillText(text, left ? 18 : pad - 6, h / 2 + 3);
+  x.save(); x.translate(dx, h / 2); x.rotate(PI / 4); x.fillStyle = '#251f2b'; x.fillRect(-29, -29, 58, 58); x.strokeStyle = '#ffffff'; x.lineWidth = 58 * .075; var o = 29 - 58 * .175 / 2; x.strokeRect(-o, -o, o * 2, o * 2); x.restore();
   var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return { tex: t, aspect: w / h };
 }
 var tagMat = function (tex, left) { return new THREE.ShaderMaterial({ transparent: true, depthWrite: false, depthTest: false, defines: left ? { LEFT: '' } : {}, uniforms: { map: { value: tex }, uOff: { value: 1 }, uDia: { value: .19 }, uOp: { value: 1 } },
@@ -2926,7 +2946,7 @@ var tagMat = function (tex, left) { return new THREE.ShaderMaterial({ transparen
 var TAG_H = { bill: 11.4, speech: 7, translation: 3.2, n1: 8, triptik: 7.4, os: 8, depths: 3.4, weeks: 9.4, everywhere: 11, contact: 3.4 };
 function makeTags() {
   STOPS.forEach(function (d) {
-    var word = d.name.replace(/^The /, '').toUpperCase(), hgt = 1.5, t = tagTexture(word), tl = tagTexture(word, true);
+    var word = d.name.replace(/^The /, ''), hgt = 1.5, t = tagTexture(word), tl = tagTexture(word, true);
     var m = new THREE.Mesh(new THREE.PlaneGeometry(t.aspect * hgt, hgt).translate(t.aspect * hgt / 2 - hgt / 2, 0, 0), tagMat(t.tex)); m.material.uniforms.uDia.value = 1 / t.aspect;
     var ml = new THREE.Mesh(new THREE.PlaneGeometry(tl.aspect * hgt, hgt).translate(-(tl.aspect * hgt / 2 - hgt / 2), 0, 0), tagMat(tl.tex, true)); ml.material.uniforms.uDia.value = 1 / tl.aspect;
     m.renderOrder = ml.renderOrder = 7; m.visible = ml.visible = false; scene.add(m, ml); d.tagR = m; d.tagL = ml; d.tag = m; d.tagOff = 1; d.flip = false; d.tagT = 9;
@@ -3248,13 +3268,13 @@ var STICKERS = [
 ];
 var got = {}, visited = {};
 function buildStickers() {
-  var ul = $('stickers'), h = ''; STICKERS.forEach(function (s, i) { var on = !!got[s[0]]; h += '<li class="stk' + (on ? ' got' : '') + '" style="--r:' + ((i * 37 % 7) - 3) + 'deg;--c:' + s[3] + '"><b>' + s[1] + (on ? '' : '<span class="sr"> (not found yet)</span>') + '</b><span>' + s[2] + '</span></li>'; }); ul.innerHTML = h;
-  $('stkCount').textContent = Object.keys(got).length + ' of ' + STICKERS.length + ' found. They last for this visit.';
+  var ul = $('stickers'), h = ''; STICKERS.forEach(function (s, i) { var on = !!got[s[0]]; h += '<li class="stk' + (on ? ' got' : '') + '"><b>' + s[1] + (on ? '' : '<span class="sr"> (not found yet)</span>') + '</b><span>' + s[2] + '<i>' + (on ? 1 : 0) + ' / 1</i></span></li>'; }); ul.innerHTML = h;
+  $('stkCount').textContent = Object.keys(got).length + ' / ' + STICKERS.length;
 }
 function award(id, quiet) {
   if (got[id]) return; var s = null; STICKERS.forEach(function (x) { if (x[0] === id) s = x; }); if (!s) return;
   got[id] = true; buildStickers(); if (quiet) return;
-  notice({ el: 'award', ms: narrowUI() ? 2600 : 4000, fill: function () { $('awardT').textContent = s[1]; $('awardD').textContent = s[2]; $('awardBadge').style.setProperty('--c', s[3]); $('awardBadge').textContent = '★'; sfx('chime'); buzz(40); if (state === 'play') confetti(car.pos.clone().setY(car.pos.y + 1), 36, 6); } });
+  notice({ el: 'award', ms: narrowUI() ? 2600 : 4000, fill: function () { $('awardT').textContent = s[1]; $('awardD').textContent = s[2]; $('awardK').textContent = Object.keys(got).length + ' / ' + STICKERS.length; $('awardBadge').style.setProperty('--c', s[3]); $('awardBadge').textContent = '★'; sfx('chime'); buzz(40); if (state === 'play') confetti(car.pos.clone().setY(car.pos.y + 1), 36, 6); } });
 }
 buildStickers();
 var odo = 0, driftT = 0;
@@ -4318,7 +4338,7 @@ $('imap') && $('imap').addEventListener('click', function (e) { var b = e.target
 // ============================================================================ boot
 resize(); applyQuality(); applyTod();
 moveCarTo(SPAWN0.x, SPAWN0.z, SPAWN0.rot); for (var st0 = 0; st0 < 90; st0++) physicsTick(); snapView();
-var fontsReady = doc.fonts && doc.fonts.load ? Promise.race([Promise.all([doc.fonts.load('400 50px Bungee'), doc.fonts.load('800 96px "Barlow Condensed"')]), new Promise(function (r) { setTimeout(r, 1800); })]) : Promise.resolve();
+var fontsReady = doc.fonts && doc.fonts.load ? Promise.race([Promise.all([doc.fonts.load('400 50px Bungee'), doc.fonts.load('800 96px "Barlow Condensed"'), doc.fonts.load('700 64px "Amatic SC"')]), new Promise(function (r) { setTimeout(r, 1800); })]) : Promise.resolve();
 state = 'boot'; startLoop();
 if (!FROM) { lettersHome(); showTitle(); titlePose(0); }
 fontsReady.then(function () {
