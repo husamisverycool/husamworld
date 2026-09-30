@@ -1163,7 +1163,7 @@ function fitText(x, text, weight, size, family, maxW) { x.font = weight + ' ' + 
 // World axes: x east, z south (the map is drawn north up), y up. The island is about 200 m square (Bruno's Terrain.size = 192),
 // sea all round. The road is one closed loop: the Fresno start line on the south straight, round the island clockwise (east,
 // north, west), and the Cambridge finish a little before Fresno on the same straight: the long way round.
-var ISLAND = 100, WORLD = 280, CHUNK = WORLD / 6, chunkMeshes = []; // CHUNK: the culling grid for the art (round 10 B) // WORLD: the terrain plane and the physics floor, sea included
+var ISLAND = 100, WORLD = 280, CHUNK = WORLD / 6, chunkMeshes = [], lampHeads = []; // CHUNK: the culling grid for the art (round 10 B) // WORLD: the terrain plane and the physics floor, sea included
 var ROAD_W = 8;               // Bruno's circuit is about four car widths wide
 var CTRL = [[-58, 74], [-20, 76], [18, 76], [52, 70], [74, 50], [80, 20], [70, -6], [80, -32], [72, -60], [46, -76], [12, -70], [-18, -80], [-50, -74], [-76, -54], [-80, -22], [-70, 4], [-82, 32], [-78, 60]];
 // closed centripetal Catmull-Rom, resampled to equal steps
@@ -1678,6 +1678,13 @@ function nearLetters(x, z, m) { return Math.hypot(x - LETTERS_MID.x, z - LETTERS
     if (roll < .78) { PZ_DYN.push({ kind: 'lantern', p: p, ry: face }); var q = roadPt(s, -sd * off); if (ok(q, .4)) PZ_DYN.push({ kind: 'lantern', p: q, ry: face + PI }); continue; }
     var t = roadTan(s); for (var k = 0; k < 3; k++) { var fp = p.clone().addScaledVector(t, (k - 1) * 2.05); if (ok(fp, .1)) PZ_DYN.push({ kind: 'fence', p: fp, ry: Math.atan2(t.x, t.z) + PI / 2 }); }
   }
+  // street lamps along the loop, alternate sides (Bruno's pole lights); they glow at night like the plazas' lamps
+  var side = 1; for (var ls = 20; ls < ROAD_LEN - 10; ls += 26 + r() * 12) {
+    side = -side; var lp = roadPt(ls, side * (ROAD_W / 2 + 1.9)); if (!ok(lp, .3) && !(landK(lp.x, lp.z) > 2 && plazaK(lp.x, lp.z) > 1 && farFrom(statics, lp.x, lp.z, 1))) continue;
+    var ry = Math.atan2(roadRight(ls).x * -side, roadRight(ls).z * -side), lk = new Kit();
+    lk.add(G.box, 17, 0, 0, 0, .4, .25, .4).add(G.cyl6, 7, 0, 0, 0, .16, 3.4, .16).add(G.box, 14, 0, 3.3, 0, .55, .12, .55).add(G.box, 25, 0, 2.95, 0, .42, .38, .42).add(G.cone4, 14, 0, 3.4, 0, .7, .4, .7, PI / 4);
+    kitGeo.push.apply(kitGeo, lk.bake(lp.x, 0, lp.z, ry)); addStatic(lp.x, 0, lp.z, .2, 1.8, .2, ry, null, 'lamp'); lampHeads.push(new V3(lp.x, 3.15, lp.z));
+  }
   // the Fresno start: lanterns down both sides of the grid, benches for the crowd, bushes behind
   for (var g = 0; g < 4; g++) [-1, 1].forEach(function (sd) {
     var ss = START_S - 4 - g * 7, p = roadPt(ss, sd * (ROAD_W / 2 + 2.6)); if (ok(p, .2)) PZ_DYN.push({ kind: 'lantern', p: p, ry: 0 });
@@ -1821,7 +1828,6 @@ var foliage = (function () {
 function foliageTier(level) { var per = level === 2 ? 80 : level === 1 ? 46 : 18; foliage.geos.forEach(function (g) { g.setDrawRange(0, per * 6); }); FOLU.uQuad.value = .8 * Math.sqrt(80 / per) * (level === 2 ? 1 : .92); }
 
 // lamp posts at the plazas' corners (static, they glow at night)
-var lampHeads = [];
 STOPS.forEach(function (d) {
   if (d.id === 'contact' || d.id === 'translation') return;
   [-1, 1].forEach(function (sg) {
