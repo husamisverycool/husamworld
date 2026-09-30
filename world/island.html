@@ -2734,7 +2734,9 @@ function buildMapImage() {
   x.putImageData(img, 0, 0);
   // pins: one button per door, placed by its site on the island (Bruno's map pins); the car is a red dot
   var pins = wrap.querySelector('.imap-pins'), h = '';
-  STOPS.forEach(function (d) { var u = (d.pad.x / (ISLAND * 1.12) * .5 + .5) * 100, v = (d.pad.z / (ISLAND * 1.12) * .5 + .5) * 100; h += '<button class="imap-pin' + (u > 55 ? ' flip' : '') + '" type="button" data-id="' + d.id + '" style="left:' + u.toFixed(2) + '%;top:' + v.toFixed(2) + '%"><span class="imap-dia" aria-hidden="true"></span><span class="imap-w">' + d.name.replace(/^The /, '') + '</span><span class="sr">: take me there</span></button>'; });
+  var UV = STOPS.map(function (d) { var u = (d.pad.x / (ISLAND * 1.12) * .5 + .5) * 100; return { u: u, v: (d.pad.z / (ISLAND * 1.12) * .5 + .5) * 100, flip: u > 55 }; });
+  UV.forEach(function (a, i) { UV.forEach(function (b, j) { if (i < j && Math.abs(a.v - b.v) < 5 && Math.abs(a.u - b.u) < 32) { var l = a.u < b.u ? a : b, r = l === a ? b : a; if (r.u < 78) { l.flip = true; r.flip = false; } } }); }); // neighbours on one row: labels point apart
+  STOPS.forEach(function (d, i) { var u = UV[i].u, v = UV[i].v; h += '<button class="imap-pin' + (UV[i].flip ? ' flip' : '') + '" type="button" data-id="' + d.id + '" style="left:' + u.toFixed(2) + '%;top:' + v.toFixed(2) + '%"><span class="imap-dia" aria-hidden="true"></span><span class="imap-w">' + d.name.replace(/^The /, '') + '</span><span class="sr">: take me there</span></button>'; });
   pins.innerHTML = h + '<span class="imap-car" id="imapCar" aria-hidden="true"></span>';
 }
 function drawMapPins() { var c = $('imapCar'); if (!c) return; c.style.left = ((car.pos.x / (ISLAND * 1.12) * .5 + .5) * 100).toFixed(2) + '%'; c.style.top = ((car.pos.z / (ISLAND * 1.12) * .5 + .5) * 100).toFixed(2) + '%'; Array.prototype.forEach.call(doc.querySelectorAll('.imap-pin'), function (b) { b.classList.toggle('been', !!visited[b.getAttribute('data-id')]); }); }
