@@ -3337,8 +3337,12 @@ function setTitleLook(on) { // the flat overlays (signs, paint, pads, labels) ar
   signMeshes.forEach(function (m) { m.visible = !on; }); if (paintMesh) paintMesh.visible = !on; STOPS.concat([RACE]).forEach(function (d) { d.padMesh.visible = !on; });
   trackMesh.visible = !on; carG.visible = !on || !!intro; sun.castShadow = sunD.castShadow = !on; shadowDirty = true; camera.far = on ? 2400 : 220; camera.updateProjectionMatrix();
 }
+function globeLeaves() { // the title globe: the fallen leaves lie over the whole island (they gather round the view once it lands)
+  var L = leaves, n = L.count; for (var i = 0; i < n; i++) { var o = L.list[i], x, z, t = 0; do { x = (Math.random() * 2 - 1) * 96; z = (Math.random() * 2 - 1) * 96; t++; } while (t < 20 && (landK(x, z) < 1 || maskAt(x, z, 3) > .3)); o.p.set(x, leafFloor(x, z), z); o.v.set(0, 0, 0); o.moving = false; _lq.setFromEuler(_le.set(o.tilt.x * .25, o.ry, o.tilt.y * .25)); _ls.setScalar(o.s); _lm.compose(o.p, _lq, _ls); L.mesh.setMatrixAt(i, _lm); }
+  L.mesh.instanceMatrix.needsUpdate = true; L.globe = true; L.placed = true;
+}
 function showTitle() {
-  state = 'title'; html.classList.add('ready');
+  state = 'title'; html.classList.add('ready'); globeLeaves();
   U.uBend.value = 1; U.uBendR.value = TITLE_R; setTitleLook(true);
   layoutTitleLetters(); titleLettersToCamera(); html.classList.add('gl-title');
   var b = $('goBtn'); b.disabled = false; b.textContent = 'Start the car'; b.addEventListener('click', startWorld);
@@ -3591,10 +3595,10 @@ var flowers = (function () {
     var n = 3 + Math.floor(r() * 8), col = cols[Math.floor(r() * cols.length)];
     for (var j = 0; j < n; j++) heads.push({ x: cx + (r() - .5) * 3, z: cz + (r() - .5) * 3, ry: TAU * r(), s: .6 + r() * .4, c: col });
   }
-  var mat = worldMat({ side: THREE.DoubleSide, vs: [WIND_GLSL, SHADOW_V, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
-    'void main(){ vec4 p = instanceMatrix * vec4(position, 1.); vec4 w = modelMatrix * p; float k = clamp(position.y + .75, 0., 1.); w.xz += windAt(w.xz) * k * 1.2; vW = w.xyz; vN = normalize(mat3(instanceMatrix) * normal); vC = instanceColor;',
+  var mat = worldMat({ side: THREE.DoubleSide, vs: [BEND_GLSL, WIND_GLSL, SHADOW_V, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
+    'void main(){ vec4 p = instanceMatrix * vec4(position * (1. + 2.6 * uBend), 1.); vec4 w = modelMatrix * p; float k = clamp(position.y + .75, 0., 1.); w.xz += windAt(w.xz) * k * 1.2; vW = w.xyz; vN = normalize(mat3(instanceMatrix) * normal); vC = instanceColor;',
     '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + uL * .25, 1.));', '#endif',
-    ' vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n').replace('varying vec3 vW;', 'uniform vec3 uL; varying vec3 vW;'),
+    ' w.xyz = bend(w.xyz); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n').replace('varying vec3 vW;', 'uniform vec3 uL; varying vec3 vW;'),
     fs: [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
       'void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 col = shade(L2(vC), n, dropShadowF(vW.xz), 0., vW, 0.); gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
   PZ_BEDS.forEach(function (bd) { for (var j = 0; j < (bd.ring ? 60 : 26); j++) { var a = r() * TAU, rr = bd.ring ? bd.r + .5 + r() * .7 : r() * bd.r; heads.push({ x: bd.p.x + Math.cos(a) * rr * (bd.ring ? 1 : .55), z: bd.p.z + Math.sin(a) * rr, y: bd.y || 0, ry: TAU * r(), s: .8 + r() * .3, c: cols[Math.floor(r() * cols.length)] }); } });
@@ -3604,6 +3608,24 @@ var flowers = (function () {
   return { mesh: mesh, max: heads.length };
 })();
 
+// ---------------------------------------------------------------- the title globe's lawns: the play grass is a grid round the view, so while
+// the island is curled onto its globe it is drawn by this instead: blades over every lawn at once, twice as tall (they are seen from
+// hundreds of metres), the same colours and the same dark mat at their feet; it gives way to the real grass as the island lands flat
+var globeGrass = (function () {
+  var r = rng(4040), n = LOWDEV ? 30000 : 52000, P = new Float32Array(n * 9), R = new Float32Array(n * 3), k = 0;
+  for (var t = 0; t < n * 6 && k < n; t++) { var x = (r() * 2 - 1) * 100, z = (r() * 2 - 1) * 100; if (maskAt(x, z, 1) < .7 || maskAt(x, z, 3) > .2) continue; P.set([x, 0, z, x, 1, z, x, 2, z], k * 9); var h = r(); R[k * 3] = R[k * 3 + 1] = R[k * 3 + 2] = h; k++; }
+  var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P.subarray(0, k * 9), 3)); g.setAttribute('rnd', new THREE.BufferAttribute(R.subarray(0, k * 3), 1));
+  var mat = worldMat({ vs: [BEND_GLSL, TERRAIN_GLSL, 'attribute float rnd; varying vec3 vW; varying float vTip; varying vec3 vCol; varying float vD; varying float vG;',
+      'void main(){ vec2 bp = position.xz; vec4 m = texture2D(uMask, bp / uWorld + .5); float g = m.g; float H = 1.3 * (.45 + .55 * rnd) * g * (texture2D(uNoise, bp * .008).r + .5);',
+      // the globe is seen from high above, where an upright blade is a dot: each blade stands up the screen instead (toward the camera's
+      // own up), so from the title the lawns read as tufts, lit tips over the dark mat, as they do in play
+      ' float tip = step(1.5, position.y), sx = position.y < .5 ? -1. : position.y < 1.5 ? 1. : 0.; vec3 cu = normalize(vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1])), cr = normalize(vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]));',
+      ' vec3 w = vec3(bp.x, 0., bp.y) + cr * sx * .3 * g + cu * tip * H; w.y = max(w.y, 0.); vW = w; vTip = tip; vG = g; vCol = terrainCol(m, bp);',
+      ' w = bend(w); vec4 mv = viewMatrix * vec4(w, 1.); vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n'),
+    fs: [LIGHT_GLSL, 'varying vec3 vW; varying float vTip; varying vec3 vCol; varying float vD; varying float vG;',
+      'void main(){ vec3 col = shade(L2(vCol), vec3(0., 1., 0.), 0., (1. - vTip) * vG * .9, vec3(vW.x, 1., vW.z), 0.); gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
+  var m = new THREE.Mesh(g, mat); m.frustumCulled = false; m.visible = false; scene.add(m); return m;
+})();
 // ---------------------------------------------------------------- pebbles and rocks: pale lilac, low-poly, on the dirt and by the water
 var pebbles = (function () {
   var r = rng(515), list = [];
@@ -3633,10 +3655,10 @@ var pebbles = (function () {
 var leaves = (function () {
   var MAX = 1024, r = rng(2024), geo = new THREE.PlaneGeometry(1, 1), pa = geo.attributes.position.array;
   pa[0] += .15; pa[3] += .15; pa[6] -= .15; pa[9] -= .15; geo.rotateX(-PI / 2); geo.deleteAttribute('uv');
-  var mat = worldMat({ side: THREE.DoubleSide, vs: [SHADOW_V, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
-    'void main(){ vec4 w = modelMatrix * instanceMatrix * vec4(position, 1.); vW = w.xyz; vN = normalize(mat3(instanceMatrix) * normal); vC = instanceColor;',
+  var mat = worldMat({ side: THREE.DoubleSide, vs: [BEND_GLSL, SHADOW_V, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
+    'void main(){ vec4 w = modelMatrix * instanceMatrix * vec4(position * (1. + 2.2 * uBend), 1.); vW = w.xyz; vN = normalize(mat3(instanceMatrix) * normal); vC = instanceColor;',
     '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + vN * .05, 1.));', '#endif',
-    ' vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n'),
+    ' w.xyz = bend(w.xyz); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n'),
     fs: [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
       'void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 col = shade(L2(vC), n, dropShadowF(vW.xz), 0., vW, 0.); gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
   var mesh = new THREE.InstancedMesh(geo, mat, MAX); mesh.frustumCulled = false; mesh.castShadow = mesh.receiveShadow = true; mesh.renderOrder = 2; scene.add(mesh);
@@ -3809,7 +3831,8 @@ function updateWindLines(dt) {
 var _cs = new V3();
 function artFrame(dt, now) {
   var flat = U.uBend.value < .01 && state !== 'title';
-  grass.mesh.visible = flat; flowers.mesh.visible = flat; leaves.mesh.visible = flat; U.uMat.value = flat ? 1 : 0;
+  grass.mesh.visible = flat; globeGrass.visible = !flat; flowers.mesh.visible = true; leaves.mesh.visible = flat || !!leaves.globe; U.uMat.value = flat ? 1 : 0;
+  if (flat && leaves.globe) { leaves.globe = false; leaves.placed = false; } // landed: the carpet gathers round the view again
   var cull = U.uBend.value < .001; if (chunkMeshes.cull !== cull) { chunkMeshes.cull = cull; chunkMeshes.forEach(function (m) { m.frustumCulled = cull; }); } // bent onto the globe, the flat bounds lie
   // the footprint's centre follows the view (Bruno optimalArea.position)
   GRU.uCenter.value.set(view.smoothed.x + area.base.x, view.smoothed.z + area.base.z);
@@ -3879,7 +3902,7 @@ function drawFrame(dt, now) {
 }
 function applyArtQuality(level) {
   optimalArea(); buildGrass(level); foliageTier(level);
-  leaves.count = level === 2 ? 1024 : level === 1 ? 512 : 256; leaves.mesh.count = leaves.count; leaves.placed = false;
+  leaves.count = level === 2 ? 1024 : level === 1 ? 512 : 256; leaves.mesh.count = leaves.count; leaves.placed = false; if (leaves.globe) globeLeaves();
   flowers.mesh.count = level === 0 ? Math.floor(flowers.max / 4) : level === 1 ? Math.floor(flowers.max * .6) : flowers.max;
   foliage.meshes.forEach(function (m) { m.castShadow = level > 0; }); leaves.mesh.castShadow = pebbles.castShadow = level > 0; bgMesh.visible = level > 0; html.classList.toggle('gl-lowq', level === 0);
   if (level === 0) flowers.mesh.count = 0;
