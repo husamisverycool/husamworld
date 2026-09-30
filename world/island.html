@@ -570,7 +570,7 @@ html.gl-lowq #gl{background:transparent}
     <div class="setp-page" id="spage-world" role="tabpanel" aria-labelledby="stab-world" hidden>
       <h3 class="page-t">The world</h3>
       <div class="row row-wide"><label class="row-l" for="sVol">Sound <span class="row-val" id="sVolV">Off</span></label><input class="road" id="sVol" type="range" min="0" max="10" step="1" value="0"></div>
-      <div class="row row-wide"><span class="row-l" id="sQualL">Quality</span><div class="seg" role="radiogroup" aria-labelledby="sQualL" aria-describedby="sQualH"><label><input type="radio" name="sQual" value="auto" checked><span>Auto</span></label><label><input type="radio" name="sQual" value="high"><span>High</span></label><label><input type="radio" name="sQual" value="medium"><span>Mid</span></label><label><input type="radio" name="sQual" value="low"><span>Low</span></label></div><p class="row-h" id="sQualH">Auto lowers the detail if frames run slow. A change waits until the car stops.</p></div>
+      <div class="row row-wide"><span class="row-l" id="sQualL">Quality</span><div class="seg" role="radiogroup" aria-labelledby="sQualL" aria-describedby="sQualH"><label><input type="radio" name="sQual" value="auto" checked><span>Auto</span></label><label><input type="radio" name="sQual" value="low"><span>Smooth</span></label><label><input type="radio" name="sQual" value="medium"><span>Balanced</span></label><label><input type="radio" name="sQual" value="high"><span>Pretty</span></label></div><p class="row-h" id="sQualH">Auto fits the detail to this device and eases off while you drive if frames run slow.</p></div>
       <div class="row row-wide"><span class="row-l" id="sWxL">Weather</span><div class="seg" role="radiogroup" aria-labelledby="sWxL" aria-describedby="sWxH"><label><input type="radio" name="sWx" value="live" checked><span>Changing</span></label><label><input type="radio" name="sWx" value="clear"><span>Clear</span></label><label><input type="radio" name="sWx" value="rain"><span>Rain</span></label></div><p class="row-h" id="sWxH">Up north, rain turns to snow.</p></div>
       <div class="row row-wide"><span class="row-l" id="sTodL">Time of day <span class="row-val" id="sTodV">--:--</span></span><div class="seg seg5" role="radiogroup" aria-labelledby="sTodL" aria-describedby="sTodH"><label><input type="radio" name="sTod" value="now"><span>Mine</span></label><label><input type="radio" name="sTod" value="6.8"><span>Dawn</span></label><label><input type="radio" name="sTod" value="12.5" checked><span>Day</span></label><label><input type="radio" name="sTod" value="18.6"><span>Dusk</span></label><label><input type="radio" name="sTod" value="22.5"><span>Night</span></label></div><p class="row-h" id="sTodH">The light follows your own clock, or try another hour.</p></div>
       <div class="row"><label class="row-l" for="sRM">Reduced motion</label><span class="sw"><input type="checkbox" id="sRM" role="switch" aria-describedby="sRMH"><span>Off</span></span><p class="row-h" id="sRMH">A steadier camera: no shakes, sways or flights.</p></div>
@@ -696,8 +696,9 @@ var byId = {}; STOPS.forEach(function (d, i) { d.index = i; byId[d.id] = d; });
 (function photos() { var src = $('photo').getAttribute('src'); Array.prototype.forEach.call(doc.querySelectorAll('img.ph'), function (im) { if (!im.getAttribute('src')) im.setAttribute('src', src); }); })();
 // one notice at a time (Bruno 2025's Notifications: a queue, one card on screen): toasts and sticker cards wait their turn
 var NQ = [], nBusy = false;
-function narrowUI() { return innerWidth <= 760 || phoneLand(); }
-function phoneLand() { return COARSE && innerHeight <= 500 && innerWidth > innerHeight; } // round 7: a phone on its side gets the phone's quiet HUD, laid out for landscape
+var VPW = innerWidth, VPH = innerHeight; addEventListener('resize', function () { VPW = innerWidth; VPH = innerHeight; }, true); // (round 15: read once per resize, see buildWorld)
+function narrowUI() { return VPW <= 760 || phoneLand(); }
+function phoneLand() { return COARSE && VPH <= 500 && VPW > VPH; } // round 7: a phone on its side gets the phone's quiet HUD, laid out for landscape
 function notice(it) {
   if (it.msg && NQ.some(function (q) { return q.msg === it.msg; })) return;
   NQ.push(it); while (NQ.length > 3) { var k = -1; for (var i = 0; i < NQ.length; i++) if (NQ[i].el === 'toast') { k = i; break; } NQ.splice(k < 0 ? 0 : k, 1); }
@@ -831,6 +832,7 @@ function main() {
   var probe = doc.createElement('canvas'), gl = null;
   try { gl = probe.getContext('webgl2') || probe.getContext('webgl'); } catch (e) {}
   if (!gl) { noWorld('This browser can\'t draw the 3D world.'); return; }
+  try { var lc = gl.getExtension('WEBGL_lose_context'); if (lc) lc.loseContext(); } catch (e) {} gl = null; // (round 15: the test context is let go, not kept beside the world's)
   try { W = buildWorld(); } catch (err) { if (window.console) console.error(err); noWorld('The 3D world hit a snag.'); W = null; }
 }
 doc.addEventListener('DOMContentLoaded', main);
@@ -942,6 +944,11 @@ function makeRaycastVehicle(CANNON, world, body, opt) {
 // plugs in at the hooks marked "HOOK(B)".
 // ============================================================================
 function buildWorld() {
+// round 15: the viewport's size is read once per resize. Reading window.innerWidth after the frame has touched the page's styles (the tags,
+// the bubble) makes the browser lay the page out again on the spot, and the frame did that several times over (a CPU profile's phoneLand)
+var innerWidth = window.innerWidth, innerHeight = window.innerHeight;
+function readViewport() { innerWidth = VPW = window.innerWidth; innerHeight = VPH = window.innerHeight; }
+addEventListener('resize', readViewport, true);
 var V3 = THREE.Vector3, Q = THREE.Quaternion, M4 = THREE.Matrix4, C3 = THREE.Color, V2 = THREE.Vector2;
 var PI = Math.PI, TAU = PI * 2, DEG = PI / 180;
 function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -956,12 +963,15 @@ function elasticOut(t, p) { t = clamp(t, 0, 1); if (t === 0 || t === 1) return t
 function wrapA(a) { return Math.atan2(Math.sin(a), Math.cos(a)); }
 function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 function hash2(x, y) { var s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453; return s - Math.floor(s); }
-function vnoise(x, y) { var ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy; fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); return lerp(lerp(hash2(ix, iy), hash2(ix + 1, iy), fx), lerp(hash2(ix, iy + 1), hash2(ix + 1, iy + 1), fx), fy); }
+// round 15: the lattice's hashes are kept (the same numbers, worked out once): painting the island's mask asked for each of them thousands of times
+var HASH_N = 512, HASH_O = 256, hashT = new Float64Array(HASH_N * HASH_N).fill(NaN);
+function hashI(ix, iy) { var a = ix + HASH_O, b = iy + HASH_O; if (a < 0 || b < 0 || a >= HASH_N || b >= HASH_N) return hash2(ix, iy); var k = a * HASH_N + b, v = hashT[k]; if (v !== v) v = hashT[k] = hash2(ix, iy); return v; }
+function vnoise(x, y) { var ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy; fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); return lerp(lerp(hashI(ix, iy), hashI(ix + 1, iy), fx), lerp(hashI(ix, iy + 1), hashI(ix + 1, iy + 1), fx), fy); }
 function fbm(x, y) { return vnoise(x, y) * .6 + vnoise(x * 2.1 + 5, y * 2.1 - 3) * .3 + vnoise(x * 4.3 - 7, y * 4.3 + 1) * .1; }
 
 var canvas = $('gl');
 var LOWDEV = COARSE || Math.min(innerWidth, innerHeight) < 600;
-var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !LOWDEV, alpha: true, powerPreference: 'high-performance' });
+var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !LOWDEV && (window.devicePixelRatio || 1) < 1.5, alpha: true, powerPreference: 'high-performance' }); // (round 15: no multisampled canvas on a 2x screen, as Bruno)
 var DPR_MAX = LOWDEV ? 1.5 : 2;
 var dpr = Math.min(window.devicePixelRatio || 1, DPR_MAX);
 renderer.setPixelRatio(dpr); renderer.setClearColor(0x000000, 0);
@@ -1014,7 +1024,7 @@ var U = {
   // round 10 B: the terrain data every material can read (bounce, waterline, grass colour under a blade), the tracks, the noise
   uMask: { value: null }, uWorld: { value: 280 }, uNoise: { value: null }, uTrack: { value: null },
   uDry: { value: new C3('#ffa94e') }, uShallow: { value: new C3('#5bc2b9') }, uDeep: { value: new C3('#13375f') }, uGrass: { value: new C3('#b8b62e') }, uGrassB: { value: new C3('#c9b53a') },
-  uCar: { value: new V3() }, uCarV: { value: new V3() }, uMat: { value: 1 }, uShQ: { value: 1 }, uFloorSh: { value: null }, uFloorC: { value: new V3(0, 0, 36) }
+  uCar: { value: new V3() }, uCarV: { value: new V3() }, uMat: { value: 1 }, uShQ: { value: 1 }, uShK: { value: 1 }, uDyn: { value: 0 }, uFloorSh: { value: null }, uFloorC: { value: new V3(0, 0, 36) }
 };
 var BEND_GLSL = 'uniform float uBend, uBendR; uniform vec3 uBendC;\n' +
   'vec3 bend(vec3 w){ if (uBend < .001) return w; float R = uBendR / uBend; vec2 d = w.xz - uBendC.xz; float r = length(d); if (r < 1e-4) return vec3(w.x, w.y - R + R, w.z);' +
@@ -1055,17 +1065,17 @@ var LIGHT_GLSL = [TERRAIN_GLSL,
 var SHADOW_V = '#if NUM_DIR_LIGHT_SHADOWS > 0\nuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHT_SHADOWS ]; varying vec4 vSC;\n#if NUM_DIR_LIGHT_SHADOWS > 1\nvarying vec4 vSC2;\n#endif\n' +
   'void setSC(vec4 p){ vSC = directionalShadowMatrix[0] * p;\n#if NUM_DIR_LIGHT_SHADOWS > 1\n vSC2 = directionalShadowMatrix[1] * p;\n#endif\n }\n#endif\n';
 // the low tier filters the shadow with four bilinear-weighted taps instead of three's seventeen (the same soft one-texel edge)
-var SHADOW_F = '#include <packing>\n#if NUM_DIR_LIGHT_SHADOWS > 0\n#include <shadowmap_pars_fragment>\nvarying vec4 vSC; uniform float uShQ;\n#if NUM_DIR_LIGHT_SHADOWS > 1\nvarying vec4 vSC2;\n#endif\n' +
+var SHADOW_F = '#include <packing>\n#if NUM_DIR_LIGHT_SHADOWS > 0\n#include <shadowmap_pars_fragment>\nvarying vec4 vSC; uniform float uShQ, uShK, uDyn;\n#if NUM_DIR_LIGHT_SHADOWS > 1\nvarying vec4 vSC2;\n#endif\n' +
   'float shTap(sampler2D m, vec2 uv, float z){ return step(z, unpackRGBAToDepth(texture2D(m, uv))); }\n' +
   // the low tier filters with four bilinear-weighted taps instead of three's seventeen (the same soft one-texel edge)
   'float sh4(sampler2D m, vec2 size, float bias, vec4 sc){ vec3 c = sc.xyz / sc.w; c.z += bias; if (c.x < 0. || c.x > 1. || c.y < 0. || c.y > 1. || c.z > 1.) return 0.;\n' +
   ' vec2 f = c.xy * size - .5, i = floor(f), w = f - i, t = 1. / size, uv = (i + .5) * t;\n' +
   ' return 1. - mix(mix(shTap(m, uv, c.z), shTap(m, uv + vec2(t.x, 0.), c.z), w.x), mix(shTap(m, uv + vec2(0., t.y), c.z), shTap(m, uv + t, c.z), w.x), w.y); }\n' +
   'float dynShadow(){\n#if NUM_DIR_LIGHT_SHADOWS > 1\n DirectionalLightShadow s2 = directionalLightShadows[1];\n' +
-  ' if (uShQ > .5) return 1. - getShadow(directionalShadowMap[1], s2.shadowMapSize, s2.shadowBias, s2.shadowRadius, vSC2); return sh4(directionalShadowMap[1], s2.shadowMapSize, s2.shadowBias, vSC2);\n' +
+  ' if (uDyn < .5) return 0.; if (uShK > .5) return 1. - getShadow(directionalShadowMap[1], s2.shadowMapSize, s2.shadowBias, s2.shadowRadius, vSC2); return sh4(directionalShadowMap[1], s2.shadowMapSize, s2.shadowBias, vSC2);\n' +
   '#else\n return 0.;\n#endif\n }\n' +
   'float dropShadow(){ DirectionalLightShadow s = directionalLightShadows[0]; float d;\n' +
-  ' if (uShQ > .5) d = 1. - getShadow(directionalShadowMap[0], s.shadowMapSize, s.shadowBias, s.shadowRadius, vSC); else d = sh4(directionalShadowMap[0], s.shadowMapSize, s.shadowBias, vSC);\n' +
+  ' if (uShK > .5) d = 1. - getShadow(directionalShadowMap[0], s.shadowMapSize, s.shadowBias, s.shadowRadius, vSC); else d = sh4(directionalShadowMap[0], s.shadowMapSize, s.shadowBias, vSC);\n' +
   ' return max(d, dynShadow()); }\n' +
   // the floor (ground, grass, water, flowers, leaves) on the low tier reads the scenery's shadow from a mask baked flat over the ground
   // whenever that map is re-drawn: one bilinear fetch instead of four depth taps, for the pixels that are most of the screen
@@ -1147,6 +1157,13 @@ sun.shadow.autoUpdate = false; sun.shadow.needsUpdate = true; SC.layers.set(1); 
 var sunD = new THREE.DirectionalLight(0xffffff, 0); sunD.castShadow = true; sunD.shadow.mapSize.set(512, 512); sunD.shadow.bias = -.001; sunD.shadow.normalBias = .06;
 var SCD = sunD.shadow.camera; SCD.near = 1; SCD.far = 140; SCD.left = -22; SCD.right = 22; SCD.top = 22; SCD.bottom = -22; SCD.updateProjectionMatrix(); SCD.layers.set(2);
 scene.add(sun, sun.target, sunD, sunD.target);
+// round 15: three r149 picks a shadow map's casters by the *view* camera's layers, not the shadow camera's, so the split never split: the
+// living things' map drew the scenery again every frame, and the car's and the locals' shadow-only casters (layer 2 alone) were in no
+// map at all. Each light is now drawn on its own with its shadow camera's layers as the test.
+(function shadowByLayers(sm) {
+  var draw = sm.render.bind(sm), one = [null], asCam = { layers: null };
+  sm.render = function (lights, sc, cam) { for (var i = 0; i < lights.length; i++) { one[0] = lights[i]; asCam.layers = lights[i].shadow.camera.layers; draw(one, sc, asCam); } };
+})(renderer.shadowMap);
 var shadowDirty = true, shSnap = { x: 1e9, z: 1e9, d: new V3() }, shAt = { x: 0, z: 0 }, floorAt = { x: 0, z: 0 }, floorNeed = false;
 var floorRT = new THREE.WebGLRenderTarget(512, 512, { depthBuffer: false, stencilBuffer: false }); U.uFloorSh.value = floorRT.texture;
 function casts(o, dynamic) { o.traverse(function (m) { if (m.isMesh || m.isPoints) { m.castShadow = true; m.layers.enable(dynamic ? 2 : 1); } }); return o; }
@@ -1166,10 +1183,13 @@ function placeSun(fx, fz) {
   var cx = car.pos.x, cz = car.pos.z; sunD.target.position.set(cx, 0, cz); sunD.position.set(cx + SUN_DIR.x * 70, SUN_DIR.y * 70, cz + SUN_DIR.z * 70); sunD.target.updateMatrixWorld();
 }
 // the shadow set-up for the globe (one island-wide map holding everything, re-drawn on demand) and for play (the tier's own, applyQuality)
+// round 15: every tier plays with the split (it was the low tier's alone; the others re-drew one big map of everything every frame, 55
+// draw calls into 1024 or 2048 px), and the living things' light stays a shadow caster on the globe too, only switched off by uDyn and
+// not re-drawn: the number of shadow lights never changes, so neither a tier nor the landing recompiles the world's shaders
 function shadowMode(globe) {
-  sun.castShadow = true;
-  if (globe) { sunD.castShadow = false; sun.shadow.autoUpdate = false; SC.layers.enable(1); SC.layers.enable(2); }
-  else { var split = quality.level === 0; sunD.castShadow = split; sun.shadow.autoUpdate = !split; if (split) SC.layers.set(1); else { SC.layers.enable(1); SC.layers.enable(2); } }
+  sun.castShadow = true; sunD.castShadow = true; sun.shadow.autoUpdate = false;
+  if (globe) { sunD.shadow.autoUpdate = false; U.uDyn.value = 0; SC.layers.enable(1); SC.layers.enable(2); }
+  else { sunD.shadow.autoUpdate = true; U.uDyn.value = 1; SC.layers.set(1); }
   shadowDirty = true;
 }
 
@@ -1212,7 +1232,7 @@ function merge(list) {
   return out;
 }
 function meshOf(kit, mat) { var m = new THREE.Mesh(merge(kit.parts), mat || matWorld); m.castShadow = m.receiveShadow = true; return m; }
-function canvasTex(w, h, draw) { var c = doc.createElement('canvas'); c.width = w; c.height = h; var x = c.getContext('2d'); draw(x, w, h); var t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t; }
+function canvasTex(w, h, draw) { var c = doc.createElement('canvas'); c.width = w; c.height = h; var x = c.getContext('2d'); draw(x, w, h); var t = new THREE.CanvasTexture(c); t.anisotropy = 4; t.redraw = function () { x.clearRect(0, 0, w, h); draw(x, w, h); t.needsUpdate = true; }; return t; } // (round 15: redraw, once the fonts are in)
 function fitText(x, text, weight, size, family, maxW) { x.font = weight + ' ' + size + 'px ' + family + ', Impact, Arial, sans-serif'; var w = x.measureText(text).width; if (w > maxW) x.font = weight + ' ' + Math.floor(size * maxW / w) + 'px ' + family + ', Impact, Arial, sans-serif'; }
 
 // ============================================================================ the island's layout
@@ -1361,8 +1381,12 @@ function nameK(x, z) { if (x < NAME_BB[0] - 4 || x > NAME_BB[1] + 4 || z < NAME_
     if (ch < 0 && !onRoad) dep = Math.max(dep, clamp(.2 + (-ch) / 2.2, 0, .92));
     var shoreSoft = land >= 0 ? clamp(1 - land / 2.2, 0, 1) * .12 : 0; if (ch >= 0 && ch < 1.6) shoreSoft = Math.max(shoreSoft, (1 - ch / 1.6) * .14);
     if (!onRoad) dep = Math.max(dep, shoreSoft);
+    var plz = plazaK(wx2, wz2), road0 = clamp(.5 + (ROAD_W / 2 - rd) / 2, 0, 1);
+    // (round 15) open water away from the plazas: no slabs (it is deeper than 0.2) and no grass (the land term is under -1.6), so the noise
+    // below can't change a thing there; skipping it is most of the sea, a good part of the load
+    if (land < 0 && plz >= 3) { mask[k2 * 4] = 0; mask[k2 * 4 + 1] = 0; mask[k2 * 4 + 2] = dep * 255; mask[k2 * 4 + 3] = road0 * 255; depthF[k2] = dep; continue; }
     var n1 = fbm(wx2 * .07 + 11, wz2 * .07 - 4), n2 = fbm(wx2 * .11 - 3, wz2 * .11 + 8);
-    var plz = plazaK(wx2, wz2), path = pathK(wx2, wz2); if (plz > -3.5 && plz < 3) plz += (fbm(wx2 * .19 + 7, wz2 * .19 - 5) - .45) * 2.6; // a wobbly edge: the grass bites into the slabs (Bruno's areas)
+    var path = pathK(wx2, wz2); if (plz > -3.5 && plz < 3) plz += (fbm(wx2 * .19 + 7, wz2 * .19 - 5) - .45) * 2.6; // a wobbly edge: the grass bites into the slabs (Bruno's areas)
     // slabs: plazas solid, the paths a looser trail of tiles (the shader breaks them up with noise)
     var nmk = nameK(wx2, wz2); if (nmk < 3) nmk += (fbm(wx2 * .23 + 3, wz2 * .23 + 9) - .45) * 1.4; // wobbly, as the plazas' edges
     var slab = Math.max(clamp((.6 - plz) / 1.2, 0, 1), clamp((.2 - path) / 1.2, 0, 1) * .72 * (land > 1 ? 1 : 0), clamp((.3 - nmk) / 1.1, 0, 1)); if (dep > .2) slab = 0;
@@ -1495,6 +1519,23 @@ var waterMesh = (function () { // only the cells that hold water (a 2.2 m grid),
 // Bruno's world steps 2/60 s per 1/60 s frame (Ticker.scale = 2) with gravity 9.81; the vehicle's impulses are worked out for
 // the real 1/60. We run a fixed 60 Hz accumulator, so the feel is the same at 30, 60 or 120 frames a second.
 var pw = new CANNON.World(); pw.gravity.set(0, -9.81, 0); pw.allowSleep = true; pw.broadphase = new CANNON.SAPBroadphase(pw); pw.solver.iterations = 8;
+// round 15, the frame budget: cannon 0.6.2's sweep-and-prune goes on past every pair it doesn't need (static or sleeping on both sides)
+// instead of stopping, so each step looked at all n^2 / 2 pairs of several hundred bodies (1.7 ms of a 2.9 ms step, 1 body awake). This
+// is the same sweep, pair for pair and in the same order, but a body at rest only looks at the awake ones after it in the sorted list
+// (the only ones its own loop would have tested), so a still island costs almost nothing
+(function fastSAP(bp) {
+  var ACT = CANNON.Body.STATIC | CANNON.Body.KINEMATIC, SLEEPING = CANNON.Body.SLEEPING, check = CANNON.SAPBroadphase.checkBounds, act = [];
+  bp.collisionPairs = function (world, p1, p2) {
+    var t = this.axisList, n = t.length, ax = this.axisIndex, i, j, k, a, b, na = 0;
+    if (this.dirty) { this.sortList(); this.dirty = false; }
+    for (i = 0; i < n; i++) { b = t[i]; if ((b.type & ACT) === 0 && b.sleepState !== SLEEPING) act[na++] = i; }
+    for (i = 0, k = 0; i < n; i++) {
+      a = t[i]; while (k < na && act[k] <= i) k++;
+      if ((a.type & ACT) === 0 && a.sleepState !== SLEEPING) { for (j = i + 1; j < n; j++) { b = t[j]; if (this.needBroadphaseCollision(a, b)) { if (!check(a, b, ax)) break; this.intersectionTest(a, b, p1, p2); } } }
+      else for (j = k; j < na; j++) { b = t[act[j]]; if (this.needBroadphaseCollision(a, b)) { if (!check(a, b, ax)) break; this.intersectionTest(a, b, p1, p2); } }
+    }
+  };
+})(pw.broadphase);
 pw.defaultContactMaterial.friction = .3; pw.defaultContactMaterial.restitution = .15; pw.defaultContactMaterial.contactEquationStiffness = 1e7;
 // collision groups (cannon 0.6.2 defaults every mask to 1, so every body names its mask)
 var GR_GROUND = 1, GR_CAR = 2, GR_STATIC = 4, GR_PROP = 8, GR_ALL = 15;
@@ -2057,7 +2098,7 @@ var foliage = (function () {
   });
   return { meshes: meshes, geos: geos, mat: mat };
 })();
-function foliageTier(level) { var per = level === 2 ? 80 : level === 1 ? 46 : 18; foliage.geos.forEach(function (g) { g.setDrawRange(0, per * 6); }); FOLU.uQuad.value = .8 * Math.sqrt(80 / per) * (level === 2 ? 1 : .92); }
+function foliageTier(level, k) { var per = Math.max(12, Math.round((level === 2 ? 80 : level === 1 ? 46 : 18) * (k || 1))); foliage.geos.forEach(function (g) { g.setDrawRange(0, per * 6); }); FOLU.uQuad.value = .8 * Math.sqrt(80 / per) * (level === 2 ? 1 : .92); }
 
 // lamp posts at the plazas' corners (static, they glow at night)
 STOPS.forEach(function (d) {
@@ -3152,6 +3193,7 @@ LOCALS.forEach(function (L, i) {
 function localsArt(dt, now, best) {
   var T = now / 1000, rm = RM();
   locals.forEach(function (o) {
+    if (o.fdt === 0) return; var dt = o.fdt; // (round 15: see updateLocals)
     var talk = o.talkK || 0, near = o === best;
     o.blinkT -= dt; if (o.blinkT < 0) o.blinkT = 2.4 + Math.random() * 3.5; var bl = o.blinkT < .12 && !rm ? .12 : 1; o.eyes.scale.set(1, bl, 1); o.eyes.position.y = (1 - bl) * .02;
     o.head.rotation.x = rm ? 0 : Math.sin(T * 9 + o.seed) * .09 * talk + (near ? -.08 : 0);
@@ -3178,7 +3220,12 @@ function updateLocals(dt, now) {
   var best = null, bd = 9;
   if (state === 'play' && !trial.on && drove && !doorNow()) locals.forEach(function (o) { var d = Math.hypot(car.pos.x - o.L.x, car.pos.z - o.L.z); if (d < bd && car.xzSpeed < (o === talk.who ? 7 : 4)) { bd = d; best = o; } });
   if (talk.who && best !== talk.who && state === 'play' && !trial.on && !doorNow() && talk.t < 1.5 && Math.hypot(car.pos.x - talk.who.L.x, car.pos.z - talk.who.L.z) < 11) best = talk.who;
+  // round 15: a local well outside the view is posed five times a second instead of every frame, with the time it missed (so a walker
+  // is where it would have been); the one you're talking to is always near
+  var lvx = view.smoothed.x, lvz = view.smoothed.z, lfar = area.radius + 14;
+  locals.forEach(function (o) { var q = o.g.position, a = (o.acc || 0) + dt; if (o !== best && (Math.abs(q.x - lvx) > lfar || Math.abs(q.z - lvz) > lfar) && a < .2) { o.acc = a; o.fdt = 0; } else { o.acc = 0; o.fdt = a; } });
   locals.forEach(function (o) {
+    if (o.fdt === 0) return; var dt = o.fdt;
     var face = 0;
     if (o === best) { var rel = car.pos.clone().sub(o.g.position).applyAxisAngle(new V3(0, 1, 0), -o.L.face); face = Math.atan2(rel.x, rel.z); } else face = Math.sin(now * .0004 + o.L.index) * .5;
     var dy = wrapA(face - o.yaw); o.yaw += dy * Math.min(1, dt * 5); o.m.rotation.y = o.yaw;
@@ -3649,7 +3696,7 @@ function buildMapImage() {
   STOPS.forEach(function (d) { if (d.tagR) { d.tagR.visible = d.tagL.visible = false; } });
   var fn = U.uFogN.value, ff = U.uFogF.value, cd0 = U.uCarD.value; U.uCarD.value = -1e4; U.uMat.value = 0; U.uFogN.value = 1e4; U.uFogF.value = 2e4; U.uRes.value.set(N, N);
   propBatch(true); renderer.setRenderTarget(rt); renderer.setClearColor(0x13375f, 1); renderer.clear(); renderer.render(scene, oc); renderer.setRenderTarget(null); renderer.setClearColor(0x000000, 0);
-  U.uFogN.value = fn; U.uFogF.value = ff; U.uCarD.value = cd0; U.uMat.value = 1; resize();
+  U.uFogN.value = fn; U.uFogF.value = ff; U.uCarD.value = cd0; U.uMat.value = 1; var ds = renderer.getDrawingBufferSize(new V2()); U.uRes.value.set(ds.x, ds.y); // (round 15: not a whole resize, which re-made every pass's target)
   hideL.forEach(function (o, i) { o.visible = vis[i]; });
   var px = new Uint8Array(N * N * 4); renderer.readRenderTargetPixels(rt, 0, 0, N, N, px); rt.dispose();
   var cv = wrap.querySelector('canvas'); cv.width = N; cv.height = N; var x = cv.getContext('2d'), img = x.createImageData(N, N);
@@ -3828,13 +3875,22 @@ function buildGrass(level) {
     var i = ix * n + iz, x = (ix / n - .5) * S + fs * .5 + (r() - .5) * fs, z = (iz / n - .5) * S + fs * .5 + (r() - .5) * fs;
     P.set([x, 0, z, x, 1, z, x, 2, z], i * 9); var h = r(); R[i * 3] = R[i * 3 + 1] = R[i * 3 + 2] = h;
   }
+  // round 15: the same blades in a shuffled order, so the first k of them are an even thinning of the whole lawn; Auto can then draw fewer
+  // (grassK: a draw range and a wider blade, no rebuild and no new shader) while the car is moving
+  var P2 = new Float32Array(cnt * 9), R2 = new Float32Array(cnt * 3), ord = new Uint32Array(cnt), rs = rng(57); for (i = 0; i < cnt; i++) ord[i] = i;
+  for (i = cnt - 1; i > 0; i--) { var j = Math.floor(rs() * (i + 1)), t = ord[i]; ord[i] = ord[j]; ord[j] = t; }
+  for (i = 0; i < cnt; i++) { var o = ord[i]; P2.set(P.subarray(o * 9, o * 9 + 9), i * 9); R2.set(R.subarray(o * 3, o * 3 + 3), i * 3); } P = P2; R = R2;
   var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('rnd', new THREE.BufferAttribute(R, 1));
   g.boundingSphere = new THREE.Sphere(new V3(), 1e4);
   if (grass.mesh) { grass.mesh.geometry.dispose(); grass.mesh.geometry = g; }
   else { grass.mesh = new THREE.Mesh(g, grassMat); grass.mesh.frustumCulled = false; grass.mesh.receiveShadow = true; scene.add(grass.mesh); }
   // Bruno's surface overflow: a bigger footprint (a phone) grows the blades, so the same lawn reads at a greater distance
-  var over = clamp(Math.max(0, S * S - 2000) / 2000, 0, 2.2), dens = Math.sqrt(280 / n);
-  GRU.uSize.value = S; GRU.uBW.value = .1 * (1 + over * .5) * lerp(1, dens, .7); GRU.uBH.value = .6 * (1 + over * .45);
+  grass.over = clamp(Math.max(0, S * S - 2000) / 2000, 0, 2.2); GRU.uSize.value = S; GRU.uBH.value = .6 * (1 + grass.over * .45); grass.k = -1; grassK(grass.kWant || 1);
+}
+function grassK(k) { // the share of the blades drawn; the blade widens as the lawn thins, by the same rule as a sparser tier's
+  grass.kWant = k; if (!grass.mesh || grass.k === k) return; grass.k = k;
+  var cnt = grass.n * grass.n, m = Math.max(1, Math.round(cnt * k)), dens = Math.sqrt(280 / (grass.n * Math.sqrt(m / cnt)));
+  grass.mesh.geometry.setDrawRange(0, m * 3); GRU.uBW.value = .1 * (1 + grass.over * .5) * lerp(1, dens, .7);
 }
 
 // ---------------------------------------------------------------- flowers (Flowers.js): clusters of 8 tiny cards whose heads peek out of the
@@ -4023,12 +4079,12 @@ var fxBlur = [3, 5, 7, 9, 11].map(function (k) {
     fragmentShader: 'uniform sampler2D tDiffuse; uniform vec2 uDir; uniform float uW[KR]; varying vec2 vUv; void main(){ vec3 c = texture2D(tDiffuse, vUv).rgb * uW[0]; for (int i = 1; i < KR; i++){ vec2 o = uDir * float(i); c += (texture2D(tDiffuse, vUv + o).rgb + texture2D(tDiffuse, vUv - o).rgb) * uW[i]; } gl_FragColor = vec4(c, 1.); }' });
 });
 var fxOut = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, defines: { NM: 5, DOF: 1 },
-  uniforms: { tDiffuse: { value: null }, tHalf: { value: null }, tB0: { value: null }, tB1: { value: null }, tB2: { value: null }, tB3: { value: null }, tB4: { value: null }, uStr: { value: .25 }, uAmt: { value: 0 }, uC: { value: new V2(.5, .5) }, uDof: { value: .003 } },
+  uniforms: { tDiffuse: { value: null }, tHalf: { value: null }, tB0: { value: null }, tB1: { value: null }, tB2: { value: null }, tB3: { value: null }, tB4: { value: null }, uStr: { value: .25 }, uAmt: { value: 0 }, uC: { value: new V2(.5, .5) }, uDof: { value: .003 }, uDofOn: { value: 1 } },
   vertexShader: FXV,
-  fragmentShader: ['uniform sampler2D tDiffuse, tHalf, tB0, tB1, tB2, tB3, tB4; uniform float uStr, uAmt, uDof; uniform vec2 uC; varying vec2 vUv;',
+  fragmentShader: ['uniform sampler2D tDiffuse, tHalf, tB0, tB1, tB2, tB3, tB4; uniform float uStr, uAmt, uDof, uDofOn; uniform vec2 uC; varying vec2 vUv;',
     'float hh(vec2 p){ return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }',
     'vec3 sceneAt(vec2 uv){',
-    '#if DOF', ' float k = smoothstep(.2, .5, abs(uv.y - .5)); vec3 c = texture2D(tDiffuse, uv).rgb; if (k > .001) { vec3 b = vec3(0.); for (int i = 0; i < 16; i++){ float a = hh(uv + float(i) * .137) * 6.2832, r = sqrt(hh(uv * 1.7 + float(i) * .291)); b += texture2D(tHalf, uv + vec2(cos(a), sin(a)) * r * uDof * k).rgb; } c = mix(c, b / 16., k); } return c;',
+    '#if DOF', ' float k = smoothstep(.2, .5, abs(uv.y - .5)); vec3 c = texture2D(tDiffuse, uv).rgb; if (k > .001 && uDofOn > .5) { vec3 b = vec3(0.); for (int i = 0; i < 16; i++){ float a = hh(uv + float(i) * .137) * 6.2832, r = sqrt(hh(uv * 1.7 + float(i) * .291)); b += texture2D(tHalf, uv + vec2(cos(a), sin(a)) * r * uDof * k).rgb; } c = mix(c, b / 16., k); } return c;',
     '#else', ' return texture2D(tDiffuse, uv).rgb;', '#endif', ' }',
     'void main(){ vec2 uv = vUv; vec3 c;',
     ' if (uAmt > .001) { vec2 d = vUv - uC; float kk = uAmt * .045; vec2 z = d * (1. - uAmt * .12); c = vec3(texture2D(tDiffuse, uC + z * (1. + kk)).r, texture2D(tDiffuse, uC + z).g, texture2D(tDiffuse, uC + z * (1. - kk)).b); float s = step(.5, fract((vUv.y + uAmt) * 90.)) * uAmt * .06; c.rb += s; }',
@@ -4040,23 +4096,26 @@ var fxOut = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, defi
 function fxSetup(level) {
   var size = renderer.getDrawingBufferSize(new V2()), gl = renderer.getContext();
   fx.hdr = renderer.capabilities.isWebGL2 ? renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float') : renderer.extensions.has('OES_texture_half_float') && renderer.extensions.has('EXT_color_buffer_half_float');
-  fx.on = level > 0; fx.level = level; fx.nMips = level === 2 ? 5 : 2; fx.dof = level === 2;
+  fx.on = level > 0 && SHED[quality.shed].fx > 0; fx.level = level; fx.nMips = level === 2 ? 5 : 2; fx.dof = level === 2; // (round 15: Auto may drop the passes under load)
   if (fx.rt) { if (fx.rt.depthTexture) fx.rt.depthTexture.dispose(); fx.rt.dispose(); fx.rt = null; } if (fx.half) { fx.half.dispose(); fx.half = null; } fx.mips.forEach(function (m) { m.a.dispose(); m.b.dispose(); }); fx.mips = [];
   if (!fx.on) return;
   var type = fx.hdr ? THREE.HalfFloatType : THREE.UnsignedByteType;
-  fx.rt = depth24(new THREE.WebGLRenderTarget(size.x, size.y, { type: type, samples: renderer.capabilities.isWebGL2 && !LOWDEV && level === 2 ? 4 : 0 }));
+  // round 15: multisampling only under 1.5 device pixels per CSS pixel (Bruno: antialias only when the pixel ratio is under 2). At 2 the
+  // edges are already fine, and a 4x half-float target at 2880 x 1800 wrote 166 MB a frame before the passes even began
+  fx.rt = depth24(new THREE.WebGLRenderTarget(size.x, size.y, { type: type, samples: renderer.capabilities.isWebGL2 && !LOWDEV && level === 2 && renderer.getPixelRatio() < 1.5 ? 4 : 0 }));
   var w = Math.max(1, Math.round(size.x / 2)), h = Math.max(1, Math.round(size.y / 2));
-  fx.half = new THREE.WebGLRenderTarget(w, h, { type: type, depthBuffer: false });
+  if (fx.dof) fx.half = new THREE.WebGLRenderTarget(w, h, { type: type, depthBuffer: false }); // (only the depth of field reads a half-size copy)
   for (var i = 0; i < fx.nMips; i++) { fx.mips.push({ a: new THREE.WebGLRenderTarget(w, h, { type: type, depthBuffer: false }), b: new THREE.WebGLRenderTarget(w, h, { type: type, depthBuffer: false }), w: w, h: h }); w = Math.max(1, Math.round(w / 2)); h = Math.max(1, Math.round(h / 2)); }
   fxHigh.uniforms.uTh.value = fx.hdr ? 1 : .92;
   fxOut.defines.NM = fx.nMips; fxOut.defines.DOF = fx.dof ? 1 : 0; fxOut.needsUpdate = true;
-  var u = fxOut.uniforms; u.tDiffuse.value = fx.rt.texture; u.tHalf.value = fx.half.texture; ['tB0', 'tB1', 'tB2', 'tB3', 'tB4'].forEach(function (k, i) { u[k].value = (fx.mips[i] || fx.mips[fx.mips.length - 1]).a.texture; });
+  var u = fxOut.uniforms; u.tDiffuse.value = fx.rt.texture; u.tHalf.value = fx.half ? fx.half.texture : null; ['tB0', 'tB1', 'tB2', 'tB3', 'tB4'].forEach(function (k, i) { u[k].value = (fx.mips[i] || fx.mips[fx.mips.length - 1]).a.texture; });
 }
 function fxResize() { if (fx.level >= 0) fxSetup(fx.level); }
 function renderFx(amt, cx, cy) {
   renderer.setRenderTarget(fx.rt); renderer.clear(); renderer.render(scene, camera);
-  fxHigh.uniforms.tDiffuse.value = fx.rt.texture; fxHigh.uniforms.uTh.value = -1; fxq.run(fxHigh, fx.half); fxHigh.uniforms.uTh.value = fx.hdr ? 1 : .92; // the half-size copy (DOF and bloom read it)
-  fxHigh.uniforms.tDiffuse.value = fx.half.texture; fxq.run(fxHigh, fx.mips[0].a);
+  var dofOn = fx.dof && fxOut.uniforms.uDofOn.value > .5;
+  if (dofOn) { fxHigh.uniforms.tDiffuse.value = fx.rt.texture; fxHigh.uniforms.uTh.value = -1; fxq.run(fxHigh, fx.half); fxHigh.uniforms.uTh.value = fx.hdr ? 1 : .92; } // the half-size copy (the DOF reads it)
+  fxHigh.uniforms.tDiffuse.value = dofOn ? fx.half.texture : fx.rt.texture; fxq.run(fxHigh, fx.mips[0].a); // the bloom's bright pass (round 15: straight from the scene when there is no DOF, one half-size pass fewer)
   for (var i = 0; i < fx.nMips; i++) {
     var M = fx.mips[i], B = fxBlur[i];
     if (i) { fxHigh.uniforms.tDiffuse.value = fx.mips[i - 1].a.texture; fxHigh.uniforms.uTh.value = -1; fxq.run(fxHigh, M.a); fxHigh.uniforms.uTh.value = fx.hdr ? 1 : .92; } // downsample
@@ -4183,22 +4242,112 @@ function applyArtQuality(level) {
 }
 function artResize() { if (fx.level < 0) return; var old = area.size; optimalArea(); if (Math.abs(area.size - old) > .5) { buildGrass(quality.level); leaves.placed = false; } fxResize(); }
 
-// ============================================================================ quality: Auto steps down while frames run long, applied only while parked
-var SOFTGL = (function () { try { var g = renderer.getContext(), e = g.getExtension('WEBGL_debug_renderer_info'), n = e ? g.getParameter(e.UNMASKED_RENDERER_WEBGL) : g.getParameter(g.RENDERER); return /swiftshader|llvmpipe|softpipe|software|basic render/i.test(String(n)); } catch (err) { return false; } })();
-var quality = { level: SOFTGL ? 0 : LOWDEV ? 1 : 2, fx: 1, auto: null, want: null };
+// ============================================================================ quality (round 15)
+// Three tiers: 0 Smooth, 1 Balanced, 2 Pretty. Auto starts from what the device says about itself (the GPU's name, its cores and memory,
+// its screen: the way pmndrs' detect-gpu and Bruno's Quality.js pick) and a short timing while the title is up; then, while you drive, it
+// keeps the frame in budget with steps that never recompile a shader (SHED: the render scale, the lawn's density, the leaf cards, the shadow
+// filter, the depth of field, the post passes), after Jesse Zhou's site and drei's PerformanceMonitor. A change of tier, which rebuilds the
+// lawn and swaps a few shaders (compiled ahead on the title), still waits until the car is parked.
+var GPU_NAME = (function () { try { var g = renderer.getContext(), e = g.getExtension('WEBGL_debug_renderer_info'); return String(e ? g.getParameter(e.UNMASKED_RENDERER_WEBGL) : g.getParameter(g.RENDERER)); } catch (err) { return ''; } })();
+var SOFTGL = /swiftshader|llvmpipe|softpipe|software|basic render/i.test(GPU_NAME);
+function deviceTier() {
+  if (SOFTGL) return { level: 0, why: 'software renderer' };
+  var g = GPU_NAME, cores = navigator.hardwareConcurrency || 0, mem = navigator.deviceMemory || 0, apple = /apple/i.test(g); // (Safari says 4 or 8 cores whatever the phone)
+  var oldGpu = /mali-(4\d\d|t\d+|g31|g51|g52|g57|g68|g71|g72)\b|adreno\D{0,16}([1-4]\d\d|5[0-3]\d|6[0-2]\d)\b|powervr|sgx|videocore|gma\b|intel.{0,30}hd graphics( [2-5]\d{2,3})?\b|geforce (8|9)\d{2}|geforce gt \d|radeon hd [2-7]\d{3}/i.test(g);
+  var bigGpu = /apple m\d|rtx|gtx (9[6-9]0|10[6-8]0|16[56]0)|radeon (rx|pro)|arc\(tm\) a|arc a\d|adreno\D{0,16}(7[3-9]\d|8\d\d)\b|immortalis|mali-g7[1-2]0/i.test(g);
+  var weak = (mem && mem <= 2) || (!apple && cores && cores <= 2);
+  if (LOWDEV) { // phones and tablets: Balanced (Bruno's mobile tier is his lower one), Smooth on an older one
+    if (weak || oldGpu || (mem && mem <= 3) || (!apple && cores && cores <= 4)) return { level: 0, why: 'older phone' };
+    return { level: 1, why: 'phone' };
+  }
+  if (weak || oldGpu && !bigGpu) return { level: /hd graphics [2-4]\d{3}\b|gma\b|geforce (8|9)\d{2}|radeon hd [2-6]\d{3}/i.test(g) || weak ? 0 : 1, why: 'older computer' };
+  if (!bigGpu && /intel|uhd|iris|radeon\(tm\) graphics|radeon graphics|vega \d/i.test(g)) return { level: 1, why: 'built-in graphics' };
+  return { level: 2, why: bigGpu ? 'graphics card' : 'computer' };
+}
+var DEV = deviceTier();
+var quality = { level: DEV.level, start: DEV.level, why: DEV.why, fx: 1, auto: null, want: null, shed: 0 };
+// the pixels a tier draws: its pixel-ratio cap (phones 1.5 at most) and a budget of device pixels, so a big 2x screen is drawn nearer 1.6x
+// (1440 x 900 at 2x is inside the top tier's budget: it draws what it drew before)
+function tierDpr(lvl) {
+  var cap = lvl === 2 ? DPR_MAX : lvl === 1 ? Math.min(1.5, DPR_MAX) : 1, budget = lvl === 2 ? 5.4e6 : lvl === 1 ? 2.2e6 : 1.1e6;
+  var d = Math.min(window.devicePixelRatio || 1, cap, Math.sqrt(budget / Math.max(1, innerWidth * innerHeight)));
+  return d * (lvl === 0 ? (SOFTGL ? .6 : .8) : 1);
+}
+// the steps Auto takes while you drive when frames run long, in order; none recompiles a shader. s: render scale, g: share of the lawn,
+// f: share of the leaf cards (the rest grow to cover), sk: three's 17-tap shadow filter (Pretty) or the 4-tap one, dof, fx: the post passes
+var SHED = [
+  { s: 1, g: 1, f: 1, sk: 1, dof: 1, fx: 1 },
+  { s: .85, g: 1, f: 1, sk: 1, dof: 1, fx: 1 },
+  { s: .85, g: .7, f: .75, sk: 0, dof: 1, fx: 1 },
+  { s: .72, g: .7, f: .75, sk: 0, dof: 0, fx: 1 },
+  { s: .72, g: .55, f: .6, sk: 0, dof: 0, fx: 0 },
+  { s: .6, g: .55, f: .6, sk: 0, dof: 0, fx: 0 }];
+function applyShed(i) { // (a render-scale change re-sizes the canvas and the passes' targets; nothing else is rebuilt)
+  i = clamp(i, 0, SHED.length - 1); var S = SHED[i], lvl = quality.level; quality.shed = i;
+  var d = Math.max(SOFTGL ? .3 : .6, tierDpr(lvl) * S.s); if (Math.abs(d - renderer.getPixelRatio()) > .005) { dpr = d; renderer.setPixelRatio(d); resize(); }
+  grassK(S.g); foliageTier(lvl, S.f); U.uShK.value = lvl === 2 && S.sk ? 1 : 0; fxOut.uniforms.uDofOn.value = S.dof;
+  if (fx.level >= 0 && fx.on !== (lvl > 0 && S.fx > 0)) fxSetup(lvl);
+}
 function applyQuality() {
-  var q = SET.qual, lvl = q === 'high' ? 2 : q === 'low' ? 0 : q === 'medium' ? 1 : quality.auto != null ? quality.auto : (SOFTGL ? 0 : LOWDEV ? 1 : 2);
-  quality.level = lvl; quality.fx = lvl === 2 ? 1 : lvl === 1 ? .6 : .3;
-  var cap = lvl === 0 ? 1 : lvl === 1 ? Math.min(1.5, DPR_MAX) : DPR_MAX; dpr = Math.min(window.devicePixelRatio || 1, cap) * (lvl === 0 ? (SOFTGL ? .6 : .8) : 1); renderer.setPixelRatio(dpr); // the low tier also draws fewer pixels
+  var q = SET.qual, lvl = q === 'high' ? 2 : q === 'low' ? 0 : q === 'medium' ? 1 : quality.auto != null ? quality.auto : quality.start;
+  quality.level = lvl; quality.fx = lvl === 2 ? 1 : lvl === 1 ? .6 : .3; if (q !== 'auto') quality.shed = 0; // a tier you pick is drawn as it is
+  dpr = Math.max(SOFTGL ? .3 : .6, tierDpr(lvl) * SHED[quality.shed].s); renderer.setPixelRatio(dpr);
   var sm = lvl === 2 ? (LOWDEV ? 1024 : 2048) : lvl === 1 ? 1024 : 512; // Bruno Quality.js: 2048, 512 on low
   if (sun.shadow.mapSize.x !== sm) { sun.shadow.mapSize.set(sm, sm); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
-  // the split (a scenery map re-drawn on demand plus a small live one) pays on the low tier, where a shadow pass is dear; the other tiers
-  // draw one map every frame, everything in it, as before
-  shadowMode(!!shTitle);
+  shadowMode(!!shTitle); // (every tier: the scenery's map re-drawn on demand plus a small live one round the car)
   var smd = lvl === 2 ? 1024 : lvl === 1 ? 512 : 256, ext = lvl === 2 ? 20 : lvl === 1 ? 14 : 10; SCD.left = SCD.bottom = -ext; SCD.right = SCD.top = ext; SCD.updateProjectionMatrix(); // the living things' map: round the car
   if (sunD.shadow.mapSize.x !== smd) { sunD.shadow.mapSize.set(smd, smd); if (sunD.shadow.map) { sunD.shadow.map.dispose(); sunD.shadow.map = null; } }
   shadowDirty = true;
-  resize(); applyArtQuality(lvl);
+  resize(); applyArtQuality(lvl); applyShed(quality.shed);
+  html.setAttribute('data-q', ['smooth', 'balanced', 'pretty'][lvl]);
+}
+// every tier's shaders, compiled while the title is up (a tier differs in three materials' LOWQ and the output pass's defines; the lights
+// are the same on every tier now), so a change of tier later swaps programs three already holds instead of compiling them mid-drive
+function precompileTiers() {
+  var mats = [foliage.mat, grassMat, groundMat], had = mats.map(function (m) { return !!m.defines.LOWQ; });
+  function setLow(on) { mats.forEach(function (m) { if (on) m.defines.LOWQ = 1; else delete m.defines.LOWQ; m.needsUpdate = true; }); }
+  setLow(true); renderer.compile(scene, camera); setLow(false); renderer.compile(scene, camera);
+  mats.forEach(function (m, i) { if (had[i]) m.defines.LOWQ = 1; else delete m.defines.LOWQ; m.needsUpdate = true; });
+  var nm = fxOut.defines.NM, dof = fxOut.defines.DOF, q0 = fxq.q.material; fxq.q.material = fxOut;
+  [[2, 0], [5, 1], [5, 0], [2, 1]].forEach(function (v) { fxOut.defines.NM = v[0]; fxOut.defines.DOF = v[1]; fxOut.needsUpdate = true; renderer.compile(fxq.sc, fxq.cam); });
+  fxOut.defines.NM = nm; fxOut.defines.DOF = dof; fxOut.needsUpdate = true; fxq.q.material = q0;
+}
+// Auto while driving: frame times over about 2 s against a 60 fps budget. Long frames step down the SHED ladder (then, at its end, ask for
+// the tier below at the next stop); a run of short ones steps back up, more and more reluctantly if it keeps bouncing (drei's flipflops).
+// A step that doesn't help (a screen held at 30 Hz, a battery saver) is undone and Auto rests; a frame the CPU is busy for can't be helped by
+// drawing less, so that asks for the lower tier (fewer leaves, lawn and cards) instead.
+var gov = { n: 0, sum: 0, cpu: 0, t: 0, good: 0, upHold: 5, hold: 0, lastUp: -1e9, before: 0, bad: 0, from: 0, rest: 0, log: [] };
+function govReset(now, hold) { gov.n = gov.sum = gov.cpu = gov.t = 0; if (hold) gov.hold = now + hold; }
+function govern(dtMs, cpuMs, now) {
+  if (SET.qual !== 'auto' || SOFTGL && !quality.govSoft || state !== 'play' || capMs > 20) { govReset(now); gov.good = 0; return; }
+  if (now < gov.hold || now < gov.rest) return;
+  if (dtMs > 250) { govReset(now, 500); return; } // a hitch or a trip to another tab, not a trend
+  gov.n++; gov.sum += dtMs; gov.cpu += cpuMs; gov.t += dtMs; if (gov.t < 2000) return;
+  var avg = gov.sum / gov.n, cpu = gov.cpu / gov.n; govReset(now);
+  if (gov.bad && gov.before) { // was the last step down worth it?
+    if (avg > gov.before * .94) { if (++gov.bad >= 3) { gov.log.push(['rest', avg]); applyShed(gov.from); gov.bad = 0; gov.before = 0; gov.rest = now + 60000; govReset(now, 1000); return; } }
+    else { gov.bad = 0; gov.before = 0; }
+  }
+  if (avg > 20) { // under 50 fps
+    gov.good = 0;
+    if (now - gov.lastUp < 8000) gov.upHold = Math.min(64, gov.upHold * 2);
+    if (cpu > avg * .7 || quality.shed >= SHED.length - 1) { if (quality.level > 0 && quality.want == null) { quality.want = quality.level - 1; gov.log.push(['tier', avg, cpu]); } return; }
+    if (!gov.bad) { gov.bad = 1; gov.before = avg; gov.from = quality.shed; }
+    gov.log.push(['down', avg, cpu, quality.shed + 1]); applyShed(quality.shed + 1); govReset(now, 600); return;
+  }
+  if (avg < 17.6 && quality.shed > 0) { gov.good += 2; if (gov.good >= gov.upHold) { gov.good = 0; gov.lastUp = now; gov.log.push(['up', avg, cpu, quality.shed - 1]); applyShed(quality.shed - 1); govReset(now, 600); } }
+  else gov.good = 0;
+}
+// the title's timing: once the letters are up, the median of 45 frames; slow on this tier, start one lower (the title is still up, so the
+// change can't catch anyone mid-drive)
+var bench = { t0: 0, dts: [], done: SOFTGL, compiled: SOFTGL };
+function benchTitle(dtMs, now) {
+  if (state !== 'title') return; if (!html.classList.contains('loaded')) { bench.t0 = now; return; }
+  if (!bench.compiled && now - bench.t0 > 900) { bench.compiled = true; try { precompileTiers(); } catch (e) {} bench.t0 = now; return; }
+  if (bench.done || now - bench.t0 < 2600) return;
+  bench.dts.push(dtMs); if (bench.dts.length < 45) return; bench.done = true;
+  var m = bench.dts.slice().sort(function (a, b) { return a - b; })[22]; quality.bench = +m.toFixed(1);
+  if (SET.qual === 'auto' && m > 24 && quality.level > 0) { quality.auto = quality.level - 1; applyQuality(); }
 }
 
 // ============================================================================ per frame
@@ -4255,13 +4404,15 @@ function physicsTick() {
 function frame(now) {
   raf = requestAnimationFrame(frame);
   capMs = COARSE ? (idleNow(now) ? 31 : 13.5) : 0; if (now - last < capMs) return;
-  var c0 = performance.now(), dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
+  var c0 = performance.now(), rawMs = now - last, dt = Math.min(.05, rawMs / 1000 || .016); last = now;
   U.uTime.value = now / 1000;
   if (state === 'intro') { updateIntro(dt); if (intro && (intro.n = (intro.n || 0) + 1) % 2 === 0) shadowDirty = true; } // the letters' shadows follow them down
   if (mailBump > 0) shadowDirty = true;
   for (var li = 0; li < letters.length; li++) if (letters[li].b.sleepState !== CANNON.Body.SLEEPING && !letters[li].inTitle) { shadowDirty = true; break; }
   if (state === 'title') { updateTitleLetters(now); titlePose(now); }
-  if (state !== 'title' && state !== 'boot') { acc += dt; var n = 0; while (acc >= DT && n < 4) { physicsTick(); acc -= DT; n++; } if (n === 4) acc = 0; }
+  // (round 15: a slow frame catches up at most 4 ticks, and past 2 only while the frame has spent under 8 ms, so a slow phone can't spiral:
+  // it runs a touch slower instead)
+  if (state !== 'title' && state !== 'boot') { acc += dt; var n = 0; while (acc >= DT && n < 4 && (n < 2 || performance.now() - c0 < 8)) { physicsTick(); acc -= DT; n++; } if (acc >= DT) acc = 0; }
   for (var i = 0; i < dyn.length; i++) { var o = dyn[i]; if (o.inTitle || o.fly || o.gone) continue; var b = o.b; if (b.position.y < -12) { var sp = o.start.p; b.position.set(sp.x, sp.y, sp.z); b.velocity.set(0, 0, 0); b.angularVelocity.set(0, 0, 0); } if (b.sleepState !== CANNON.Body.SLEEPING || o.dirty !== false) { o.m.position.set(b.position.x, b.position.y, b.position.z); o.m.quaternion.set(b.quaternion.x, b.quaternion.y, b.quaternion.z, b.quaternion.w); o.dirty = b.sleepState !== CANNON.Body.SLEEPING; } }
   if (state === 'play' || state === 'map' || state === 'enter' || state === 'intro') { updateVisualCar(dt * 2); updateTracks(); nipFrame(); nipJumpAnim(now); }
   if (state === 'play') { updateView(dt); applyPlayCam(); }
@@ -4285,15 +4436,15 @@ function frame(now) {
   engineSound(dt);
   drawFrame(dt, now);
   // adaptive quality (Jesse Zhou): decided while driving, applied only once parked and untouched (or with the map open)
-  if (state === 'play' && SET.qual === 'auto' && capMs < 20) { fpsAcc += dt; fpsN++; if (fpsN >= 90) { var avg = fpsAcc / fpsN; fpsAcc = 0; fpsN = 0; if (avg > .03 && quality.level > 0) quality.want = quality.level - 1; } }
+  var cpuMs = performance.now() - c0; govern(rawMs, cpuMs, now); if (!bench.done || !bench.compiled) benchTitle(rawMs, now);
   if (quality.pend && (state !== 'play' || car.xzSpeed < .3)) { quality.pend = false; applyQuality(); }
-  if (quality.want != null && SET.qual === 'auto' && (state === 'map' || (state === 'play' && quietNow(now)))) { quality.auto = quality.want; quality.want = null; fpsAcc = fpsN = 0; applyQuality(); }
+  if (quality.want != null && SET.qual === 'auto' && (state === 'map' || (state === 'play' && quietNow(now)))) { quality.auto = quality.want; quality.want = null; quality.shed = 0; govReset(now, 1500); applyQuality(); }
   window.__frameCpu = performance.now() - c0;
 }
 function startLoop() { if (running) return; running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
 function stopLoop() { if (!running) return; running = false; cancelAnimationFrame(raf); }
 function resize() {
-  renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); viewOverflow();
+  readViewport(); renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); viewOverflow();
   var s = renderer.getDrawingBufferSize(new V2()); U.uRes.value.set(s.x, s.y); U.uAsp.value = camera.aspect;
   if (post && (post.rt.width !== s.x || post.rt.height !== s.y)) { var ort = post.rt; post.rt = depth24(new THREE.WebGLRenderTarget(s.x, s.y, { samples: ort.samples })); post.mat.uniforms.tDiffuse.value = post.rt.texture; if (ort.depthTexture) ort.depthTexture.dispose(); ort.dispose(); }
   artResize();
@@ -4320,7 +4471,7 @@ var fontsReady = doc.fonts && doc.fonts.load ? Promise.race([Promise.all([doc.fo
 state = 'boot'; startLoop();
 if (!FROM) { lettersHome(); showTitle(); titlePose(0); }
 fontsReady.then(function () {
-  makeTags(); makePaint(); signTexs.forEach(function (t) { t.needsUpdate = true; });
+  makeTags(); makePaint(); signTexs.forEach(function (t) { t.redraw(); }); // (the signs are drawn again in their own faces: a quicker build could beat the fonts to it)
   if (state === 'title') setTitleLook(true);
   setTimeout(function () { try { buildMapImage(); } catch (e) { if (window.console) console.warn(e); } }, FROM ? 200 : 1600);
   if (FROM) {
