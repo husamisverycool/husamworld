@@ -1030,7 +1030,7 @@ var U = {
   // round 10 B: the terrain data every material can read (bounce, waterline, grass colour under a blade), the tracks, the noise
   uMask: { value: null }, uWorld: { value: 280 }, uNoise: { value: null }, uTrack: { value: null },
   uDry: { value: new C3('#ffa94e') }, uShallow: { value: new C3('#5bc2b9') }, uDeep: { value: new C3('#13375f') }, uGrass: { value: new C3('#b8b62e') }, uGrassB: { value: new C3('#c9b53a') },
-  uCar: { value: new V3() }, uCarV: { value: new V3() }, uMat: { value: 1 }, uShQ: { value: 1 }
+  uCar: { value: new V3() }, uCarV: { value: new V3() }, uMat: { value: 1 }, uShQ: { value: 1 }, uFloorSh: { value: null }, uFloorC: { value: new V3(0, 0, 36) }
 };
 var BEND_GLSL = 'uniform float uBend, uBendR; uniform vec3 uBendC;\n' +
   'vec3 bend(vec3 w){ if (uBend < .001) return w; float R = uBendR / uBend; vec2 d = w.xz - uBendC.xz; float r = length(d); if (r < 1e-4) return vec3(w.x, w.y - R + R, w.z);' +
@@ -1077,12 +1077,18 @@ var SHADOW_F = '#include <packing>\n#if NUM_DIR_LIGHT_SHADOWS > 0\n#include <sha
   'float sh4(sampler2D m, vec2 size, float bias, vec4 sc){ vec3 c = sc.xyz / sc.w; c.z += bias; if (c.x < 0. || c.x > 1. || c.y < 0. || c.y > 1. || c.z > 1.) return 0.;\n' +
   ' vec2 f = c.xy * size - .5, i = floor(f), w = f - i, t = 1. / size, uv = (i + .5) * t;\n' +
   ' return 1. - mix(mix(shTap(m, uv, c.z), shTap(m, uv + vec2(t.x, 0.), c.z), w.x), mix(shTap(m, uv + vec2(0., t.y), c.z), shTap(m, uv + t, c.z), w.x), w.y); }\n' +
+  'float dynShadow(){\n#if NUM_DIR_LIGHT_SHADOWS > 1\n DirectionalLightShadow s2 = directionalLightShadows[1];\n' +
+  ' if (uShQ > .5) return 1. - getShadow(directionalShadowMap[1], s2.shadowMapSize, s2.shadowBias, s2.shadowRadius, vSC2); return sh4(directionalShadowMap[1], s2.shadowMapSize, s2.shadowBias, vSC2);\n' +
+  '#else\n return 0.;\n#endif\n }\n' +
   'float dropShadow(){ DirectionalLightShadow s = directionalLightShadows[0]; float d;\n' +
   ' if (uShQ > .5) d = 1. - getShadow(directionalShadowMap[0], s.shadowMapSize, s.shadowBias, s.shadowRadius, vSC); else d = sh4(directionalShadowMap[0], s.shadowMapSize, s.shadowBias, vSC);\n' +
-  '#if NUM_DIR_LIGHT_SHADOWS > 1\n DirectionalLightShadow s2 = directionalLightShadows[1];\n' +
-  ' if (uShQ > .5) d = max(d, 1. - getShadow(directionalShadowMap[1], s2.shadowMapSize, s2.shadowBias, s2.shadowRadius, vSC2)); else d = max(d, sh4(directionalShadowMap[1], s2.shadowMapSize, s2.shadowBias, vSC2));\n' +
-  '#endif\n return d; }\n' +
-  '#else\nfloat dropShadow(){ return 0.; }\n#endif\n';
+  ' return max(d, dynShadow()); }\n' +
+  // the floor (ground, grass, water, flowers, leaves) on the low tier reads the scenery's shadow from a mask baked flat over the ground
+  // whenever that map is re-drawn: one bilinear fetch instead of four depth taps, for the pixels that are most of the screen
+  'uniform sampler2D uFloorSh; uniform vec3 uFloorC;\n' +
+  'float dropShadowF(vec2 xz){ if (uShQ > .5) return dropShadow(); vec2 uv = (xz - uFloorC.xy) / (2. * uFloorC.z) + .5;\n' +
+  ' float st = uv.x < 0. || uv.x > 1. || uv.y < 0. || uv.y > 1. ? 0. : texture2D(uFloorSh, uv).r; return max(st, dynShadow()); }\n' +
+  '#else\nfloat dropShadow(){ return 0.; }\nfloat dropShadowF(vec2 xz){ return 0.; }\n#endif\n';
 var WORLD_V = [BEND_GLSL, WIND_GLSL, SHADOW_V,
   'attribute float pal; varying float vPal; varying vec3 vN; varying vec3 vW; varying float vD;',
   'void main(){ float sw = step(63.5, pal); vPal = pal - sw * 64.; vec4 p = vec4(position, 1.); vec3 n = normal;',
@@ -1130,7 +1136,8 @@ sun.shadow.autoUpdate = false; sun.shadow.needsUpdate = true; SC.layers.set(1); 
 var sunD = new THREE.DirectionalLight(0xffffff, 0); sunD.castShadow = true; sunD.shadow.mapSize.set(512, 512); sunD.shadow.bias = -.001; sunD.shadow.normalBias = .06;
 var SCD = sunD.shadow.camera; SCD.near = 1; SCD.far = 140; SCD.left = -22; SCD.right = 22; SCD.top = 22; SCD.bottom = -22; SCD.updateProjectionMatrix(); SCD.layers.set(2);
 scene.add(sun, sun.target, sunD, sunD.target);
-var shadowDirty = true, shSnap = { x: 1e9, z: 1e9, d: new V3() };
+var shadowDirty = true, shSnap = { x: 1e9, z: 1e9, d: new V3() }, shAt = { x: 0, z: 0 }, floorAt = { x: 0, z: 0 }, floorNeed = false;
+var floorRT = new THREE.WebGLRenderTarget(512, 512, { depthBuffer: false, stencilBuffer: false }); U.uFloorSh.value = floorRT.texture;
 function casts(o, dynamic) { o.traverse(function (m) { if (m.isMesh || m.isPoints) { m.castShadow = true; m.layers.enable(dynamic ? 2 : 1); } }); return o; }
 // Bruno Ligthing.js: spherical phi 0.63, theta 0.72 (the light's own direction, from the ground up)
 var SUN_DIR = new V3().setFromSphericalCoords(1, .63, .72);
@@ -1138,7 +1145,7 @@ U.uL.value.copy(SUN_DIR);
 function placeSun(fx, fz) {
   var sx = Math.round(fx / 3) * 3, sz = Math.round(fz / 3) * 3; // the scenery's map moves in 3 m steps (its shadows are fixed in the world, so a step never shows)
   if (sx !== shSnap.x || sz !== shSnap.z || shSnap.d.dot(SUN_DIR) < .99999) { shSnap.x = sx; shSnap.z = sz; shSnap.d.copy(SUN_DIR); shadowDirty = true; }
-  if (shadowDirty) { sun.target.position.set(sx, 0, sz); sun.position.set(sx + SUN_DIR.x * 70, SUN_DIR.y * 70, sz + SUN_DIR.z * 70); sun.target.updateMatrixWorld(); sun.shadow.needsUpdate = true; shadowDirty = false; window.__shN = (window.__shN || 0) + 1; }
+  if (shadowDirty) { shAt.x = sx; shAt.z = sz; sun.target.position.set(sx, 0, sz); sun.position.set(sx + SUN_DIR.x * 70, SUN_DIR.y * 70, sz + SUN_DIR.z * 70); sun.target.updateMatrixWorld(); sun.shadow.needsUpdate = true; shadowDirty = false; window.__shN = (window.__shN || 0) + 1; }
   var cx = car.pos.x, cz = car.pos.z; sunD.target.position.set(cx, 0, cz); sunD.position.set(cx + SUN_DIR.x * 70, SUN_DIR.y * 70, cz + SUN_DIR.z * 70); sunD.target.updateMatrixWorld();
 }
 
@@ -1188,7 +1195,7 @@ function fitText(x, text, weight, size, family, maxW) { x.font = weight + ' ' + 
 // World axes: x east, z south (the map is drawn north up), y up. The island is about 200 m square (Bruno's Terrain.size = 192),
 // sea all round. The road is one closed loop: the Fresno start line on the south straight, round the island clockwise (east,
 // north, west), and the Cambridge finish a little before Fresno on the same straight: the long way round.
-var ISLAND = 100, WORLD = 280, CHUNK = WORLD / 6, chunkMeshes = [], lampHeads = []; // CHUNK: the culling grid for the art (round 10 B) // WORLD: the terrain plane and the physics floor, sea included
+var ISLAND = 100, WORLD = 280, CHUNK = WORLD / 12, chunkMeshes = [], lampHeads = []; // CHUNK: the culling grid for the art (round 10 B) // WORLD: the terrain plane and the physics floor, sea included
 var ROAD_W = 8;               // Bruno's circuit is about four car widths wide
 var CTRL = [[-58, 74], [-20, 76], [18, 76], [52, 70], [74, 50], [80, 20], [70, -6], [80, -32], [72, -60], [46, -76], [12, -70], [-18, -80], [-50, -74], [-76, -54], [-80, -22], [-70, 4], [-82, 32], [-78, 60]];
 // closed centripetal Catmull-Rom, resampled to equal steps
@@ -1349,14 +1356,22 @@ var WATER_Y = -.3;
 // the terrain colour (dirt -> shallow -> deep by depth, grass by G); slabs by R x noise (a re-made tile texture: running bond, each tile
 // its own shade, bevelled joints); asphalt by A with its edge cut at the half-way line and anti-aliased by fwidth, flecked with grit.
 // The grass floor takes the shadow colour (Bruno's shadowNode = G): the lawn reads as lit tips on a dark mat. Normal straight up.
-var groundMat = worldMat({ u: { uSlabA: { value: new C3('#a87762') }, uSlabB: { value: new C3('#ffcf8b') }, uAsph: { value: new C3('#2a2130') } },
+var groundMat = worldMat({ u: { uSlabA: { value: new C3('#a87762') }, uSlabB: { value: new C3('#ffcf8b') }, uAsph: { value: new C3('#2a2130') }, uGBake: { value: null } },
   vs: [BEND_GLSL, SHADOW_V, 'uniform sampler2D uMask; uniform float uWorld; varying vec3 vW; varying vec2 vUv; varying float vD;',
     'void main(){ vec4 w = modelMatrix * vec4(position, 1.); vUv = w.xz / uWorld + .5; vec4 m = texture2D(uMask, vUv); w.y -= 1.5 * m.b * (1. - smoothstep(.5, .95, m.a)); vW = w.xyz;',
     '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + vec3(0., .06, 0.), 1.));', '#endif',
     ' w.xyz = bend(w.xyz); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n'),
-  fs: [SHADOW_F, LIGHT_GLSL, 'uniform float uMat; uniform vec3 uSlabA, uSlabB, uAsph; varying vec3 vW; varying vec2 vUv; varying float vD;',
+  fs: [SHADOW_F, LIGHT_GLSL, 'uniform float uMat; uniform vec3 uSlabA, uSlabB, uAsph; uniform sampler2D uGBake; varying vec3 vW; varying vec2 vUv; varying float vD;',
     'float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
-    'void main(){ vec4 m = terrainAt(vW.xz); vec3 c = L2(terrainCol(m, vW.xz));',
+    'void main(){',
+    // the low tier reads the ground's colour from a bake (dirt, grass and slabs mixed once per palette, see bakeGround) and works out
+    // only the wheel tracks and the asphalt's crisp edge per pixel: three fetches instead of five, a fraction of the arithmetic
+    '#ifdef LOWQ',
+    ' vec4 m = texture2D(uMask, vUv); float tr = texture2D(uTrack, vUv).r; vec4 bk = texture2D(uGBake, vUv); vec3 c = bk.rgb * bk.rgb; float sk = bk.a;',
+    ' if (tr > .004) { vec4 m2 = m; m2.g *= 1. - tr; c = mix(L2(terrainCol(m2, vW.xz)), L2(mix(uSlabA, uSlabB, .72)), sk); } m.g *= 1. - tr;',
+    ' float aw = max(fwidth(m.a), 1e-4) * .8; float ak = smoothstep(.5 - aw, .5 + aw, m.a); c = mix(c, L2(uAsph), ak);',
+    '#else',
+    ' vec4 m = terrainAt(vW.xz); vec3 c = L2(terrainCol(m, vW.xz));',
     // slabs: 1.05 m tiles in a running bond, each its own shade, joints and a light bevel (Bruno's slab texture, re-made)
     ' float sn = texture2D(uNoise, vW.xz * .03).r; float sk = smoothstep(.34, .56, m.r * (.55 + 1.1 * sn));',
     '#ifdef LOWQ', ' c = mix(c, L2(mix(uSlabA, uSlabB, .72)), sk);', '#else',
@@ -1368,11 +1383,41 @@ var groundMat = worldMat({ u: { uSlabA: { value: new C3('#a87762') }, uSlabB: { 
     ' float aw = max(fwidth(m.a), 1e-4) * .8; float ak = smoothstep(.5 - aw, .5 + aw, m.a);',
     '#ifdef LOWQ', ' c = mix(c, L2(uAsph), ak);', '#else',
     ' if (ak > .001) { vec2 g = floor(vW.xz * 22.); float gr = h21(g); vec3 as = L2(uAsph) * (.94 + .1 * h21(floor(vW.xz * 2.3))); as = mix(as, L2(vec3(.86, .8, 1.)), step(.992, gr) * .7); c = mix(c, as, ak); }', '#endif',
+    '#endif',
     ' float grassMat = m.g * (1. - ak) * (1. - sk) * uMat;',
-    ' vec3 col = shade(c, vec3(0., 1., 0.), dropShadow(), grassMat, vec3(vW.x, 1., vW.z), 0.);',
+    ' vec3 col = shade(c, vec3(0., 1., 0.), dropShadowF(vW.xz), grassMat, vec3(vW.x, 1., vW.z), 0.);',
     ' gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
+// the ground's bake for the low tier: every mask texel's colour (dirt, grass, water gradient, slabs) under the current palette
+var gBake = (function () {
+  var rt = new THREE.WebGLRenderTarget(MASK_N, MASK_N, { depthBuffer: false, stencilBuffer: false }); rt.texture.minFilter = rt.texture.magFilter = THREE.LinearFilter;
+  var u = { uSlabA: groundMat.uniforms.uSlabA, uSlabB: groundMat.uniforms.uSlabB }; ['uMask', 'uNoise', 'uWorld', 'uTrack', 'uDry', 'uShallow', 'uDeep', 'uGrass', 'uGrassB'].forEach(function (k) { u[k] = U[k]; });
+  var mat = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: u, vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0., 1.); }',
+    fragmentShader: [TERRAIN_GLSL, 'uniform vec3 uSlabA, uSlabB; varying vec2 vUv;',
+      'void main(){ vec2 xz = (vUv - .5) * uWorld; vec4 m = texture2D(uMask, vUv); vec3 c = L2(terrainCol(m, xz)); float sn = texture2D(uNoise, xz * .03).r; float sk = smoothstep(.34, .56, m.r * (.55 + 1.1 * sn));',
+      ' c = mix(c, L2(mix(uSlabA, uSlabB, .72)), sk); gl_FragColor = vec4(sqrt(c), sk); }'].join('\n') });
+  groundMat.uniforms.uGBake.value = rt.texture;
+  return { rt: rt, mat: mat, key: '', t: -1e9 };
+})();
+function bakeGround(force) {
+  var key = [U.uDry.value, U.uShallow.value, U.uDeep.value, U.uGrass.value, U.uGrassB.value].map(function (c) { return c.getHexString(); }).join(''), now = performance.now();
+  if (!force && (key === gBake.key || now - gBake.t < 400)) return; gBake.key = key; gBake.t = now;
+  var q = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), gBake.mat), sc = new THREE.Scene(), cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1); q.frustumCulled = false; sc.add(q);
+  var rt0 = renderer.getRenderTarget(); renderer.setRenderTarget(gBake.rt); renderer.render(sc, cam); renderer.setRenderTarget(rt0); q.geometry.dispose();
+}
+// the ground's mesh (round 10, the frame budget): the same grid, but where the land is flat (no water under any corner) its cells are merged
+// into blocks of up to 8 x 8, so the vertex work goes where the ground actually dips (banks, channels, the sea shelf); the colour is per pixel
 var groundMesh = (function () {
-  var seg = LOWDEV ? 112 : 200, g = new THREE.PlaneGeometry(WORLD, WORLD, seg, seg).rotateX(-PI / 2);
+  var seg = LOWDEV ? 112 : 200, c = WORLD / seg, N1 = seg + 1, flat = new Uint8Array(N1 * N1), used = new Uint8Array(seg * seg), P = [];
+  for (var j = 0; j <= seg; j++) for (var i = 0; i <= seg; i++) {
+    var x = -WORLD / 2 + i * c, z = -WORLD / 2 + j * c, f = 1;
+    for (var dz = -1; dz <= 1 && f; dz++) for (var dx = -1; dx <= 1 && f; dx++) if (maskAt(x + dx * MPX, z + dz * MPX, 2) > .014) f = 0; // (a dip under 2 cm counts as flat)
+    flat[j * N1 + i] = f;
+  }
+  function blockFlat(i0, j0, S) { if (i0 + S > seg || j0 + S > seg) return false; for (var j = j0; j <= j0 + S; j++) for (var i = i0; i <= i0 + S; i++) if (!flat[j * N1 + i]) return false; for (var jj = j0; jj < j0 + S; jj++) for (var ii = i0; ii < i0 + S; ii++) if (used[jj * seg + ii]) return false; return true; }
+  function emit(i0, j0, S) { var x0 = -WORLD / 2 + i0 * c, z0 = -WORLD / 2 + j0 * c, x1 = x0 + S * c, z1 = z0 + S * c; P.push(x0, 0, z0, x0, 0, z1, x1, 0, z1, x0, 0, z0, x1, 0, z1, x1, 0, z0); for (var jj = j0; jj < j0 + S; jj++) for (var ii = i0; ii < i0 + S; ii++) used[jj * seg + ii] = 1; }
+  [8, 4, 2].forEach(function (S) { for (var j0 = 0; j0 < seg; j0 += S) for (var i0 = 0; i0 < seg; i0 += S) if (blockFlat(i0, j0, S)) emit(i0, j0, S); });
+  for (var j2 = 0; j2 < seg; j2++) for (var i2 = 0; i2 < seg; i2++) if (!used[j2 * seg + i2]) emit(i2, j2, 1);
+  var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
   var m = new THREE.Mesh(g, groundMat); m.receiveShadow = true; m.frustumCulled = false; scene.add(m); return m;
 })();
 // the sea beyond the terrain: a wide skirt at the deep colour (it also closes the title globe)
@@ -1399,17 +1444,18 @@ var waterMat = worldMat({ vs: [BEND_GLSL, SHADOW_V, 'varying vec3 vW; varying fl
     ' float band = fract(base); float bw = fwidth(base); float rip = 1. - smoothstep(bw * .8, bw * 1.8, abs(band - .5)); rip *= smoothstep(.5, .6, nz + .16 - b * .15);',
     ' rip *= (1. - smoothstep(.5, .78, b)) * (1. - smoothstep(70., 160., vD));',
     ' float a = max(shore, rip * .9); if (a < .02) discard;',
-    ' vec3 col = shade(vec3(1.), vec3(0., 1., 0.), dropShadow(), 0., vec3(vW.x, 1., vW.z), 0.);',
+    ' vec3 col = shade(vec3(1.), vec3(0., 1., 0.), dropShadowF(vW.xz), 0., vec3(vW.x, 1., vW.z), 0.);',
     ' gl_FragColor = vec4(S2(fogIt(col, vD)), a * .92); }'].join('\n') });
-var waterMesh = new THREE.Mesh((function () { // only the cells that hold water (a 2.2 m grid), so dry land costs the water shader nothing
-  var n = 128, c = WORLD / n, P = [];
+var waterMesh = (function () { // only the cells that hold water (a 2.2 m grid), so dry land costs the water shader nothing; one mesh per culling chunk
+  var n = 128, c = WORLD / n, by = {}, grp = new THREE.Group();
   for (var iz = 0; iz < n; iz++) for (var ix = 0; ix < n; ix++) {
     var x0 = -WORLD / 2 + ix * c, z0 = -WORLD / 2 + iz * c, wet = false;
     for (var sz = 0; sz <= 4 && !wet; sz++) for (var sx = 0; sx <= 4 && !wet; sx++) if (maskAt(x0 + sx * c / 4, z0 + sz * c / 4, 2) > .13) wet = true;
-    if (wet) P.push(x0, WATER_Y, z0, x0, WATER_Y, z0 + c, x0 + c, WATER_Y, z0 + c, x0, WATER_Y, z0, x0 + c, WATER_Y, z0 + c, x0 + c, WATER_Y, z0);
+    if (wet) { var k = chunkKey(x0 + c / 2, z0 + c / 2); (by[k] = by[k] || []).push(x0, WATER_Y, z0, x0, WATER_Y, z0 + c, x0 + c, WATER_Y, z0 + c, x0, WATER_Y, z0, x0 + c, WATER_Y, z0 + c, x0 + c, WATER_Y, z0); }
   }
-  var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); return g;
-})(), waterMat); waterMesh.frustumCulled = false; waterMesh.renderOrder = 2; scene.add(waterMesh);
+  Object.keys(by).forEach(function (k) { var g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(by[k], 3)); g.computeBoundingSphere(); var m = new THREE.Mesh(g, waterMat); m.renderOrder = 2; grp.add(m); chunkMeshes.push(m); });
+  scene.add(grp); return grp;
+})();
 
 // ============================================================================ physics world (cannon 0.6.2), Bruno's clock
 // Bruno's world steps 2/60 s per 1/60 s frame (Ticker.scale = 2) with gravity 9.81; the vehicle's impulses are worked out for
@@ -1875,14 +1921,15 @@ var FOL_V = [BEND_GLSL, WIND_GLSL, SHADOW_V, '#define NO_FRAGCOORD', LIGHT_GLSL,
   'void main(){ float c = cos(cr.z), s = sin(cr.z); vec2 q = vec2(c * cr.x - s * cr.y, s * cr.x + c * cr.y) * uQuad; vec3 lp = ctr + vec3(q, 0.);',
   ' vec3 nl = normalize(mix(lp, normalize(ctr + 1e-4), .85)); mat4 im = modelMatrix * instanceMatrix; vec4 w = im * vec4(lp, 1.);',
   ' vec2 wd = windAt(w.xz); w.xz += wd * uSway * max(w.y, 0.) * .1;',
-  ' vN = normalize(mat3(im) * nl); vW = w.xyz; vUv = cr.xy + .5; vA = colA; vB = colB; vSee = see; vRot = length(wd) * 2.2;',
+  ' vN = normalize(mat3(im) * nl); vW = w.xyz; vA = colA; vB = colB; vSee = see; vRot = length(wd) * 2.2; float rc = cos(vRot), rs = sin(vRot); vUv = vec2(rc * cr.x - rs * cr.y, rs * cr.x + rc * cr.y) + .5;',
   '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + uL * 1., 1.));', '#endif',
   ' w.xyz = bend(w.xyz); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv;',
   // the low tier lights each card at its corners (the same model, no cast shadow; a card is small and nearly flat) and leaves the
   // fragment only the leaf cut: the crowns cost a third as much on a software renderer and look the same
   '#ifdef LOWQ', ' vLit = shade(L2(mix(colA, colB, smoothstep(0., 1., dot(vN, uL)))), vN, 0., 0., vW, 0.); vFk = fogK(vD);', '#endif', ' }'].join('\n');
 var FOL_ALPHA = 'uniform sampler2D uLeaf; uniform vec3 uCarS; uniform float uAsp, uTh;\n' +
-  'float leafA(vec2 uv, float rot){ vec2 p = uv - .5; float c = cos(rot), s = sin(rot); p = vec2(c * p.x - s * p.y, s * p.x + c * p.y) + .5; return texture2D(uLeaf, p).r; }\n';
+  'float leafA(vec2 uv, float rot){ return texture2D(uLeaf, uv).r; }\n' + // the card's uv arrives already turned by the wind (turned per corner: the same picture, no sin and cos per pixel)
+  '';
 var FOL_F = [SHADOW_F, LIGHT_GLSL, FOL_ALPHA, 'varying vec2 vUv; varying vec3 vN; varying vec3 vW; varying float vD; varying vec3 vA; varying vec3 vB; varying float vSee; varying float vRot; varying vec3 vLit; varying float vFk;',
   'void main(){ float sdf = leafA(vUv, vRot); float a = sdf;',
   ' if (vSee > .5) { vec2 q = gl_FragCoord.xy / uRes - uCarS.xy; q.x *= uAsp; float fade = smoothstep(uCarS.z * 3., uCarS.z * 15., length(q)); a = sdf * (fade * (1. - uTh) + uTh); }',
@@ -1892,7 +1939,7 @@ var FOL_F = [SHADOW_F, LIGHT_GLSL, FOL_ALPHA, 'varying vec2 vUv; varying vec3 vN
   ' vec3 col = shade(base, n, dropShadow(), 0., vW, 0.);', ' gl_FragColor = outCol(fogIt(col, vD)); }', '#endif'].join('\n');
 var FOL_DEPTH_V = [WIND_GLSL, 'attribute vec3 ctr; attribute vec3 cr; uniform float uQuad, uSway; varying vec2 vUv; varying float vRot;',
   'void main(){ float c = cos(cr.z), s = sin(cr.z); vec2 q = vec2(c * cr.x - s * cr.y, s * cr.x + c * cr.y) * uQuad; vec4 w = modelMatrix * instanceMatrix * vec4(ctr + vec3(q, 0.), 1.);',
-  ' vec2 wd = windAt(w.xz); w.xz += wd * uSway * max(w.y, 0.) * .1; vUv = cr.xy + .5; vRot = length(wd) * 2.2; gl_Position = projectionMatrix * viewMatrix * w; }'].join('\n');
+  ' vec2 wd = windAt(w.xz); w.xz += wd * uSway * max(w.y, 0.) * .1; vRot = length(wd) * 2.2; float rc = cos(vRot), rs = sin(vRot); vUv = vec2(rc * cr.x - rs * cr.y, rs * cr.x + rc * cr.y) + .5; gl_Position = projectionMatrix * viewMatrix * w; }'].join('\n');
 var FOL_DEPTH_F = ['#include <packing>', FOL_ALPHA, 'varying vec2 vUv; varying float vRot;', 'void main(){ if (leafA(vUv, vRot) < .5) discard; gl_FragColor = packDepthToRGBA(gl_FragCoord.z); }'].join('\n');
 function foliageGeo() { // 80 cards in a unit sphere, as one indexed geometry; a quality tier draws the first n of them (setDrawRange)
   var r = rng(4711), n = 80, C = new Float32Array(n * 12), R = new Float32Array(n * 12), I = [];
@@ -2231,7 +2278,10 @@ var carParts = {};
     return { c: c, spin: spin, base: new V3(p[0], 0, p[1]) };
   });
   carParts.steer = 0;
-  carG.traverse(function (o) { if (o.isMesh) o.castShadow = true; });
+  // one shadow for the whole truck (a caster only the shadow camera sees: the body and the four wheels at rest), one draw instead of ten
+  var sg = merge([body.geometry].concat(carParts.wheels.map(function (W) { return wgeo.clone().translate(W.c.position.x, W.c.position.y, W.c.position.z); })));
+  var proxy = new THREE.Mesh(sg, matWorld); proxy.castShadow = true; proxy.layers.set(2); carG.add(proxy);
+  carG.traverse(function (o) { if (o.isMesh && o !== proxy) o.castShadow = false; });
 })();
 // boost trails: two ribbons from the rear corners (-1.28, 0.1, +-0.55), pink to white (Bruno's Trails)
 var trails = (function () {
@@ -2858,6 +2908,8 @@ LOCALS.forEach(function (L, i) {
   var inner = new THREE.Group(); outer.add(inner);
   var mb = meshOf(body), mh = meshOf(head), me = meshOf(eyes), ma = meshOf(armL), mr = meshOf(armR);
   var hg = new THREE.Group(); hg.position.set(0, .93, 0); hg.add(mh); hg.add(me); inner.add(mb); inner.add(hg);
+  [mb, mh, me, ma, mr].forEach(function (m) { m.castShadow = false; }); // one shadow caster per local (body and head), seen only by the shadow camera
+  var lsh = new THREE.Mesh(merge([mb.geometry, mh.geometry.clone().translate(0, .93, 0)]), matWorld); lsh.castShadow = true; lsh.layers.set(2); inner.add(lsh);
   ma.position.set(-.24, .68, 0); mr.position.set(.24, .68, 0); ma.rotation.z = -.18; mr.rotation.z = .18; inner.add(ma); inner.add(mr);
   scene.add(outer);
   var st = addStatic(x, 0, z, .35, .9, .35, 0, 'local', 'local');
@@ -3487,7 +3539,7 @@ var GRASS_V = [WIND_GLSL, SHADOW_V, TERRAIN_GLSL,
   '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w + vec3(0., .06, 0.), 1.));', '#endif',
   ' vec4 mv = viewMatrix * vec4(w, 1.); vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n');
 var GRASS_F = [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying float vTip; varying vec3 vCol; varying float vD; varying float vG;',
-  'void main(){ vec3 col = shade(L2(vCol), vec3(0., 1., 0.), dropShadow(), (1. - vTip) * vG, vec3(vW.x, 1., vW.z), 0.);',
+  'void main(){ vec3 col = shade(L2(vCol), vec3(0., 1., 0.), dropShadowF(vW.xz), (1. - vTip) * vG, vec3(vW.x, 1., vW.z), 0.);',
   ' gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n');
 var GRU = { uCenter: { value: new V2() }, uSize: { value: 60 }, uBW: { value: .1 }, uBH: { value: .6 } };
 var grassMat = worldMat({ vs: GRASS_V, fs: GRASS_F, u: GRU }); grassMat.uniforms.uCar = U.uCar; grassMat.uniforms.uCarV = U.uCarV;
@@ -3532,7 +3584,7 @@ var flowers = (function () {
     '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + uL * .25, 1.));', '#endif',
     ' vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n').replace('varying vec3 vW;', 'uniform vec3 uL; varying vec3 vW;'),
     fs: [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
-      'void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 col = shade(L2(vC), n, dropShadow(), 0., vW, 0.); gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
+      'void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 col = shade(L2(vC), n, dropShadowF(vW.xz), 0., vW, 0.); gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
   PZ_BEDS.forEach(function (bd) { for (var j = 0; j < (bd.ring ? 60 : 26); j++) { var a = r() * TAU, rr = bd.ring ? bd.r + .5 + r() * .7 : r() * bd.r; heads.push({ x: bd.p.x + Math.cos(a) * rr * (bd.ring ? 1 : .55), z: bd.p.z + Math.sin(a) * rr, y: bd.y || 0, ry: TAU * r(), s: .8 + r() * .3, c: cols[Math.floor(r() * cols.length)] }); } });
   var mesh = new THREE.InstancedMesh(geo, mat, heads.length), ob = new THREE.Object3D();
   heads.forEach(function (h, i) { ob.position.set(h.x, h.y || 0, h.z); ob.rotation.set(0, h.ry, 0); ob.scale.setScalar(h.s); ob.updateMatrix(); mesh.setMatrixAt(i, ob.matrix); mesh.setColorAt(i, h.c); });
@@ -3551,9 +3603,16 @@ var pebbles = (function () {
     var big = shore && r() < .35, s = big ? .45 + r() * .5 : .12 + r() * .2;
     list.push({ x: x, z: z, s: s, sy: s * (.45 + r() * .35), ry: r() * TAU, rx: (r() - .5) * .5 });
   }
-  var geo = merge([place(G.blob, 17, new V3(0, -.18, 0), new Q(), new V3(1, 1, 1))]), mesh = new THREE.InstancedMesh(geo, matWorld, list.length), ob = new THREE.Object3D();
-  list.forEach(function (p, i) { ob.position.set(p.x, groundY(p.x, p.z) - p.sy * .15, p.z); ob.rotation.set(p.rx, p.ry, 0); ob.scale.set(p.s * 1.3, p.sy * 1.6, p.s); ob.updateMatrix(); mesh.setMatrixAt(i, ob.matrix); });
-  mesh.castShadow = mesh.receiveShadow = true; mesh.frustumCulled = false; scene.add(mesh); return mesh;
+  var geo = merge([place(G.blob, 17, new V3(0, -.18, 0), new Q(), new V3(1, 1, 1))]), ob = new THREE.Object3D(), by = {}, meshes = [];
+  list.forEach(function (p) { var k = chunkKey(p.x, p.z); (by[k] = by[k] || []).push(p); });
+  Object.keys(by).forEach(function (k) { // one instanced mesh per culling chunk, its bounds the chunk's (three culls an instanced mesh by its geometry's sphere)
+    var L = by[k], g = new THREE.BufferGeometry(); ['position', 'normal', 'pal'].forEach(function (a) { g.setAttribute(a, geo.attributes[a]); });
+    var mid = chunkMid(k); g.boundingSphere = new THREE.Sphere(new V3(mid.x, 0, mid.z), CHUNK * .75 + 2);
+    var mesh = new THREE.InstancedMesh(g, matWorld, L.length);
+    L.forEach(function (p, i) { ob.position.set(p.x, groundY(p.x, p.z) - p.sy * .15, p.z); ob.rotation.set(p.rx, p.ry, 0); ob.scale.set(p.s * 1.3, p.sy * 1.6, p.s); ob.updateMatrix(); mesh.setMatrixAt(i, ob.matrix); });
+    mesh.castShadow = mesh.receiveShadow = true; scene.add(mesh); meshes.push(mesh); chunkMeshes.push(mesh);
+  });
+  return { meshes: meshes, set castShadow(v) { meshes.forEach(function (m) { m.castShadow = v; }); } };
 })();
 
 // ---------------------------------------------------------------- fallen leaves (Leaves.js): a carpet of small cards round the view that the
@@ -3567,7 +3626,7 @@ var leaves = (function () {
     '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + vN * .05, 1.));', '#endif',
     ' vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n'),
     fs: [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
-      'void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 col = shade(L2(vC), n, dropShadow(), 0., vW, 0.); gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
+      'void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 col = shade(L2(vC), n, dropShadowF(vW.xz), 0., vW, 0.); gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
   var mesh = new THREE.InstancedMesh(geo, mat, MAX); mesh.frustumCulled = false; mesh.castShadow = mesh.receiveShadow = true; mesh.renderOrder = 2; scene.add(mesh);
   var cA = new C3('#95513a'), cB = new C3('#f56a3a'), cP = new C3('#f28fa4'), cY = new C3('#e8b13a'), tmpc = new C3(), list = [];
   for (var i = 0; i < MAX; i++) {
@@ -3760,7 +3819,7 @@ var PB = (function () {
   return { mesh: m, P: P, N: N, A: A, cap: cap, list: [], cx: 1e9, cz: 1e9, all: false, dirty: true, n: 0 };
 })();
 function propBatch(all) {
-  var cx = view.smoothed.x, cz = view.smoothed.z, R = Math.max(area.radius, 30) + 12, i, o;
+  var cx = view.smoothed.x + area.base.x, cz = view.smoothed.z + area.base.z, R = area.radius + 6, i, o; // the view's footprint and a margin for the shadows cast into it
   if (all !== PB.all || Math.hypot(cx - PB.cx, cz - PB.cz) > 3) {
     PB.all = all; PB.cx = cx; PB.cz = cz; PB.list = [];
     for (i = 0; i < dyn.length; i++) { o = dyn[i]; if (!o.pk) continue; var q = o.b.position; if (all || Math.abs(q.x - cx) < R && Math.abs(q.z - cz) < R) PB.list.push(o); }
@@ -3784,8 +3843,21 @@ function propBatch(all) {
   ['position', 'normal'].forEach(function (k) { var at = g.attributes[k]; at.updateRange.offset = 0; at.updateRange.count = v * 3; at.needsUpdate = true; });
   g.attributes.pal.updateRange.offset = 0; g.attributes.pal.updateRange.count = v; g.attributes.pal.needsUpdate = true;
 }
+var floorShMat = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, uniforms: { tSh: { value: null }, uM: { value: new M4() }, uSize: { value: new V2(512, 512) }, uBias: { value: -.001 }, uC: { value: new V3() } }, vertexShader: FXV,
+  fragmentShader: ['#include <packing>', 'uniform sampler2D tSh; uniform mat4 uM; uniform vec2 uSize; uniform float uBias; uniform vec3 uC; varying vec2 vUv;',
+    'float tap(vec2 uv, float z){ return step(z, unpackRGBAToDepth(texture2D(tSh, uv))); }',
+    'void main(){ vec2 xz = uC.xy + (vUv - .5) * 2. * uC.z; vec4 sc = uM * vec4(xz.x, .06, xz.y, 1.); vec3 c = sc.xyz / sc.w; c.z += uBias; float d = 0.;',
+    ' if (c.x >= 0. && c.x <= 1. && c.y >= 0. && c.y <= 1. && c.z <= 1.) { vec2 f = c.xy * uSize - .5, i = floor(f), w = f - i, t = 1. / uSize, uv = (i + .5) * t;',
+    '  d = 1. - mix(mix(tap(uv, c.z), tap(uv + vec2(t.x, 0.), c.z), w.x), mix(tap(uv + vec2(0., t.y), c.z), tap(uv + t, c.z), w.x), w.y); }',
+    ' gl_FragColor = vec4(d, d, d, 1.); }'].join('\n') });
+function bakeFloorShadow() { // after the scenery's map was re-drawn: flatten it into the floor mask (the low tier's floor reads that)
+  if (!sun.shadow.map) return; var u = floorShMat.uniforms; u.tSh.value = sun.shadow.map.texture; u.uM.value.copy(sun.shadow.matrix); u.uSize.value.set(sun.shadow.mapSize.x, sun.shadow.mapSize.y); u.uBias.value = sun.shadow.bias;
+  u.uC.value.set(floorAt.x, floorAt.z, SC.right); fxq.run(floorShMat, floorRT); renderer.setRenderTarget(null); U.uFloorC.value.copy(u.uC.value);
+}
 function drawFrame(dt, now) {
   propBatch(U.uBend.value > .001 || state === 'title');
+  if (U.uShQ.value < .5) { bakeGround(); if (floorNeed) { floorNeed = false; bakeFloorShadow(); } }
+  if (sun.shadow.needsUpdate && sun.castShadow) { floorNeed = true; floorAt.x = shAt.x; floorAt.z = shAt.z; } // it is drawn during this frame's render; the mask follows next frame
   artFrame(dt, now || performance.now());
   fitFog();
   var amt = post && post.amt > .001 ? post.amt : 0;
@@ -3815,7 +3887,8 @@ function applyQuality() {
   var cap = lvl === 0 ? 1 : lvl === 1 ? Math.min(1.5, DPR_MAX) : DPR_MAX; dpr = Math.min(window.devicePixelRatio || 1, cap) * (lvl === 0 ? (SOFTGL ? .6 : .8) : 1); renderer.setPixelRatio(dpr); // the low tier also draws fewer pixels
   var sm = lvl === 2 ? (LOWDEV ? 1024 : 2048) : lvl === 1 ? 1024 : 512; // Bruno Quality.js: 2048, 512 on low
   if (sun.shadow.mapSize.x !== sm) { sun.shadow.mapSize.set(sm, sm); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
-  var smd = lvl === 2 ? 1024 : 512; if (sunD.shadow.mapSize.x !== smd) { sunD.shadow.mapSize.set(smd, smd); if (sunD.shadow.map) { sunD.shadow.map.dispose(); sunD.shadow.map = null; } }
+  var smd = lvl === 2 ? 1024 : lvl === 1 ? 512 : 256, ext = lvl === 2 ? 20 : lvl === 1 ? 14 : 10; SCD.left = SCD.bottom = -ext; SCD.right = SCD.top = ext; SCD.updateProjectionMatrix(); // the living things' map: round the car
+  if (sunD.shadow.mapSize.x !== smd) { sunD.shadow.mapSize.set(smd, smd); if (sunD.shadow.map) { sunD.shadow.map.dispose(); sunD.shadow.map = null; } }
   shadowDirty = true;
   resize(); applyArtQuality(lvl);
 }
@@ -3929,8 +4002,8 @@ $('imap') && $('imap').addEventListener('click', function (e) { var b = e.target
 // which shadow map each caster draws into: the living things (the car, the locals, the birds, the leaves, the windsocks) into the small
 // every-frame one, everything else into the scenery's
 (function shadowLayers() {
-  var live = new Set(); [carG, birdMesh, leaves.mesh].concat(locals.map(function (o) { return o.g; })).concat(windsocks.map(function (w) { return w.g; })).forEach(function (o) { o.traverse(function (m) { live.add(m); }); });
-  scene.traverse(function (m) { if (m.castShadow) m.layers.enable(live.has(m) ? 2 : 1); });
+  var live = new Set(); [carG, birdMesh, leaves.mesh].concat(locals.filter(function (o) { return o.walk; }).map(function (o) { return o.g; })).concat(windsocks.map(function (w) { return w.g; })).forEach(function (o) { o.traverse(function (m) { live.add(m); }); });
+  scene.traverse(function (m) { if (!m.isMesh && !m.isPoints) return; if (m.layers.mask === 4) { if (!live.has(m)) m.layers.set(1); } else m.layers.enable(live.has(m) ? 2 : 1); }); // every mesh (a tier may turn its shadow on later); a standing local's shadow-only caster moves to the scenery's layer
 })();
 // ============================================================================ boot
 resize(); applyQuality(); applyTod();
