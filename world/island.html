@@ -1338,7 +1338,7 @@ var roadDist = new Float32Array(MASK_N * MASK_N);
     // slabs: plazas solid, the paths a looser trail of tiles (the shader breaks them up with noise)
     var slab = Math.max(clamp((.6 - plz) / 1.2, 0, 1), clamp((.2 - path) / 1.2, 0, 1) * .72 * (land > 1 ? 1 : 0)); if (dep > .2) slab = 0;
     // grass: everywhere on land except a dirt margin round the road, the plazas, the paths, the shore and the banks, and a few bare patches
-    var e = Math.min(land - (1.6 + 2.4 * n1), ch - (.5 + 1.5 * n2), rd - (ROAD_W / 2 + 1.1 + 2.6 * n1), plz - (1 + 3 * n2), path - (.5 + 1.8 * n1), (.74 - fbm(wx2 * .035 + 40, wz2 * .035 - 13)) * 30);
+    var e = Math.min(land - (1.6 + 2.4 * n1), ch - (.5 + 1.5 * n2), rd - (ROAD_W / 2 + .7 + 1.9 * n1), plz - (1 + 3 * n2), path - (.5 + 1.8 * n1), (.74 - fbm(wx2 * .035 + 40, wz2 * .035 - 13)) * 30);
     var grass = clamp(e / 1.3, 0, 1);
     if (plz < 1) { var bk = bedK(wx2, wz2); if (bk < .6) { grass = Math.max(grass, clamp((-bk + .3) / .9, 0, 1)); slab *= clamp((bk + .1) / .7, 0, 1); } } // the plazas' grass beds
     var road = clamp(.5 + (ROAD_W / 2 - rd) / 2, 0, 1); // +-1 m of distance round the edge in 0..1
@@ -1790,6 +1790,9 @@ var LETTERS_MID = (function () { var s0 = START_S - 6, p = roadAt(s0).addScaledV
 function nearLetters(x, z, m) { return Math.hypot(x - LETTERS_MID.x, z - LETTERS_MID.z) < m; } // the name's lawn stays open
 // round 10 B: the loop's roadside, dressed the way Bruno lines his circuit: bush clumps just past the kerbs, lanterns in pairs, tyre stacks
 // on the outsides of bends, a run of fence here and there; and a busier Fresno start. Nothing on the road, a plaza, a pad or the water.
+// pale stepping stones (Bruno's white slabs, re-made): short trails off the verges into the grass, and round the plazas' beds
+function stones(x, z, dir, n, r) { for (var i = 0; i < n; i++) { var px = x + Math.cos(dir) * i * 1.15 + (r() - .5) * .35, pz = z + Math.sin(dir) * i * 1.15 + (r() - .5) * .35; if (maskAt(px, pz, 3) > .05 || maskAt(px, pz, 2) > .1 || landK(px, pz) < 1 || !farFrom(statics, px, pz, .8)) continue; var ang = dir + r(), w = .55 + r() * .2, h = .42 + r() * .15, ca = Math.cos(ang), sa = Math.sin(ang), c0 = new V3(px, .035, pz), ring = []; for (var q = 0; q < 6; q++) { var t = q / 6 * TAU + .3, lx = Math.cos(t) * w * (.85 + r() * .25), lz = Math.sin(t) * h * (.85 + r() * .25); ring.push(new V3(px + lx * ca - lz * sa, .035, pz + lx * sa + lz * ca)); } for (var q2 = 0; q2 < 6; q2++) STONES.push(c0, ring[q2], ring[(q2 + 1) % 6]); } } // flat on the ground (a thin solid would shadow itself)
+var STONES = [];
 (function roadside() {
   var r = rng(4242), keep = STOPS.map(function (d) { return d.pad; }).concat(STOPS.map(function (d) { return new V3(d.spawn.x, 0, d.spawn.z); }));
   function ok(p, m) {
@@ -1803,8 +1806,8 @@ function nearLetters(x, z, m) { return Math.hypot(x - LETTERS_MID.x, z - LETTERS
   // outsides of bends, bush clumps, lantern pairs, fence runs, crate stacks, barrels, signposts, a bench under a lantern, picnic tables,
   // hay, pale boulders, cones; everything but the plants and boulders knocks over; nothing on the asphalt
   function put(kind, q, ry, m, y) { if (!ok(q, m) || !pzRoom(q, m)) return false; PZ_DYN.push({ kind: kind, p: q, ry: ry, y: y }); PZ_PLACED.push({ x: q.x, z: q.z, r: m }); return true; }
-  for (var s = 8; s < ROAD_LEN - 4; s += 4.2 + r() * 3.6) {
-    var sd = r() < .5 ? -1 : 1, cv = roadCurv(s), outside = Math.sign(cv) === -sd && Math.abs(cv) > .02, off = ROAD_W / 2 + 2.8 + r() * 2.6, p = roadPt(s, sd * off), roll = r();
+  for (var s0 = 8, side0 = 1; s0 < ROAD_LEN - 4; s0 += 2.4 + r() * 2.2) { side0 = -side0;
+    var s = s0, sd = r() < .8 ? side0 : -side0, cv = roadCurv(s), outside = Math.sign(cv) === -sd && Math.abs(cv) > .02, off = ROAD_W / 2 + 2.6 + r() * 3.4, p = roadPt(s, sd * off), roll = r();
     if (!ok(p, .6) || !pzRoom(p, .8)) continue;
     var face = Math.atan2(roadRight(s).x * -sd, roadRight(s).z * -sd), t = roadTan(s), along = Math.atan2(t.x, t.z), tv = function (d) { return p.clone().addScaledVector(t, d); };
     if (outside && roll < .4) { for (var c = 0; c < 3; c++) put('chevron', roadPt(s + (c - 1) * 3.2, sd * (ROAD_W / 2 + 2.4)), face, .5); continue; }
@@ -1822,6 +1825,8 @@ function nearLetters(x, z, m) { return Math.hypot(x - LETTERS_MID.x, z - LETTERS
     if (roll < .93) { if (farFrom(statics, p.x, p.z, 2)) { boulder(p.x, p.z, .7 + r() * .6, r() * TAU); PZ_PLACED.push({ x: p.x, z: p.z, r: 1.2 }); PZ_GREEN.push({ p: tv(1.4), s: .8, y: .5, col: LEAF.bush }); } continue; }
     put('cone', p, 0, .35); put('cone', tv(1.2), 1, .35);
   }
+  for (var ss = 14; ss < ROAD_LEN - 6; ss += 9 + r() * 9) { var st = r() < .5 ? -1 : 1, sp = roadPt(ss, st * (ROAD_W / 2 + 1.4)); if (plazaK(sp.x, sp.z) < 1 || !pzRoom(sp, .8)) continue; var rr = roadRight(ss), dir = Math.atan2(rr.z * st, rr.x * st) + (r() - .5) * 1.2; stones(sp.x, sp.z, dir, 3 + Math.floor(r() * 3), r); }
+  STOPS.forEach(function (d) { d.beds.forEach(function (b, i) { if (i % 2) return; var a = r() * TAU; stones(b.x + Math.cos(a) * (b.r + .9), b.z + Math.sin(a) * (b.r + .9), a + PI / 2, 3, r); }); });
   // street lamps along the loop, alternate sides (Bruno's pole lights); they glow at night like the plazas' lamps
   var side = 1; for (var ls = 20; ls < ROAD_LEN - 10; ls += 26 + r() * 12) {
     side = -side; var lp = roadPt(ls, side * (ROAD_W / 2 + 1.9)); if (!ok(lp, .3) && !(landK(lp.x, lp.z) > 2 && plazaK(lp.x, lp.z) > 1 && farFrom(statics, lp.x, lp.z, 1))) continue;
@@ -1861,6 +1866,8 @@ G.trunk = prim(new THREE.CylinderGeometry(.3, .5, 1, 7).translate(0, .5, 0));
     var kind = kindAt(cx, cz), n = 2 + Math.floor(r() * 5);
     for (var i = 0; i < n && trees.length < 96; i++) { var a = r() * TAU, rr = i ? 3 + r() * 5 : 0, x = cx + Math.cos(a) * rr, z = cz + Math.sin(a) * rr; if (treeOK(x, z, 1.8)) plant(x, z, kind); }
   }
+  // trees right on the verges (Bruno's crowns overhang his paths): one every twenty-odd metres, alternate sides, 6.5 to 9 m off the centre line
+  for (var vs = 12, vside = 1; vs < ROAD_LEN - 8; vs += 17 + r() * 12) { vside = -vside; var vo = ROAD_W / 2 + 2.6 + r() * 2.4, vp = roadPt(vs, vside * vo); if (landK(vp.x, vp.z) < 4 || channelK(vp.x, vp.z) < 1.5 || plazaK(vp.x, vp.z) < 3 || pathK(vp.x, vp.z) < 1.5 || !farFrom(trees, vp.x, vp.z, 3.2) || !farFrom(statics, vp.x, vp.z, 1.4) || nearLetters(vp.x, vp.z, 15) || nearestRoad(vp.x, vp.z).d < ROAD_W / 2 + 2.4 || !pzRoom(vp, 1.2)) continue; if (STOPS.some(function (d) { return Math.hypot(vp.x - d.spawn.x, vp.z - d.spawn.z) < 9 || Math.hypot(vp.x - d.pad.x, vp.z - d.pad.z) < 8; })) continue; plant(vp.x, vp.z, kindAt(vp.x, vp.z)); }
   var k = new Kit();
   trees.forEach(function (t) {
     var h = t.h, bark = t.kind === 'maple' ? 40 : 39, tk = new Kit(), crown = [];
@@ -1926,7 +1933,8 @@ var FOL_V = [BEND_GLSL, WIND_GLSL, SHADOW_V, '#define NO_FRAGCOORD', LIGHT_GLSL,
   ' w.xyz = bend(w.xyz); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv;',
   // the low tier lights each card at its corners (the same model, no cast shadow; a card is small and nearly flat) and leaves the
   // fragment only the leaf cut: the crowns cost a third as much on a software renderer and look the same
-  '#ifdef LOWQ', ' vLit = shade(L2(mix(colA, colB, smoothstep(0., 1., dot(vN, uL)))), vN, 0., 0., vW, 0.); vFk = fogK(vD);', '#endif', ' }'].join('\n');
+  '#ifdef LOWQ', ' vLit = shade(L2(mix(colA, colB, smoothstep(0., 1., dot(vN, uL)))), vN, 0., 0., vW, 0.); vec2 fq = gl_Position.xy / gl_Position.w * .5 + .5; fq.y = 1. - fq.y;',
+  ' vLit = S2(mix(vLit, L2(mix(uFogA, uFogB, smoothstep(0., 1., length(fq)))), fogK(vD)));', '#endif', ' }'].join('\n'); // (the fog and the output curve at the corners too)
 var FOL_ALPHA = 'uniform sampler2D uLeaf; uniform vec3 uCarS; uniform float uAsp, uTh;\n' +
   'float leafA(vec2 uv, float rot){ return texture2D(uLeaf, uv).r; }\n' + // the card's uv arrives already turned by the wind (turned per corner: the same picture, no sin and cos per pixel)
   '';
@@ -1934,7 +1942,7 @@ var FOL_F = [SHADOW_F, LIGHT_GLSL, FOL_ALPHA, 'varying vec2 vUv; varying vec3 vN
   'void main(){ float sdf = leafA(vUv, vRot); float a = sdf;',
   ' if (vSee > .5) { vec2 q = gl_FragCoord.xy / uRes - uCarS.xy; q.x *= uAsp; float fade = smoothstep(uCarS.z * 3., uCarS.z * 15., length(q)); a = sdf * (fade * (1. - uTh) + uTh); }',
   ' if (a - uTh < .1) discard;',
-  '#ifdef LOWQ', ' gl_FragColor = outCol(mix(vLit, fogCol(), vFk)); }',
+  '#ifdef LOWQ', ' gl_FragColor = vec4(vLit, 1.); }',
   '#else', ' vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 base = L2(mix(vA, vB, smoothstep(0., 1., dot(n, uL))));',
   ' vec3 col = shade(base, n, dropShadow(), 0., vW, 0.);', ' gl_FragColor = outCol(fogIt(col, vD)); }', '#endif'].join('\n');
 var FOL_DEPTH_V = [WIND_GLSL, 'attribute vec3 ctr; attribute vec3 cr; uniform float uQuad, uSway; varying vec2 vUv; varying float vRot;',
@@ -2655,6 +2663,7 @@ var speedLines = (function () {
 
 // ============================================================================ bake the statics: one mesh for every landmark, gantry and lamp, one for the road paint
 (function bake() {
+  if (STONES.length) { var sg0 = flatMesh(STONES, 20, 0); var pp = sg0.attributes.position.array; for (var i = 0; i < pp.length; i += 9) { var ax = pp[i + 3] - pp[i], az = pp[i + 5] - pp[i + 2], bx = pp[i + 6] - pp[i], bz = pp[i + 8] - pp[i + 2]; if (ax * bz - az * bx > 0) { for (var j = 0; j < 3; j++) { var tmp = pp[i + 3 + j]; pp[i + 3 + j] = pp[i + 6 + j]; pp[i + 6 + j] = tmp; } } } }
   var byC = {}; kitGeo.forEach(function (g) { var pa = g.attributes.position.array, key = chunkKey(pa[0], pa[2]); (byC[key] = byC[key] || []).push(g); });
   Object.keys(byC).forEach(function (key) { var m = new THREE.Mesh(merge(byC[key]), matWorld); m.castShadow = m.receiveShadow = true; scene.add(m); chunkMeshes.push(m); }); kitGeo = null; // one mesh per chunk, culled by the camera
   var f = new THREE.Mesh(merge(flats), matWorldDS); f.receiveShadow = true; f.frustumCulled = false; f.renderOrder = 1; scene.add(f); flats = null;
@@ -3524,7 +3533,7 @@ var bgMesh = (function () {
 // the tips move with the wind; the blade's colour is the ground's under it; its base takes the shadow colour (shadow = (1 - tip) x G)
 // so the lawn reads as lit tips on a dark mat. Round 10 B adds the parting: blades lean away from the car and lie down under it.
 var GRASS_V = [WIND_GLSL, SHADOW_V, TERRAIN_GLSL,
-  'attribute float rnd; uniform vec2 uCenter; uniform float uSize, uBW, uBH; uniform vec3 uCar, uCarV;',
+  'uniform sampler2D uGBake; attribute float rnd; uniform vec2 uCenter; uniform float uSize, uBW, uBH; uniform vec3 uCar, uCarV;',
   'varying vec3 vW; varying float vTip; varying vec3 vCol; varying float vD; varying float vG;',
   'void main(){ vec2 p = position.xz - uCenter; float hs = uSize * .5; p = mod(p + hs, uSize) - hs; vec2 bp = p + uCenter;',
   ' vec4 m = terrainAt(bp); float g = m.g; float hv = texture2D(uNoise, bp * .0321 * .25).r + .5;',
@@ -3535,17 +3544,20 @@ var GRASS_V = [WIND_GLSL, SHADOW_V, TERRAIN_GLSL,
   ' vec2 dc = bp - uCar.xz; float dl = length(dc); float push = (1. - smoothstep(.6, 2.2 + length(uCarV) * .06, dl)) * tip;',
   ' w.xz += dc / max(dl, 1e-3) * push * H * .8; w.y -= push * H * .55;',
   ' if (g <= .5) w.y -= 100.;',
-  ' vW = w; vTip = tip; vG = g; vCol = terrainCol(m, bp);',
+  ' vW = w; vTip = tip; vG = g;',
+  '#ifdef LOWQ', ' vec4 bk = texture2D(uGBake, bp / uWorld + .5); vCol = bk.rgb * bk.rgb;', '#else', ' vCol = terrainCol(m, bp);', '#endif',
+  '',
   '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w + vec3(0., .06, 0.), 1.));', '#endif',
   ' vec4 mv = viewMatrix * vec4(w, 1.); vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n');
 var GRASS_F = [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying float vTip; varying vec3 vCol; varying float vD; varying float vG;',
-  'void main(){ vec3 col = shade(L2(vCol), vec3(0., 1., 0.), dropShadowF(vW.xz), (1. - vTip) * vG, vec3(vW.x, 1., vW.z), 0.);',
+  'void main(){', '#ifdef LOWQ', ' vec3 base = vCol;', '#else', ' vec3 base = L2(vCol);', '#endif', // the low tier's blade takes its colour from the ground's bake, already linear
+  ' vec3 col = shade(base, vec3(0., 1., 0.), dropShadowF(vW.xz), (1. - vTip) * vG, vec3(vW.x, 1., vW.z), 0.);',
   ' gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n');
 var GRU = { uCenter: { value: new V2() }, uSize: { value: 60 }, uBW: { value: .1 }, uBH: { value: .6 } };
-var grassMat = worldMat({ vs: GRASS_V, fs: GRASS_F, u: GRU }); grassMat.uniforms.uCar = U.uCar; grassMat.uniforms.uCarV = U.uCarV;
+var grassMat = worldMat({ vs: GRASS_V, fs: GRASS_F, u: GRU }); grassMat.uniforms.uGBake = groundMat.uniforms.uGBake; grassMat.uniforms.uCar = U.uCar; grassMat.uniforms.uCarV = U.uCarV;
 var grass = { mesh: null, n: 0 };
 function buildGrass(level) {
-  var n = level === 2 ? 280 : level === 1 ? (LOWDEV ? 180 : 220) : 120, S = area.size;
+  var n = level === 2 ? 280 : level === 1 ? (LOWDEV ? 180 : 220) : 108, S = area.size;
   if (grass.n === n && Math.abs(grass.size - S) < .01) return;
   grass.n = n; grass.size = S;
   var cnt = n * n, P = new Float32Array(cnt * 9), R = new Float32Array(cnt * 3), r = rng(31), fs = S / n;
@@ -3872,6 +3884,7 @@ function applyArtQuality(level) {
   foliage.meshes.forEach(function (m) { m.castShadow = level > 0; }); leaves.mesh.castShadow = pebbles.castShadow = level > 0; bgMesh.visible = level > 0; html.classList.toggle('gl-lowq', level === 0);
   if (level === 0) flowers.mesh.count = 0;
   if (!!foliage.mat.defines.LOWQ !== (level === 0)) { if (level === 0) foliage.mat.defines.LOWQ = 1; else delete foliage.mat.defines.LOWQ; foliage.mat.needsUpdate = true; } // the low tier: only trunks, props and the car cast shadows
+  if (!!grassMat.defines.LOWQ !== (level === 0)) { if (level === 0) grassMat.defines.LOWQ = 1; else delete grassMat.defines.LOWQ; grassMat.needsUpdate = true; }
   if (!!groundMat.defines.LOWQ !== (level === 0)) { if (level === 0) groundMat.defines.LOWQ = 1; else delete groundMat.defines.LOWQ; groundMat.needsUpdate = true; }
   U.uShQ.value = level === 0 ? 0 : 1;
   fxSetup(level);
