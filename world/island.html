@@ -1360,7 +1360,7 @@ var MASK_N = LOWDEV ? 512 : 1024, MPX = WORLD / MASK_N;
 var mask = new Uint8Array(MASK_N * MASK_N * 4), depthF = new Float32Array(MASK_N * MASK_N);
 var roadDist = new Float32Array(MASK_N * MASK_N);
 // round 13: the name stands on a strip of slabs let into the verge (Bruno's name stands on his landing area's paving, not in long grass)
-var NAME_S = CAR0_S + 7, NAME_OFF = ROAD_W / 2 + 2.9, NAME_PTS = []; for (var nsi = -10; nsi <= 10; nsi++) NAME_PTS.push(roadPt(NAME_S + nsi, NAME_OFF));
+var NAME_S = CAR0_S + 7, NAME_OFF = ROAD_W / 2 + 4.2, NAME_PTS = []; for (var nsi = -10; nsi <= 10; nsi++) NAME_PTS.push(roadPt(NAME_S + nsi, NAME_OFF));
 var NAME_BB = NAME_PTS.reduce(function (a, p) { return [Math.min(a[0], p.x), Math.max(a[1], p.x), Math.min(a[2], p.z), Math.max(a[3], p.z)]; }, [1e9, -1e9, 1e9, -1e9]);
 function nameK(x, z) { if (x < NAME_BB[0] - 4 || x > NAME_BB[1] + 4 || z < NAME_BB[2] - 4 || z > NAME_BB[3] + 4) return 1e9; var best = 1e9; for (var i = 0; i < NAME_PTS.length - 1; i++) { var d = segDist(x, z, NAME_PTS[i].x, NAME_PTS[i].z, NAME_PTS[i + 1].x, NAME_PTS[i + 1].z); if (d < best) best = d; } return best - 1.25; }
 (function paintMask() {
@@ -2829,7 +2829,7 @@ function rollKick(s) { if (!RM()) view.rollSpeed = (s || 1) * (Math.random() < .
 var NAME_FOCUS = null;
 function nameHold() {
   if (!NAME_FOCUS) { NAME_FOCUS = new V3(); letters.forEach(function (o) { NAME_FOCUS.x += o.home.x / letters.length; NAME_FOCUS.z += o.home.z / letters.length; }); }
-  var p = new V3(car.pos.x, 0, car.pos.z).lerp(NAME_FOCUS, .72);
+  var p = new V3(car.pos.x, 0, car.pos.z).lerp(NAME_FOCUS, .6);
   view.hold = { p: p, until: performance.now() + 8000 }; view.tracking = false; view.focus.copy(p); view.smoothed.copy(p); view.glide = 1; updateView(0);
 }
 function snapView() { view.hold = null; view.glide = 1; view.leadN.set(0, 0); view.leadT.set(0, 0); view.lead.set(0, 0, 0); view.focus.set(car.pos.x, 0, car.pos.z); view.smoothed.copy(view.focus); view.tracking = true; view.zoomSmoothed = view.zoomBase; updateView(0); }
@@ -2850,7 +2850,8 @@ function updateView(dt) {
   view.zoomRatio = view.zoomBase; if (view.tracking && quality.level === 2 && !RM()) view.zoomRatio += -.4 * sstep(5, 40, fs);
   // round 13: a portrait phone pulls back with speed on every tier (Bruno only on his top tier): its view is 11 m wide, so a road that
   // crosses the screen leaves it 6 m from the car; at 18 m/s it pulls back 18% (the grass footprint is grown to match, optimalArea)
-  if (view.tracking && view.overflow > .5 && quality.level < 2 && !RM()) view.zoomRatio += -.25 * sstep(4, 18, fs);
+  var pbT = view.tracking && view.overflow > .5 && quality.level < 2 && !RM() && state === 'play' ? sstep(4, 18, car.xzSpeed * 2) : 0; // from the car's own speed (the focus's speed would feed on the lead's slide)
+  view.pbP = dt ? (view.pbP || 0) + (pbT - (view.pbP || 0)) * Math.min(1, dt * 1.2) : pbT; view.zoomRatio += -.25 * view.pbP; // eased slowly: the view breathes out and in, never jumps
   view.zoomSmoothed = dt ? lerp(view.zoomSmoothed, view.zoomRatio, Math.min(1, dt * 10)) : view.zoomRatio;
   var phiT = PI * (quality.level === 0 ? .27 : .31); view.phi = dt ? view.phi + (phiT - view.phi) * Math.min(1, dt * 1.5) : phiT; // a tier change eases the angle over about a second (never a cut)
   var rMax = 30 + view.overflow * 9; view.radius = lerp(15, rMax, 1 - view.zoomSmoothed);
