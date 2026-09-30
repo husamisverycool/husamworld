@@ -500,6 +500,17 @@ html.has-world .imap{display:block}
 .imap-pin:hover .imap-w,.imap-pin.on .imap-w,.imap-pin:focus-visible .imap-w{background:var(--yellow);color:var(--ink)}
 .imap-pin.been .imap-dia{background:#9fe0b7}
 .imap-pin.flip{flex-direction:row-reverse;transform:translate(calc(-100% + 8px),-50%)}
+/* round 10 B: Bruno 2025's two small square buttons, top right (menu, map), in the hub's cream slab; the words stay for screen readers */
+.tabs{right:max(16px,env(safe-area-inset-right));gap:12px}
+.tab{width:46px;height:46px;padding:0;justify-content:center;gap:0;border-radius:0;transform:translateX(90px)}
+.tab .tab-word{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.tab svg{width:22px;height:22px}
+html.started .tab{transform:none}
+html.started .tab:hover{transform:translateY(-2px)}
+.tab:active{transform:translateY(3px)!important;box-shadow:0 0 0 2.5px var(--ink),0 1px 0 2.5px var(--ink)}
+.tab::after{content:attr(data-tip);position:absolute;right:calc(100% + 10px);top:50%;transform:translate(6px,-50%);opacity:0;pointer-events:none;background:var(--ink);color:var(--cream);font:400 12px/1 var(--display);padding:6px 8px 5px;white-space:nowrap;transition:opacity .15s,transform .15s}
+@media (hover:hover){.tab:hover::after,.tab:focus-visible::after{opacity:1;transform:translate(0,-50%)}}
+@media (max-width:560px),(pointer:coarse) and (max-height:500px){.tab{width:44px;height:44px;padding:0}}
 .imap-car{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2.5px var(--cream),0 0 0 4px var(--ink)}
 @media (max-width:420px){.imap-w{font-size:9.5px;padding:3px 4px 2px}}
 </style>
@@ -536,11 +547,11 @@ html.has-world .imap{display:block}
     </button>
   </header>
   <nav class="tabs" aria-label="World">
-    <button class="tab tab-map" id="mapBtn" type="button" aria-controls="atlas" aria-expanded="false">
+    <button class="tab tab-map" id="mapBtn" type="button" aria-controls="atlas" aria-expanded="false" data-tip="Map  M">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M4 10.5c3 1.5 5 1 8-1s5.5-2 8 0M5 16c3-1 5.5 0 8 1.5s4 1 6-1"/></svg>
       <span class="tab-word">Map</span><kbd class="tab-word" aria-hidden="true">M</kbd>
     </button>
-    <button class="tab tab-set" id="setBtn" type="button" aria-controls="setPanel" aria-expanded="false">
+    <button class="tab tab-set" id="setBtn" type="button" aria-controls="setPanel" aria-expanded="false" data-tip="Settings  O">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><rect x="13" y="4.5" width="4" height="5"/><rect x="7" y="14.5" width="4" height="5"/></svg>
       <span class="tab-word">Settings</span><kbd class="tab-word" aria-hidden="true">O</kbd>
     </button>
@@ -1030,7 +1041,7 @@ var WIND_GLSL = 'uniform vec2 uWind; uniform float uWindT, uWindS;\n#ifndef HAS_
 // the dry ground warms from California gold (south) to a rust orange (north), the grass from olive gold to a greener olive
 var TERRAIN_GLSL = 'uniform sampler2D uMask, uTrack; uniform float uWorld; uniform vec3 uDry, uShallow, uDeep, uGrass, uGrassB;\n#ifndef HAS_NOISE\n#define HAS_NOISE\nuniform sampler2D uNoise;\n#endif\n' +
   'vec3 L2(vec3 c){ return c * c * (c * .2848 + .7152); }\n' + // sRGB -> linear, close to pow 2.2 (cheaper)
-  'vec3 S2(vec3 c){ c = max(c, 0.); return mix(sqrt(c) * 1.055 - .055, c * 12.92, step(c, vec3(.0031308))); }\n' +
+  'vec3 S2(vec3 c){ c = max(c, 0.); return mix(pow(c, vec3(1. / 2.4)) * 1.055 - .055, c * 12.92, step(c, vec3(.0031308))); }\n' +
   'vec4 terrainAt(vec2 xz){ vec2 uv = xz / uWorld + .5; vec4 m = texture2D(uMask, uv); m.g *= 1. - texture2D(uTrack, uv).r; return m; }\n' +
   'vec3 dirtCol(vec2 xz){ float k = clamp(xz.y / 90., -1., 1.); vec3 d = uDry; d = mix(d, d * vec3(.97, 1.05, 1.1), max(k, 0.)); return mix(d, d * vec3(1.03, .9, .92), max(-k, 0.)); }\n' +
   'vec3 grassCol(vec2 xz){ float n = texture2D(uNoise, xz * .013).r; float k = clamp(-xz.y / 110. + .5, 0., 1.); return mix(uGrass, uGrassB, smoothstep(.3, .7, n)) * mix(vec3(1.05, 1., .9), vec3(.92, 1.02, .96), k); }\n' +
@@ -1276,7 +1287,7 @@ var roadDist = new Float32Array(MASK_N * MASK_N);
     var onRoad = rd < ROAD_W / 2 + .25 && land > 0; // the road stays dry where it crosses water (it is a bridge deck there)
     // depth: 0 on land; shallow at the shore, deep offshore (Bruno: 0.1 dry, 0.3 shallow, 0.9 deep)
     var dep = land < 0 ? clamp(.25 + (-land) / 18, 0, 1) : 0;
-    if (ch < 0 && !onRoad) dep = Math.max(dep, clamp(.2 + (-ch) / 3.2, 0, .78));
+    if (ch < 0 && !onRoad) dep = Math.max(dep, clamp(.2 + (-ch) / 2.2, 0, .92));
     var shoreSoft = land >= 0 ? clamp(1 - land / 2.2, 0, 1) * .12 : 0; if (ch >= 0 && ch < 1.6) shoreSoft = Math.max(shoreSoft, (1 - ch / 1.6) * .14);
     if (!onRoad) dep = Math.max(dep, shoreSoft);
     var n1 = fbm(wx2 * .07 + 11, wz2 * .07 - 4), n2 = fbm(wx2 * .11 - 3, wz2 * .11 + 8);
@@ -1284,7 +1295,7 @@ var roadDist = new Float32Array(MASK_N * MASK_N);
     // slabs: plazas solid, the paths a looser trail of tiles (the shader breaks them up with noise)
     var slab = Math.max(clamp((.6 - plz) / 1.2, 0, 1), clamp((.2 - path) / 1.2, 0, 1) * .72 * (land > 1 ? 1 : 0)); if (dep > .2) slab = 0;
     // grass: everywhere on land except a dirt margin round the road, the plazas, the paths, the shore and the banks, and a few bare patches
-    var e = Math.min(land - (2.2 + 3 * n1), ch - (.5 + 1.8 * n2), rd - (ROAD_W / 2 + 2 + 3.2 * n1), plz - (1.2 + 3.5 * n2), path - (.6 + 2 * n1), (.66 - fbm(wx2 * .035 + 40, wz2 * .035 - 13)) * 30);
+    var e = Math.min(land - (1.6 + 2.4 * n1), ch - (.5 + 1.5 * n2), rd - (ROAD_W / 2 + 1.1 + 2.6 * n1), plz - (1 + 3 * n2), path - (.5 + 1.8 * n1), (.68 - fbm(wx2 * .035 + 40, wz2 * .035 - 13)) * 30);
     var grass = clamp(e / 1.3, 0, 1);
     var road = clamp(.5 + (ROAD_W / 2 - rd) / 2, 0, 1); // +-1 m of distance round the edge in 0..1
     mask[k2 * 4] = slab * 255; mask[k2 * 4 + 1] = grass * 255; mask[k2 * 4 + 2] = dep * 255; mask[k2 * 4 + 3] = road * 255;
@@ -1301,7 +1312,7 @@ var WATER_Y = -.3;
 // the terrain colour (dirt -> shallow -> deep by depth, grass by G); slabs by R x noise (a re-made tile texture: running bond, each tile
 // its own shade, bevelled joints); asphalt by A with its edge cut at the half-way line and anti-aliased by fwidth, flecked with grit.
 // The grass floor takes the shadow colour (Bruno's shadowNode = G): the lawn reads as lit tips on a dark mat. Normal straight up.
-var groundMat = worldMat({ u: { uSlabA: { value: new C3('#a87762') }, uSlabB: { value: new C3('#ffcf8b') }, uAsph: { value: new C3('#2e2533') } },
+var groundMat = worldMat({ u: { uSlabA: { value: new C3('#a87762') }, uSlabB: { value: new C3('#ffcf8b') }, uAsph: { value: new C3('#2a2130') } },
   vs: [BEND_GLSL, SHADOW_V, 'uniform sampler2D uMask; uniform float uWorld; varying vec3 vW; varying vec2 vUv; varying float vD;',
     'void main(){ vec4 w = modelMatrix * vec4(position, 1.); vUv = w.xz / uWorld + .5; vec4 m = texture2D(uMask, vUv); w.y -= 1.5 * m.b * (1. - smoothstep(.5, .95, m.a)); vW = w.xyz;',
     '#if NUM_DIR_LIGHT_SHADOWS > 0', ' vSC = directionalShadowMatrix[0] * vec4(w.xyz + vec3(0., .06, 0.), 1.);', '#endif',
@@ -1346,8 +1357,8 @@ var waterMat = worldMat({ vs: [BEND_GLSL, SHADOW_V, 'varying vec3 vW; varying fl
     ' float fw = fwidth(b) * 1.5; float shore = 1. - smoothstep(.2, .2 + fw + .012, b);',
     ' float base = (b + uWindT * .5) * 10.; float idx = floor(base);',
     ' float nz = texture2D(uNoise, (vW.xz + idx * 2.9) * .1).r;',
-    ' float band = fract(base); float rip = smoothstep(.0, fw * 10. + .02, band - .78) * (1. - smoothstep(.9, .98, band)) * step(.5, nz + .55 - b * 1.1);',
-    ' rip *= 1. - smoothstep(.34, .5, b);',
+    ' float band = fract(base); float rip = smoothstep(.0, fw * 10. + .02, band - .84) * (1. - smoothstep(.92, .98, band)) * step(.62, nz + .5 - b * 1.2);',
+    ' rip *= 1. - smoothstep(.3, .42, b);',
     ' float a = max(shore, rip); if (a < .02) discard;',
     ' vec3 col = shade(vec3(1.), vec3(0., 1., 0.), dropShadow(), 0., vec3(vW.x, 1., vW.z), 0.);',
     ' gl_FragColor = vec4(S2(fogIt(col, vD)), a * .92); }'].join('\n') });
@@ -1473,9 +1484,9 @@ var BUILD = {
   translation: function (k) { // the road crosses a stream on a little arched bridge
     for (var sd = -1; sd <= 1; sd += 2) {
       var x = sd * (ROAD_W / 2 + .35);
-      k.add(G.box, 17, x, 0, 0, .5, 1.2, 10).add(G.box, 20, x, 1.2, 0, .7, .18, 10.2);
-      for (var p = -4; p <= 4; p += 2) k.add(G.box, 17, x, 0, p, .7, 1.45, .7);
-      k.add(G.torus, 17, x * 1.04, -.9, 0, 7.4, 4.2, 2.2, PI / 2, 0, 0);
+      k.add(G.box, 6, x, .45, 0, .22, .16, 10).add(G.box, 6, x, .95, 0, .26, .16, 10.2).add(G.box, 51, x, -1.2, 0, .6, 1.3, 10);
+      for (var p = -4; p <= 4; p += 2) k.add(G.box, 6, x, 0, p, .3, 1.25, .3).add(G.box, p === -4 || p === 4 ? 41 : 6, x, 1.25, p, .26, .26, .26);
+      k.add(G.torus, 51, x * 1.04, -.9, 0, 7.4, 4.2, 2.2, PI / 2, 0, 0);
       k.add(G.box, 19, x + sd * .1, 1.5, -5.6, .15, 1.8, 3, 0).add(G.cyl, 7, x + sd * .1, 0, -5.6, .12, 1.6, .12);
     }
   },
@@ -1558,6 +1569,81 @@ STOPS.forEach(function (d) {
 var TREE_KINDS = { oak: [8, 9], almond: [21, 24], maple: [26, 22] }; // kept for the palette's sake
 var LEAF = { oak: ['#a7ac34', '#e0d23e'], almond: ['#f06f8a', '#ffb3bd'], maple: ['#e8462b', '#ff9a3f'], bush: ['#a9ab34', '#d9cd3c'], bushPink: ['#e86f86', '#ffa9b5'], gold: ['#e39a2a', '#ffd04a'] };
 var trees = [], clusters = [];
+// ============================================================================ round 10 B: the plazas dressed like Bruno's areas. Each is told apart only by
+// what stands on it (OWNERSHIP.md: no district facts on the hub). Frame: u along the road, v from the kerb side (-) to the back (+).
+// The corridor from the road to the pad and on to the landmark stays clear, and so do the local's spot and Brief A's props.
+function pzAt(d, u, v) { return d.plaza.clone().addScaledVector(d.tan, u).addScaledVector(d.face, -v); }
+function pzFree(d, u, v, m) {
+  if (Math.abs(u) < 3.3 + m) return false; // the corridor
+  var p = pzAt(d, u, v), q = d.pad.clone().addScaledVector(d.tan, 4.2).addScaledVector(d.face, -1.2);
+  if (Math.hypot(p.x - q.x, p.z - q.z) < 1.8 + m) return false; // the local
+  return farFrom(statics, p.x, p.z, m + .4);
+}
+function pzKit(d, u, v, ry, build, col) { var p = pzAt(d, u, v), k = new Kit(); build(k); kitGeo.push.apply(kitGeo, k.bake(p.x, 0, p.z, d.rot + (ry || 0))); if (col) addStatic(p.x, 0, p.z, col[0], col[1], col[2], d.rot + (ry || 0), null, col[3] || 'prop'); return p; }
+var PZ_GREEN = [], PZ_BEDS = [], PZ_DYN = []; // hedges and planters (foliage), flower beds (flowers), knockable props (placed with the props)
+var DRESS = {
+  bill: function (d) { // formal: clipped hedge rows, twin flagpoles, stone planters, a red carpet up the middle
+    [-1, 1].forEach(function (s) {
+      for (var i = 0; i < 5; i++) { var u = s * (5.5 + i * 1.1), v = d.depth / 2 - 1.6; if (pzFree(d, u, v, .2)) PZ_GREEN.push({ p: pzAt(d, u, v), s: .72, y: .55, col: LEAF.bush }); }
+      var fu = s * (d.pw / 2 - 3.4), fv = d.depth * .08; if (pzFree(d, fu, fv, .3)) pzKit(d, fu, fv, 0, function (k) { k.add(G.box, 51, 0, 0, 0, .6, .3, .6).add(G.cyl6, 7, 0, .3, 0, .12, 7, .12).add(G.ball, 11, 0, 7.3, 0, .26, .26, .26).add(G.box, s < 0 ? 54 : 53, .7, 6.1, 0, 1.3, .85, .04); }, [.3, 3.6, .3]);
+      var pu = s * 3.9, pv = -d.depth * .06; if (pzFree(d, pu, pv, 0)) { pzKit(d, pu, pv, 0, function (k) { k.add(G.box, 51, 0, 0, 0, 1.1, .7, 1.1).add(G.box, 20, 0, .7, 0, 1.2, .08, 1.2); }, [.55, .4, .55]); PZ_GREEN.push({ p: pzAt(d, pu, pv), s: .75, y: 1.2, col: LEAF.gold }); }
+    });
+    var cq = []; quad(cq, pzAt(d, -1.1, 3.4 - d.depth / 2 + 1.5), pzAt(d, 1.1, 3.4 - d.depth / 2 + 1.5), pzAt(d, 1.1, d.depth * .16 - 1.2), pzAt(d, -1.1, d.depth * .16 - 1.2)); flatMesh(cq, 53, .02);
+  },
+  speech: function (d) { // an audience: two blocks of little chairs facing the lectern, a velvet rope on brass posts
+    [-1, 1].forEach(function (s) {
+      for (var r = 0; r < 2; r++) for (var c = 0; c < 3; c++) { var u = s * (4.6 + c * 1.05), v = -d.depth * .02 - r * 1.3; if (pzFree(d, u, v, 0)) PZ_DYN.push({ kind: 'chair', p: pzAt(d, u, v), ry: d.rot + PI }); }
+      var ru = s * 3.5; for (var j = 0; j < 3; j++) { var v2 = d.depth * .02 + j * 1.6; pzKit(d, ru, v2, 0, function (k) { k.add(G.cyl, 51, 0, 0, 0, .28, .06, .28).add(G.cyl6, 11, 0, 0, 0, .07, .9, .07).add(G.ball, 11, 0, .9, 0, .14, .14, .14); if (j < 2) k.add(G.box, 53, 0, .72, .8, .07, .07, 1.6); }); }
+    });
+  },
+  translation: function (d) { // the river bank: reeds, a moored rowboat, rope posts, lanterns on the rail
+    for (var i = 0; i < 9; i++) { var u = (i % 2 ? 1 : -1) * (4 + (i >> 1) * 1.3), v = d.depth / 2 - .8 - (i % 3) * .5; if (pzFree(d, u, v, 0)) pzKit(d, u, v, i, function (k) { for (var j = 0; j < 5; j++) k.add(G.cone4, 44, (j - 2) * .12, 0, (j % 2) * .1, .09, .9 + j % 3 * .35, .09, j); }); }
+    var bp = CHANNELS[0].samples[Math.round(CHANNELS[0].samples.length * .22)], bk = new Kit();
+    bk.add(G.box, 6, 0, 0, 0, 1.3, .35, 3).add(G.wedge, 6, 0, 0, 1.9, 1.3, .35, .8, 0, -PI / 2).add(G.box, 20, 0, .3, 0, 1.1, .06, 2.7).add(G.box, 6, 0, .35, -.3, 1.2, .08, .35).add(G.cyl, 6, .45, .38, .3, .05, .05, 1.4, 0, PI / 2 - .3);
+    kitGeo.push.apply(kitGeo, bk.bake(bp.x + 2, -.42, bp.z, .9));
+  },
+  n1: function (d) { // bunting across the back on posts, a row of boxes with slots, a sandwich board
+    var pts = [-1, 1].map(function (s) { var u = s * (d.pw / 2 - 1.2), v = d.depth / 2 - 1; pzKit(d, u, v, 0, function (k) { k.add(G.cyl6, 6, 0, 0, 0, .14, 3.6, .14); }, [.12, 1.8, .12]); return pzAt(d, u, v); });
+    var n = 14; for (var i = 1; i < n; i++) { var t = i / n, p = pts[0].clone().lerp(pts[1], t), sag = Math.sin(t * PI) * .7, k = new Kit(); k.add(G.wedge, [53, 20, 54][i % 3], 0, 3.45 - sag, 0, .5, -.55, .03); kitGeo.push.apply(kitGeo, k.bake(p.x, 0, p.z, d.rot)); }
+    [-1, 1].forEach(function (s) { for (var j = 0; j < 2; j++) { var u = s * (5 + j * 1.2), v = d.depth * .12; if (pzFree(d, u, v, .1)) PZ_DYN.push({ kind: 'ballot', p: pzAt(d, u, v), ry: d.rot }); } });
+    var su = -(d.pw / 2 - 2.5), sv = -d.depth * .02; if (pzFree(d, su, sv, .2)) pzKit(d, su, sv, .3, function (k) { k.add(G.box, 6, 0, 0, .25, .9, 1.2, .06, 0, -.2).add(G.box, 6, 0, 0, -.25, .9, 1.2, .06, 0, .2).add(G.box, 20, 0, .35, .33, .7, .5, .02, 0, -.2).add(G.box, 54, 0, .5, .35, .4, .08, .02, 0, -.2); }, [.45, .6, .35]);
+  },
+  triptik: function (d) { // the old station's yard: tyre stacks, oil drums, a signpost with arrows
+    [-1, 1].forEach(function (s) { var u = s * (d.pw / 2 - 2.2), v = d.depth / 2 - 1.8; for (var j = 0; j < 3; j++) if (pzFree(d, u + s * -j * .95, v, .1)) PZ_DYN.push({ kind: j === 1 ? 'drum' : 'tyres', p: pzAt(d, u - s * j * .95, v), ry: d.rot }); });
+    var su = d.pw / 2 - 3.2, sv = d.depth * .05; if (pzFree(d, su, sv, .2)) pzKit(d, su, sv, 0, function (k) { k.add(G.cyl6, 6, 0, 0, 0, .12, 3.2, .12); [[2.8, .4, 54], [2.35, -.5, 53], [1.9, .3, 11]].forEach(function (a) { k.add(G.box, a[2], .45 * Math.sign(a[1]), a[0], 0, 1, .32, .05, a[1]); }); }, [.12, 1.6, .12]);
+  },
+  os: function (d) { // the workshop: cable spools, a tool chest, tyres, a jack, oil stains
+    [-1, 1].forEach(function (s) { var u = s * (d.pw / 2 - 2.6), v = d.depth * .1; if (pzFree(d, u, v, .4)) pzKit(d, u, v, s, function (k) { k.add(G.cyl, 6, 0, 0, 0, 1.3, .12, 1.3, 0, 0, 0).add(G.cyl, 6, 0, .12, 0, .5, .8, .5).add(G.cyl, 14, 0, .2, 0, .9, .6, .9).add(G.cyl, 6, 0, .8, 0, 1.3, .12, 1.3); }, [.65, .5, .65]); });
+    var tu = -(d.pw / 2 - 1.5), tv = d.depth / 2 - 2.4; if (pzFree(d, tu, tv, .3)) pzKit(d, tu, tv, 0, function (k) { k.add(G.box, 13, 0, 0, 0, 1.4, .9, .6).add(G.box, 14, 0, .9, 0, 1.44, .06, .64).add(G.box, 7, 0, .3, .31, .6, .05, .02).add(G.box, 7, 0, .6, .31, .6, .05, .02); }, [.7, .5, .3]);
+    PZ_DYN.push({ kind: 'tyres', p: pzAt(d, d.pw / 2 - 1.6, d.depth / 2 - 1.8), ry: d.rot });
+    var oq = []; [[-5, -1, 1.1], [6, 1.5, .8], [4.6, -2.8, .6]].forEach(function (o) { var c = pzAt(d, o[0], o[1]), r = o[2]; for (var a = 0; a < 10; a++) { var a0 = a / 10 * TAU, a1 = (a + 1) / 10 * TAU; oq.push(c.clone(), new V3(c.x + Math.cos(a1) * r, 0, c.z + Math.sin(a1) * r * .7), new V3(c.x + Math.cos(a0) * r, 0, c.z + Math.sin(a0) * r * .7)); } }); flatMesh(oq, 14, .03);
+  },
+  depths: function (d) { // the water's edge: buoys, a lifebuoy on a post, mooring posts with rope, rocks
+    var s0 = d.site; [[-3.5, 4], [3.2, 6.5], [-2.5, 9], [4.5, 11]].forEach(function (o, i) { var p = s0.clone().addScaledVector(d.tan, o[0]).addScaledVector(d.face, -o[1]); if (maskAt(p.x, p.z, 2) > .3) { var k = new Kit(); k.add(G.ball, i % 2 ? 22 : 13, 0, -.45, 0, .7, .7, .7).add(G.cyl, 20, 0, -.05, 0, .72, .12, .72).add(G.cyl6, 14, 0, .2, 0, .06, .5, .06); kitGeo.push.apply(kitGeo, k.bake(p.x, WATER_Y, p.z, 0)); } });
+    [-1, 1].forEach(function (s) { var u = s * 3.6, v = d.depth / 2 - 1.2; pzKit(d, u, v, 0, function (k) { k.add(G.cyl6, 6, 0, 0, 0, .3, 1.1, .3).add(G.cyl, 50, 0, .8, 0, .34, .1, .34); if (s > 0) k.add(G.torus, 13, 0, .75, .2, .9, .9, .9, 0, PI / 2).add(G.torus, 13, 0, .75, .2, .9, .9, .9, PI, PI / 2); }, [.15, .55, .15]); });
+  },
+  weeks: function (d) { // the town square: a fountain, flower beds, planters
+    var fu = -(d.pw / 2 - 4), fv = d.depth * .02; if (pzFree(d, fu, fv, 1.6)) { var fp = pzKit(d, fu, fv, 0, function (k) { k.add(G.cyl, 51, 0, 0, 0, 3.2, .45, 3.2).add(G.cyl, 12, 0, .3, 0, 2.8, .12, 2.8).add(G.cyl, 51, 0, 0, 0, .5, 1.3, .5).add(G.cyl, 51, 0, 1.3, 0, 1.3, .15, 1.3).add(G.cyl, 27, 0, 1.4, 0, .15, .5, .15).add(G.ball, 27, 0, 1.8, 0, .3, .3, .3); }, [1.5, .4, 1.5]); PZ_BEDS.push({ p: fp, r: 2.6, ring: true }); }
+    [-1, 1].forEach(function (s) { var u = s * (d.pw / 2 - 1.6), v = d.depth / 2 - 3.2; if (pzFree(d, u, v, .6)) { var p = pzKit(d, u, v, 0, function (k) { k.add(G.box, 51, 0, 0, 0, 1.4, .35, 3).add(G.box, 23, 0, .3, 0, 1.2, .08, 2.8); }, [.7, .3, 1.5]); PZ_BEDS.push({ p: p, r: 1.1, y: .38 }); } });
+  },
+  everywhere: function (d) { // the apron: a windsock, runway edge lights in two lines, a luggage cart
+    var wu = d.pw / 2 - 2, wv = d.depth / 2 - 2; if (pzFree(d, wu, wv, .3)) { var wp = pzKit(d, wu, wv, 0, function (k) { k.add(G.cyl6, 7, 0, 0, 0, .12, 4.4, .12); }, [.12, 2.2, .12]); PZ_DYN.push({ kind: 'sock', p: wp }); }
+    for (var i = 0; i < 7; i++) [-1, 1].forEach(function (s) { var u = s * 3.4, v = -d.depth / 2 + 5 + i * 2.2; if (v < d.depth / 2 - 1) pzKit(d, u, v, 0, function (k) { k.add(G.cyl6, 14, 0, 0, 0, .14, .25, .14).add(G.ball, 41, 0, .25, 0, .16, .16, .16); }); });
+    var lu = -(d.pw / 2 - 3.5), lv = d.depth * .05; if (pzFree(d, lu, lv, .8)) pzKit(d, lu, lv, .4, function (k) { k.add(G.box, 7, 0, .35, 0, 1.8, .1, 1).add(G.cyl, 14, -.6, 0, .5, .3, .08, .3, 0, PI / 2).add(G.cyl, 14, .6, 0, .5, .3, .08, .3, 0, PI / 2).add(G.box, 54, -.35, .45, 0, .7, .5, .45).add(G.box, 46, .35, .45, .1, .6, .4, .4).add(G.box, 45, .1, .95, -.1, .5, .35, .4); }, [.9, .6, .5]);
+  },
+  contact: function (d) { // a few letters blown about the kerb
+    var lq = []; for (var i = 0; i < 6; i++) { var p = d.site.clone().addScaledVector(d.tan, (i - 2.5) * .9 + Math.sin(i * 7) * .3).addScaledVector(d.face, .8 + Math.cos(i * 3) * .6), a = i * 1.3, c = Math.cos(a) * .22, s = Math.sin(a) * .22; quad(lq, new V3(p.x - c + s * .7, 0, p.z - s - c * .7), new V3(p.x + c + s * .7, 0, p.z + s - c * .7), new V3(p.x + c - s * .7, 0, p.z + s + c * .7), new V3(p.x - c - s * .7, 0, p.z - s + c * .7)); } flatMesh(lq, 20, .03);
+  }
+};
+STOPS.forEach(function (d) { if (DRESS[d.id]) DRESS[d.id](d); });
+// every plaza but the smallest gets two glowing lanterns at its back corners and a run of knockable fence along part of its back edge
+STOPS.forEach(function (d, i) {
+  if (d.id === 'contact' || d.id === 'translation') return;
+  [-1, 1].forEach(function (s) { var u = s * (d.pw / 2 - 1), v = d.depth / 2 - .9; if (pzFree(d, u, v, .1)) PZ_DYN.push({ kind: 'lantern', p: pzAt(d, u, v), ry: d.rot }); });
+  if (d.id === 'depths' || d.id === 'everywhere') return;
+  var side = i % 2 ? 1 : -1; for (var j = 0; j < 3; j++) { var u = side * (d.pw / 2 - 3 - j * 2.05), v = d.depth / 2 + .6; if (Math.abs(u) > 4.5 && pzFree(d, u, v, .1)) PZ_DYN.push({ kind: 'fence', p: pzAt(d, u, v), ry: d.rot + PI / 2 }); }
+});
+
 var LETTERS_MID = (function () { var s0 = START_S - 6, p = roadAt(s0).addScaledVector(roadRight(s0).negate(), ROAD_W / 2 + 7), d = new V3(1, 0, -1).normalize(); return p.addScaledVector(d, 12); })(); // as SPOTS.letters, set later
 function nearLetters(x, z, m) { return Math.hypot(x - LETTERS_MID.x, z - LETTERS_MID.z) < m; } // the name's lawn stays open
 function treeOK(x, z, m) {
@@ -1604,11 +1690,12 @@ G.trunk = prim(new THREE.CylinderGeometry(.3, .5, 1, 7).translate(0, .5, 0));
     var bx = (r() * 2 - 1) * 90, bz = (r() * 2 - 1) * 90, pk = plazaK(bx, bz), ck = channelK(bx, bz);
     var edge = (pk > 1.5 && pk < 5) || (ck > 1 && ck < 4.5) || (b % 5 === 0);
     if (!edge) continue; if (landK(bx, bz) < 2 || nearestRoad(bx, bz).d < ROAD_W / 2 + 2.5 || pathK(bx, bz) < 1.2) continue; if (!farFrom(statics, bx, bz, 1.2) || !farFrom(trees, bx, bz, 1.6)) continue;
-    if (nearLetters(bx, bz, 15)) continue;
+    if (nearLetters(bx, bz, 15) || maskAt(bx, bz, 0) > .2 || STOPS.some(function (d) { return Math.hypot(bx - d.pad.x, bz - d.pad.z) < 6 || Math.hypot(bx - d.spawn.x, bz - d.spawn.z) < 5; })) continue;
     var sc = .8 + r() * .5, col = bz < -35 && r() < .3 ? LEAF.gold : r() < .12 ? LEAF.bushPink : LEAF.bush, m = 1 + Math.floor(r() * 3);
     for (var j = 0; j < m; j++) clusters.push({ x: bx + (r() - .5) * 1.8 * sc, y: .55 * sc, z: bz + (r() - .5) * 1.8 * sc, s: (.85 + r() * .35) * sc, col: col, see: 0 });
     nb++;
   }
+  PZ_GREEN.forEach(function (g) { for (var j = 0; j < 2; j++) clusters.push({ x: g.p.x + (j - .5) * .5, y: g.y, z: g.p.z, s: g.s, col: g.col, see: 0 }); });
   var tm = meshOf(k); tm.frustumCulled = false; scene.add(tm);
   window.__treesMesh = tm;
 })();
@@ -1789,6 +1876,23 @@ var pins = [], ball;
   SPOTS.bowl.r = 10;
 })();
 
+// round 10 B: the plazas' knockable props (Bruno's lanterns, fences, benches and crates are all rigid bodies): lanterns glow day and night
+var windsocks = [];
+(function placePlazaProps() {
+  function lanternKit() { var k = new Kit(); k.add(G.box, 6, 0, -.42, 0, .5, .08, .5).add(G.box, 41, 0, -.34, 0, .36, .5, .36); [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (c) { k.add(G.box, 6, c[0] * .2, -.34, c[1] * .2, .07, .52, .07); }); k.add(G.box, 6, 0, .16, 0, .5, .07, .5).add(G.cone4, 6, 0, .2, 0, .5, .24, .5, PI / 4).add(G.box, 6, 0, -.12, .185, .36, .04, .02).add(G.box, 6, 0, -.12, -.185, .36, .04, .02); return k; }
+  PZ_DYN.forEach(function (o) {
+    var p = o.p, k = new Kit();
+    if (o.kind === 'lantern') { addDyn(propMesh(lanternKit()), new V3(.25, .42, .25), .4, 'brick', p.x, .42, p.z, o.ry); }
+    else if (o.kind === 'fence') { k.add(G.box, 6, -.95, -.5, 0, .14, 1, .14).add(G.box, 6, .95, -.5, 0, .14, 1, .14).add(G.box, 6, 0, -.25, .02, 2.05, .16, .06).add(G.box, 6, 0, .15, .02, 2.05, .16, .06); addDyn(propMesh(k), new V3(1.02, .5, .1), .6, 'brick', p.x, .5, p.z, o.ry); }
+    else if (o.kind === 'chair') { k.add(G.box, 54, 0, -.05, 0, .46, .07, .44).add(G.box, 54, 0, .2, -.2, .46, .45, .06); [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (c) { k.add(G.box, 14, c[0] * .19, -.42, c[1] * .18, .05, .38, .05); }); addDyn(propMesh(k), new V3(.23, .4, .22), .2, 'cone', p.x, .42, p.z, o.ry); }
+    else if (o.kind === 'ballot') { k.add(G.box, 20, 0, -.35, 0, .6, .6, .6).add(G.box, 14, 0, .26, 0, .3, .02, .06).add(G.box, 54, 0, -.2, .31, .5, .12, .02); addDyn(propMesh(k), new V3(.3, .3, .3), .25, 'brick', p.x, .35, p.z, o.ry); }
+    else if (o.kind === 'drum') { k.add(G.cyl, 13, 0, -.45, 0, .62, .9, .62).add(G.cyl, 14, 0, -.2, 0, .64, .05, .64).add(G.cyl, 14, 0, .2, 0, .64, .05, .64).add(G.cyl, 7, .15, .45, .1, .1, .03, .1); addDyn(propMesh(k), new V3(.31, .45, .31), .6, 'brick', p.x, .46, p.z, o.ry, new CANNON.Cylinder(.31, .31, .9, 8)); }
+    else if (o.kind === 'tyres') { for (var t = 0; t < 3; t++) k.add(G.cyl, 34, 0, -.45 + t * .3, 0, .9, .28, .9).add(G.cyl, 14, 0, -.44 + t * .3, 0, .5, .29, .5); addDyn(propMesh(k), new V3(.45, .45, .45), .8, 'hay', p.x, .46, p.z, o.ry, new CANNON.Cylinder(.45, .45, .9, 8)); }
+    else if (o.kind === 'sock') { var g = new THREE.Group(), sk = new Kit(); for (var j = 0; j < 4; j++) sk.add(G.cyl, j % 2 ? 20 : 22, 0, 0, .05 + j * .38, .5 - j * .07, .4, .5 - j * .07, 0, PI / 2); var m = meshOf(sk); m.position.y = 0; g.add(m); g.position.set(p.x, 4.25, p.z); scene.add(g); windsocks.push({ g: g, m: m }); }
+  });
+})();
+// cannon's Cylinder is built along z in 0.6.2; stand the drums and tyre stacks up
+dyn.forEach(function (o) { var sh = o.b.shapes[0]; if (sh instanceof CANNON.Cylinder && !o.cylFixed) { o.cylFixed = true; o.b.shapeOrientations[0].setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -PI / 2); o.b.updateBoundingRadius(); o.b.aabbNeedsUpdate = true; } });
 // ============================================================================ the car: Bruno 2025's physical vehicle, on cannon
 var carBody = new CANNON.Body({ mass: 2.5 }); carBody.allowSleep = false;
 // Bruno's colliders, with the body's origin at his centre of mass (0.6 below the chassis origin): main (1.3, .4, .85) at y -0.1,
@@ -3110,7 +3214,7 @@ function updateTabTitle(now) { lastTitleT = now; var s = wrapS(nearestRoad(car.p
 // the view footprint: the default camera at its farthest, rays through the screen's corners and edges onto the ground (View.optimalArea)
 var area = { radius: 30, near: 24, far: 47, base: new V3(), size: 60 };
 function optimalArea() {
-  var cam = new THREE.PerspectiveCamera(25, camera.aspect, .1, 400), rMax = (30 + view.overflow * 9) * (quality.level === 2 ? 1.12 : 1), ray = new THREE.Raycaster(), pl = new THREE.Plane(new V3(0, 1, 0), 0);
+  var cam = new THREE.PerspectiveCamera(25, camera.aspect, .1, 400), rMax = (30 + view.overflow * 9) * (quality.level === 2 ? 1.4 : 1), ray = new THREE.Raycaster(), pl = new THREE.Plane(new V3(0, 1, 0), 0);
   cam.position.setFromSphericalCoords(rMax, PI * (quality.level === 0 ? .27 : .31), PI * .25); cam.lookAt(0, 0, 0); cam.updateMatrixWorld(); cam.updateProjectionMatrix();
   function hit(x, y) { ray.setFromCamera(new V2(x, y), cam); var o = new V3(); return ray.ray.intersectPlane(pl, o) ? o : new V3(); }
   var a = hit(1, -1), b = hit(-1, 1), c = hit(-1, -1), d = hit(1, 1), cA = a.clone().lerp(b, .5), cB = c.clone().lerp(d, .5);
@@ -3197,8 +3301,9 @@ var flowers = (function () {
     ' vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n').replace('varying vec3 vW;', 'uniform vec3 uL; varying vec3 vW;'),
     fs: [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
       'void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 col = shade(L2(vC), n, dropShadow(), 0., vW, 0.); gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
+  PZ_BEDS.forEach(function (bd) { for (var j = 0; j < (bd.ring ? 60 : 26); j++) { var a = r() * TAU, rr = bd.ring ? bd.r + .5 + r() * .7 : r() * bd.r; heads.push({ x: bd.p.x + Math.cos(a) * rr * (bd.ring ? 1 : .55), z: bd.p.z + Math.sin(a) * rr, y: bd.y || 0, ry: TAU * r(), s: .8 + r() * .3, c: cols[Math.floor(r() * cols.length)] }); } });
   var mesh = new THREE.InstancedMesh(geo, mat, heads.length), ob = new THREE.Object3D();
-  heads.forEach(function (h, i) { ob.position.set(h.x, 0, h.z); ob.rotation.set(0, h.ry, 0); ob.scale.setScalar(h.s); ob.updateMatrix(); mesh.setMatrixAt(i, ob.matrix); mesh.setColorAt(i, h.c); });
+  heads.forEach(function (h, i) { ob.position.set(h.x, h.y || 0, h.z); ob.rotation.set(0, h.ry, 0); ob.scale.setScalar(h.s); ob.updateMatrix(); mesh.setMatrixAt(i, ob.matrix); mesh.setColorAt(i, h.c); });
   mesh.frustumCulled = false; mesh.receiveShadow = true; scene.add(mesh);
   return { mesh: mesh, max: heads.length };
 })();
@@ -3234,7 +3339,7 @@ var leaves = (function () {
   var mesh = new THREE.InstancedMesh(geo, mat, MAX); mesh.frustumCulled = false; mesh.castShadow = mesh.receiveShadow = true; mesh.renderOrder = 2; scene.add(mesh);
   var cA = new C3('#95513a'), cB = new C3('#f56a3a'), cP = new C3('#f28fa4'), cY = new C3('#e8b13a'), tmpc = new C3(), list = [];
   for (var i = 0; i < MAX; i++) {
-    var k = r(); tmpc.copy(cA).lerp(cB, r()); if (k < .12) tmpc.copy(cP); else if (k < .2) tmpc.copy(cY);
+    var k = r(); tmpc.copy(cA).lerp(cB, r()); if (k < .04) tmpc.copy(cP); else if (k < .08) tmpc.copy(cY);
     mesh.setColorAt(i, tmpc);
     list.push({ p: new V3(), v: new V3(), s: (.5 + r() * .5) * .25, ry: r() * TAU, tilt: new V2((r() - .5) * 2, (r() - .5) * 2), w: .1 + r() * .1, moving: true, fall: 0, seed: r() * 100 });
   }
@@ -3385,6 +3490,7 @@ function artFrame(dt, now) {
   // see-through: the car's place on screen, and the radius (3 / R .. 15 / R)
   _cs.copy(car.pos).project(camera); U.uCarS.value.set(_cs.x * .5 + .5, _cs.y * .5 + .5, 1 / Math.max(10, view.radius));
   if (flat && (state === 'play' || state === 'map' || state === 'enter' || state === 'boot')) { updateLeaves(Math.min(dt, .05)); updateTrackRT(dt); }
+  var wa = Math.atan2(U.uWind.value.x, U.uWind.value.y), tt = (now || 0) / 1000; windsocks.forEach(function (w, i) { w.g.rotation.y = wa + Math.sin(tt * .7 + i) * .3; w.m.rotation.x = .35 - U.uWindS.value * .3 + Math.sin(tt * 6 + i) * .04; });
 }
 function drawFrame(dt, now) {
   artFrame(dt, now || performance.now());
