@@ -581,6 +581,7 @@ html.gl-lowq #gl{background:transparent}
       <div class="row row-wide"><label class="row-l" for="sSens">Steering <span class="row-val" id="sSensV">Normal</span></label><input class="road" id="sSens" type="range" min="1" max="5" step="1" value="3" aria-describedby="sSensH"><p class="row-h" id="sSensH">How far the front wheels turn. Normal is Bruno Simon&rsquo;s own.</p></div>
       <div class="row row-wide"><span class="row-l" id="sSpeedL">Speed</span><div class="seg" role="radiogroup" aria-labelledby="sSpeedL"><label><input type="radio" name="sSpeed" value="calm"><span>Calm</span></label><label><input type="radio" name="sSpeed" value="normal" checked><span>Normal</span></label><label><input type="radio" name="sSpeed" value="fast"><span>Fast</span></label></div></div>
       <div class="row row-wide" id="sTouchRow"><span class="row-l" id="sTouchL">Touch driving</span><div class="seg" role="radiogroup" aria-labelledby="sTouchL" aria-describedby="sTouchH"><label><input type="radio" name="sTouch" value="ring" checked><span>Ring</span></label><label><input type="radio" name="sTouch" value="tap"><span>Tap to go</span></label></div><p class="row-h" id="sTouchH">Touch the ground: the car drives toward your finger.</p></div>
+      <div class="row row-wide" id="sKeysRow"><span class="row-l" id="sKeysL">Arrow keys</span><div class="seg" role="radiogroup" aria-labelledby="sKeysL" aria-describedby="sKeysH"><label><input type="radio" name="sKeys" value="car" checked><span>Steer</span></label><label><input type="radio" name="sKeys" value="screen"><span>Point</span></label></div><p class="row-h" id="sKeysH">Up drives, left and right turn the wheel, as in Bruno Simon&rsquo;s.</p></div>
       <div class="row"><label class="row-l" for="sVib">Vibration</label><span class="sw"><input type="checkbox" id="sVib" role="switch" aria-describedby="sVibH"><span>Off</span></span><p class="row-h" id="sVibH">A buzz on bumps and hops, on phones that can.</p></div>
       <div class="row"><span class="row-l">I&rsquo;m stuck!</span><button class="act" id="sRoad" type="button">Back on the road</button></div>
     </div>
@@ -763,9 +764,10 @@ $('stops').addEventListener('focusin', function (e) { var li = e.target.closest(
 doc.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.hud button'); if (b && e.detail > 0 && b.id !== 'exitGo') setTimeout(function () { b.blur(); }, 0); });
 // ---------------------------------------------------------------- settings (round 4): they live for the visit only (no storage, a site rule)
 // Presented like Bruno 2025's Options (label left, one control right, one-line hint), in the hub's own slabs.
-var SET = { sens: 3, speed: 'normal', touch: 'ring', vib: COARSE && ('vibrate' in navigator || HAP_IOS), /* round 7: on by default on phones, like a native game's haptics */ vol: 0, lastVol: 6, qual: 'auto', wx: 'live', rm: html.classList.contains('rm') };
+var SET = { sens: 3, speed: 'normal', touch: 'ring', keys: 'car', vib: COARSE && ('vibrate' in navigator || HAP_IOS), /* round 7: on by default on phones, like a native game's haptics */ vol: 0, lastVol: 6, qual: 'auto', wx: 'live', rm: html.classList.contains('rm') };
 function RMset() { return SET.rm; }
 var setOpen = false, setFocusBack = null;
+var KEYS_HINT = { car: 'Up drives, left and right turn the wheel, as in Bruno Simon’s.', screen: 'The arrows point the way on screen: press down and the car comes down the screen, whichever way it faces.' };
 var TOUCH_HINT = { ring: 'Touch the ground: the car drives toward your finger. Behind it, it backs up.', tap: 'Tap a sign or a spot on the ground and the car drives itself there.' };
 var SENS_WORD = ['', 'Gentle', 'Soft', 'Normal', 'Quick', 'Sharp'];
 function openSettings(tab) {
@@ -795,11 +797,11 @@ $('setPanel').addEventListener('keydown', function (e) { if (e.key === 'Escape')
 function swLabel(inp) { inp.nextElementSibling.textContent = inp.checked ? 'On' : 'Off'; }
 function syncSettingsUI() {
   $('sSens').value = SET.sens; $('sSensV').textContent = SENS_WORD[SET.sens];
-  ['sSpeed:speed', 'sTouch:touch', 'sQual:qual', 'sWx:wx'].forEach(function (p) { var a = p.split(':'); Array.prototype.forEach.call(doc.querySelectorAll('input[name="' + a[0] + '"]'), function (r) { r.checked = r.value === SET[a[1]]; }); });
+  ['sSpeed:speed', 'sTouch:touch', 'sKeys:keys', 'sQual:qual', 'sWx:wx'].forEach(function (p) { var a = p.split(':'); Array.prototype.forEach.call(doc.querySelectorAll('input[name="' + a[0] + '"]'), function (r) { r.checked = r.value === SET[a[1]]; }); });
   $('sVib').checked = SET.vib; $('sRM').checked = SET.rm;
   ['sVib', 'sRM'].forEach(function (id) { swLabel($(id)); });
   $('sVol').value = SET.vol; $('sVolV').textContent = SET.vol ? SET.vol * 10 + '%' : 'Off';
-  $('sTouchH').textContent = TOUCH_HINT[SET.touch];
+  $('sTouchH').textContent = TOUCH_HINT[SET.touch]; $('sKeysH').textContent = KEYS_HINT[SET.keys];
 }
 function setSetting(k, v) {
   SET[k] = v;
@@ -811,7 +813,7 @@ function setSetting(k, v) {
   if (!('vibrate' in navigator) && !HAP_IOS) { $('sVib').disabled = true; $('sVibH').textContent = 'This device can’t vibrate.'; }
   $('sSens').addEventListener('input', function () { setSetting('sens', +this.value); });
   $('sVol').addEventListener('input', function () { setSetting('vol', +this.value); if (+this.value) SET.lastVol = +this.value; });
-  [['sSpeed', 'speed'], ['sTouch', 'touch'], ['sQual', 'qual'], ['sWx', 'wx']].forEach(function (p) { Array.prototype.forEach.call(doc.querySelectorAll('input[name="' + p[0] + '"]'), function (r) { r.addEventListener('change', function () { if (r.checked) setSetting(p[1], r.value); }); }); });
+  [['sSpeed', 'speed'], ['sTouch', 'touch'], ['sKeys', 'keys'], ['sQual', 'qual'], ['sWx', 'wx']].forEach(function (p) { Array.prototype.forEach.call(doc.querySelectorAll('input[name="' + p[0] + '"]'), function (r) { r.addEventListener('change', function () { if (r.checked) setSetting(p[1], r.value); }); }); });
   [['sVib', 'vib'], ['sRM', 'rm']].forEach(function (p) { $(p[0]).addEventListener('change', function () { setSetting(p[1], this.checked); if (p[1] === 'vib' && this.checked) buzz(30); }); });
   $('sRoad').addEventListener('click', function () { closeSettings(); if (W && W.resetCar) W.resetCar(); });
   $('sTidy').addEventListener('click', function () { if (W && W.tidy) W.tidy(); });
@@ -1832,7 +1834,7 @@ STOPS.forEach(function (d, i) {
   var side = i % 2 ? 1 : -1; for (var j = 0; j < 3; j++) { var u = side * (d.pw / 2 - 3 - j * 2.05), v = d.depth / 2 + .6; if (Math.abs(u) > 4.5 && pzFree(d, u, v, .1)) PZ_DYN.push({ kind: 'fence', p: pzAt(d, u, v), ry: d.rot + PI / 2 }); }
 });
 
-var LETTERS_MID = (function () { var s0 = START_S - 6, p = roadAt(s0).addScaledVector(roadRight(s0).negate(), ROAD_W / 2 + 7), d = new V3(1, 0, -1).normalize(); return p.addScaledVector(d, 12); })(); // as SPOTS.letters, set later
+var LETTERS_MID = roadPt(CAR0_S + 7, ROAD_W / 2 + 2.9); // as SPOTS.letters, set later (round 13: the verge beside the car at the start)
 function nearLetters(x, z, m) { return Math.hypot(x - LETTERS_MID.x, z - LETTERS_MID.z) < m; } // the name's lawn stays open
 // round 10 B: the loop's roadside, dressed the way Bruno lines his circuit: bush clumps just past the kerbs, lanterns in pairs, tyre stacks
 // on the outsides of bends, a run of fence here and there; and a busier Fresno start. Nothing on the road, a plaza, a pad or the water.
@@ -1868,7 +1870,7 @@ var STONES = [];
     if (roll < .73) { put('bench', p, face, .9); put('lantern', tv(1.5), face, .4); if (r() < .5) put('pot', tv(-1.4), 0, .3); continue; }
     if (roll < .8) { var pp = roadPt(s, sd * (off + 2)); if (put('picnic', pp, along, 1.1)) put('umbrella', pp.clone().addScaledVector(roadRight(s), sd * 1.3), 0, .3); continue; }
     if (roll < .86) { put('hay', p, along, .7); put('hay', tv(1.4), along + .2, .7); continue; }
-    if (roll < .93) { if (farFrom(statics, p.x, p.z, 2)) { boulder(p.x, p.z, .7 + r() * .6, r() * TAU); PZ_PLACED.push({ x: p.x, z: p.z, r: 1.2 }); PZ_GREEN.push({ p: tv(1.4), s: .8, y: .5, col: LEAF.bush }); } continue; }
+    if (roll < .93) { if (farFrom(statics, p.x, p.z, 2)) { var bsc = .7 + r() * .6, bry = r() * TAU; if (off > ROAD_W / 2 + 4.6 || Math.sign(cv) !== sd || Math.abs(cv) < .008) { boulder(p.x, p.z, bsc, bry); PZ_PLACED.push({ x: p.x, z: p.z, r: 1.2 }); } PZ_GREEN.push({ p: tv(1.4), s: .8, y: .5, col: LEAF.bush }); } continue; } // round 13: no boulder by the kerb on the inside of a bend
     put('cone', p, 0, .35); put('cone', tv(1.2), 1, .35);
   }
   for (var ss = 14; ss < ROAD_LEN - 6; ss += 9 + r() * 9) { var st = r() < .5 ? -1 : 1, sp = roadPt(ss, st * (ROAD_W / 2 + 1.4)); if (plazaK(sp.x, sp.z) < 1 || !pzRoom(sp, .8)) continue; var rr = roadRight(ss), dir = Math.atan2(rr.z * st, rr.x * st) + (r() - .5) * 1.2; stones(sp.x, sp.z, dir, 3 + Math.floor(r() * 3), r); }
@@ -1884,7 +1886,7 @@ var STONES = [];
   }
   // street lamps along the loop, alternate sides (Bruno's pole lights); they glow at night like the plazas' lamps
   var side = 1; for (var ls = 20; ls < ROAD_LEN - 10; ls += 26 + r() * 12) {
-    side = -side; var lp = roadPt(ls, side * (ROAD_W / 2 + 1.9)); if (!ok(lp, .3) && !(landK(lp.x, lp.z) > 2 && plazaK(lp.x, lp.z) > 1 && farFrom(statics, lp.x, lp.z, 1))) continue;
+    side = -side; var lp = roadPt(ls, side * (ROAD_W / 2 + (Math.sign(roadCurv(ls)) === side && Math.abs(roadCurv(ls)) > .008 ? 3.6 : 1.9))); // round 13: on the inside of a bend a lamp stands back (a first-timer cuts the corner; SP/r13/human.js hit one) if (!ok(lp, .3) && !(landK(lp.x, lp.z) > 2 && plazaK(lp.x, lp.z) > 1 && farFrom(statics, lp.x, lp.z, 1))) continue;
     var ry = Math.atan2(roadRight(ls).x * -side, roadRight(ls).z * -side), lk = new Kit();
     lk.add(G.box, 17, 0, 0, 0, .4, .25, .4).add(G.cyl6, 7, 0, 0, 0, .16, 3.4, .16).add(G.box, 14, 0, 3.3, 0, .55, .12, .55).add(G.box, 25, 0, 2.95, 0, .42, .38, .42).add(G.cone4, 14, 0, 3.4, 0, .7, .4, .7, PI / 4);
     kitGeo.push.apply(kitGeo, lk.bake(lp.x, 0, lp.z, ry)); addStatic(lp.x, 0, lp.z, .2, 1.8, .2, ry, null, 'lamp'); lampHeads.push(new V3(lp.x, 3.15, lp.z));
@@ -2059,6 +2061,7 @@ STOPS.forEach(function (d) {
   if (d.id === 'contact' || d.id === 'translation') return;
   [-1, 1].forEach(function (sg) {
     var p = d.plaza.clone().addScaledVector(d.tan, sg * (d.pw / 2 - .8)).addScaledVector(d.face, d.depth / 2 - .6), k = new Kit();
+    var cs = nearestRoad(p.x, p.z).s, cc = roadCurv(cs); if (Math.sign(cc) === d.side && Math.abs(cc) > .008) p.addScaledVector(d.face, -1.8); // round 13: a corner lamp on the inside of a bend stands back from the kerb
     k.add(G.box, 17, 0, 0, 0, .4, .25, .4).add(G.cyl6, 7, 0, 0, 0, .16, 3.4, .16).add(G.box, 14, 0, 3.3, 0, .55, .12, .55).add(G.box, 25, 0, 2.95, 0, .42, .38, .42).add(G.cone4, 14, 0, 3.4, 0, .7, .4, .7, PI / 4);
     kitGeo.push.apply(kitGeo, k.bake(p.x, 0, p.z, d.rot)); addStatic(p.x, 0, p.z, .2, 1.8, .2, d.rot, null, 'lamp'); lampHeads.push(new V3(p.x, 3.15, p.z));
   });
@@ -2143,30 +2146,48 @@ var SPOTS = {};
 (function () {
   var s0 = START_S - 6, n = roadRight(s0).negate(); // north of the start straight (left of travel)
   var p = roadAt(s0).addScaledVector(n, ROAD_W / 2 + 7);
-  SPOTS.letters = { x: p.x, z: p.z, dir: new V3(1, 0, -1).normalize() };           // the name, reading left to right on screen
+  var ls = CAR0_S + 7, lp = roadPt(ls, ROAD_W / 2 + 2.9); SPOTS.letters = { x: lp.x, z: lp.z, s: ls, off: ROAD_W / 2 + 2.9, turn: .31 }; // the name, on the verge beside the car (round 13)
   var cp = roadPt(START_S + 22, ROAD_W / 2 + 5.5); SPOTS.crates = { x: cp.x, z: cp.z };  // south of the straight, near the camera
   var bl = roadPt(STOPS[5].s - 22, -(ROAD_W / 2 + 9)); SPOTS.bowl = { x: bl.x, z: bl.z, f: roadTan(STOPS[5].s - 22) };
   SPOTS.race = roadAt(RACE_S);
 })();
-// the block letters (Messenger's title letters; Bruno's name in the grass): a 5x5 grid per glyph, greedy slabs
-var GLYPH = { H: ['#...#', '#...#', '#####', '#...#', '#...#'], U: ['#...#', '#...#', '#...#', '#...#', '.###.'], S: ['.####', '#....', '.###.', '....#', '####.'], A: ['.###.', '#...#', '#####', '#...#', '#...#'], M: ['#...#', '##.##', '#.#.#', '#...#', '#...#'], O: ['.###.', '#...#', '#...#', '#...#', '.###.'], K: ['#..#.', '#.#..', '##...', '#.#..', '#..##'], R: ['####.', '#...#', '####.', '#.#..', '#..##'] };
-var BLK = .44, letters = [];
-function glyphKit(ch) {
-  var g = GLYPH[ch], used = [], k = new Kit(); for (var y = 0; y < 5; y++) used.push([0, 0, 0, 0, 0]);
-  for (var y0 = 0; y0 < 5; y0++) for (var x0 = 0; x0 < 5; x0++) {
-    if (g[y0][x0] !== '#' || used[y0][x0]) continue;
-    var x1 = x0; while (x1 + 1 < 5 && g[y0][x1 + 1] === '#' && !used[y0][x1 + 1]) x1++;
-    var y1 = y0; while (y1 + 1 < 5) { var ok = true; for (var xx = x0; xx <= x1; xx++) if (g[y1 + 1][xx] !== '#' || used[y1 + 1][xx]) ok = false; if (!ok) break; y1++; }
-    for (var yy = y0; yy <= y1; yy++) for (var xz = x0; xz <= x1; xz++) used[yy][xz] = 1;
-    k.add(G.box, 13, ((x0 + x1) / 2 - 2) * BLK, (4 - y1) * BLK - 2.5 * BLK, 0, (x1 - x0 + 1) * BLK, (y1 - y0 + 1) * BLK, BLK * 1.4);
-  }
-  return k;
+// round 13: the name, re-cut. It was a 5 x 5 pixel font built from boxes (seams at every slab, stair-stepped S and K); now each letter is
+// the site's own display face, Bungee (David Jonathan Ross, SIL OFL 1.1: signage letters, rounded corners), its outlines (from
+// Bungee-Regular.ttf, 1000 units to the em, cap height 720) extruded in one piece with a small bevel that catches the light. Proportions
+// and physics after Bruno 2025's "BRUNO SIMON" (static/areas: each letter a dynamic cuboid 1.45 m tall and 0.46 m deep, depth = 0.32 of
+// the height, mass 0.2 against the car's 2.5, standing in a line beside the spawn, knocked flying by the car): ours are 1.5 m tall,
+// 0.5 m deep, mass 0.35, spaced by the font's own advances (plus 8% tracking), standing on the verge in front of the car at the start.
+var GLY = {H:[759,"M260 0L105 0Q69 0 69 36L69 684Q69 720 105 720L260 720Q296 720 296 684L296 467L463 467L463 684Q463 720 499 720L654 720Q690 720 690 684L690 36Q690 0 654 0L499 0Q463 0 463 36L463 258L296 258L296 36Q296 0 260 0Z"],U:[746,"M682 189Q682 143 668 105Q655 68 620 41Q586 14 526 0Q466 -15 373 -15Q280 -15 220 0Q160 14 125 41Q91 68 77 105Q64 143 64 189L64 684Q64 720 100 720L257 720Q293 720 293 684L293 228Q293 208 308 194Q323 181 375 181Q428 181 443 194Q458 208 458 228L458 684Q458 720 494 720L646 720Q682 720 682 684Z"],S:[650,"M403 0L87 0Q51 0 51 36L51 153Q51 189 87 189L356 189Q369 189 375 197Q382 206 382 218Q382 235 375 243Q369 251 356 252L206 273Q136 284 93 319Q51 355 51 439L51 544Q51 630 106 675Q161 720 258 720L538 720Q574 720 574 684L574 565Q574 529 538 529L305 529Q278 529 278 499Q278 470 305 467L454 447Q501 440 536 422Q571 405 590 371Q610 337 610 281L610 176Q610 91 555 45Q500 0 403 0Z"],A:[730,"M273 36Q273 0 237 0L90 0Q54 0 54 36L54 300Q54 330 63 369Q73 408 93 460L180 687Q191 720 231 720L500 720Q539 720 550 687L637 460Q657 408 666 369Q676 330 676 300L676 36Q676 0 640 0L489 0Q450 0 450 36L450 176L273 176ZM330 510L283 358L440 358L393 510Q386 527 374 527L349 527Q337 527 330 510Z"],M:[849,"M254 0L105 0Q69 0 69 36L69 684Q69 720 105 720L266 720Q296 720 312 690L402 527Q407 518 410 514Q414 510 420 510L429 510Q435 510 438 514Q442 518 447 527L536 690Q552 720 582 720L744 720Q780 720 780 684L780 36Q780 0 744 0L590 0Q554 0 554 36L554 388L495 279Q478 247 442 247L402 247Q366 247 349 279L290 388L290 36Q290 0 254 0Z"],O:[737,"M679 189Q679 143 665 105Q652 68 618 41Q584 14 523 0Q463 -15 369 -15Q275 -15 214 0Q154 14 120 41Q86 68 72 105Q58 143 58 189L58 530Q58 576 72 613Q86 651 120 678Q154 705 214 720Q275 735 369 735Q463 735 523 720Q584 705 618 678Q652 651 665 613Q679 576 679 530ZM285 225Q285 205 300 191Q315 178 369 178Q424 178 438 191Q453 205 453 225L453 494Q453 514 438 527Q424 540 369 540Q315 540 300 527Q285 514 285 494Z"],K:[746,"M260 0L105 0Q69 0 69 36L69 684Q69 720 105 720L260 720Q296 720 296 684L296 454L336 454L439 687Q453 720 489 720L643 720Q679 720 665 687L563 454Q619 451 652 414Q686 378 686 318L686 36Q686 0 650 0L496 0Q460 0 460 36L460 231Q460 265 428 265L296 265L296 36Q296 0 260 0Z"],R:[743,"M259 0L105 0Q69 0 69 36L69 684Q69 720 105 720L438 720Q513 720 556 699Q599 678 617 640Q635 603 635 553L635 507Q635 465 623 436Q611 407 579 393Q634 387 667 349Q700 311 700 248L700 36Q700 0 664 0L509 0Q473 0 473 36L473 189Q473 212 464 222Q456 232 435 232L295 232L295 36Q295 0 259 0ZM295 540L295 412L370 412Q396 412 405 425Q414 439 414 459L414 493Q414 513 405 526Q396 540 370 540Z"]}, GLY_K = { SS: -5, RO: -5 };
+var LET_H = 1.5, LET_D = .5, LET_S = LET_H / 720, LET_TRACK = 60, letters = [], BLK = LET_H / 5; // BLK: kept for the half height (2.5 * BLK)
+function glyphShapes(ch) { // the path (M, L, Q, Z in font units) as THREE shapes; TrueType outers run clockwise, counters anticlockwise
+  var d = GLY[ch][1], sp = new THREE.ShapePath(), re = /([MLQZ])([^MLQZ]*)/g, m, n;
+  while ((m = re.exec(d))) { n = m[2].trim() ? m[2].trim().split(/\s+/).map(Number) : [];
+    if (m[1] === 'M') sp.moveTo(n[0] * LET_S, n[1] * LET_S); else if (m[1] === 'L') sp.lineTo(n[0] * LET_S, n[1] * LET_S); else if (m[1] === 'Q') sp.quadraticCurveTo(n[0] * LET_S, n[1] * LET_S, n[2] * LET_S, n[3] * LET_S); }
+  return sp.toShapes(false);
 }
-'HUSAMSOKAR'.split('').forEach(function (ch, i) {
-  var L = SPOTS.letters, along = i * 2.55 + (i >= 5 ? 1.6 : 0), x = L.x + L.dir.x * along, z = L.z + L.dir.z * along;
-  var o = addDyn(propMesh(glyphKit(ch)), new V3(2.5 * BLK, 2.5 * BLK, .7 * BLK), 1.6, 'brick', x, 2.5 * BLK, z, PI / 4);
-  o.m.material = matFlat; o.home = { x: x, z: z, ry: PI / 4 }; o.idx = i; o.row = i < 5 ? 0 : 1; o.col = i < 5 ? i : i - 5; letters.push(o);
-});
+var _glyC = {};
+function glyphGeo(ch) { // one letter, extruded and bevelled, centred on its box (the physics cuboid); returns the geometry and its box
+  if (_glyC[ch]) return _glyC[ch];
+  var bev = .035, g = new THREE.ExtrudeGeometry(glyphShapes(ch), { depth: LET_D - bev * 2, bevelEnabled: true, bevelThickness: bev, bevelSize: .022, bevelOffset: -.022, bevelSegments: 2, curveSegments: 5 });
+  g.computeBoundingBox(); var bb = g.boundingBox, c = new V3(); bb.getCenter(c); g.translate(-c.x, -c.y, -c.z);
+  var out = { g: prim(g), w: bb.max.x - bb.min.x, h: bb.max.y - bb.min.y, cx: c.x, adv: GLY[ch][0] * LET_S };
+  return (_glyC[ch] = out);
+}
+function glyphKit(ch) { return new Kit().add(glyphGeo(ch).g, 13, 0, 0, 0); }
+// the line: along the road's south verge beside the car's first stop (Bruno's name stands beside his spawn, reading along the diagonal
+// that runs down to the right of the screen, as the start straight does); each letter turned 18 degrees toward the camera
+function nameLayout(word) { // x of each letter's box centre along a line, from the advances, kerning and tracking; returns [xs, width]
+  var xs = [], x = 0; for (var i = 0; i < word.length; i++) { var ch = word[i]; if (ch === ' ') { x += 300 * LET_S; continue; } var gg = glyphGeo(ch); xs.push(x + gg.cx); x += gg.adv + LET_TRACK * LET_S + (GLY_K[ch + (word[i + 1] || '')] || 0) * LET_S; }
+  return [xs, x - LET_TRACK * LET_S];
+}
+(function () {
+  var NL = nameLayout('HUSAM SOKAR'), L = SPOTS.letters, t = roadTan(L.s), rgt = roadRight(L.s);
+  'HUSAMSOKAR'.split('').forEach(function (ch, i) {
+    var along = NL[0][i] - NL[1] / 2, c = roadAt(L.s + along).addScaledVector(roadRight(L.s + along), L.off), tt = roadTan(L.s + along), ry = Math.atan2(tt.x, tt.z) - PI / 2 + L.turn, gg = glyphGeo(ch);
+    var o = addDyn(propMesh(glyphKit(ch)), new V3(gg.w / 2, gg.h / 2, LET_D / 2), .35, 'brick', c.x, gg.h / 2, c.z, ry);
+    o.m.material = matFlat; o.home = { x: c.x, z: c.z, ry: ry, y: gg.h / 2 }; o.idx = i; o.ch = ch; o.row = i < 5 ? 0 : 1; o.col = i < 5 ? i : i - 5; o.gw = gg.w; o.gh = gg.h; letters.push(o);
+  });
+})();
 SPOTS.letters.r = 14;
 // crates: a pyramid (Bruno 2019's walls)
 (function () {
@@ -2300,6 +2321,15 @@ function flipTest() { // a front or back flip, landed on four wheels (Bruno setF
   else if (F.air) { F.x += wrapA(xr - F.px); F.px = xr; F.z += wrapA(zr - F.pz); F.pz = zr; }
 }
 function respawnNearest() {
+  // round 13: "Back on the road" puts the car back on the road where it left it (Bruno's R takes you to the nearest of his respawns, which
+  // on a loop can be 30 m back or across the island): the nearest point of the loop, a few metres back, in the middle, facing the way the
+  // car was going along the road; the old respawns are kept for the far places (a car that flew off into the sea)
+  var nr = nearestRoad(car.pos.x, car.pos.z);
+  if (nr.d < 40) {
+    var t0 = roadTan(nr.s), dir = car.fwd.x * t0.x + car.fwd.z * t0.z < -.2 ? -1 : 1, rs = nr.s - dir * 3;
+    for (var tries = 0; tries < 6; tries++) { var rp = roadAt(rs), clear = true; for (var i = 0; i < dyn.length; i++) { var b = dyn[i].b; if (b !== carBody && Math.hypot(b.position.x - rp.x, b.position.z - rp.z) < 2.2) { clear = false; break; } } if (clear) break; rs -= dir * 3; }
+    var rt = roadTan(rs).multiplyScalar(dir), p0 = roadAt(rs); respawnAt({ x: p0.x, z: p0.z, rot: Math.atan2(-rt.z, rt.x) }); return;
+  }
   var best = SPAWN0, bd = Math.hypot(car.pos.x - SPAWN0.x, car.pos.z - SPAWN0.z);
   STOPS.forEach(function (d) { var dd = Math.hypot(car.pos.x - d.spawn.x, car.pos.z - d.spawn.z); if (dd < bd) { bd = dd; best = d.spawn; } });
   respawnAt(best);
@@ -2538,8 +2568,8 @@ function pollPad() {
   if (!g) return; var B = g.buttons, A = g.axes, val = function (i) { return B[i] ? (typeof B[i] === 'object' ? B[i].value : B[i]) : 0; }, prs = function (i) { return B[i] && (B[i].pressed || val(i) > .5); };
   var dz = function (v) { return Math.abs(v) < .16 ? 0 : (v - Math.sign(v) * .16) / .84; };
   gp.steer = -dz(A[0] || 0) - (prs(15) ? 1 : 0) + (prs(14) ? 1 : 0); gp.acc = (val(7) + (prs(12) ? 1 : 0)) - (val(6) + (prs(13) ? 1 : 0));
-  gp.boost = prs(1); gp.brake = prs(2); gp.sus = prs(3); gp.susL = prs(4); gp.susR = prs(5); gp.rx = dz(A[2] || 0); gp.ry = dz(A[3] || 0);
-  gp.on = Math.abs(gp.steer) > .05 || Math.abs(gp.acc) > .05 || gp.boost || gp.brake || gp.sus;
+  gp.lx = dz(A[0] || 0); gp.ly = dz(A[1] || 0); gp.boost = prs(1); gp.brake = prs(2); gp.sus = prs(3); gp.susL = prs(4); gp.susR = prs(5); gp.rx = dz(A[2] || 0); gp.ry = dz(A[3] || 0);
+  gp.on = Math.abs(gp.steer) > .05 || Math.abs(gp.acc) > .05 || gp.boost || gp.brake || gp.sus || (SET.keys === 'screen' && Math.hypot(gp.lx, gp.ly) > .05);
   var now = []; for (var j = 0; j < B.length; j++) now[j] = prs(j);
   function edge(j) { return now[j] && !gp.prev[j]; }
   if (state === 'play') {
@@ -2560,6 +2590,21 @@ function playerInput() {
   if (ctl.brake || gp.brake) { player.acc = 0; player.brake = 1; }
   if (ctl.right) player.steer -= 1; if (ctl.left) player.steer += 1;
   if (player.steer === 0 && gp.on) player.steer = clamp(gp.steer, -1, 1);
+  // round 13: "Point" (Settings > Driving): the arrows (and the left stick) are directions on the screen, not the wheel. The camera never
+  // turns, so screen up is always the same way on the ground (north-west); the wanted heading goes through the ring's own rule below
+  // (full lock 45 degrees off the nose, the back quarter reverses), so keys and touch drive alike. Default stays Bruno's steer-the-car.
+  if (SET.keys === 'screen' && !ctl.brake) {
+    var kx = (ctl.right ? 1 : 0) - (ctl.left ? 1 : 0), ky = (ctl.forward ? 1 : 0) - (ctl.backward ? 1 : 0), km = 1;
+    if (!kx && !ky && gp.on && gp.lx != null) { kx = gp.lx; ky = -gp.ly; km = Math.min(1, Math.hypot(kx, ky)); }
+    if (kx || ky) { var ka = screenHeading(kx, ky);
+      // eight keys give eight headings, and the road runs at every angle: a key pressed roughly along the road (within 40 degrees) follows
+      // it, holding the lane the car is in, so "down-right" drives the road that goes down-right (the stick, being analog, isn't snapped)
+      if (km === 1) { var kr = nearestRoad(car.pos.x, car.pos.z); if (kr.d < ROAD_W / 2 + 2.5) { var kt = roadTan(kr.s), kh = Math.atan2(kt.z, kt.x), kdir = Math.abs(wrapA(ka - kh)) < .7 ? 1 : Math.abs(wrapA(ka - kh - PI)) < .7 ? -1 : 0;
+        if (kdir) { var kp = roadPt(kr.s + kdir * (6 + car.speed * .6), clamp(kr.off * .6, -ROAD_W / 2 + 2, ROAD_W / 2 - 2)); ka = Math.atan2(kp.z - car.pos.z, kp.x - car.pos.x); } } }
+      var kd = wrapA(ka - Math.atan2(car.fwd.z, car.fwd.x)), kf = Math.abs(kd) < (player.keyRev ? 2.36 : 2.8) || (car.goingForward && car.speed > 2); player.keyRev = !kf; if (!kf) kd = wrapA(ka - Math.atan2(car.fwd.z, car.fwd.x) - PI);
+      player.acc = km * (kf ? 1 : -1); player.steer = -Math.min(Math.abs(kd) / ((TAU - NIP_FWD) / 2), 1) * Math.sign(kd) * (kf ? 1 : -1); }
+    else if (!gp.on) { player.acc = 0; player.steer = 0; }
+  }
   // the ring (Nipple.js): progress^3 throttle, steer = angle off the nose / 45 degrees, the back quarter reverses
   if (nip.active && nip.progress > 0) {
     player.acc = Math.pow(nip.progress, 3);
@@ -2575,6 +2620,10 @@ function playerInput() {
   for (var i = 0; i < 4; i++) player.sus[i] = high ? 'high' : st[i] ? 'mid' : 'low';
   if (honkT > 0 && honkWheel >= 0 && player.sus[honkWheel] === 'low') player.sus[honkWheel] = 'mid';
   if (st.some(Boolean) && !high) award('lowride');
+}
+function screenHeading(x, y) { // a direction on screen (x right, y up) as a heading on the ground (atan2(z, x)); the camera's theta fixes it
+  var rx = Math.cos(view.theta), rz = -Math.sin(view.theta), ux = -Math.sin(view.theta), uz = -Math.cos(view.theta);
+  return Math.atan2(x * rz + y * uz, x * rx + y * ux);
 }
 // ---------------------------------------------------------------- touch: the ring on the ground round the car (Bruno 2025 Inputs/Nipple.js)
 var NIP_LOW = 2, NIP_HIGH = 4.5, NIP_EDGE = .1, NIP_OUT = .2, NIP_FWD = PI * 1.5;
@@ -2749,22 +2798,54 @@ var view = { theta: PI * .25, phi: PI * .31, focus: new V3(), smoothed: new V3()
   roll: 0, rollSpeed: 0, overflow: 0, offset: new V3(), pos: new V3(), speedLines: 0, blend: 1 };
 function viewOverflow() { view.overflow = Math.max(1, (16 / 9) / (innerWidth / innerHeight)) - 1; }
 function rollKick(s) { if (!RM()) view.rollSpeed = (s || 1) * (Math.random() < .5 ? -1 : 1); }
-function snapView() { view.focus.set(car.pos.x, 0, car.pos.z); view.smoothed.copy(view.focus); view.tracking = true; view.zoomSmoothed = view.zoomBase; updateView(0); }
+function snapView() { view.leadN.set(0, 0); view.leadT.set(0, 0); view.lead.set(0, 0, 0); view.focus.set(car.pos.x, 0, car.pos.z); view.smoothed.copy(view.focus); view.tracking = true; view.zoomSmoothed = view.zoomBase; updateView(0); }
 var _vq = new Q(), _vd = new V3();
 function updateView(dt) {
   if (gp.on !== undefined && (Math.abs(gp.rx) > 0 || Math.abs(gp.ry) > 0) && state === 'play') { view.tracking = false; var mv = new V2(gp.rx, gp.ry).rotateAround(new V2(), -view.theta).multiplyScalar(20 * dt); view.focus.x += mv.x; view.focus.z += mv.y; }
-  if (view.tracking) { view.focus.x = car.pos.x; view.focus.z = car.pos.z; }
+  leadUpdate(dt);
+  if (view.tracking) { view.focus.x = car.pos.x + view.lead.x; view.focus.z = car.pos.z + view.lead.z; }
   else { var mx = car.pos.x - view.focus.x, mz = car.pos.z - view.focus.z, md = Math.hypot(mx, mz) * .25; view.focus.x += md * mx * dt; view.focus.z += md * mz * dt; } // the magnet
   var e = dt ? Math.min(1, dt * 10) : 1, nx = lerp(view.smoothed.x, view.focus.x, e), nz = lerp(view.smoothed.z, view.focus.z, e);
   var fs = dt ? Math.hypot(nx - view.smoothed.x, nz - view.smoothed.z) / dt : 0; view.smoothed.set(nx, 0, nz); view.focusSpeed = fs;
   if (view.settle) { var S = view.settle; S.t += dt; var sx = clamp(S.t / 1.75, 0, 1), be = sx * sx * (2.5 * sx - 1.5); view.zoomBase = S.z0 * (1 - be); if (sx >= 1) { view.zoomBase = 0; view.settle = null; } }
   view.zoomRatio = view.zoomBase; if (view.tracking && quality.level === 2 && !RM()) view.zoomRatio += -.4 * sstep(5, 40, fs);
+  // round 13: a portrait phone pulls back with speed on every tier (Bruno only on his top tier): its view is 11 m wide, so a road that
+  // crosses the screen leaves it 6 m from the car; at 18 m/s it pulls back 18% (the grass footprint is grown to match, optimalArea)
+  if (view.tracking && view.overflow > .5 && quality.level < 2 && !RM()) view.zoomRatio += -.25 * sstep(4, 18, fs);
   view.zoomSmoothed = dt ? lerp(view.zoomSmoothed, view.zoomRatio, Math.min(1, dt * 10)) : view.zoomRatio;
   var phiT = PI * (quality.level === 0 ? .27 : .31); view.phi = dt ? view.phi + (phiT - view.phi) * Math.min(1, dt * 1.5) : phiT; // a tier change eases the angle over about a second (never a cut)
   var rMax = 30 + view.overflow * 9; view.radius = lerp(15, rMax, 1 - view.zoomSmoothed);
   view.offset.setFromSphericalCoords(view.radius, view.phi, view.theta);
   view.pos.copy(view.smoothed).add(view.offset);
   var ds = dt * 2; view.rollSpeed += -view.roll * 100 * ds; view.roll += view.rollSpeed * ds; view.rollSpeed *= Math.max(0, 1 - 4 * ds);
+}
+// round 13: the camera leads the car. Bruno's fixed view (FOV 25, 31 m; 55.6 m on a phone) shows the car's own surroundings, not the road
+// ahead: logged round our loop at cruise (SP/r13/loop-before-*), the next 10 m of road were on screen on a desktop (0.66 s at 17 m/s) and
+// 5 m on a phone (0.28 s), and the focus's lag (lerp dt * 10) put the car ~0.2 of the half screen AHEAD of centre, toward the edge it
+// was driving at. Bruno has no road to follow at speed, so he doesn't need more; a road trip does. The fix is the look-ahead ("camera
+// lead" / "forward focus") of top-down and side-scrolling cameras (Itay Keren, "Scroll Back: The Theory and Practice of Cameras in
+// Side-Scrollers", 2015): the focus slides ahead along the car's on-screen direction of travel, so the car sits back toward the edge it
+// came from and the screen in front of it opens up. It is set in screen space (a share of the half screen, not metres), so a narrow
+// phone gets its lead sideways where its view is narrowest; it grows with speed (4 to 18 m/s) and turns slowly (1.6 / s), so steering
+// wiggles don't swing the view; the camera itself never turns (Bruno's leaves and grass are drawn for that one angle).
+var LEAD_MAX = .5, _lc = { r: new V3(), u: new V3(), f: new V3(), d: new V3() };
+view.lead = new V3(); view.leadN = new V2(); view.leadT = new V2();
+function leadGround(nx, ny, out) { // where the ray through NDC (nx, ny) meets the ground, relative to the focus, for the view's current angle and radius
+  var o = _lc, off = view.offset.lengthSq() ? view.offset : _lc.d.setFromSphericalCoords(view.radius, view.phi, view.theta), t = Math.tan(camera.fov * DEG / 2);
+  o.f.copy(off).negate().normalize(); o.r.set(-o.f.z, 0, o.f.x).normalize(); o.u.crossVectors(o.r, o.f);
+  o.d.copy(o.f).addScaledVector(o.r, nx * t * camera.aspect).addScaledVector(o.u, ny * t);
+  var k = -off.y / o.d.y; return out.set(off.x + o.d.x * k, 0, off.z + o.d.z * k);
+}
+function leadUpdate(dt) {
+  var vx = car.vel.x / DT, vz = car.vel.z / DT, sp = Math.hypot(vx, vz), k = 0;
+  if (view.tracking && (state === 'play' || state === 'enter') && sp > .5) k = (SET.lead === 0 ? 0 : LEAD_MAX) * sstep(4, 18, sp) * (RM() ? .5 : 1);
+  if (k > 0) { // the direction of travel on screen, in NDC (so a phone's narrow width counts): project a step along the velocity
+    var o = _lc, t = Math.tan(camera.fov * DEG / 2), off = view.offset; o.f.copy(off).negate().normalize(); o.r.set(-o.f.z, 0, o.f.x).normalize(); o.u.crossVectors(o.r, o.f);
+    var el = Math.asin(clamp(-o.f.y, .1, 1)), sx = (vx * o.r.x + vz * o.r.z) / sp / (t * camera.aspect), sy = (vx * o.f.x + vz * o.f.z) / sp * Math.tan(el) / t, sl = Math.hypot(sx, sy) || 1;
+    view.leadT.set(-sx / sl * k, -sy / sl * k); // the car's place on screen: back toward the edge it came from
+  } else view.leadT.set(0, 0);
+  if (!dt) view.leadN.copy(view.leadT); else view.leadN.lerp(view.leadT, 1 - Math.exp(-dt * (nip.active ? .9 : 1.6)));
+  leadGround(view.leadN.x, view.leadN.y, view.lead).negate(); // the focus sits this far from the car
 }
 function applyPlayCam() { camera.position.copy(view.pos); camera.up.set(0, 1, 0); camera.lookAt(view.smoothed); camera.rotateZ(view.roll); }
 // speed lines: 30 white spikes in clip space that reach toward the car while boosting hard (View.setSpeedLines)
@@ -3432,29 +3513,40 @@ function titlePose(t) {
   camera.position.set(Math.sin(a) * D * .8, -TITLE_R + D * .62, Math.cos(a) * D * .8);
   var tall = clamp(1 / camera.aspect - 1, 0, 1.4); camera.up.set(0, 1, 0); camera.lookAt(c.x, c.y + TITLE_R * (.62 + tall * .32), c.z); // on a tall phone the globe sits lower, under the name
 }
-function layoutTitleLetters() {
+function layoutTitleLetters() { // two rows, HUSAM over SOKAR, each set by the font's advances and centred; the block sits over the globe
   var vf = camera.fov * DEG, dz = 40, vh = 2 * dz * Math.tan(vf / 2), vw = vh * camera.aspect;
-  var lw = 5 * BLK, gap = .9 * BLK, rg = 1.4 * BLK, rowW = 5 * lw + 4 * gap, colH = 2 * lw + rg;
+  var R0 = nameLayout('HUSAM'), R1 = nameLayout('SOKAR'), rowW = Math.max(R0[1], R1[1]), lead = LET_H * 1.16, colH = LET_H + lead;
   var short = innerHeight <= 500 && innerWidth > innerHeight;
-  var wide = camera.aspect > 1, sc = short ? Math.min(vw * .56 / rowW, vh * .4 / colH) : Math.min(vw * (wide ? .5 : .78) / rowW, vh * (wide ? .3 : .36) / colH), lift = short ? .18 : wide ? .25 : .1;
-  letters.forEach(function (o) { var x = (o.col - 2) * (lw + gap) * sc, y = (o.row ? -1 : 1) * (lw + rg) / 2 * sc + vh * lift; o.title = { pos: new V3(x, y, -dz), scale: sc }; });
+  var wide = camera.aspect > 1, sc = short ? Math.min(vw * .56 / rowW, vh * .4 / colH) : Math.min(vw * (wide ? .5 : .8) / rowW, vh * (wide ? .31 : .3) / colH), lift = short ? .18 : wide ? .25 : .13;
+  letters.forEach(function (o) { var R = o.row ? R1 : R0, x = (R[0][o.col] - R[1] / 2) * sc, y = (o.row ? -1 : 1) * lead / 2 * sc + vh * lift; o.title = { pos: new V3(x, y, -dz), scale: sc }; });
 }
 function titleLettersToCamera() {
-  var t0 = performance.now(); letters.forEach(function (o) { camera.add(o.m); o.m.position.copy(o.title.pos); o.m.quaternion.identity(); o.m.scale.setScalar(o.title.scale); o.b.sleep(); o.inTitle = true; o.pop0 = t0 + Math.max(0, 1300 - t0) + 650 + (o.col + o.row * 2.5) * 70; });
+  var t0 = performance.now(); letters.forEach(function (o) { camera.add(o.m); o.m.position.copy(o.title.pos); o.m.quaternion.identity(); o.m.scale.setScalar(.001); o.b.sleep(); o.inTitle = true; o.pop0 = t0 + Math.max(0, 1300 - t0) + 650 + (o.col * 85 + o.row * 260); });
   var wait = Math.max(0, 1300 - performance.now()); setTimeout(function () { requestAnimationFrame(function () { html.classList.add('loaded'); setTimeout(function () { var el = $('loader'); if (el) el.remove(); }, 1000); }); }, wait);
 }
 function lettersHome() {
   letters.forEach(function (o) {
     if (o.inTitle) { scene.add(o.m); o.inTitle = false; }
-    o.m.scale.setScalar(1); o.m.position.set(o.home.x, 2.5 * BLK, o.home.z); o.m.quaternion.setFromAxisAngle(new V3(0, 1, 0), o.home.ry);
-    o.b.position.set(o.home.x, 2.5 * BLK, o.home.z); o.b.quaternion.set(o.m.quaternion.x, o.m.quaternion.y, o.m.quaternion.z, o.m.quaternion.w); o.b.velocity.set(0, 0, 0); o.b.angularVelocity.set(0, 0, 0); o.b.sleep();
+    o.m.scale.setScalar(1); o.m.position.set(o.home.x, o.home.y, o.home.z); o.m.quaternion.setFromAxisAngle(new V3(0, 1, 0), o.home.ry);
+    o.b.position.set(o.home.x, o.home.y, o.home.z); o.b.quaternion.set(o.m.quaternion.x, o.m.quaternion.y, o.m.quaternion.z, o.m.quaternion.w); o.b.velocity.set(0, 0, 0); o.b.angularVelocity.set(0, 0, 0); o.b.sleep();
   });
+}
+// round 13: the pop-in. It was an elastic scale (1600 ms, 42% overshoot): for a few frames on a wide screen every letter grew into its
+// neighbours (SP/r13/pop-before-desktop: 54 px of overlap, 53 of 75 frames). Now each letter drops in from above like a block set down
+// (Bruno's letters are physical and fall into place): a fall with gravity's ease, a squash on landing that keeps its width within 4%
+// (the tracking leaves 8%), a small rebound; nothing ever grows sideways into the next letter.
+function letterPop(t) { // -> [y offset in letter heights, scale x, scale y]
+  if (t <= 0) return [3, 1, 0]; if (t < .28) { var f = t / .28; return [3 * (1 - f * f), .92, 1.1]; } // the fall, a little stretched
+  var u = t - .28; if (u < .12) { var q = Math.sin(u / .12 * PI); return [0, 1 + .04 * q, 1 - .16 * q]; } // the squash
+  var w = u - .12, bo = Math.exp(-w * 7) * Math.sin(w * 15); return [Math.max(0, bo) * .09, 1 - .02 * bo, 1 + .06 * bo]; // the rebound
 }
 function updateTitleLetters(now) {
   var rm = RM();
   letters.forEach(function (o) {
-    if (!o.inTitle || !o.title) return; var k = rm ? 1 : elasticOut((now - (o.pop0 || 0)) / 1600, .42), ph = now * .0016 + o.col * .7 + o.row * 1.9, sc = o.title.scale;
-    o.m.scale.setScalar(sc * Math.max(.001, k)); o.m.position.copy(o.title.pos); if (!rm) { o.m.position.y += Math.sin(ph) * .07 * sc; o.m.rotation.set(Math.sin(ph * .8 + 1) * .05, Math.sin(ph * .6) * .08, Math.sin(ph + 2) * .025); }
+    if (!o.inTitle || !o.title) return; var t = rm ? 9 : (now - (o.pop0 || 0)) / 1000, P = letterPop(t), ph = now * .0014 + o.col * .7 + o.row * 1.9, sc = o.title.scale;
+    var g0 = t <= 0 ? .001 : Math.min(1, t / .06); // it appears over the first 60 ms of its fall
+    o.m.scale.set(sc * P[1] * g0, sc * Math.max(.001, P[2]) * g0, sc * P[1] * g0); o.m.position.copy(o.title.pos); o.m.position.y += (P[0] * LET_H + (P[2] - 1) * o.gh / 2) * sc; // squashes on its base
+    if (!rm && t > .8) { var k = Math.min(1, (t - .8) / .8); o.m.position.y += Math.sin(ph) * .05 * sc * k; o.m.rotation.set(Math.sin(ph * .8 + 1) * .035 * k, Math.sin(ph * .6) * .05 * k, 0); } else o.m.rotation.set(0, 0, 0);
   });
 }
 function setTitleLook(on) { // round 11: everything bends onto the globe now (signs, paint, pads too), so nothing is hidden there and nothing pops in
@@ -3482,7 +3574,7 @@ function startWorld() {
   titlePose(performance.now()); camera.updateMatrixWorld(); var from = { pos: camera.position.clone(), q: camera.quaternion.clone() };
   // round 11: the letters leave from where they hang in front of the camera, and that place moves with the camera; they used to be let go
   // in the world at the title's camera, so the diving camera flew through them (screen-filling fragments of the name)
-  letters.forEach(function (o) { var tp = o.m.position.clone(), tq = o.m.quaternion.clone(), ts = o.m.scale.x; scene.add(o.m); o.inTitle = false; o.fly = { tp: tp, tq: tq, s0: ts, p1: new V3(o.home.x, 2.5 * BLK + .9, o.home.z), q1: new Q().setFromAxisAngle(new V3(0, 1, 0), o.home.ry) }; });
+  letters.forEach(function (o) { var tp = o.m.position.clone(), tq = o.m.quaternion.clone(), ts = o.m.scale.x; scene.add(o.m); o.inTitle = false; o.fly = { tp: tp, tq: tq, s0: ts, p1: new V3(o.home.x, o.home.y + 1.1, o.home.z), q1: new Q().setFromEuler(new THREE.Euler((o.col % 2 ? 1 : -1) * .12, o.home.ry, (o.col % 3 - 1) * .1, 'YXZ')) }; });
   intro = { t: 0, from: from, to: to, dFrom: from.pos.distanceTo(car.pos), dTo: to.pos.distanceTo(car.pos) };
   sfx('reveal');
 }
@@ -3507,7 +3599,7 @@ function updateIntro(dt) {
 function finishIntro() {
   if (state === 'play') return;
   state = 'play'; html.classList.add('started');
-  if (!intro) lettersHome(); else letters.forEach(function (o) { if (o.fly) { o.fly = null; o.m.scale.setScalar(1); o.m.position.set(o.home.x, 2.5 * BLK, o.home.z); o.m.quaternion.setFromAxisAngle(new V3(0, 1, 0), o.home.ry); o.b.position.set(o.home.x, 2.5 * BLK, o.home.z); o.b.quaternion.set(o.m.quaternion.x, o.m.quaternion.y, o.m.quaternion.z, o.m.quaternion.w); } });
+  if (!intro) lettersHome(); else letters.forEach(function (o) { if (o.fly) { o.fly = null; o.m.scale.setScalar(1); o.m.position.set(o.home.x, o.home.y, o.home.z); o.m.quaternion.setFromAxisAngle(new V3(0, 1, 0), o.home.ry); o.b.position.set(o.home.x, o.home.y, o.home.z); o.b.quaternion.set(o.m.quaternion.x, o.m.quaternion.y, o.m.quaternion.z, o.m.quaternion.w); } });
   if (!intro) moveCarTo(SPAWN0.x, SPAWN0.z, SPAWN0.rot);
   if (intro && !RM()) view.settle = { t: 0, z0: view.zoomBase }; else view.zoomBase = 0; // Bruno's Reveal: the view pulls out to its rest with back.in(1.5) over 1.75 s
   intro = null; U.uBend.value = 0; setTitleLook(false); carG.visible = true; snapView();
@@ -3649,7 +3741,7 @@ function updateTabTitle(now) { lastTitleT = now; var s = wrapS(nearestRoad(car.p
 // the view footprint: the default camera at its farthest, rays through the screen's corners and edges onto the ground (View.optimalArea)
 var area = { radius: 30, near: 24, far: 47, base: new V3(), size: 60 };
 function optimalArea() {
-  var cam = new THREE.PerspectiveCamera(25, camera.aspect, .1, 400), rMax = (30 + view.overflow * 9) * (quality.level === 2 ? 1.4 : 1), ray = new THREE.Raycaster(), pl = new THREE.Plane(new V3(0, 1, 0), 0);
+  var cam = new THREE.PerspectiveCamera(25, camera.aspect, .1, 400), rMax = (30 + view.overflow * 9) * (quality.level === 2 ? 1.4 : view.overflow > .5 ? 1.2 : 1), ray = new THREE.Raycaster(), pl = new THREE.Plane(new V3(0, 1, 0), 0);
   cam.position.setFromSphericalCoords(rMax, PI * (quality.level === 0 ? .27 : .31), PI * .25); cam.lookAt(0, 0, 0); cam.updateMatrixWorld(); cam.updateProjectionMatrix();
   function hit(x, y) { ray.setFromCamera(new V2(x, y), cam); var o = new V3(); return ray.ray.intersectPlane(pl, o) ? o : new V3(); }
   var a = hit(1, -1), b = hit(-1, 1), c = hit(-1, -1), d = hit(1, 1), cA = a.clone().lerp(b, .5), cB = c.clone().lerp(d, .5);
