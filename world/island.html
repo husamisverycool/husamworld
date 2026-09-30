@@ -1288,7 +1288,7 @@ var roadDist = new Float32Array(MASK_N * MASK_N);
     var land = landK(wx2, wz2), ch = channelK(wx2, wz2), rd = roadDist[k2];
     var onRoad = rd < ROAD_W / 2 + .25 && land > 0; // the road stays dry where it crosses water (it is a bridge deck there)
     // depth: 0 on land; shallow at the shore, deep offshore (Bruno: 0.1 dry, 0.3 shallow, 0.9 deep)
-    var dep = land < 0 ? clamp(.25 + (-land) / 18, 0, 1) : 0;
+    var dep = land < 0 ? clamp(.25 + (-land) / 9, 0, 1) : 0;
     if (ch < 0 && !onRoad) dep = Math.max(dep, clamp(.2 + (-ch) / 2.2, 0, .92));
     var shoreSoft = land >= 0 ? clamp(1 - land / 2.2, 0, 1) * .12 : 0; if (ch >= 0 && ch < 1.6) shoreSoft = Math.max(shoreSoft, (1 - ch / 1.6) * .14);
     if (!onRoad) dep = Math.max(dep, shoreSoft);
@@ -1297,7 +1297,7 @@ var roadDist = new Float32Array(MASK_N * MASK_N);
     // slabs: plazas solid, the paths a looser trail of tiles (the shader breaks them up with noise)
     var slab = Math.max(clamp((.6 - plz) / 1.2, 0, 1), clamp((.2 - path) / 1.2, 0, 1) * .72 * (land > 1 ? 1 : 0)); if (dep > .2) slab = 0;
     // grass: everywhere on land except a dirt margin round the road, the plazas, the paths, the shore and the banks, and a few bare patches
-    var e = Math.min(land - (1.6 + 2.4 * n1), ch - (.5 + 1.5 * n2), rd - (ROAD_W / 2 + 1.1 + 2.6 * n1), plz - (1 + 3 * n2), path - (.5 + 1.8 * n1), (.68 - fbm(wx2 * .035 + 40, wz2 * .035 - 13)) * 30);
+    var e = Math.min(land - (1.6 + 2.4 * n1), ch - (.5 + 1.5 * n2), rd - (ROAD_W / 2 + 1.1 + 2.6 * n1), plz - (1 + 3 * n2), path - (.5 + 1.8 * n1), (.74 - fbm(wx2 * .035 + 40, wz2 * .035 - 13)) * 30);
     var grass = clamp(e / 1.3, 0, 1);
     var road = clamp(.5 + (ROAD_W / 2 - rd) / 2, 0, 1); // +-1 m of distance round the edge in 0..1
     mask[k2 * 4] = slab * 255; mask[k2 * 4 + 1] = grass * 255; mask[k2 * 4 + 2] = dep * 255; mask[k2 * 4 + 3] = road * 255;
@@ -1658,6 +1658,34 @@ STOPS.forEach(function (d, i) {
 
 var LETTERS_MID = (function () { var s0 = START_S - 6, p = roadAt(s0).addScaledVector(roadRight(s0).negate(), ROAD_W / 2 + 7), d = new V3(1, 0, -1).normalize(); return p.addScaledVector(d, 12); })(); // as SPOTS.letters, set later
 function nearLetters(x, z, m) { return Math.hypot(x - LETTERS_MID.x, z - LETTERS_MID.z) < m; } // the name's lawn stays open
+// round 10 B: the loop's roadside, dressed the way Bruno lines his circuit: bush clumps just past the kerbs, lanterns in pairs, tyre stacks
+// on the outsides of bends, a run of fence here and there; and a busier Fresno start. Nothing on the road, a plaza, a pad or the water.
+(function roadside() {
+  var r = rng(4242), keep = STOPS.map(function (d) { return d.pad; }).concat(STOPS.map(function (d) { return new V3(d.spawn.x, 0, d.spawn.z); }));
+  function ok(p, m) {
+    if (landK(p.x, p.z) < 2.5 || channelK(p.x, p.z) < 1.5 || plazaK(p.x, p.z) < 1.5 + m || pathK(p.x, p.z) < .8) return false;
+    if (nearestRoad(p.x, p.z).d < ROAD_W / 2 + 2.2) return false;
+    if (Math.hypot(p.x - LETTERS_MID.x, p.z - LETTERS_MID.z) < 15) return false;
+    for (var i = 0; i < keep.length; i++) if (Math.hypot(p.x - keep[i].x, p.z - keep[i].z) < 7) return false;
+    return farFrom(statics, p.x, p.z, m + .5);
+  }
+  for (var s = 8; s < ROAD_LEN - 4; s += 6 + r() * 7) {
+    var sd = r() < .5 ? -1 : 1, cv = roadCurv(s), outside = Math.sign(cv) === -sd && Math.abs(cv) > .02, off = ROAD_W / 2 + 2.8 + r() * 2.2, p = roadPt(s, sd * off), roll = r();
+    if (!ok(p, .6)) continue;
+    var face = Math.atan2(roadRight(s).x * -sd, roadRight(s).z * -sd);
+    if (outside && roll < .5) { PZ_DYN.push({ kind: 'tyres', p: p, ry: face }); continue; }
+    if (roll < .6) { var n = 1 + Math.floor(r() * 3), col = p.z < -35 && r() < .35 ? LEAF.gold : r() < .15 ? LEAF.bushPink : LEAF.bush; for (var j = 0; j < n; j++) PZ_GREEN.push({ p: p.clone().add(new V3((r() - .5) * 2, 0, (r() - .5) * 2)), s: .8 + r() * .45, y: .5, col: col }); continue; }
+    if (roll < .78) { PZ_DYN.push({ kind: 'lantern', p: p, ry: face }); var q = roadPt(s, -sd * off); if (ok(q, .4)) PZ_DYN.push({ kind: 'lantern', p: q, ry: face + PI }); continue; }
+    var t = roadTan(s); for (var k = 0; k < 3; k++) { var fp = p.clone().addScaledVector(t, (k - 1) * 2.05); if (ok(fp, .1)) PZ_DYN.push({ kind: 'fence', p: fp, ry: Math.atan2(t.x, t.z) + PI / 2 }); }
+  }
+  // the Fresno start: lanterns down both sides of the grid, benches for the crowd, bushes behind
+  for (var g = 0; g < 4; g++) [-1, 1].forEach(function (sd) {
+    var ss = START_S - 4 - g * 7, p = roadPt(ss, sd * (ROAD_W / 2 + 2.6)); if (ok(p, .2)) PZ_DYN.push({ kind: 'lantern', p: p, ry: 0 });
+    var b = roadPt(ss - 3.5, sd * (ROAD_W / 2 + 4.6)); if (g % 2 && ok(b, .6)) PZ_DYN.push({ kind: 'bench', p: b, ry: Math.atan2(roadRight(ss).x * -sd, roadRight(ss).z * -sd) });
+    var h = roadPt(ss - 1.5, sd * (ROAD_W / 2 + 7)); if (ok(h, .4)) PZ_GREEN.push({ p: h, s: 1 + r() * .3, y: .6, col: g % 2 ? LEAF.bush : LEAF.gold });
+  });
+})();
+
 function treeOK(x, z, m) {
   if (landK(x, z) < 4 || channelK(x, z) < 1.5) return false;
   var nr = nearestRoad(x, z); if (nr.d < ROAD_W / 2 + 3 + m) return false;
@@ -1902,12 +1930,13 @@ var windsocks = [];
   function lanternKit() { var k = new Kit(); k.add(G.box, 6, 0, -.42, 0, .5, .08, .5).add(G.box, 41, 0, -.34, 0, .36, .5, .36); [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (c) { k.add(G.box, 6, c[0] * .2, -.34, c[1] * .2, .07, .52, .07); }); k.add(G.box, 6, 0, .16, 0, .5, .07, .5).add(G.cone4, 6, 0, .2, 0, .5, .24, .5, PI / 4).add(G.box, 6, 0, -.12, .185, .36, .04, .02).add(G.box, 6, 0, -.12, -.185, .36, .04, .02); return k; }
   PZ_DYN.forEach(function (o) {
     var p = o.p, k = new Kit();
-    if (o.kind === 'lantern') { addDyn(propMesh(lanternKit()), new V3(.25, .42, .25), .4, 'brick', p.x, .42, p.z, o.ry); }
+    if (o.kind === 'lantern') { var lm = propMesh(lanternKit()); lm.geometry.scale(1.35, 1.35, 1.35); addDyn(lm, new V3(.34, .57, .34), .5, 'brick', p.x, .57, p.z, o.ry); }
     else if (o.kind === 'fence') { k.add(G.box, 6, -.95, -.5, 0, .14, 1, .14).add(G.box, 6, .95, -.5, 0, .14, 1, .14).add(G.box, 6, 0, -.25, .02, 2.05, .16, .06).add(G.box, 6, 0, .15, .02, 2.05, .16, .06); addDyn(propMesh(k), new V3(1.02, .5, .1), .6, 'brick', p.x, .5, p.z, o.ry); }
     else if (o.kind === 'chair') { k.add(G.box, 54, 0, -.05, 0, .46, .07, .44).add(G.box, 54, 0, .2, -.2, .46, .45, .06); [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (c) { k.add(G.box, 14, c[0] * .19, -.42, c[1] * .18, .05, .38, .05); }); addDyn(propMesh(k), new V3(.23, .4, .22), .2, 'cone', p.x, .42, p.z, o.ry); }
     else if (o.kind === 'ballot') { k.add(G.box, 20, 0, -.35, 0, .6, .6, .6).add(G.box, 14, 0, .26, 0, .3, .02, .06).add(G.box, 54, 0, -.2, .31, .5, .12, .02); addDyn(propMesh(k), new V3(.3, .3, .3), .25, 'brick', p.x, .35, p.z, o.ry); }
     else if (o.kind === 'drum') { k.add(G.cyl, 13, 0, -.45, 0, .62, .9, .62).add(G.cyl, 14, 0, -.2, 0, .64, .05, .64).add(G.cyl, 14, 0, .2, 0, .64, .05, .64).add(G.cyl, 7, .15, .45, .1, .1, .03, .1); addDyn(propMesh(k), new V3(.31, .45, .31), .6, 'brick', p.x, .46, p.z, o.ry, new CANNON.Cylinder(.31, .31, .9, 8)); }
     else if (o.kind === 'tyres') { for (var t = 0; t < 3; t++) k.add(G.cyl, 34, 0, -.45 + t * .3, 0, .9, .28, .9).add(G.cyl, 14, 0, -.44 + t * .3, 0, .5, .29, .5); addDyn(propMesh(k), new V3(.45, .45, .45), .8, 'hay', p.x, .46, p.z, o.ry, new CANNON.Cylinder(.45, .45, .9, 8)); }
+    else if (o.kind === 'bench') { k.add(G.box, 6, 0, -.05, 0, 1.8, .12, .5).add(G.box, 6, 0, .2, -.22, 1.8, .4, .08).add(G.box, 7, -.75, -.45, 0, .1, .4, .45).add(G.box, 7, .75, -.45, 0, .1, .4, .45); addDyn(propMesh(k), new V3(.9, .45, .28), .7, 'brick', p.x, .45, p.z, o.ry); }
     else if (o.kind === 'sock') { var g = new THREE.Group(), sk = new Kit(); for (var j = 0; j < 4; j++) sk.add(G.cyl, j % 2 ? 20 : 22, 0, 0, .05 + j * .38, .5 - j * .07, .4, .5 - j * .07, 0, PI / 2); var m = meshOf(sk); m.position.y = 0; g.add(m); g.position.set(p.x, 4.25, p.z); scene.add(g); windsocks.push({ g: g, m: m }); }
   });
 })();
