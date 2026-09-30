@@ -1030,7 +1030,7 @@ var U = {
   // round 10 B: the terrain data every material can read (bounce, waterline, grass colour under a blade), the tracks, the noise
   uMask: { value: null }, uWorld: { value: 280 }, uNoise: { value: null }, uTrack: { value: null },
   uDry: { value: new C3('#ffa94e') }, uShallow: { value: new C3('#5bc2b9') }, uDeep: { value: new C3('#13375f') }, uGrass: { value: new C3('#b8b62e') }, uGrassB: { value: new C3('#c9b53a') },
-  uCar: { value: new V3() }, uCarV: { value: new V3() }, uMat: { value: 1 }
+  uCar: { value: new V3() }, uCarV: { value: new V3() }, uMat: { value: 1 }, uShQ: { value: 1 }
 };
 var BEND_GLSL = 'uniform float uBend, uBendR; uniform vec3 uBendC;\n' +
   'vec3 bend(vec3 w){ if (uBend < .001) return w; float R = uBendR / uBend; vec2 d = w.xz - uBendC.xz; float r = length(d); if (r < 1e-4) return vec3(w.x, w.y - R + R, w.z);' +
@@ -1053,7 +1053,7 @@ var TERRAIN_GLSL = 'uniform sampler2D uMask, uTrack; uniform float uWorld; unifo
 // a white line where the surface cuts the water; fog toward a two-colour screen gradient (A at the top left) that is also the background
 var LIGHT_GLSL = [TERRAIN_GLSL,
   'uniform vec3 uL, uLight, uShadow, uFogA, uFogB, uGround; uniform float uInt, uEmis, uFogN, uFogF; uniform vec2 uRes;',
-  'vec3 fogCol(){ vec2 q = gl_FragCoord.xy / uRes; q.y = 1. - q.y; return L2(mix(uFogA, uFogB, smoothstep(0., 1., length(q)))); }',
+  '#ifndef NO_FRAGCOORD', 'vec3 fogCol(){ vec2 q = gl_FragCoord.xy / uRes; q.y = 1. - q.y; return L2(mix(uFogA, uFogB, smoothstep(0., 1., length(q)))); }', '#endif',
   'vec3 shade(vec3 base, vec3 n, float drop, float extra, vec3 wp, float emis){',
   ' vec3 c = base;',
   ' float bo = smoothstep(-1., 1., -n.y) * pow(max(0., (1.5 - max(0., wp.y)) / 1.5), 2.);',
@@ -1064,17 +1064,32 @@ var LIGHT_GLSL = [TERRAIN_GLSL,
   ' return mix(col, base * 2.4, emis); }',
   'vec3 waterLine(vec3 base, vec3 wp){ return abs(wp.y + .3) < .025 ? vec3(1.) : base; }',
   'float fogK(float depth){ return smoothstep(uFogN, uFogF, depth); }',
-  'vec3 fogIt(vec3 col, float depth){ return mix(col, fogCol(), fogK(depth)); }',
+  '#ifndef NO_FRAGCOORD', 'vec3 fogIt(vec3 col, float depth){ return mix(col, fogCol(), fogK(depth)); }', '#endif',
   'vec4 outCol(vec3 col){ return vec4(S2(col), 1.); }'].join('\n');
-var SHADOW_V = '#if NUM_DIR_LIGHT_SHADOWS > 0\nuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHT_SHADOWS ]; varying vec4 vSC;\n#endif\n';
-var SHADOW_F = '#include <packing>\n#if NUM_DIR_LIGHT_SHADOWS > 0\n#include <shadowmap_pars_fragment>\nvarying vec4 vSC;\nfloat dropShadow(){ DirectionalLightShadow s = directionalLightShadows[0]; return 1. - getShadow(directionalShadowMap[0], s.shadowMapSize, s.shadowBias, s.shadowRadius, vSC); }\n#else\nfloat dropShadow(){ return 0.; }\n#endif\n';
+// two shadow maps (round 10, the frame budget): [0] the scenery's (buildings, trees, props at rest), re-drawn only when the view has moved a
+// few metres, the sun has turned or something in it moved; [1] the living things' (the car, the locals, the birds), every frame but small
+var SHADOW_V = '#if NUM_DIR_LIGHT_SHADOWS > 0\nuniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHT_SHADOWS ]; varying vec4 vSC;\n#if NUM_DIR_LIGHT_SHADOWS > 1\nvarying vec4 vSC2;\n#endif\n' +
+  'void setSC(vec4 p){ vSC = directionalShadowMatrix[0] * p;\n#if NUM_DIR_LIGHT_SHADOWS > 1\n vSC2 = directionalShadowMatrix[1] * p;\n#endif\n }\n#endif\n';
+// the low tier filters the shadow with four bilinear-weighted taps instead of three's seventeen (the same soft one-texel edge)
+var SHADOW_F = '#include <packing>\n#if NUM_DIR_LIGHT_SHADOWS > 0\n#include <shadowmap_pars_fragment>\nvarying vec4 vSC; uniform float uShQ;\n#if NUM_DIR_LIGHT_SHADOWS > 1\nvarying vec4 vSC2;\n#endif\n' +
+  'float shTap(sampler2D m, vec2 uv, float z){ return step(z, unpackRGBAToDepth(texture2D(m, uv))); }\n' +
+  // the low tier filters with four bilinear-weighted taps instead of three's seventeen (the same soft one-texel edge)
+  'float sh4(sampler2D m, vec2 size, float bias, vec4 sc){ vec3 c = sc.xyz / sc.w; c.z += bias; if (c.x < 0. || c.x > 1. || c.y < 0. || c.y > 1. || c.z > 1.) return 0.;\n' +
+  ' vec2 f = c.xy * size - .5, i = floor(f), w = f - i, t = 1. / size, uv = (i + .5) * t;\n' +
+  ' return 1. - mix(mix(shTap(m, uv, c.z), shTap(m, uv + vec2(t.x, 0.), c.z), w.x), mix(shTap(m, uv + vec2(0., t.y), c.z), shTap(m, uv + t, c.z), w.x), w.y); }\n' +
+  'float dropShadow(){ DirectionalLightShadow s = directionalLightShadows[0]; float d;\n' +
+  ' if (uShQ > .5) d = 1. - getShadow(directionalShadowMap[0], s.shadowMapSize, s.shadowBias, s.shadowRadius, vSC); else d = sh4(directionalShadowMap[0], s.shadowMapSize, s.shadowBias, vSC);\n' +
+  '#if NUM_DIR_LIGHT_SHADOWS > 1\n DirectionalLightShadow s2 = directionalLightShadows[1];\n' +
+  ' if (uShQ > .5) d = max(d, 1. - getShadow(directionalShadowMap[1], s2.shadowMapSize, s2.shadowBias, s2.shadowRadius, vSC2)); else d = max(d, sh4(directionalShadowMap[1], s2.shadowMapSize, s2.shadowBias, vSC2));\n' +
+  '#endif\n return d; }\n' +
+  '#else\nfloat dropShadow(){ return 0.; }\n#endif\n';
 var WORLD_V = [BEND_GLSL, WIND_GLSL, SHADOW_V,
   'attribute float pal; varying float vPal; varying vec3 vN; varying vec3 vW; varying float vD;',
   'void main(){ float sw = step(63.5, pal); vPal = pal - sw * 64.; vec4 p = vec4(position, 1.); vec3 n = normal;',
   '#ifdef USE_INSTANCING', ' p = instanceMatrix * p; n = mat3(instanceMatrix) * n;', '#endif',
   ' vec4 w = modelMatrix * p; if (sw > .5) { float hh = max(w.y, 0.); w.xz += windAt(w.xz) * .12 * hh; }',
   ' vN = normalize(mat3(modelMatrix) * n); vW = w.xyz;',
-  '#if NUM_DIR_LIGHT_SHADOWS > 0', ' vSC = directionalShadowMatrix[0] * vec4(w.xyz + vN * .06, 1.);', '#endif',
+  '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + vN * .06, 1.));', '#endif',
   ' w.xyz = bend(w.xyz); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n');
 var WORLD_F = [SHADOW_F, LIGHT_GLSL, 'uniform sampler2D uPal; varying float vPal; varying vec3 vN; varying vec3 vW; varying float vD;',
   'void main(){ vec3 base = L2(texture2D(uPal, vec2((vPal + .5) / 64., .5)).rgb); vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n;',
@@ -1110,12 +1125,22 @@ var matWorld = worldMat(), matWorldDS = worldMat({ side: THREE.DoubleSide }), ma
 // ---------------------------------------------------------------- the sun: one directional light, one shadow map fitted to the view footprint
 var sun = new THREE.DirectionalLight(0xffffff, 0); // intensity 0: our shader does the lighting, three only renders its shadow map
 sun.castShadow = true; sun.shadow.mapSize.set(LOWDEV ? 1024 : 2048, LOWDEV ? 1024 : 2048); sun.shadow.bias = -.001; sun.shadow.normalBias = .06;
-var SC = sun.shadow.camera; SC.near = 1; SC.far = 140; SC.left = -34; SC.right = 34; SC.top = 34; SC.bottom = -34; SC.updateProjectionMatrix();
-scene.add(sun, sun.target);
+var SC = sun.shadow.camera; SC.near = 1; SC.far = 140; SC.left = -36; SC.right = 36; SC.top = 36; SC.bottom = -36; SC.updateProjectionMatrix();
+sun.shadow.autoUpdate = false; sun.shadow.needsUpdate = true; SC.layers.set(1); // the scenery's map: re-drawn on demand (shadowDirty)
+var sunD = new THREE.DirectionalLight(0xffffff, 0); sunD.castShadow = true; sunD.shadow.mapSize.set(512, 512); sunD.shadow.bias = -.001; sunD.shadow.normalBias = .06;
+var SCD = sunD.shadow.camera; SCD.near = 1; SCD.far = 140; SCD.left = -22; SCD.right = 22; SCD.top = 22; SCD.bottom = -22; SCD.updateProjectionMatrix(); SCD.layers.set(2);
+scene.add(sun, sun.target, sunD, sunD.target);
+var shadowDirty = true, shSnap = { x: 1e9, z: 1e9, d: new V3() };
+function casts(o, dynamic) { o.traverse(function (m) { if (m.isMesh || m.isPoints) { m.castShadow = true; m.layers.enable(dynamic ? 2 : 1); } }); return o; }
 // Bruno Ligthing.js: spherical phi 0.63, theta 0.72 (the light's own direction, from the ground up)
 var SUN_DIR = new V3().setFromSphericalCoords(1, .63, .72);
 U.uL.value.copy(SUN_DIR);
-function placeSun(fx, fz) { sun.target.position.set(fx, 0, fz); sun.position.set(fx + SUN_DIR.x * 70, SUN_DIR.y * 70, fz + SUN_DIR.z * 70); sun.target.updateMatrixWorld(); }
+function placeSun(fx, fz) {
+  var sx = Math.round(fx / 3) * 3, sz = Math.round(fz / 3) * 3; // the scenery's map moves in 3 m steps (its shadows are fixed in the world, so a step never shows)
+  if (sx !== shSnap.x || sz !== shSnap.z || shSnap.d.dot(SUN_DIR) < .99999) { shSnap.x = sx; shSnap.z = sz; shSnap.d.copy(SUN_DIR); shadowDirty = true; }
+  if (shadowDirty) { sun.target.position.set(sx, 0, sz); sun.position.set(sx + SUN_DIR.x * 70, SUN_DIR.y * 70, sz + SUN_DIR.z * 70); sun.target.updateMatrixWorld(); sun.shadow.needsUpdate = true; shadowDirty = false; window.__shN = (window.__shN || 0) + 1; }
+  var cx = car.pos.x, cz = car.pos.z; sunD.target.position.set(cx, 0, cz); sunD.position.set(cx + SUN_DIR.x * 70, SUN_DIR.y * 70, cz + SUN_DIR.z * 70); sunD.target.updateMatrixWorld();
+}
 
 // ---------------------------------------------------------------- geometry kit (primitives carry a palette index; kits bake into one mesh)
 function prim(g) { g = g.index ? g.toNonIndexed() : g; if (g.attributes.uv) g.deleteAttribute('uv'); return g; }
@@ -1266,6 +1291,15 @@ var PATHS = [[[-10, 64], [-8, 44], [8, 28], [30, 22], [48, 30], [62, 42]], [[8, 
 function pathK(x, z) { var best = 1e9; PATHS.forEach(function (p) { for (var i = 0; i < p.length - 1; i++) { var d = segDist(x, z, p[i][0], p[i][1], p[i + 1][0], p[i + 1][1]) - 1.6; if (d < best) best = d; } }); return best; }
 // the race box and the grid are asphalt too (they are on the road)
 
+// round 10: grass beds let into each plaza's slabs (Bruno's areas are paved round islands of long grass): a big one at each back corner and a
+// smaller one at each front corner, clear of the corridor from the road to the pad and the landmark; soft, wobbly edges
+STOPS.forEach(function (d) {
+  var hw = d.pw / 2, hd = d.depth / 2; d.beds = [];
+  if (d.id === 'contact') { d.beds.push({ u: -(hw - 1.3), v: hd - .8, r: 1.6 }, { u: hw - 1.3, v: hd - .8, r: 1.6 }); }
+  else [-1, 1].forEach(function (sg) { d.beds.push({ u: sg * (hw - 2.6), v: hd - 2.6, r: 3.3 + (d.depth > 17 ? .5 : 0) }, { u: sg * (hw - 1.6), v: -hd + 1.6, r: 2.2 }, { u: sg * (hw - 1.2), v: hd * .1, r: 2.9, side: true }); if (d.pw > 19) d.beds.push({ u: sg * (hw * .42 + 1.6), v: hd - 1.2, r: 2 }); if (hw >= 10) d.beds.push({ u: sg * Math.max(6.6, hw * .56), v: -hd * .32, r: 2.2, front: true }); });
+  d.beds.forEach(function (b) { var p = pzAt(d, b.u, b.v); b.x = p.x; b.z = p.z; b.seed = b.x * .37 + b.z * .11; });
+});
+function bedK(x, z) { var best = 1e9; for (var i = 0; i < STOPS.length; i++) { var d = STOPS[i]; if (Math.abs(x - d.plaza.x) > 22 || Math.abs(z - d.plaza.z) > 22) continue; for (var j = 0; j < d.beds.length; j++) { var b = d.beds[j], a = Math.atan2(z - b.z, x - b.x), e = Math.hypot(x - b.x, z - b.z) - b.r * (1 + .22 * Math.sin(a * 3 + b.seed) + .12 * Math.sin(a * 5 - b.seed * 2)); if (e < best) best = e; } } return best; }
 // ---------------------------------------------------------------- the island mask (spec 4.1): R slabs, G grass, B water depth, A asphalt
 // 1024 px over WORLD metres; painted once at load (round 10 B). R and A are stored as ramps of a signed distance, so the ground shader
 // can cut crisp, anti-aliased edges (fwidth) from a bilinear sample; G ramps over about a metre, so the blades taper into the dirt
@@ -1293,12 +1327,13 @@ var roadDist = new Float32Array(MASK_N * MASK_N);
     var shoreSoft = land >= 0 ? clamp(1 - land / 2.2, 0, 1) * .12 : 0; if (ch >= 0 && ch < 1.6) shoreSoft = Math.max(shoreSoft, (1 - ch / 1.6) * .14);
     if (!onRoad) dep = Math.max(dep, shoreSoft);
     var n1 = fbm(wx2 * .07 + 11, wz2 * .07 - 4), n2 = fbm(wx2 * .11 - 3, wz2 * .11 + 8);
-    var plz = plazaK(wx2, wz2), path = pathK(wx2, wz2);
+    var plz = plazaK(wx2, wz2), path = pathK(wx2, wz2); if (plz > -3.5 && plz < 3) plz += (fbm(wx2 * .19 + 7, wz2 * .19 - 5) - .45) * 2.6; // a wobbly edge: the grass bites into the slabs (Bruno's areas)
     // slabs: plazas solid, the paths a looser trail of tiles (the shader breaks them up with noise)
     var slab = Math.max(clamp((.6 - plz) / 1.2, 0, 1), clamp((.2 - path) / 1.2, 0, 1) * .72 * (land > 1 ? 1 : 0)); if (dep > .2) slab = 0;
     // grass: everywhere on land except a dirt margin round the road, the plazas, the paths, the shore and the banks, and a few bare patches
     var e = Math.min(land - (1.6 + 2.4 * n1), ch - (.5 + 1.5 * n2), rd - (ROAD_W / 2 + 1.1 + 2.6 * n1), plz - (1 + 3 * n2), path - (.5 + 1.8 * n1), (.74 - fbm(wx2 * .035 + 40, wz2 * .035 - 13)) * 30);
     var grass = clamp(e / 1.3, 0, 1);
+    if (plz < 1) { var bk = bedK(wx2, wz2); if (bk < .6) { grass = Math.max(grass, clamp((-bk + .3) / .9, 0, 1)); slab *= clamp((bk + .1) / .7, 0, 1); } } // the plazas' grass beds
     var road = clamp(.5 + (ROAD_W / 2 - rd) / 2, 0, 1); // +-1 m of distance round the edge in 0..1
     mask[k2 * 4] = slab * 255; mask[k2 * 4 + 1] = grass * 255; mask[k2 * 4 + 2] = dep * 255; mask[k2 * 4 + 3] = road * 255;
     depthF[k2] = onRoad ? Math.min(dep, .05) : dep;
@@ -1317,7 +1352,7 @@ var WATER_Y = -.3;
 var groundMat = worldMat({ u: { uSlabA: { value: new C3('#a87762') }, uSlabB: { value: new C3('#ffcf8b') }, uAsph: { value: new C3('#2a2130') } },
   vs: [BEND_GLSL, SHADOW_V, 'uniform sampler2D uMask; uniform float uWorld; varying vec3 vW; varying vec2 vUv; varying float vD;',
     'void main(){ vec4 w = modelMatrix * vec4(position, 1.); vUv = w.xz / uWorld + .5; vec4 m = texture2D(uMask, vUv); w.y -= 1.5 * m.b * (1. - smoothstep(.5, .95, m.a)); vW = w.xyz;',
-    '#if NUM_DIR_LIGHT_SHADOWS > 0', ' vSC = directionalShadowMatrix[0] * vec4(w.xyz + vec3(0., .06, 0.), 1.);', '#endif',
+    '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + vec3(0., .06, 0.), 1.));', '#endif',
     ' w.xyz = bend(w.xyz); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n'),
   fs: [SHADOW_F, LIGHT_GLSL, 'uniform float uMat; uniform vec3 uSlabA, uSlabB, uAsph; varying vec3 vW; varying vec2 vUv; varying float vD;',
     'float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
@@ -1354,7 +1389,7 @@ var seaMesh = (function () {
 // the water surface (Bruno WaterSurface.js): flat at y = -0.3 over every dip; clear where it is calm (the ground's depth gradient shows
 // through), white where it laps: a thin line at the shore and ripple bands that roll off the banks, broken up by noise, fading with depth
 var waterMat = worldMat({ vs: [BEND_GLSL, SHADOW_V, 'varying vec3 vW; varying float vD; void main(){ vec4 w = modelMatrix * vec4(position, 1.); vW = w.xyz;',
-    '#if NUM_DIR_LIGHT_SHADOWS > 0', ' vSC = directionalShadowMatrix[0] * vec4(w.xyz + vec3(0., .06, 0.), 1.);', '#endif',
+    '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + vec3(0., .06, 0.), 1.));', '#endif',
     ' w.xyz = bend(w.xyz); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n'),
   fs: [SHADOW_F, LIGHT_GLSL, 'uniform float uTime, uWindT; varying vec3 vW; varying float vD;',
     'void main(){ float b = texture2D(uMask, vW.xz / uWorld + .5).b; if (b < .15) discard;',
@@ -1649,6 +1684,54 @@ var DRESS = {
   }
 };
 STOPS.forEach(function (d) { if (DRESS[d.id]) DRESS[d.id](d); });
+// round 10: the plazas filled the way Bruno fills an area: each grass bed planted (bushes, a boulder, flowers), then clusters of loose
+// things in the district's own kinds (so each plaza reads apart at a glance), a few along its edges; the corridor, the pad, the local
+// and the landmark stay clear. Nothing here names or counts anything (OWNERSHIP.md).
+var PZ_SET = {
+  bill: { kinds: ['urn', 'planter', 'stanchion', 'pot', 'benchB', 'lantern'], bush: LEAF.bush },
+  speech: { kinds: ['speaker', 'spot', 'stanchion', 'chair', 'aboard', 'crateS'], bush: LEAF.bushPink },
+  translation: { kinds: ['coil', 'crateT', 'barrel', 'buoy', 'pallet', 'lantern'], bush: LEAF.bush },
+  n1: { kinds: ['aboard', 'ballot', 'chairW', 'cafe', 'bollard', 'parcel'], bush: LEAF.bush },
+  triptik: { kinds: ['can', 'drum', 'tyre', 'signpost', 'drumB', 'cone'], bush: LEAF.gold },
+  os: { kinds: ['toolbox', 'pallet', 'crate', 'barrel', 'tyre', 'drumB', 'can'], bush: LEAF.bush },
+  depths: { kinds: ['buoy', 'coil', 'crateT', 'barrel', 'umbrella', 'bench'], bush: LEAF.bush },
+  weeks: { kinds: ['cafe', 'chairW', 'pot', 'benchB', 'umbrella', 'planter'], bush: LEAF.bushPink },
+  everywhere: { kinds: ['suitA', 'suitB', 'suitC', 'bollard', 'cone', 'sack'], bush: LEAF.bush },
+  contact: { kinds: ['parcel', 'sack', 'parcel', 'pot'], bush: LEAF.bush }
+};
+var PZ_PLACED = [];
+function pzRoom(p, m) { for (var i = 0; i < PZ_PLACED.length; i++) if (Math.hypot(PZ_PLACED[i].x - p.x, PZ_PLACED[i].z - p.z) < m + PZ_PLACED[i].r) return false; for (var j = 0; j < PZ_DYN.length; j++) if (Math.hypot(PZ_DYN[j].p.x - p.x, PZ_DYN[j].p.z - p.z) < m + .6) return false; return true; }
+function pzPut(kind, p, ry, r) { if (kind === 'umbrella') { if (!pzRoom(p, 1.3)) return; r = 1.3; } PZ_DYN.push({ kind: kind, p: p, ry: ry }); PZ_PLACED.push({ x: p.x, z: p.z, r: r || .5 }); }
+function boulder(x, z, sc, ry) { var k = new Kit(); k.add(G.blob, 17, 0, -.25 * sc, 0, 1.5 * sc, 1.05 * sc, 1.25 * sc, 0, .15, .08).add(G.blob, 17, .55 * sc, -.2 * sc, .35 * sc, .7 * sc, .55 * sc, .7 * sc, 1); kitGeo.push.apply(kitGeo, k.bake(x, 0, z, ry)); addStatic(x, 0, z, .6 * sc, .45 * sc, .55 * sc, ry, null, 'rock'); }
+STOPS.forEach(function (d, si) {
+  var r = rng(900 + si * 37), set = PZ_SET[d.id], K = set.kinds, hw = d.pw / 2, hd = d.depth / 2;
+  // the beds: a bush clump or two, a boulder in the big ones, flowers
+  d.beds.forEach(function (b, bi) {
+    var nb = b.r > 2 ? 3 : 1; for (var j = 0; j < nb; j++) { var a = r() * TAU, rr = r() * b.r * .45; PZ_GREEN.push({ p: new V3(b.x + Math.cos(a) * rr, 0, b.z + Math.sin(a) * rr), s: .75 + r() * .35, y: .5, col: j === 1 && r() < .5 ? LEAF.gold : set.bush }); }
+    var lq = d.pad.clone().addScaledVector(d.tan, 4.2).addScaledVector(d.face, -1.2);
+    if (b.r > 2 && !b.front && farFrom(statics, b.x, b.z, 1.5) && Math.hypot(b.x - lq.x, b.z - lq.z) > 4.5) { var a2 = r() * TAU; boulder(b.x + Math.cos(a2) * b.r * .5, b.z + Math.sin(a2) * b.r * .5, .8 + r() * .5, r() * TAU); }
+    PZ_BEDS.push({ p: new V3(b.x, 0, b.z), r: b.r * .9, y: 0 });
+  });
+  // clusters of the district's things, then singles, anywhere the plaza has room
+  var tries = 0, clusters = 0, want = d.id === 'contact' ? 3 : d.pw > 20 ? 8 : 6;
+  while (clusters < want && tries++ < 400) {
+    var u = (r() * 2 - 1) * (hw - 1.2), v = (r() * 2 - 1) * (hd - 1.2); if (!pzFree(d, u, v, .6)) continue; var c = pzAt(d, u, v); if (!pzRoom(c, 1.6)) continue;
+    var n = 2 + Math.floor(r() * 3), k0 = Math.floor(r() * K.length), base = r() * TAU;
+    for (var j = 0; j < n; j++) {
+      var kind = K[(k0 + (j && r() < .5 ? j : 0)) % K.length], a = base + j * 2.1 + r() * .6, rr = j ? .8 + r() * .5 : 0, q = c.clone().add(new V3(Math.cos(a) * rr, 0, Math.sin(a) * rr));
+      if (j && (!pzRoom(q, .45) || !pzFree(d, (q.x - d.plaza.x) * d.tan.x + (q.z - d.plaza.z) * d.tan.z, -((q.x - d.plaza.x) * d.face.x + (q.z - d.plaza.z) * d.face.z), .4))) continue;
+      pzPut(kind, q, d.rot + (r() - .5) * 1.2 + (kind === 'chair' || kind === 'chairW' ? PI : 0), .45);
+    }
+    clusters++;
+  }
+  // district set pieces that tell the plazas apart from a distance
+  if (d.id === 'weeks') for (var t = 0; t < 3; t++) { var u2 = (t - 1) * 3.6 + 1, v2 = hd - 5.2; if (!pzFree(d, u2, v2, 1.3)) continue; var tc = pzAt(d, u2, v2); if (!pzRoom(tc, 1.2)) continue; pzPut('cafe', tc, 0, 1); [-1, 1].forEach(function (sg) { pzPut('chairW', tc.clone().addScaledVector(d.tan, sg * .82), d.rot + sg * PI / 2, .3); }); pzPut('umbrella', tc.clone().addScaledVector(d.face, 1.05), 0, .3); }
+  if (d.id === 'everywhere') [[-6.5, 2], [6.5, -1.5], [-5.2, -3.5]].forEach(function (o, i) { if (!pzFree(d, o[0], o[1], 1)) return; var c2 = pzAt(d, o[0], o[1]); if (!pzRoom(c2, 1)) return; ['suitA', 'suitB', 'suitC'].forEach(function (k, j) { pzPut(k, c2.clone().add(new V3((j - 1) * .7, 0, (j % 2) * .4)), d.rot + j * .3, .35); }); PZ_DYN.push({ kind: ['suitB', 'suitA', 'suitC'][i], p: c2.clone(), ry: d.rot + .5, y: .67 }); });
+  if (d.id === 'speech') [-1, 1].forEach(function (sg) { var u3 = sg * (hw - 2.2), v3 = hd * .35; if (pzFree(d, u3, v3, .5) && pzRoom(pzAt(d, u3, v3), .6)) { pzPut('speaker', pzAt(d, u3, v3), d.rot, .5); pzPut('spot', pzAt(d, u3 - sg * 1.1, v3 + .6), d.rot + PI, .4); } });
+  if (d.id === 'triptik' || d.id === 'os') for (var q2 = 0; q2 < 2; q2++) { var u4 = (q2 ? 1 : -1) * (hw - 1.6), v4 = -hd * .25; if (pzFree(d, u4, v4, .6) && pzRoom(pzAt(d, u4, v4), .7)) { pzPut('pallet', pzAt(d, u4, v4), d.rot, .7); PZ_DYN.push({ kind: d.id === 'os' ? 'crate' : 'drumB', p: pzAt(d, u4, v4), ry: d.rot + .3, y: d.id === 'os' ? .6 : .6 }); } }
+  // a row of lanterns or bollards along the kerb side, clear of the corridor
+  for (var e = 0; e < 4; e++) { var ue = (e < 2 ? -1 : 1) * (4.6 + (e % 2) * 3.2), ve = -hd + .6; if (Math.abs(ue) > hw - .8 || !pzFree(d, ue, ve, .2)) continue; var pe = pzAt(d, ue, ve); if (!pzRoom(pe, .5)) continue; pzPut(d.id === 'bill' || d.id === 'weeks' ? 'lantern' : d.id === 'everywhere' || d.id === 'n1' || d.id === 'contact' ? 'bollard' : d.id === 'triptik' ? 'cone' : 'lantern', pe, d.rot, .4); }
+});
 // every plaza but the smallest gets two glowing lanterns at its back corners and a run of knockable fence along part of its back edge
 STOPS.forEach(function (d, i) {
   if (d.id === 'contact' || d.id === 'translation') return;
@@ -1670,14 +1753,28 @@ function nearLetters(x, z, m) { return Math.hypot(x - LETTERS_MID.x, z - LETTERS
     for (var i = 0; i < keep.length; i++) if (Math.hypot(p.x - keep[i].x, p.z - keep[i].z) < 7) return false;
     return farFrom(statics, p.x, p.z, m + .5);
   }
-  for (var s = 8; s < ROAD_LEN - 4; s += 6 + r() * 7) {
-    var sd = r() < .5 ? -1 : 1, cv = roadCurv(s), outside = Math.sign(cv) === -sd && Math.abs(cv) > .02, off = ROAD_W / 2 + 2.8 + r() * 2.2, p = roadPt(s, sd * off), roll = r();
-    if (!ok(p, .6)) continue;
-    var face = Math.atan2(roadRight(s).x * -sd, roadRight(s).z * -sd);
-    if (outside && roll < .5) { PZ_DYN.push({ kind: 'tyres', p: p, ry: face }); continue; }
-    if (roll < .6) { var n = 1 + Math.floor(r() * 3), col = p.z < -35 && r() < .35 ? LEAF.gold : r() < .15 ? LEAF.bushPink : LEAF.bush; for (var j = 0; j < n; j++) PZ_GREEN.push({ p: p.clone().add(new V3((r() - .5) * 2, 0, (r() - .5) * 2)), s: .8 + r() * .45, y: .5, col: col }); continue; }
-    if (roll < .78) { PZ_DYN.push({ kind: 'lantern', p: p, ry: face }); var q = roadPt(s, -sd * off); if (ok(q, .4)) PZ_DYN.push({ kind: 'lantern', p: q, ry: face + PI }); continue; }
-    var t = roadTan(s); for (var k = 0; k < 3; k++) { var fp = p.clone().addScaledVector(t, (k - 1) * 2.05); if (ok(fp, .1)) PZ_DYN.push({ kind: 'fence', p: fp, ry: Math.atan2(t.x, t.z) + PI / 2 }); }
+  // round 10: about every six metres a side, one of Bruno's roadside vignettes (his verges are never bare): chevrons and tyre walls on the
+  // outsides of bends, bush clumps, lantern pairs, fence runs, crate stacks, barrels, signposts, a bench under a lantern, picnic tables,
+  // hay, pale boulders, cones; everything but the plants and boulders knocks over; nothing on the asphalt
+  function put(kind, q, ry, m, y) { if (!ok(q, m) || !pzRoom(q, m)) return false; PZ_DYN.push({ kind: kind, p: q, ry: ry, y: y }); PZ_PLACED.push({ x: q.x, z: q.z, r: m }); return true; }
+  for (var s = 8; s < ROAD_LEN - 4; s += 4.2 + r() * 3.6) {
+    var sd = r() < .5 ? -1 : 1, cv = roadCurv(s), outside = Math.sign(cv) === -sd && Math.abs(cv) > .02, off = ROAD_W / 2 + 2.8 + r() * 2.6, p = roadPt(s, sd * off), roll = r();
+    if (!ok(p, .6) || !pzRoom(p, .8)) continue;
+    var face = Math.atan2(roadRight(s).x * -sd, roadRight(s).z * -sd), t = roadTan(s), along = Math.atan2(t.x, t.z), tv = function (d) { return p.clone().addScaledVector(t, d); };
+    if (outside && roll < .4) { for (var c = 0; c < 3; c++) put('chevron', roadPt(s + (c - 1) * 3.2, sd * (ROAD_W / 2 + 2.4)), face, .5); continue; }
+    if (outside && roll < .62) { put('tyres', p, face, .6); put('tyres', tv(1), face, .6); if (r() < .5) put('tyre', tv(-1.1), face, .6); continue; }
+    roll = r();
+    if (roll < .2) { var n = 1 + Math.floor(r() * 3), col = p.z < -35 && r() < .35 ? LEAF.gold : r() < .15 ? LEAF.bushPink : LEAF.bush; for (var j = 0; j < n; j++) PZ_GREEN.push({ p: p.clone().add(new V3((r() - .5) * 2, 0, (r() - .5) * 2)), s: .8 + r() * .45, y: .5, col: col }); PZ_PLACED.push({ x: p.x, z: p.z, r: 1.2 }); continue; }
+    if (roll < .31) { put('lantern', p, face, .5); var q = roadPt(s, -sd * off); put('lantern', q, face + PI, .4); continue; }
+    if (roll < .4) { for (var k = 0; k < 3; k++) put('fence', tv((k - 1) * 2.05), along + PI / 2, .3); continue; }
+    if (roll < .5) { put('crate', p, along + r() * .4, .55); put('crate', tv(1), along - r() * .3, .5); if (r() < .6) PZ_DYN.push({ kind: 'crate', p: tv(.5), ry: along + .3, y: 1.36 }); put('crateS', tv(-1), along + 1, .35); continue; }
+    if (roll < .58) { put(r() < .5 ? 'barrel' : 'drum', p, 0, .4); put('barrel', tv(.8), 1, .4); if (r() < .6) put('drumB', p.clone().addScaledVector(roadRight(s), sd * .8), 2, .4); continue; }
+    if (roll < .65) { put('signpost', p, face + (r() - .5) * .4, .6); put('pot', tv(.9), 0, .3); continue; }
+    if (roll < .73) { put('bench', p, face, .9); put('lantern', tv(1.5), face, .4); if (r() < .5) put('pot', tv(-1.4), 0, .3); continue; }
+    if (roll < .8) { var pp = roadPt(s, sd * (off + 2)); if (put('picnic', pp, along, 1.1)) put('umbrella', pp.clone().addScaledVector(roadRight(s), sd * 1.3), 0, .3); continue; }
+    if (roll < .86) { put('hay', p, along, .7); put('hay', tv(1.4), along + .2, .7); continue; }
+    if (roll < .93) { if (farFrom(statics, p.x, p.z, 2)) { boulder(p.x, p.z, .7 + r() * .6, r() * TAU); PZ_PLACED.push({ x: p.x, z: p.z, r: 1.2 }); PZ_GREEN.push({ p: tv(1.4), s: .8, y: .5, col: LEAF.bush }); } continue; }
+    put('cone', p, 0, .35); put('cone', tv(1.2), 1, .35);
   }
   // street lamps along the loop, alternate sides (Bruno's pole lights); they glow at night like the plazas' lamps
   var side = 1; for (var ls = 20; ls < ROAD_LEN - 10; ls += 26 + r() * 12) {
@@ -1708,6 +1805,8 @@ G.trunk = prim(new THREE.CylinderGeometry(.3, .5, 1, 7).translate(0, .5, 0));
   var r = rng(1207), kinds = ['oak', 'almond', 'maple'];
   function kindAt(x, z) { return z > 25 ? (r() < .55 ? 'oak' : 'almond') : z < -35 ? (r() < .72 ? 'maple' : 'oak') : kinds[Math.floor(r() * 3)]; }
   function plant(x, z, kind) { trees.push({ x: x, z: z, r: 1.2, kind: kind, h: (kind === 'maple' ? 4.4 : kind === 'almond' ? 2.9 : 3.5) * (.85 + r() * .35), rot: r() * TAU }); }
+  // a tree in some plazas' back beds (Bruno's areas sit under trees), where the bed has room
+  STOPS.forEach(function (d, i) { d.beds.forEach(function (b, j) { if (b.r < 2.4 || (i + j) % 3 === 2) return; if (!farFrom(statics, b.x, b.z, 2.2) || !farFrom(trees, b.x, b.z, 3) || Math.hypot(b.x - d.pad.x, b.z - d.pad.z) < 7) return; plant(b.x, b.z, kindAt(b.x, b.z)); }); });
   // groves round the ponds and along the channels first (Bruno's trees gather at the water), then clumps in the meadows
   PONDS.forEach(function (o) { for (var i = 0; i < 9; i++) { var a = r() * TAU, rr = o.r + 3 + r() * 5, x = o.x + Math.cos(a) * rr, z = o.z + Math.sin(a) * rr; if (treeOK(x, z, 1.8)) plant(x, z, kindAt(x, z)); } });
   CHANNELS.forEach(function (c) { for (var i = 0; i < c.samples.length; i += 14) { var q = c.samples[i], sd = r() < .5 ? -1 : 1, x = q.x + sd * (4 + r() * 4), z = q.z + (r() - .5) * 6; if (r() < .6 && treeOK(x, z, 1.8)) plant(x, z, kindAt(x, z)); } });
@@ -1770,24 +1869,27 @@ var leafTex = (function () {
   }
   var tx = new THREE.DataTexture(d, N, N, THREE.RGBAFormat); tx.magFilter = tx.minFilter = THREE.NearestFilter; tx.needsUpdate = true; return tx;
 })();
-var FOL_V = [BEND_GLSL, WIND_GLSL, SHADOW_V,
-  'attribute vec3 ctr; attribute vec3 cr; attribute vec3 colA; attribute vec3 colB; attribute float see; uniform float uQuad, uSway; uniform vec3 uL;',
-  'varying vec2 vUv; varying vec3 vN; varying vec3 vW; varying float vD; varying vec3 vA; varying vec3 vB; varying float vSee; varying float vRot;',
+var FOL_V = [BEND_GLSL, WIND_GLSL, SHADOW_V, '#define NO_FRAGCOORD', LIGHT_GLSL,
+  'attribute vec3 ctr; attribute vec3 cr; attribute vec3 colA; attribute vec3 colB; attribute float see; uniform float uQuad, uSway;',
+  'varying vec2 vUv; varying vec3 vN; varying vec3 vW; varying float vD; varying vec3 vA; varying vec3 vB; varying float vSee; varying float vRot; varying vec3 vLit; varying float vFk;',
   'void main(){ float c = cos(cr.z), s = sin(cr.z); vec2 q = vec2(c * cr.x - s * cr.y, s * cr.x + c * cr.y) * uQuad; vec3 lp = ctr + vec3(q, 0.);',
   ' vec3 nl = normalize(mix(lp, normalize(ctr + 1e-4), .85)); mat4 im = modelMatrix * instanceMatrix; vec4 w = im * vec4(lp, 1.);',
   ' vec2 wd = windAt(w.xz); w.xz += wd * uSway * max(w.y, 0.) * .1;',
   ' vN = normalize(mat3(im) * nl); vW = w.xyz; vUv = cr.xy + .5; vA = colA; vB = colB; vSee = see; vRot = length(wd) * 2.2;',
-  '#if NUM_DIR_LIGHT_SHADOWS > 0', ' vSC = directionalShadowMatrix[0] * vec4(w.xyz + uL * 1., 1.);', '#endif',
-  ' w.xyz = bend(w.xyz); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n');
+  '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + uL * 1., 1.));', '#endif',
+  ' w.xyz = bend(w.xyz); vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv;',
+  // the low tier lights each card at its corners (the same model, no cast shadow; a card is small and nearly flat) and leaves the
+  // fragment only the leaf cut: the crowns cost a third as much on a software renderer and look the same
+  '#ifdef LOWQ', ' vLit = shade(L2(mix(colA, colB, smoothstep(0., 1., dot(vN, uL)))), vN, 0., 0., vW, 0.); vFk = fogK(vD);', '#endif', ' }'].join('\n');
 var FOL_ALPHA = 'uniform sampler2D uLeaf; uniform vec3 uCarS; uniform float uAsp, uTh;\n' +
   'float leafA(vec2 uv, float rot){ vec2 p = uv - .5; float c = cos(rot), s = sin(rot); p = vec2(c * p.x - s * p.y, s * p.x + c * p.y) + .5; return texture2D(uLeaf, p).r; }\n';
-var FOL_F = [SHADOW_F, LIGHT_GLSL, FOL_ALPHA, 'varying vec2 vUv; varying vec3 vN; varying vec3 vW; varying float vD; varying vec3 vA; varying vec3 vB; varying float vSee; varying float vRot;',
+var FOL_F = [SHADOW_F, LIGHT_GLSL, FOL_ALPHA, 'varying vec2 vUv; varying vec3 vN; varying vec3 vW; varying float vD; varying vec3 vA; varying vec3 vB; varying float vSee; varying float vRot; varying vec3 vLit; varying float vFk;',
   'void main(){ float sdf = leafA(vUv, vRot); float a = sdf;',
   ' if (vSee > .5) { vec2 q = gl_FragCoord.xy / uRes - uCarS.xy; q.x *= uAsp; float fade = smoothstep(uCarS.z * 3., uCarS.z * 15., length(q)); a = sdf * (fade * (1. - uTh) + uTh); }',
   ' if (a - uTh < .1) discard;',
-  ' vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 base = L2(mix(vA, vB, smoothstep(0., 1., dot(n, uL))));',
-  '#ifdef LOWQ', ' vec3 col = shade(base, n, 0., 0., vW, 0.);', '#else', ' vec3 col = shade(base, n, dropShadow(), 0., vW, 0.);', '#endif',
-  ' gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n');
+  '#ifdef LOWQ', ' gl_FragColor = outCol(mix(vLit, fogCol(), vFk)); }',
+  '#else', ' vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 base = L2(mix(vA, vB, smoothstep(0., 1., dot(n, uL))));',
+  ' vec3 col = shade(base, n, dropShadow(), 0., vW, 0.);', ' gl_FragColor = outCol(fogIt(col, vD)); }', '#endif'].join('\n');
 var FOL_DEPTH_V = [WIND_GLSL, 'attribute vec3 ctr; attribute vec3 cr; uniform float uQuad, uSway; varying vec2 vUv; varying float vRot;',
   'void main(){ float c = cos(cr.z), s = sin(cr.z); vec2 q = vec2(c * cr.x - s * cr.y, s * cr.x + c * cr.y) * uQuad; vec4 w = modelMatrix * instanceMatrix * vec4(ctr + vec3(q, 0.), 1.);',
   ' vec2 wd = windAt(w.xz); w.xz += wd * uSway * max(w.y, 0.) * .1; vUv = cr.xy + .5; vRot = length(wd) * 2.2; gl_Position = projectionMatrix * viewMatrix * w; }'].join('\n');
@@ -1845,12 +1947,71 @@ function addDyn(mesh, half, mass, sound, x, y, z, ry, shape, opts) {
   var b = new CANNON.Body({ mass: mass, shape: shape || new CANNON.Box(new CANNON.Vec3(half.x, half.y, half.z)), position: new CANNON.Vec3(x, y, z), linearDamping: .0952, angularDamping: .0952 });
   b.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), ry || 0);
   b.collisionFilterGroup = GR_PROP; b.collisionFilterMask = GR_ALL; b.sleepSpeedLimit = .3; b.sleepTimeLimit = .5; pw.addBody(b); b.sleep();
-  mesh.position.set(x, y, z); mesh.quaternion.set(b.quaternion.x, b.quaternion.y, b.quaternion.z, b.quaternion.w); mesh.castShadow = mesh.receiveShadow = true; scene.add(mesh);
+  mesh.position.set(x, y, z); mesh.quaternion.set(b.quaternion.x, b.quaternion.y, b.quaternion.z, b.quaternion.w); if (mesh.isMesh) { mesh.castShadow = mesh.receiveShadow = true; scene.add(mesh); } // a kind's prop is only a pose (drawn by the batch)
   var o = { m: mesh, b: b, sound: sound, start: { p: new V3(x, y, z), q: mesh.quaternion.clone() }, half: half, hitByCar: false }; Object.assign(o, opts); dyn.push(o); b.userData = o;
   b.addEventListener('collide', function (e) { var v = Math.abs(e.contact.getImpactVelocityAlongNormal()); if (e.body === carBody) { if (v > 1.5) o.hitByCar = true; if (o.onCar) o.onCar(v); } sfx(sound, v); });
   return o;
 }
 function propMesh(kit) { return meshOf(kit); }
+// round 10: every knockable prop comes from a kind (a kit built once) and is drawn by one batch (see propBatch): a prop is only a
+// rigid body and a pose; the batch writes the posed kits near the view into one buffer, so a hundred props cost one draw
+var PK = {};
+function propKind(name, def) {
+  var k = new Kit(); def.build(k); var g = merge(k.parts); if (def.scale) g.scale(def.scale, def.scale, def.scale);
+  def.P = g.attributes.position.array; def.N = g.attributes.normal.array; def.A = g.attributes.pal.array; def.n = g.attributes.position.count; def.name = name; PK[name] = def;
+}
+function spawnProp(kind, x, z, ry, y, opts) {
+  var d = PK[kind], m = new THREE.Object3D(), o = addDyn(m, d.half, d.mass, d.sound, x, y == null ? d.y : y, z, ry, d.shape ? d.shape() : null, opts); o.pk = d; o.kind = kind; return o;
+}
+function crateKit(c) { var k = new Kit(); c = c == null ? 23 : c; k.add(G.box, 6, 0, -.45, 0, .9, .9, .9).add(G.box, c, 0, -.45, .46, .92, .14, .02).add(G.box, c, 0, -.1, .46, .92, .12, .02).add(G.box, c, .46, -.45, 0, .02, .14, .92).add(G.box, c, -.46, -.45, 0, .02, .14, .92).add(G.box, c, 0, -.45, -.46, .92, .14, .02).add(G.box, c, 0, -.1, -.46, .92, .12, .02); return k; }
+function lanternKit(k) { k.add(G.box, 6, 0, -.42, 0, .5, .08, .5).add(G.box, 41, 0, -.34, 0, .36, .5, .36); [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (c) { k.add(G.box, 6, c[0] * .2, -.34, c[1] * .2, .07, .52, .07); }); k.add(G.box, 6, 0, .16, 0, .5, .07, .5).add(G.cone4, 6, 0, .2, 0, .5, .24, .5, PI / 4).add(G.box, 6, 0, -.12, .185, .36, .04, .02).add(G.box, 6, 0, -.12, -.185, .36, .04, .02); }
+function cylShape(r, h) { return function () { return new CANNON.Cylinder(r, r, h, 8); }; }
+function box3(x, y, z) { return new V3(x, y, z); }
+propKind('lantern', { build: lanternKit, scale: 1.35, half: box3(.34, .57, .34), mass: .5, sound: 'brick', y: .57 });
+propKind('fence', { build: function (k) { k.add(G.box, 6, -.95, -.5, 0, .14, 1, .14).add(G.box, 6, .95, -.5, 0, .14, 1, .14).add(G.box, 6, 0, -.25, .02, 2.05, .16, .06).add(G.box, 6, 0, .15, .02, 2.05, .16, .06); }, half: box3(1.02, .5, .1), mass: .6, sound: 'brick', y: .5 });
+propKind('chair', { build: function (k) { k.add(G.box, 54, 0, -.05, 0, .46, .07, .44).add(G.box, 54, 0, .2, -.2, .46, .45, .06); [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (c) { k.add(G.box, 14, c[0] * .19, -.42, c[1] * .18, .05, .38, .05); }); }, half: box3(.23, .4, .22), mass: .2, sound: 'cone', y: .42 });
+propKind('chairW', { build: function (k) { k.add(G.box, 6, 0, -.05, 0, .46, .07, .44).add(G.box, 6, 0, .2, -.2, .46, .45, .06); [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (c) { k.add(G.box, 7, c[0] * .19, -.42, c[1] * .18, .05, .38, .05); }); }, half: box3(.23, .4, .22), mass: .2, sound: 'cone', y: .42 });
+propKind('ballot', { build: function (k) { k.add(G.box, 20, 0, -.35, 0, .6, .6, .6).add(G.box, 14, 0, .26, 0, .3, .02, .06).add(G.box, 54, 0, -.2, .31, .5, .12, .02); }, half: box3(.3, .3, .3), mass: .25, sound: 'brick', y: .35 });
+propKind('drum', { build: function (k) { k.add(G.cyl, 13, 0, -.45, 0, .62, .9, .62).add(G.cyl, 14, 0, -.2, 0, .64, .05, .64).add(G.cyl, 14, 0, .2, 0, .64, .05, .64).add(G.cyl, 7, .15, .45, .1, .1, .03, .1); }, half: box3(.31, .45, .31), mass: .6, sound: 'brick', y: .46, shape: cylShape(.31, .9) });
+propKind('drumB', { build: function (k) { k.add(G.cyl, 12, 0, -.45, 0, .62, .9, .62).add(G.cyl, 20, 0, -.2, 0, .64, .05, .64).add(G.cyl, 20, 0, .2, 0, .64, .05, .64).add(G.cyl, 7, .15, .45, .1, .1, .03, .1); }, half: box3(.31, .45, .31), mass: .6, sound: 'brick', y: .46, shape: cylShape(.31, .9) });
+propKind('barrel', { build: function (k) { k.add(G.cyl, 6, 0, -.45, 0, .6, .9, .6).add(G.cyl, 6, 0, -.3, 0, .68, .6, .68).add(G.cyl, 14, 0, -.32, 0, .69, .05, .69).add(G.cyl, 14, 0, .22, 0, .69, .05, .69).add(G.cyl, 23, 0, .44, 0, .56, .02, .56); }, half: box3(.34, .45, .34), mass: .5, sound: 'brick', y: .46, shape: cylShape(.34, .9) });
+propKind('tyres', { build: function (k) { for (var t = 0; t < 3; t++) k.add(G.cyl, 34, 0, -.45 + t * .3, 0, .9, .28, .9).add(G.cyl, 14, 0, -.44 + t * .3, 0, .5, .29, .5); }, half: box3(.45, .45, .45), mass: .8, sound: 'hay', y: .46, shape: cylShape(.45, .9) });
+propKind('tyre', { build: function (k) { k.add(G.cyl, 34, 0, -.15, 0, .9, .28, .9).add(G.cyl, 14, 0, -.14, 0, .5, .29, .5); }, half: box3(.45, .15, .45), mass: .3, sound: 'hay', y: .16, shape: cylShape(.45, .3) });
+propKind('bench', { build: function (k) { k.add(G.box, 6, 0, -.05, 0, 1.8, .12, .5).add(G.box, 6, 0, .2, -.22, 1.8, .4, .08).add(G.box, 7, -.75, -.45, 0, .1, .4, .45).add(G.box, 7, .75, -.45, 0, .1, .4, .45); }, half: box3(.9, .45, .28), mass: .7, sound: 'brick', y: .45 });
+propKind('benchB', { build: function (k) { k.add(G.box, 54, 0, -.05, 0, 1.8, .12, .5).add(G.box, 54, 0, .2, -.22, 1.8, .4, .08).add(G.box, 14, -.75, -.45, 0, .1, .4, .45).add(G.box, 14, .75, -.45, 0, .1, .4, .45); }, half: box3(.9, .45, .28), mass: .7, sound: 'brick', y: .45 });
+propKind('crate', { build: function (k) { k.parts = crateKit().parts; }, half: box3(.45, .45, .45), mass: .3, sound: 'brick', y: .45 });
+propKind('crateS', { build: function (k) { k.parts = crateKit(50).parts; }, scale: .66, half: box3(.3, .3, .3), mass: .12, sound: 'brick', y: .3 });
+propKind('crateT', { build: function (k) { k.parts = crateKit(31).parts; }, scale: .66, half: box3(.3, .3, .3), mass: .12, sound: 'brick', y: .3 });
+propKind('boom', { build: function (k) { k.add(G.box, 13, 0, -.45, 0, .9, .9, .9).add(G.box, 11, 0, -.45, .46, .5, .5, .02).add(G.box, 14, 0, -.2, .47, .12, .3, .02).add(G.box, 11, .46, -.45, 0, .02, .5, .5); }, half: box3(.45, .45, .45), mass: .5, sound: 'brick', y: .45 });
+propKind('cone', { build: function (k) { k.add(G.box, 14, 0, -.42, 0, .62, .08, .62).add(G.cone, 22, 0, -.36, 0, .5, .95, .5).add(G.cyl, 20, 0, -.02, 0, .32, .13, .32); }, half: box3(.31, .42, .31), mass: .25, sound: 'cone', y: .42 });
+propKind('hay', { build: function (k) { k.add(G.box, 11, 0, -.42, 0, 1.3, .84, .84).add(G.box, 23, 0, -.42, 0, 1.34, .1, .88); }, half: box3(.65, .42, .42), mass: .8, sound: 'hay', y: .42 });
+propKind('pin', { build: function (k) { k.add(G.cyl, 20, 0, -.45, 0, .3, .62, .3).add(G.cyl, 13, 0, -.02, 0, .26, .1, .26).add(G.cyl, 20, 0, .08, 0, .2, .22, .2).add(G.ball, 20, 0, .22, 0, .26, .26, .26); }, half: box3(.15, .45, .15), mass: .1, sound: 'pin', y: .46 });
+propKind('ball', { build: function (k) { k.add(G.ball, 12, 0, -.45, 0, .9, .9, .9).add(G.ball, 14, .12, .28, .3, .1, .1, .1).add(G.ball, 14, -.1, .3, .3, .1, .1, .1); }, half: box3(.45, .45, .45), mass: 1, sound: 'ball', y: .46, shape: function () { return new CANNON.Sphere(.45); } });
+// round 10: more of Bruno's loose things, re-made: chevrons and signposts on the verges, picnic and cafe tables, planters and urns,
+// suitcases and parcels, stanchions, speakers and stage lights, bollards, jerrycans, pallets, tool boxes, sandwich boards, flowerpots
+propKind('chevron', { build: function (k) { k.add(G.box, 14, 0, -.75, 0, .5, .06, .3).add(G.cyl6, 7, 0, -.72, 0, .08, 1.1, .08).add(G.box, 13, 0, .2, .05, .9, .55, .05); [-.22, .1].forEach(function (x) { k.add(G.box, 20, x, .2, .08, .1, .42, .02, 0, 0, .7).add(G.box, 20, x + .08, .2, .08, .1, .42, .02, 0, 0, -.7); }); }, half: box3(.45, .75, .08), mass: .3, sound: 'cone', y: .76 });
+propKind('signpost', { build: function (k) { k.add(G.box, 51, 0, -.95, 0, .4, .1, .4).add(G.cyl6, 6, 0, -.9, 0, .11, 1.9, .11); [[.7, .35, 54], [.35, -.4, 53], [.02, .3, 55]].forEach(function (a) { var d = Math.sign(a[1]); k.add(G.box, a[2], d * .38, a[0], 0, .8, .22, .05).add(G.wedge, a[2], d * .86, a[0] - .11, 0, .22, .16, .05, 0, 0, -d * PI / 2); }); }, half: box3(.55, .95, .1), mass: .35, sound: 'cone', y: .96 });
+propKind('picnic', { build: function (k) { k.add(G.box, 6, 0, .3, 0, 1.7, .08, .8); [-1, 1].forEach(function (s) { k.add(G.box, 6, 0, -.08, s * .62, 1.7, .07, .28).add(G.box, 6, s * .65, -.45, 0, .1, .75, 1.5, 0, s * .0).add(G.box, 6, s * .65, -.45, 0, .08, .78, .1); }); }, half: box3(.85, .38, .76), mass: .9, sound: 'brick', y: .45 });
+propKind('cafe', { build: function (k) { k.add(G.cyl, 51, 0, -.37, 0, .5, .04, .5).add(G.cyl6, 7, 0, -.35, 0, .07, .66, .07).add(G.cyl, 20, 0, .29, 0, .78, .05, .78); }, half: box3(.39, .37, .39), mass: .3, sound: 'brick', y: .38, shape: cylShape(.39, .74) });
+propKind('umbrella', { build: function (k) { k.add(G.cyl, 51, 0, -1.2, 0, .5, .08, .5).add(G.cyl6, 7, 0, -1.15, 0, .06, 2.2, .06).add(G.cone4, 53, 0, .8, 0, 1.7, .42, 1.7).add(G.cone4, 20, 0, .8, 0, 1.72, .42, 1.72, PI / 4).add(G.ball, 20, 0, 1.18, 0, .12, .12, .12); }, half: box3(.25, 1.2, .25), mass: .4, sound: 'cone', y: 1.21 });
+propKind('planter', { build: function (k) { k.add(G.box, 51, 0, -.45, 0, .8, .45, .8).add(G.box, 20, 0, -.02, 0, .86, .05, .86).add(G.box, 23, 0, .02, 0, .7, .03, .7).add(G.blob, 52, 0, -.05, 0, .72, .62, .72).add(G.blob, 52, .12, .2, -.06, .42, .4, .42); }, half: box3(.4, .45, .4), mass: .7, sound: 'brick', y: .46 });
+propKind('pot', { build: function (k) { k.add(G.cyl6, 5, 0, -.3, 0, .36, .34, .36).add(G.cyl6, 5, 0, .02, 0, .42, .06, .42).add(G.blob, 24, 0, .02, 0, .4, .32, .4); [0, 2.1, 4.2].forEach(function (a, i) { k.add(G.ball, [21, 55, 20][i], Math.cos(a) * .1, .22, Math.sin(a) * .1, .12, .12, .12); }); }, scale: 1.45, half: box3(0.29, 0.435, 0.29), mass: .15, sound: 'cone', y: 0.45 });
+propKind('urn', { build: function (k) { k.add(G.box, 51, 0, -.4, 0, .5, .12, .5).add(G.cyl, 51, 0, -.28, 0, .18, .16, .18).add(G.cyl, 51, 0, -.12, 0, .56, .34, .56).add(G.cyl, 20, 0, .2, 0, .62, .05, .62).add(G.blob, 24, 0, .2, 0, .5, .3, .5); }, half: box3(.3, .4, .3), mass: .6, sound: 'brick', y: .41 });
+propKind('suitA', { build: function (k) { k.add(G.box, 53, 0, -.22, 0, .62, .44, .26).add(G.box, 14, 0, .22, 0, .2, .05, .05).add(G.box, 20, 0, -.1, .131, .5, .04, .01); }, scale: 1.35, half: box3(0.419, 0.297, 0.176), mass: .15, sound: 'cone', y: 0.311 });
+propKind('suitB', { build: function (k) { k.add(G.box, 54, 0, -.22, 0, .56, .44, .28).add(G.box, 14, 0, .22, 0, .2, .05, .05).add(G.box, 11, 0, -.02, .141, .3, .1, .01); }, scale: 1.35, half: box3(0.378, 0.297, 0.189), mass: .15, sound: 'cone', y: 0.311 });
+propKind('suitC', { build: function (k) { k.add(G.box, 46, 0, -.22, 0, .5, .44, .24).add(G.box, 14, 0, .22, 0, .2, .05, .05).add(G.box, 14, -.18, -.22, .121, .04, .44, .01).add(G.box, 14, .18, -.22, .121, .04, .44, .01); }, scale: 1.35, half: box3(0.338, 0.297, 0.162), mass: .15, sound: 'cone', y: 0.311 });
+propKind('parcel', { build: function (k) { k.add(G.box, 23, 0, -.2, 0, .44, .4, .44).add(G.box, 50, 0, -.2, 0, .45, .41, .08).add(G.box, 50, 0, .2, 0, .08, .01, .45); }, scale: 1.4, half: box3(0.308, 0.28, 0.308), mass: .1, sound: 'cone', y: 0.294 });
+propKind('stanchion', { build: function (k) { k.add(G.cyl, 11, 0, -.45, 0, .3, .05, .3).add(G.cyl6, 11, 0, -.42, 0, .06, .82, .06).add(G.ball, 11, 0, .38, 0, .12, .12, .12); }, scale: 1.25, half: box3(0.188, 0.562, 0.188), mass: .2, sound: 'pin', y: 0.575 });
+propKind('speaker', { build: function (k) { k.add(G.box, 14, 0, -.4, 0, .5, .8, .44).add(G.cyl, 47, 0, -.2, .22, .3, .02, .3, 0, PI / 2).add(G.cyl, 47, 0, .2, .22, .18, .02, .18, 0, PI / 2); }, half: box3(.25, .4, .22), mass: .5, sound: 'brick', y: .41 });
+propKind('spot', { build: function (k) { k.add(G.cyl, 14, 0, -.8, 0, .4, .05, .4).add(G.cyl6, 14, 0, -.78, 0, .06, 1.3, .06).add(G.cyl, 14, 0, .52, .02, .34, .34, .34, 0, 1.2).add(G.cyl, 41, 0, .6, .2, .26, .02, .26, 0, 1.2); }, half: box3(.2, .8, .2), mass: .3, sound: 'cone', y: .81 });
+propKind('bollard', { build: function (k) { k.add(G.cyl6, 20, 0, -.4, 0, .24, .8, .24).add(G.cyl6, 13, 0, .1, 0, .25, .12, .25).add(G.dome, 20, 0, .4, 0, .24, .1, .24); }, scale: 1.25, half: box3(0.163, 0.525, 0.163), mass: .3, sound: 'cone', y: 0.525 });
+propKind('can', { build: function (k) { k.add(G.box, 13, 0, -.23, 0, .36, .44, .16).add(G.box, 14, .08, .21, 0, .14, .05, .06).add(G.cyl6, 11, -.1, .2, 0, .06, .07, .06); }, scale: 1.4, half: box3(0.252, 0.322, 0.112), mass: .1, sound: 'cone', y: 0.336 });
+propKind('pallet', { build: function (k) { for (var i = 0; i < 5; i++) k.add(G.box, 6, 0, .02, -.48 + i * .24, 1.2, .04, .16); [-.5, 0, .5].forEach(function (x) { k.add(G.box, 6, x, -.07, 0, .12, .09, 1.1); }); }, half: box3(.6, .07, .55), mass: .3, sound: 'brick', y: .08 });
+propKind('toolbox', { build: function (k) { k.add(G.box, 13, 0, -.14, 0, .6, .26, .3).add(G.box, 14, 0, .12, 0, .3, .04, .04).add(G.box, 7, 0, 0, .151, .4, .04, .01); }, scale: 1.4, half: box3(0.42, 0.21, 0.21), mass: .15, sound: 'brick', y: 0.21 });
+propKind('aboard', { build: function (k) { k.add(G.box, 6, 0, -.6, .25, .9, 1.2, .06, 0, -.2).add(G.box, 6, 0, -.6, -.25, .9, 1.2, .06, 0, .2).add(G.box, 14, 0, -.28, .33, .7, .6, .02, 0, -.2).add(G.box, 20, -.1, -.1, .36, .4, .06, .01, 0, -.2).add(G.box, 20, .05, -.28, .38, .5, .06, .01, 0, -.2); }, half: box3(.45, .6, .32), mass: .25, sound: 'cone', y: .61 });
+propKind('coil', { build: function (k) { k.add(G.cyl, 50, 0, -.12, 0, .8, .24, .8).add(G.cyl, 23, 0, -.11, 0, .34, .25, .34); }, half: box3(.4, .12, .4), mass: .2, sound: 'hay', y: .13, shape: cylShape(.4, .24) });
+propKind('buoy', { build: function (k) { k.add(G.ball, 22, 0, -.3, 0, .6, .6, .6).add(G.cyl, 20, 0, -.05, 0, .62, .1, .62); }, half: box3(.3, .3, .3), mass: .2, sound: 'ball', y: .31, shape: function () { return new CANNON.Sphere(.3); } });
+propKind('sack', { build: function (k) { k.add(G.blob, 50, 0, -.35, 0, .6, .6, .55).add(G.cone, 50, 0, .15, 0, .3, .2, .3).add(G.cyl6, 6, 0, .15, 0, .32, .04, .32); }, scale: 1.25, half: box3(0.35, 0.438, 0.325), mass: .3, sound: 'hay', y: 0.438 });
 // places kept clear for the props and the locals, decided before anything else is scattered
 var SPOTS = {};
 (function () {
@@ -1882,10 +2043,9 @@ function glyphKit(ch) {
 });
 SPOTS.letters.r = 14;
 // crates: a pyramid (Bruno 2019's walls)
-function crateKit() { var k = new Kit(); k.add(G.box, 6, 0, -.45, 0, .9, .9, .9).add(G.box, 23, 0, -.45, .46, .92, .14, .02).add(G.box, 23, 0, -.1, .46, .92, .12, .02).add(G.box, 23, .46, -.45, 0, .02, .14, .92).add(G.box, 23, -.46, -.45, 0, .02, .14, .92); return k; }
 (function () {
   var c = SPOTS.crates, t = roadTan(START_S + 22);
-  [4, 3, 2, 1].forEach(function (cnt, row) { for (var i = 0; i < cnt; i++) { var off = (i - (cnt - 1) / 2) * .95; addDyn(propMesh(crateKit()), new V3(.45, .45, .45), .3, 'brick', c.x + t.x * off, .45 + row * .91, c.z + t.z * off, Math.atan2(t.x, t.z)); } });
+  [4, 3, 2, 1].forEach(function (cnt, row) { for (var i = 0; i < cnt; i++) { var off = (i - (cnt - 1) / 2) * .95; spawnProp('crate', c.x + t.x * off, c.z + t.z * off, Math.atan2(t.x, t.z), .45 + row * .91); } });
 })();
 // explosive crates: one on every plaza (Bruno 2025's red crates that blow up and throw the car)
 var booms = [];
@@ -1893,7 +2053,7 @@ function boomKit() { var k = new Kit(); k.add(G.box, 13, 0, -.45, 0, .9, .9, .9)
 STOPS.forEach(function (d, i) {
   if (d.id === 'contact' || d.id === 'translation') return;
   var p = d.plaza.clone().addScaledVector(d.tan, (i % 2 ? 1 : -1) * (d.pw / 2 - 2)).addScaledVector(d.face, -d.depth * .1);
-  var o = addDyn(propMesh(boomKit()), new V3(.45, .45, .45), .5, 'brick', p.x, .45, p.z, d.rot + .4); o.boom = true; booms.push(o);
+  var o = spawnProp('boom', p.x, p.z, d.rot + .4); o.boom = true; booms.push(o);
   o.onCar = function (v) { if (v > 2.5 && !o.gone && pendingBoom.indexOf(o) < 0) pendingBoom.push(o); }; // explode after the step: cannon must not lose a body mid-narrowphase
 });
 // cones on the insides of the tightest bends, hay bales by the start, benches on the plazas
@@ -1902,16 +2062,14 @@ STOPS.forEach(function (d, i) {
   for (var s = 30; s < ROAD_LEN - 20; s += 7) {
     var cv = roadCurv(s); if (Math.abs(cv) < .03) continue; var sd = Math.sign(cv), p = roadPt(s, sd * (ROAD_W / 2 + 1.3));
     if (plazaK(p.x, p.z) < 2 || !farFrom(statics, p.x, p.z, 1)) continue;
-    var k = new Kit(); k.add(G.box, 14, 0, -.42, 0, .62, .08, .62).add(G.cone, 22, 0, -.36, 0, .5, .95, .5).add(G.cyl, 20, 0, -.02, 0, .32, .13, .32);
-    addDyn(propMesh(k), new V3(.31, .42, .31), .25, 'cone', p.x, .42, p.z, r() * 3);
+    spawnProp('cone', p.x, p.z, r() * 3);
   }
   var hb = roadPt(START_S - 18, ROAD_W / 2 + 4);
-  for (var j = 0; j < 5; j++) { var kb = new Kit(); kb.add(G.box, 11, 0, -.42, 0, 1.3, .84, .84).add(G.box, 23, 0, -.42, 0, 1.34, .1, .88); var up = j > 2; addDyn(propMesh(kb), new V3(.65, .42, .42), .8, 'hay', hb.x + (up ? (j - 3.5) * 1.35 : (j - 1) * 1.35), .42 + (up ? .85 : 0), hb.z, 0); }
+  for (var j = 0; j < 5; j++) { var up = j > 2; spawnProp('hay', hb.x + (up ? (j - 3.5) * 1.35 : (j - 1) * 1.35), hb.z, 0, .42 + (up ? .85 : 0)); }
   STOPS.forEach(function (d, i) {
     if (d.id === 'contact' || d.id === 'translation') return;
     var p = d.plaza.clone().addScaledVector(d.tan, (i % 2 ? -1 : 1) * (d.pw / 2 - 2.2)).addScaledVector(d.face, d.depth * .1);
-    var k = new Kit(); k.add(G.box, 6, 0, -.05, 0, 1.8, .12, .5).add(G.box, 6, 0, .2, -.22, 1.8, .4, .08).add(G.box, 7, -.75, -.45, 0, .1, .4, .45).add(G.box, 7, .75, -.45, 0, .1, .4, .45);
-    addDyn(propMesh(k), new V3(.9, .45, .28), .7, 'brick', p.x, .45, p.z, d.rot + PI / 2);
+    spawnProp('bench', p.x, p.z, d.rot + PI / 2);
   });
 })();
 // the bowling lane (Bruno 2019 and 2025): ten pins and a ball
@@ -1924,9 +2082,8 @@ var pins = [], ball;
   quad(L, P(-9, -1.3), P(-9, 1.3), P(9, 1.3), P(9, -1.3)); flatMesh(L, 28, .03);
   quad(G2, P(-9, -1.6), P(-9, -1.3), P(9, -1.3), P(9, -1.6)); quad(G2, P(-9, 1.3), P(-9, 1.6), P(9, 1.6), P(9, 1.3)); flatMesh(G2, 29, .035);
   var rows = [[0], [-.5, .5], [-1, 0, 1], [-1.5, -.5, .5, 1.5]];
-  rows.forEach(function (r, ri) { r.forEach(function (x) { var p = P(5 + ri * .62, x * .56), pk = new Kit(); pk.add(G.cyl, 20, 0, -.45, 0, .3, .62, .3).add(G.cyl, 13, 0, -.02, 0, .26, .1, .26).add(G.cyl, 20, 0, .08, 0, .2, .22, .2).add(G.ball, 20, 0, .22, 0, .26, .26, .26); pins.push(addDyn(propMesh(pk), new V3(.15, .45, .15), .1, 'pin', p.x, .46, p.z, ry)); }); });
-  var bk = new Kit(); bk.add(G.ball, 12, 0, -.45, 0, .9, .9, .9).add(G.ball, 14, .12, .28, .3, .1, .1, .1).add(G.ball, 14, -.1, .3, .3, .1, .1, .1);
-  var bp = P(-4, 0); ball = addDyn(propMesh(bk), new V3(.45, .45, .45), 1, 'ball', bp.x, .46, bp.z, ry, new CANNON.Sphere(.45));
+  rows.forEach(function (r, ri) { r.forEach(function (x) { var p = P(5 + ri * .62, x * .56), pk = null; pins.push(spawnProp('pin', p.x, p.z, ry)); }); });
+  var bp = P(-4, 0); ball = spawnProp('ball', bp.x, bp.z, ry);
   addStatic(P(7.9, 0).x, 0, P(7.9, 0).z, 1.7, .3, .2, ry, null, 'wall');
   SPOTS.bowl.r = 10;
 })();
@@ -1934,17 +2091,10 @@ var pins = [], ball;
 // round 10 B: the plazas' knockable props (Bruno's lanterns, fences, benches and crates are all rigid bodies): lanterns glow day and night
 var windsocks = [];
 (function placePlazaProps() {
-  function lanternKit() { var k = new Kit(); k.add(G.box, 6, 0, -.42, 0, .5, .08, .5).add(G.box, 41, 0, -.34, 0, .36, .5, .36); [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (c) { k.add(G.box, 6, c[0] * .2, -.34, c[1] * .2, .07, .52, .07); }); k.add(G.box, 6, 0, .16, 0, .5, .07, .5).add(G.cone4, 6, 0, .2, 0, .5, .24, .5, PI / 4).add(G.box, 6, 0, -.12, .185, .36, .04, .02).add(G.box, 6, 0, -.12, -.185, .36, .04, .02); return k; }
   PZ_DYN.forEach(function (o) {
-    var p = o.p, k = new Kit();
-    if (o.kind === 'lantern') { var lm = propMesh(lanternKit()); lm.geometry.scale(1.35, 1.35, 1.35); addDyn(lm, new V3(.34, .57, .34), .5, 'brick', p.x, .57, p.z, o.ry); }
-    else if (o.kind === 'fence') { k.add(G.box, 6, -.95, -.5, 0, .14, 1, .14).add(G.box, 6, .95, -.5, 0, .14, 1, .14).add(G.box, 6, 0, -.25, .02, 2.05, .16, .06).add(G.box, 6, 0, .15, .02, 2.05, .16, .06); addDyn(propMesh(k), new V3(1.02, .5, .1), .6, 'brick', p.x, .5, p.z, o.ry); }
-    else if (o.kind === 'chair') { k.add(G.box, 54, 0, -.05, 0, .46, .07, .44).add(G.box, 54, 0, .2, -.2, .46, .45, .06); [[-1, -1], [-1, 1], [1, -1], [1, 1]].forEach(function (c) { k.add(G.box, 14, c[0] * .19, -.42, c[1] * .18, .05, .38, .05); }); addDyn(propMesh(k), new V3(.23, .4, .22), .2, 'cone', p.x, .42, p.z, o.ry); }
-    else if (o.kind === 'ballot') { k.add(G.box, 20, 0, -.35, 0, .6, .6, .6).add(G.box, 14, 0, .26, 0, .3, .02, .06).add(G.box, 54, 0, -.2, .31, .5, .12, .02); addDyn(propMesh(k), new V3(.3, .3, .3), .25, 'brick', p.x, .35, p.z, o.ry); }
-    else if (o.kind === 'drum') { k.add(G.cyl, 13, 0, -.45, 0, .62, .9, .62).add(G.cyl, 14, 0, -.2, 0, .64, .05, .64).add(G.cyl, 14, 0, .2, 0, .64, .05, .64).add(G.cyl, 7, .15, .45, .1, .1, .03, .1); addDyn(propMesh(k), new V3(.31, .45, .31), .6, 'brick', p.x, .46, p.z, o.ry, new CANNON.Cylinder(.31, .31, .9, 8)); }
-    else if (o.kind === 'tyres') { for (var t = 0; t < 3; t++) k.add(G.cyl, 34, 0, -.45 + t * .3, 0, .9, .28, .9).add(G.cyl, 14, 0, -.44 + t * .3, 0, .5, .29, .5); addDyn(propMesh(k), new V3(.45, .45, .45), .8, 'hay', p.x, .46, p.z, o.ry, new CANNON.Cylinder(.45, .45, .9, 8)); }
-    else if (o.kind === 'bench') { k.add(G.box, 6, 0, -.05, 0, 1.8, .12, .5).add(G.box, 6, 0, .2, -.22, 1.8, .4, .08).add(G.box, 7, -.75, -.45, 0, .1, .4, .45).add(G.box, 7, .75, -.45, 0, .1, .4, .45); addDyn(propMesh(k), new V3(.9, .45, .28), .7, 'brick', p.x, .45, p.z, o.ry); }
-    else if (o.kind === 'sock') { var g = new THREE.Group(), sk = new Kit(); for (var j = 0; j < 4; j++) sk.add(G.cyl, j % 2 ? 20 : 22, 0, 0, .05 + j * .38, .5 - j * .07, .4, .5 - j * .07, 0, PI / 2); var m = meshOf(sk); m.position.y = 0; g.add(m); g.position.set(p.x, 4.25, p.z); scene.add(g); windsocks.push({ g: g, m: m }); }
+    var p = o.p;
+    if (o.kind === 'sock') { var g = new THREE.Group(), sk = new Kit(); for (var j = 0; j < 4; j++) sk.add(G.cyl, j % 2 ? 20 : 22, 0, 0, .05 + j * .38, .5 - j * .07, .4, .5 - j * .07, 0, PI / 2); var m = meshOf(sk); m.position.y = 0; g.add(m); g.position.set(p.x, (o.h || 4.25), p.z); scene.add(g); windsocks.push({ g: g, m: m }); return; }
+    if (PK[o.kind]) spawnProp(o.kind, p.x, p.z, o.ry || 0, o.y);
   });
 })();
 // cannon's Cylinder is built along z in 0.6.2; stand the drums and tyre stacks up
@@ -2563,14 +2713,14 @@ var FIRE = (function () { var m = new THREE.Mesh(new THREE.IcosahedronGeometry(1
 var pendingBoom = [];
 function explode(o) {
   o.gone = true; var p = o.b.position, c = new V3(p.x, p.y, p.z);
-  pw.removeBody(o.b); o.m.visible = false; o.b.sleep();
+  if (!o.out) pw.removeBody(o.b); o.out = false; o.m.visible = false; o.b.sleep(); PB.dirty = true;
   var push = function (b, str) { var d = new V3(b.position.x - c.x, b.position.y - c.y, b.position.z - c.z), l = d.length(); if (l > 7) return; var k = (1 - l / 7) * str; d.normalize(); d.y = Math.max(d.y, .6); b.wakeUp && b.wakeUp(); b.applyImpulse(new CANNON.Vec3(d.x * k * b.mass, d.y * k * b.mass, d.z * k * b.mass), b.position); };
   dyn.forEach(function (q) { if (q !== o && !q.gone) push(q.b, 9); }); push(carBody, 7);
   var t = new V3(Math.random() - .5, 0, Math.random() - .5).normalize().multiplyScalar(2); carBody.angularVelocity.vadd(new CANNON.Vec3(t.x, 0, t.z), carBody.angularVelocity);
   rollKick(1); sfx('boom'); buzz(90); award('boom');
   FIRE.position.copy(c); FIRE.visible = !RM(); FIRE.userData.t = 0;
   confetti(c.clone().setY(1), 40, 9, [new C3('#ffd23a'), new C3('#ff7a2a'), new C3('#e0533d'), new C3('#2b2f3b')], { spread: 2 });
-  setTimeout(function () { var sp = o.start.p; o.b.position.set(sp.x, sp.y, sp.z); o.b.quaternion.set(o.start.q.x, o.start.q.y, o.start.q.z, o.start.q.w); o.b.velocity.set(0, 0, 0); o.b.angularVelocity.set(0, 0, 0); pw.addBody(o.b); o.b.sleep(); o.m.visible = true; o.gone = false; }, 20000);
+  setTimeout(function () { var sp = o.start.p; o.b.position.set(sp.x, sp.y, sp.z); o.b.quaternion.set(o.start.q.x, o.start.q.y, o.start.q.z, o.start.q.w); o.b.velocity.set(0, 0, 0); o.b.angularVelocity.set(0, 0, 0); pw.addBody(o.b); o.b.sleep(); o.m.visible = true; o.gone = false; o.dirty = true; PB.dirty = true; }, 20000);
 }
 function updateFire(dt) { if (!FIRE.visible) return; var t = FIRE.userData.t += dt; FIRE.scale.setScalar(.5 + t * 9); FIRE.material.opacity = Math.max(0, 1 - t / .45); FIRE.material.color.set(t < .12 ? '#fff4a8' : '#ff9a2a'); if (t > .45) FIRE.visible = false; }
 
@@ -2587,7 +2737,7 @@ var BIRD_V = [WIND_GLSL, SHADOW_V, 'attribute vec2 part; attribute float flap; a
   ' if (part.x > .5) p.xy = rz(p.xy, vec2(sd * .05, 0.), sd * th);',
   ' p.y -= s * .05 * flap; return p; }',
   'void main(){ vec4 w = modelMatrix * instanceMatrix * vec4(birdPos(), 1.); vW = w.xyz; vPart = part.x;',
-  '#if NUM_DIR_LIGHT_SHADOWS > 0', ' vSC = directionalShadowMatrix[0] * vec4(w.xyz, 1.);', '#endif',
+  '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz, 1.));', '#endif',
   ' vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n');
 var BIRD_F = [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying float vD; varying float vPart;',
   'void main(){ vec3 n = normalize(cross(dFdx(vW), dFdy(vW))); if (n.y < 0.) n = -n; vec3 base = L2(vPart > .5 ? vec3(.99, .98, .96) : vec3(.93, .92, .95));',
@@ -2609,7 +2759,7 @@ var BIRD_F = [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying float vD; varying 
   g.setAttribute('phase', new THREE.InstancedBufferAttribute(ph, 1)); g.setAttribute('flap', new THREE.InstancedBufferAttribute(fl, 1));
   var mat = worldMat({ vs: BIRD_V, fs: BIRD_F, side: THREE.DoubleSide }); mat.extensions = { derivatives: true };
   birdMesh = new THREE.InstancedMesh(g, mat, NB); birdMesh.frustumCulled = false; birdMesh.castShadow = true;
-  birdMesh.customDepthMaterial = new THREE.ShaderMaterial({ vertexShader: BIRD_V.replace('varying vec3 vW;', 'varying vec3 vW2;').replace(/#if NUM_DIR_LIGHT_SHADOWS[\s\S]*?#endif/g, '').replace('uniform mat4 directionalShadowMatrix[ NUM_DIR_LIGHT_SHADOWS ]; varying vec4 vSC;', '').replace('vW = w.xyz;', ''), fragmentShader: '#include <packing>\nvoid main(){ gl_FragColor = packDepthToRGBA(gl_FragCoord.z); }', uniforms: { uTime: U.uTime, uWind: U.uWind, uWindT: U.uWindT, uWindS: U.uWindS, uNoise: U.uNoise }, side: THREE.DoubleSide });
+  birdMesh.customDepthMaterial = new THREE.ShaderMaterial({ vertexShader: BIRD_V.replace('varying vec3 vW;', 'varying vec3 vW2;').replace('vW = w.xyz;', ''), fragmentShader: '#include <packing>\nvoid main(){ gl_FragColor = packDepthToRGBA(gl_FragCoord.z); }', uniforms: { uTime: U.uTime, uWind: U.uWind, uWindT: U.uWindT, uWindS: U.uWindS, uNoise: U.uNoise }, side: THREE.DoubleSide });
   scene.add(birdMesh);
   var r = rng(808), homes = [[-20, 30], [40, -20], [-45, -45]];
   homes.forEach(function (h, f) {
@@ -2842,13 +2992,13 @@ function rainOranges() {
   for (var i = 0; i < n; i++) (function (i) { setTimeout(function () {
     if (oranges.length >= 30) { var old = oranges.shift(); pw.removeBody(old.b); scene.remove(old.m); dyn.splice(dyn.indexOf(old), 1); }
     var k = new Kit(); k.add(G.ball, 22, 0, -.3, 0, .6, .58, .6).add(G.box, 24, .05, .28, 0, .18, .05, .1, .4);
-    var o = addDyn(meshOf(k), new V3(.3, .3, .3), .3, 'orange', car.pos.x + (Math.random() - .5) * 10, 9 + Math.random() * 3, car.pos.z + (Math.random() - .5) * 10, 0, new CANNON.Sphere(.3)); o.b.wakeUp(); o.orange = true; oranges.push(o);
+    var om = meshOf(k); om.layers.enable(2); var o = addDyn(om, new V3(.3, .3, .3), .3, 'orange', car.pos.x + (Math.random() - .5) * 10, 9 + Math.random() * 3, car.pos.z + (Math.random() - .5) * 10, 0, new CANNON.Sphere(.3)); o.b.wakeUp(); o.orange = true; oranges.push(o);
   }, i * 50); })(i);
 }
 function tidy() {
   for (var i = oranges.length - 1; i >= 0; i--) { var o = oranges[i]; pw.removeBody(o.b); scene.remove(o.m); dyn.splice(dyn.indexOf(o), 1); } oranges = [];
   dyn.forEach(function (o) { if (o.inTitle || o.gone) return; var p = o.start.p, q = o.start.q; o.b.position.set(p.x, p.y, p.z); o.b.quaternion.set(q.x, q.y, q.z, q.w); o.b.velocity.set(0, 0, 0); o.b.angularVelocity.set(0, 0, 0); o.b.sleep(); o.m.position.copy(p); o.m.quaternion.copy(q); o.hitByCar = false; });
-  sfx('paper'); award('tidy'); toast('All tidy', 1400);
+  PB.dirty = true; sfx('paper'); award('tidy'); toast('All tidy', 1400);
 }
 
 // ============================================================================ sound: synthesised, with Bruno 2025's mappings (Player.js setSounds)
@@ -3124,7 +3274,7 @@ function updateTitleLetters(now) {
 }
 function setTitleLook(on) { // the flat overlays (signs, paint, pads, labels) are drawn by three's own materials and never bend: hidden on the globe
   signMeshes.forEach(function (m) { m.visible = !on; }); if (paintMesh) paintMesh.visible = !on; STOPS.concat([RACE]).forEach(function (d) { d.padMesh.visible = !on; });
-  trackMesh.visible = !on; carG.visible = !on || !!intro; sun.castShadow = !on; camera.far = on ? 2400 : 220; camera.updateProjectionMatrix();
+  trackMesh.visible = !on; carG.visible = !on || !!intro; sun.castShadow = sunD.castShadow = !on; shadowDirty = true; camera.far = on ? 2400 : 220; camera.updateProjectionMatrix();
 }
 function showTitle() {
   state = 'title'; html.classList.add('ready');
@@ -3189,7 +3339,7 @@ function buildMapImage() {
   var hideL = [carG, trackMesh, birdMesh, rainMesh, nipMesh, speedLines, marker, grass.mesh, leaves.mesh, flowers.mesh, bgMesh, windLines.mesh], vis = []; hideL.forEach(function (o) { vis.push(o.visible); o.visible = false; });
   STOPS.forEach(function (d) { if (d.tagR) { d.tagR.visible = d.tagL.visible = false; } });
   var fn = U.uFogN.value, ff = U.uFogF.value; U.uMat.value = 0; U.uFogN.value = 1e4; U.uFogF.value = 2e4; U.uRes.value.set(N, N);
-  renderer.setRenderTarget(rt); renderer.setClearColor(0x13375f, 1); renderer.clear(); renderer.render(scene, oc); renderer.setRenderTarget(null); renderer.setClearColor(0x000000, 0);
+  propBatch(true); renderer.setRenderTarget(rt); renderer.setClearColor(0x13375f, 1); renderer.clear(); renderer.render(scene, oc); renderer.setRenderTarget(null); renderer.setClearColor(0x000000, 0);
   U.uFogN.value = fn; U.uFogF.value = ff; U.uMat.value = 1; resize();
   hideL.forEach(function (o, i) { o.visible = vis[i]; });
   var px = new Uint8Array(N * N * 4); renderer.readRenderTargetPixels(rt, 0, 0, N, N, px); rt.dispose();
@@ -3334,7 +3484,7 @@ var GRASS_V = [WIND_GLSL, SHADOW_V, TERRAIN_GLSL,
   ' w.xz += dc / max(dl, 1e-3) * push * H * .8; w.y -= push * H * .55;',
   ' if (g <= .5) w.y -= 100.;',
   ' vW = w; vTip = tip; vG = g; vCol = terrainCol(m, bp);',
-  '#if NUM_DIR_LIGHT_SHADOWS > 0', ' vSC = directionalShadowMatrix[0] * vec4(w + vec3(0., .06, 0.), 1.);', '#endif',
+  '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w + vec3(0., .06, 0.), 1.));', '#endif',
   ' vec4 mv = viewMatrix * vec4(w, 1.); vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n');
 var GRASS_F = [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying float vTip; varying vec3 vCol; varying float vD; varying float vG;',
   'void main(){ vec3 col = shade(L2(vCol), vec3(0., 1., 0.), dropShadow(), (1. - vTip) * vG, vec3(vW.x, 1., vW.z), 0.);',
@@ -3379,7 +3529,7 @@ var flowers = (function () {
   }
   var mat = worldMat({ side: THREE.DoubleSide, vs: [WIND_GLSL, SHADOW_V, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
     'void main(){ vec4 p = instanceMatrix * vec4(position, 1.); vec4 w = modelMatrix * p; float k = clamp(position.y + .75, 0., 1.); w.xz += windAt(w.xz) * k * 1.2; vW = w.xyz; vN = normalize(mat3(instanceMatrix) * normal); vC = instanceColor;',
-    '#if NUM_DIR_LIGHT_SHADOWS > 0', ' vSC = directionalShadowMatrix[0] * vec4(w.xyz + uL * .25, 1.);', '#endif',
+    '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + uL * .25, 1.));', '#endif',
     ' vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n').replace('varying vec3 vW;', 'uniform vec3 uL; varying vec3 vW;'),
     fs: [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
       'void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 col = shade(L2(vC), n, dropShadow(), 0., vW, 0.); gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
@@ -3414,7 +3564,7 @@ var leaves = (function () {
   pa[0] += .15; pa[3] += .15; pa[6] -= .15; pa[9] -= .15; geo.rotateX(-PI / 2); geo.deleteAttribute('uv');
   var mat = worldMat({ side: THREE.DoubleSide, vs: [SHADOW_V, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
     'void main(){ vec4 w = modelMatrix * instanceMatrix * vec4(position, 1.); vW = w.xyz; vN = normalize(mat3(instanceMatrix) * normal); vC = instanceColor;',
-    '#if NUM_DIR_LIGHT_SHADOWS > 0', ' vSC = directionalShadowMatrix[0] * vec4(w.xyz + vN * .05, 1.);', '#endif',
+    '#if NUM_DIR_LIGHT_SHADOWS > 0', ' setSC(vec4(w.xyz + vN * .05, 1.));', '#endif',
     ' vec4 mv = viewMatrix * w; vD = -mv.z; gl_Position = projectionMatrix * mv; }'].join('\n'),
     fs: [SHADOW_F, LIGHT_GLSL, 'varying vec3 vW; varying vec3 vN; varying float vD; varying vec3 vC;',
       'void main(){ vec3 n = normalize(vN); if (!gl_FrontFacing) n = -n; vec3 col = shade(L2(vC), n, dropShadow(), 0., vW, 0.); gl_FragColor = outCol(fogIt(col, vD)); }'].join('\n') });
@@ -3599,7 +3749,43 @@ function artFrame(dt, now) {
   updateWindLines(Math.min(dt, .05));
   var wa = Math.atan2(U.uWind.value.x, U.uWind.value.y), tt = (now || 0) / 1000; windsocks.forEach(function (w, i) { w.g.rotation.y = wa + Math.sin(tt * .7 + i) * .3; w.m.rotation.x = .35 - U.uWindS.value * .3 + Math.sin(tt * 6 + i) * .04; });
 }
+// the props' batch: every kind's prop near the view (or all of them on the title globe and the map) posed into one buffer; rebuilt only
+// when the view has moved on or one of them is awake, so a still scene costs nothing on the CPU and one draw (and one shadow draw)
+var PB = (function () {
+  var cap = 2000; dyn.forEach(function (o) { if (o.pk) cap += o.pk.n; }); // room for every prop at once (the title globe)
+  var g = new THREE.BufferGeometry(), P = new Float32Array(cap * 3), N = new Float32Array(cap * 3), A = new Float32Array(cap);
+  g.setAttribute('position', new THREE.BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.BufferAttribute(N, 3)); g.setAttribute('pal', new THREE.BufferAttribute(A, 1));
+  ['position', 'normal', 'pal'].forEach(function (a) { g.attributes[a].setUsage(THREE.DynamicDrawUsage); }); g.setDrawRange(0, 0);
+  var m = new THREE.Mesh(g, matWorld); m.frustumCulled = false; m.castShadow = m.receiveShadow = true; scene.add(m);
+  return { mesh: m, P: P, N: N, A: A, cap: cap, list: [], cx: 1e9, cz: 1e9, all: false, dirty: true, n: 0 };
+})();
+function propBatch(all) {
+  var cx = view.smoothed.x, cz = view.smoothed.z, R = Math.max(area.radius, 30) + 12, i, o;
+  if (all !== PB.all || Math.hypot(cx - PB.cx, cz - PB.cz) > 3) {
+    PB.all = all; PB.cx = cx; PB.cz = cz; PB.list = [];
+    for (i = 0; i < dyn.length; i++) { o = dyn[i]; if (!o.pk) continue; var q = o.b.position; if (all || Math.abs(q.x - cx) < R && Math.abs(q.z - cz) < R) PB.list.push(o); }
+    PB.dirty = true;
+  }
+  if (!PB.dirty) for (i = 0; i < PB.list.length; i++) { o = PB.list[i]; if (o.b.sleepState !== CANNON.Body.SLEEPING && !o.gone) { PB.dirty = true; break; } }
+  if (!PB.dirty) return; PB.dirty = false;
+  var P = PB.P, N = PB.N, A = PB.A, v = 0;
+  for (i = 0; i < PB.list.length; i++) {
+    o = PB.list[i]; if (o.gone) continue; var d = o.pk, n = d.n; if (v + n > PB.cap) break;
+    var p = o.b.position, qq = o.b.quaternion, x = qq.x, y = qq.y, z = qq.z, w = qq.w;
+    var m00 = 1 - 2 * (y * y + z * z), m01 = 2 * (x * y - z * w), m02 = 2 * (x * z + y * w), m10 = 2 * (x * y + z * w), m11 = 1 - 2 * (x * x + z * z), m12 = 2 * (y * z - x * w), m20 = 2 * (x * z - y * w), m21 = 2 * (y * z + x * w), m22 = 1 - 2 * (x * x + y * y);
+    var sP = d.P, sN = d.N, o3 = v * 3;
+    for (var j = 0, j3 = 0; j < n; j++, j3 += 3) {
+      var a = sP[j3], b = sP[j3 + 1], c = sP[j3 + 2]; P[o3 + j3] = m00 * a + m01 * b + m02 * c + p.x; P[o3 + j3 + 1] = m10 * a + m11 * b + m12 * c + p.y; P[o3 + j3 + 2] = m20 * a + m21 * b + m22 * c + p.z;
+      a = sN[j3]; b = sN[j3 + 1]; c = sN[j3 + 2]; N[o3 + j3] = m00 * a + m01 * b + m02 * c; N[o3 + j3 + 1] = m10 * a + m11 * b + m12 * c; N[o3 + j3 + 2] = m20 * a + m21 * b + m22 * c;
+    }
+    A.set(d.A, v); v += n;
+  }
+  var g = PB.mesh.geometry; g.setDrawRange(0, v); PB.n = v; shadowDirty = true; window.__pbN = (window.__pbN || 0) + 1;
+  ['position', 'normal'].forEach(function (k) { var at = g.attributes[k]; at.updateRange.offset = 0; at.updateRange.count = v * 3; at.needsUpdate = true; });
+  g.attributes.pal.updateRange.offset = 0; g.attributes.pal.updateRange.count = v; g.attributes.pal.needsUpdate = true;
+}
 function drawFrame(dt, now) {
+  propBatch(U.uBend.value > .001 || state === 'title');
   artFrame(dt, now || performance.now());
   fitFog();
   var amt = post && post.amt > .001 ? post.amt : 0;
@@ -3615,6 +3801,7 @@ function applyArtQuality(level) {
   if (level === 0) flowers.mesh.count = 0;
   if (!!foliage.mat.defines.LOWQ !== (level === 0)) { if (level === 0) foliage.mat.defines.LOWQ = 1; else delete foliage.mat.defines.LOWQ; foliage.mat.needsUpdate = true; } // the low tier: only trunks, props and the car cast shadows
   if (!!groundMat.defines.LOWQ !== (level === 0)) { if (level === 0) groundMat.defines.LOWQ = 1; else delete groundMat.defines.LOWQ; groundMat.needsUpdate = true; }
+  U.uShQ.value = level === 0 ? 0 : 1;
   fxSetup(level);
 }
 function artResize() { if (fx.level < 0) return; var old = area.size; optimalArea(); if (Math.abs(area.size - old) > .5) { buildGrass(quality.level); leaves.placed = false; } fxResize(); }
@@ -3628,6 +3815,8 @@ function applyQuality() {
   var cap = lvl === 0 ? 1 : lvl === 1 ? Math.min(1.5, DPR_MAX) : DPR_MAX; dpr = Math.min(window.devicePixelRatio || 1, cap) * (lvl === 0 ? (SOFTGL ? .6 : .8) : 1); renderer.setPixelRatio(dpr); // the low tier also draws fewer pixels
   var sm = lvl === 2 ? (LOWDEV ? 1024 : 2048) : lvl === 1 ? 1024 : 512; // Bruno Quality.js: 2048, 512 on low
   if (sun.shadow.mapSize.x !== sm) { sun.shadow.mapSize.set(sm, sm); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
+  var smd = lvl === 2 ? 1024 : 512; if (sunD.shadow.mapSize.x !== smd) { sunD.shadow.mapSize.set(smd, smd); if (sunD.shadow.map) { sunD.shadow.map.dispose(); sunD.shadow.map = null; } }
+  shadowDirty = true;
   resize(); applyArtQuality(lvl);
 }
 
@@ -3651,7 +3840,7 @@ function roadSweep(dt) {
     o.shed = true; roadShed.push(o);
   }
 }
-function homeProp(o) { var sp = o.start.p, sq = o.start.q; o.b.position.set(sp.x, sp.y, sp.z); o.b.quaternion.set(sq.x, sq.y, sq.z, sq.w); o.b.velocity.set(0, 0, 0); o.b.angularVelocity.set(0, 0, 0); o.b.sleep(); o.m.position.copy(sp); o.m.quaternion.copy(sq); o.dirty = true; o.hitByCar = false; }
+function homeProp(o) { var sp = o.start.p, sq = o.start.q; o.b.position.set(sp.x, sp.y, sp.z); o.b.quaternion.set(sq.x, sq.y, sq.z, sq.w); o.b.velocity.set(0, 0, 0); o.b.angularVelocity.set(0, 0, 0); o.b.sleep(); o.m.position.copy(sp); o.m.quaternion.copy(sq); o.dirty = true; o.hitByCar = false; PB.dirty = true; }
 function shedTick() {
   for (var i = roadShed.length - 1; i >= 0; i--) {
     var o = roadShed[i], b = o.b, q = b.position;
@@ -3660,7 +3849,20 @@ function shedTick() {
     b.material = SLIDE_MAT; b.wakeUp(); if (lat < 1.4) { var dv = (1.4 - lat) * .5; b.velocity.x += ex * dv; b.velocity.z += ez * dv; } // it slides toward the nearer edge at a walking pace, whatever its shape
   }
 }
+// physics level of detail (Bruno's objects sleep out of view; Rapier makes that free, cannon does not): a sleeping prop far from the car and
+// the view leaves the physics world and comes back, still asleep, before the car can reach it. Several hundred props cost what a few dozen do.
+var lodT = 0;
+function physLOD() {
+  if (++lodT < 12) return; lodT = 0;
+  var cx = car.pos.x, cz = car.pos.z, vx = view.smoothed.x, vz = view.smoothed.z;
+  for (var i = 0; i < dyn.length; i++) {
+    var o = dyn[i]; if (o.gone || o.inTitle || o.fly || o.orange) continue; var q = o.b.position, d = Math.min(Math.hypot(q.x - cx, q.z - cz), Math.hypot(q.x - vx, q.z - vz));
+    if (o.out) { if (d < 42) { o.out = false; pw.addBody(o.b); o.b.sleep(); } }
+    else if (d > 54 && o.b.sleepState === CANNON.Body.SLEEPING) { o.out = true; pw.removeBody(o.b); }
+  }
+}
 function physicsTick() {
+  physLOD();
   // Bruno's tick order: Player.updatePrePhysics, PhysicsVehicle.updatePrePhysics, Physics.update, PhysicsVehicle.updatePostPhysics
   if (tapJumpT > 0) tapJumpT -= DT; if (honkT > 0) honkT -= DT;
   if (state === 'play' || state === 'map' || state === 'enter' || state === 'intro') { playerInput(); if (state !== 'play') { player.acc = 0; player.steer = 0; player.boost = 0; } vehiclePre(); }
@@ -3674,7 +3876,9 @@ function frame(now) {
   capMs = COARSE ? (idleNow(now) ? 31 : 13.5) : 0; if (now - last < capMs) return;
   var c0 = performance.now(), dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
   U.uTime.value = now / 1000;
-  if (state === 'intro') updateIntro(dt);
+  if (state === 'intro') { updateIntro(dt); shadowDirty = true; }
+  if (mailBump > 0) shadowDirty = true;
+  for (var li = 0; li < letters.length; li++) if (letters[li].b.sleepState !== CANNON.Body.SLEEPING && !letters[li].inTitle) { shadowDirty = true; break; }
   if (state === 'title') { updateTitleLetters(now); titlePose(now); }
   if (state !== 'title' && state !== 'boot') { acc += dt; var n = 0; while (acc >= DT && n < 4) { physicsTick(); acc -= DT; n++; } if (n === 4) acc = 0; }
   for (var i = 0; i < dyn.length; i++) { var o = dyn[i]; if (o.inTitle || o.fly || o.gone) continue; var b = o.b; if (b.position.y < -12) { var sp = o.start.p; b.position.set(sp.x, sp.y, sp.z); b.velocity.set(0, 0, 0); b.angularVelocity.set(0, 0, 0); } if (b.sleepState !== CANNON.Body.SLEEPING || o.dirty !== false) { o.m.position.set(b.position.x, b.position.y, b.position.z); o.m.quaternion.set(b.quaternion.x, b.quaternion.y, b.quaternion.z, b.quaternion.w); o.dirty = b.sleepState !== CANNON.Body.SLEEPING; } }
@@ -3722,6 +3926,12 @@ addEventListener('orientationchange', afterTurn); if (screen.orientation && scre
 canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 $('imap') && $('imap').addEventListener('click', function (e) { var b = e.target.closest('.imap-pin'); if (b) mapGo(b.getAttribute('data-id')); });
 
+// which shadow map each caster draws into: the living things (the car, the locals, the birds, the leaves, the windsocks) into the small
+// every-frame one, everything else into the scenery's
+(function shadowLayers() {
+  var live = new Set(); [carG, birdMesh, leaves.mesh].concat(locals.map(function (o) { return o.g; })).concat(windsocks.map(function (w) { return w.g; })).forEach(function (o) { o.traverse(function (m) { live.add(m); }); });
+  scene.traverse(function (m) { if (m.castShadow) m.layers.enable(live.has(m) ? 2 : 1); });
+})();
 // ============================================================================ boot
 resize(); applyQuality(); applyTod();
 moveCarTo(SPAWN0.x, SPAWN0.z, SPAWN0.rot); for (var st0 = 0; st0 < 90; st0++) physicsTick(); snapView();
