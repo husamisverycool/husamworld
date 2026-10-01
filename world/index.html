@@ -827,11 +827,13 @@ function noWorld(reason) {
 }
 
 // ============================================================================
+var PROBE_GPU = '';
 function main() {
   if (!window.THREE || !window.CANNON) { noWorld('The 3D world could not load.'); return; }
   var probe = doc.createElement('canvas'), gl = null;
   try { gl = probe.getContext('webgl2') || probe.getContext('webgl'); } catch (e) {}
   if (!gl) { noWorld('This browser can\'t draw the 3D world.'); return; }
+  try { var di = gl.getExtension('WEBGL_debug_renderer_info'); PROBE_GPU = String(di ? gl.getParameter(di.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)); } catch (e) {} // (round 16: read before the world's own context is made, which needs to know whether to multisample)
   try { var lc = gl.getExtension('WEBGL_lose_context'); if (lc) lc.loseContext(); } catch (e) {} gl = null; // (round 15: the test context is let go, not kept beside the world's)
   try { W = buildWorld(); } catch (err) { if (window.console) console.error(err); noWorld('The 3D world hit a snag.'); W = null; }
 }
@@ -971,7 +973,7 @@ function fbm(x, y) { return vnoise(x, y) * .6 + vnoise(x * 2.1 + 5, y * 2.1 - 3)
 
 var canvas = $('gl');
 var LOWDEV = COARSE || Math.min(innerWidth, innerHeight) < 600;
-var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !LOWDEV && (window.devicePixelRatio || 1) < 1.5, alpha: true, powerPreference: 'high-performance' }); // (round 15: no multisampled canvas on a 2x screen, as Bruno)
+var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: LOWDEV ? !/swiftshader|llvmpipe|softpipe|software|basic render/i.test(PROBE_GPU) : (window.devicePixelRatio || 1) < 1.5, alpha: true, powerPreference: 'high-performance' }); // (round 15: no multisampled canvas on a 2x screen, as Bruno; round 16: a phone draws straight to a multisampled canvas, as Messenger, see tierDpr)
 var DPR_MAX = LOWDEV ? 1.5 : 2;
 var dpr = Math.min(window.devicePixelRatio || 1, DPR_MAX);
 renderer.setPixelRatio(dpr); renderer.setClearColor(0x000000, 0);
@@ -2312,7 +2314,7 @@ var PV = { // PhysicsVehicle.js constants, verbatim
   heights: { low: .88, mid: 1.23, high: 1.63 }, stiff: { low: 20, mid: 30, high: 40 }
 };
 var DT = 1 / 60, DTS = DT * 2; // the fixed tick and Bruno's scaled tick
-var car = { pos: new V3(), prevPos: new V3(), quat: new Q(), vel: new V3(), fwd: new V3(1, 0, 0), up: new V3(0, 1, 0), side: new V3(0, 0, 1), speed: 0, xzSpeed: 0, forwardRatio: 1, goingForward: true, forwardSpeed: 0,
+var car = { pos: new V3(), prevPos: new V3(), quat: new Q(), rp: new V3(), rq: new Q(), tp: new V3(), tq: new Q(), vel: new V3(), fwd: new V3(1, 0, 0), up: new V3(0, 1, 0), side: new V3(0, 0, 1), speed: 0, xzSpeed: 0, forwardRatio: 1, goingForward: true, forwardSpeed: 0,
   wc: 4, justTouched: 0, upsideDown: { active: false, ratio: 0, t: 0 }, stuck: { items: [], dist: 0, dur: 0, active: false }, air: 0, flipAcc: { x: 0, z: 0, px: 0, pz: 0, air: false } };
 var player = { acc: 0, steer: 0, boost: 0, brake: 0, sus: ['low', 'low', 'low', 'low'] };
 var CHASSIS_OFF = new CANNON.Vec3(0, .6, 0), _cv = new CANNON.Vec3();
@@ -2321,6 +2323,7 @@ function moveCarTo(x, z, rot, y) { // Bruno PhysicsVehicle.moveTo: position and 
   var q = new CANNON.Quaternion(); q.setFromAxisAngle(new CANNON.Vec3(0, 1, 0), rot || 0); carBody.quaternion.copy(q);
   carBody.position.set(x, (y == null ? 1.15 : y) - .6, z); carBody.velocity.set(0, 0, 0); carBody.angularVelocity.set(0, 0, 0); carBody.force.set(0, 0, 0); carBody.torque.set(0, 0, 0);
   chassisPos(car.pos); car.prevPos.copy(car.pos); car.speed = 0; car.vel.set(0, 0, 0);
+  car.quat.set(q.x, q.y, q.z, q.w); car.tp.copy(car.pos); car.tq.copy(car.quat); car.rp.copy(car.pos); car.rq.copy(car.quat);
 }
 function vehiclePre() {
   var speedK = SPEED_K[SET.speed] || 1, sens = SENS_K[SET.sens] || 1;
@@ -2498,7 +2501,7 @@ var _tp = new V3(), _tc = new V3();
 function updateTrails(on) {
   var cam = camera.position;
   trails.list.forEach(function (T) {
-    T.alpha += ((on ? 1 : 0) - T.alpha) * .2; _tp.copy(T.ref).applyQuaternion(car.quat).add(car.pos);
+    T.alpha += ((on ? 1 : 0) - T.alpha) * .2; _tp.copy(T.ref).applyQuaternion(car.rq).add(car.rp);
     T.pts.unshift(_tp.clone()); if (T.pts.length > trails.N) T.pts.length = trails.N;
     var P = T.m.geometry.attributes.position.array, A = T.m.geometry.attributes.al.array;
     for (var i = 0; i < trails.N; i++) {
@@ -2524,7 +2527,7 @@ function updateTracks() {
 }
 var _wq = new Q(), _ax = new V3(0, 1, 0);
 function updateVisualCar(dts) {
-  carG.position.copy(car.pos); carG.quaternion.copy(car.quat);
+  carG.position.copy(car.rp); carG.quaternion.copy(car.rq);
   carParts.steer += (player.steer * (SENS_K[SET.sens] || 1) * PV.steeringAmplitude - carParts.steer) * Math.min(1, dts * 16);
   var rot = car.forwardSpeed / .4 * .006 * (dts / DTS);
   carParts.wheels.forEach(function (W, i) {
@@ -2702,7 +2705,7 @@ function nipUpdateFromPointer(start) {
 }
 function nipFrame() {
   var y = clamp(car.pos.y - .25, .1, .65); nip.angle = Math.atan2(car.fwd.z, car.fwd.x);
-  nipMesh.position.set(car.pos.x, y + (nip.jumpY || 0), car.pos.z); nipMesh.rotation.y = -nip.angle;
+  nipMesh.position.set(car.rp.x, y + (nip.jumpY || 0), car.rp.z); nipMesh.rotation.y = -nip.angle;
   if (nip.active) nipUpdateFromPointer(false);
   if (nip.active || nip.animated) {
     nip.smallest = wrapA(nip.targetAngle - nip.angle); nip.forward = Math.abs(nip.smallest) < NIP_FWD / 2;
@@ -2861,9 +2864,9 @@ function updateView(dt) {
   if (gp.on !== undefined && (Math.abs(gp.rx) > 0 || Math.abs(gp.ry) > 0) && state === 'play') { view.tracking = false; var mv = new V2(gp.rx, gp.ry).rotateAround(new V2(), -view.theta).multiplyScalar(20 * dt); view.focus.x += mv.x; view.focus.z += mv.y; }
   leadUpdate(dt);
   if (view.hold && (view.tracking || performance.now() > view.hold.until || state !== 'play' && state !== 'intro')) { view.hold = null; view.tracking = true; view.glide = 0; } // any drive input (it sets tracking) lets go
-  if (view.tracking) { view.focus.x = car.pos.x + view.lead.x; view.focus.z = car.pos.z + view.lead.z; }
+  if (view.tracking) { view.focus.x = car.rp.x + view.lead.x; view.focus.z = car.rp.z + view.lead.z; }
   else if (view.hold) { view.focus.copy(view.hold.p); }
-  else { var mx = car.pos.x - view.focus.x, mz = car.pos.z - view.focus.z, md = Math.hypot(mx, mz) * .25; view.focus.x += md * mx * dt; view.focus.z += md * mz * dt; } // the magnet
+  else { var mx = car.rp.x - view.focus.x, mz = car.rp.z - view.focus.z, md = Math.hypot(mx, mz) * .25; view.focus.x += md * mx * dt; view.focus.z += md * mz * dt; } // the magnet
   var e = dt ? Math.min(1, dt * 10) : 1;
   if (view.glide < 1 && dt) { view.glide = Math.min(1, view.glide + dt / 1.3); e *= lerp(.12, 1, view.glide * view.glide); } // from the name back to the car: eased in, not snapped
   var nx = lerp(view.smoothed.x, view.focus.x, e), nz = lerp(view.smoothed.z, view.focus.z, e);
@@ -3684,7 +3687,7 @@ function mapCamera(dt) {
   if (k >= 1) mapFly = null; return k;
 }
 function onMap(open, focusId) {
-  if (open) { markStops(); drawMapPins(); if (state === 'title' || state === 'intro') finishIntro(); mapFly = { t: 0, p0: camera.position.clone(), q0: camera.quaternion.clone() }; state = 'map'; shTitle = { ext: 118, x: 0, z: 0 }; shadowMode(true); /* the whole island casts its shadows, as on the globe */ clearCtl(); camera.far = 900; camera.updateProjectionMatrix(); sfx('paper'); if (focusId) mapFocus(focusId); }
+  if (open) { if (!mapImg.done) { try { buildMapImage(); } catch (e) {} } markStops(); drawMapPins(); if (state === 'title' || state === 'intro') finishIntro(); mapFly = { t: 0, p0: camera.position.clone(), q0: camera.quaternion.clone() }; state = 'map'; shTitle = { ext: 118, x: 0, z: 0 }; shadowMode(true); /* the whole island casts its shadows, as on the globe */ clearCtl(); camera.far = 900; camera.updateProjectionMatrix(); sfx('paper'); if (focusId) mapFocus(focusId); }
   else { if (state === 'map') { state = 'play'; shTitle = null; shadowMode(false); view.mapK = 0; } stopHover(); }
 }
 var hovered = null;
@@ -3692,6 +3695,16 @@ function mapFocus(id) { hovered = byId[id] || null; Array.prototype.forEach.call
 function stopHover() { hovered = null; Array.prototype.forEach.call(doc.querySelectorAll('.stop.is-hover, .imap-pin.on'), function (li) { li.classList.remove('is-hover', 'on'); }); }
 // the map picture in the panel: the island rendered once from above into a canvas (so it also works on a phone, where the panel covers the world)
 var mapImg = { done: false };
+// round 16: the map's picture is a render of the whole island and a read-back (a stall on any GPU): it used to land 1.6 s after the fonts,
+// in the middle of the name popping in, a freeze of a second or more on a phone. It waits now for a calm moment: the title once its
+// letters stand and its shaders are compiled, or the car parked; opening the map draws it at once if it isn't there yet
+function mapImageWhenCalm() {
+  (function tick() {
+    if (mapImg.done) return; var now = performance.now();
+    var calm = state === 'title' ? bench.compiled && (bench.done || now - bench.t0 > 3000) && now - bench.t0 > 900 : state === 'play' ? quietNow(now) : false; // (after the title's timing, which it would spoil)
+    if (calm) { try { buildMapImage(); } catch (e) { if (window.console) console.warn(e); } } else setTimeout(tick, 300);
+  })();
+}
 function buildMapImage() {
   var wrap = $('imap'); if (!wrap || mapImg.done) return; mapImg.done = true;
   var N = LOWDEV ? 512 : 768, rt = new THREE.WebGLRenderTarget(N, N), oc = new THREE.OrthographicCamera(-ISLAND * 1.12, ISLAND * 1.12, ISLAND * 1.12, -ISLAND * 1.12, 1, 600);
@@ -4100,7 +4113,7 @@ var fxOut = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, defi
 function fxSetup(level) {
   var size = renderer.getDrawingBufferSize(new V2()), gl = renderer.getContext();
   fx.hdr = renderer.capabilities.isWebGL2 ? renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float') : renderer.extensions.has('OES_texture_half_float') && renderer.extensions.has('EXT_color_buffer_half_float');
-  fx.on = level > 0 && SHED[quality.shed].fx > 0; fx.level = level; fx.nMips = level === 2 ? 5 : 2; fx.dof = level === 2; // (round 15: Auto may drop the passes under load)
+  fx.on = level > (LOWDEV ? 1 : 0) && SHED[quality.shed].fx > 0; // (round 16: a phone's Balanced is one pass, as Messenger; its lamps keep their glow cards) fx.level = level; fx.nMips = level === 2 ? 5 : 2; fx.dof = level === 2; // (round 15: Auto may drop the passes under load)
   if (fx.rt) { if (fx.rt.depthTexture) fx.rt.depthTexture.dispose(); fx.rt.dispose(); fx.rt = null; } if (fx.half) { fx.half.dispose(); fx.half = null; } fx.mips.forEach(function (m) { m.a.dispose(); m.b.dispose(); }); fx.mips = [];
   if (!fx.on) return;
   var type = fx.hdr ? THREE.HalfFloatType : THREE.UnsignedByteType;
@@ -4166,12 +4179,12 @@ function artFrame(dt, now) {
   if (!cull) cullBent(); // (round 15: so the globe culls its chunks by where they are bent to)
   // the footprint's centre follows the view (Bruno optimalArea.position)
   GRU.uCenter.value.set(view.smoothed.x + area.base.x, view.smoothed.z + area.base.z);
-  U.uCar.value.copy(car.pos); U.uCarV.value.set(car.vel.x / DTS, 0, car.vel.z / DTS);
+  U.uCar.value.copy(car.rp); U.uCarV.value.set(car.vel.x / DTS, 0, car.vel.z / DTS);
   // see-through: the car's place on screen, and the radius (3 / R .. 15 / R)
   // (none on the globe: the hidden car's place used to cut holes in the crowns round it; it opens up as the camera lands)
   var seeK = state === 'title' || state === 'boot' && !FROM ? 0 : state === 'intro' && intro ? smooth((intro.t - 1.6) / .9) : state === 'enter' && entering ? 1 - smooth(entering.t / .35) : 1; // (going in, the landmark closes up again)
-  _cs.copy(car.pos).applyMatrix4(camera.matrixWorldInverse); U.uCarD.value = -_cs.z;
-  _cs.copy(car.pos).project(camera); U.uCarS.value.set(_cs.x * .5 + .5, _cs.y * .5 + .5, Math.max(1e-5, seeK) / Math.max(10, view.radius));
+  _cs.copy(car.rp).applyMatrix4(camera.matrixWorldInverse); U.uCarD.value = -_cs.z;
+  _cs.copy(car.rp).project(camera); U.uCarS.value.set(_cs.x * .5 + .5, _cs.y * .5 + .5, Math.max(1e-5, seeK) / Math.max(10, view.radius));
   if (flat && (state === 'play' || state === 'map' || state === 'enter' || state === 'boot')) { updateLeaves(Math.min(dt, .05)); updateTrackRT(dt); }
   updateWindLines(Math.min(dt, .05));
   var wa = Math.atan2(U.uWind.value.x, U.uWind.value.y), tt = (now || 0) / 1000; windsocks.forEach(function (w, i) { w.g.rotation.y = wa + Math.sin(tt * .7 + i) * .3; w.m.rotation.x = .35 - U.uWindS.value * .3 + Math.sin(tt * 6 + i) * .04; });
@@ -4214,6 +4227,7 @@ function propBatch(all) {
     PB.dirty = true;
   }
   var awake = false; for (i = 0; i < PB.list.length; i++) { o = PB.list[i]; if (o.b.sleepState !== CANNON.Body.SLEEPING && !o.gone) { awake = PB.dirty = true; break; } }
+  if (PB.shOwed && (!LOWDEV || fN % 4 === 0)) { PB.shOwed = false; shadowDirty = true; }
   if (!PB.dirty) return; PB.dirty = false;
   // (round 15) a batch re-made only because the view moved on changes nothing the scenery's shadow map needs at once: the props that come
   // in are at the footprint's far margin, and the map's own 3 m step re-draws them within a few frames. It used to force a re-draw of the
@@ -4222,7 +4236,7 @@ function propBatch(all) {
   var P = PB.P, N = PB.N, A = PB.A, v = 0;
   for (i = 0; i < PB.list.length; i++) {
     o = PB.list[i]; if (o.gone) continue; var d = o.pk, n = d.n; if (v + n > PB.cap) break;
-    var p = o.b.position, qq = o.b.quaternion, x = qq.x, y = qq.y, z = qq.z, w = qq.w;
+    var p = o.m.position, qq = o.m.quaternion, x = qq.x, y = qq.y, z = qq.z, w = qq.w; // (round 16: the drawn pose, blended between physics steps)
     var m00 = 1 - 2 * (y * y + z * z), m01 = 2 * (x * y - z * w), m02 = 2 * (x * z + y * w), m10 = 2 * (x * y + z * w), m11 = 1 - 2 * (x * x + z * z), m12 = 2 * (y * z - x * w), m20 = 2 * (x * z - y * w), m21 = 2 * (y * z + x * w), m22 = 1 - 2 * (x * x + y * y);
     var sP = d.P, sN = d.N, o3 = v * 3;
     for (var j = 0, j3 = 0; j < n; j++, j3 += 3) {
@@ -4231,7 +4245,7 @@ function propBatch(all) {
     }
     A.set(d.A, v); v += n;
   }
-  var g = PB.mesh.geometry; g.setDrawRange(0, v); PB.n = v; if (shNeed) shadowDirty = true; window.__pbN = (window.__pbN || 0) + 1;
+  var g = PB.mesh.geometry; g.setDrawRange(0, v); PB.n = v; if (shNeed) { if (!LOWDEV || ext || fN % 4 === 0) shadowDirty = true; else PB.shOwed = true; } // (round 16: a phone re-draws the scenery's map for tumbling props 15 times a second) window.__pbN = (window.__pbN || 0) + 1;
   ['position', 'normal'].forEach(function (k) { var at = g.attributes[k]; at.updateRange.offset = 0; at.updateRange.count = v * 3; at.needsUpdate = true; });
   g.attributes.pal.updateRange.offset = 0; g.attributes.pal.updateRange.count = v; g.attributes.pal.needsUpdate = true;
 }
@@ -4300,7 +4314,13 @@ var DEV = deviceTier();
 var quality = { level: DEV.level, start: DEV.level, why: DEV.why, fx: 1, auto: null, want: null, shed: 0 };
 // the pixels a tier draws: its pixel-ratio cap (phones 1.5 at most) and a budget of device pixels (about 2560 x 1440 on the top tier), so a
 // laptop's 2880 x 1800 is drawn at 1.7x and upscaled; fill is what a laptop's graphics run out of first
+// round 16, phones (Messenger, abeto: the canvas at min(dpr, 1.15) on a 2x screen and 1.5 on a 3x one, one scene pass, anti-aliased, and a
+// multiplier that only ever trims it a little): the old Smooth tier drew a 3x phone at 0.6 to 0.8 px per CSS px with no anti-aliasing,
+// which is what read as smeared and jagged. Every phone tier now draws at Messenger's ratio; what a lighter tier sheds is work, not pixels
+function phoneDpr() { var d = window.devicePixelRatio || 1; return d > 2.2 ? 1.5 : Math.min(d, 1.15); }
+var DPR_FLOOR = LOWDEV ? .85 : .6; // (Messenger's adaptive ratio stops at 0.6 of 1.5)
 function tierDpr(lvl) {
+  if (LOWDEV && !SOFTGL) return lvl === 2 ? Math.max(phoneDpr(), Math.min(window.devicePixelRatio || 1, 1.5)) : phoneDpr();
   var cap = lvl === 2 ? DPR_MAX : lvl === 1 ? Math.min(1.5, DPR_MAX) : 1, budget = lvl === 2 ? 3.7e6 : lvl === 1 ? 2.2e6 : 1.1e6;
   var d = Math.min(window.devicePixelRatio || 1, cap, Math.sqrt(budget / Math.max(1, innerWidth * innerHeight)));
   return d * (lvl === 0 ? (SOFTGL ? .6 : .8) : 1);
@@ -4316,14 +4336,14 @@ var SHED = [
   { s: .6, g: .55, f: .6, sk: 0, dof: 0, fx: 0 }];
 function applyShed(i) { // (a render-scale change re-sizes the canvas and the passes' targets; nothing else is rebuilt)
   i = clamp(i, 0, SHED.length - 1); var S = SHED[i], lvl = quality.level; quality.shed = i;
-  var d = Math.max(SOFTGL ? .3 : .6, tierDpr(lvl) * S.s); if (Math.abs(d - renderer.getPixelRatio()) > .005) { dpr = d; renderer.setPixelRatio(d); resize(); }
+  var d = Math.max(SOFTGL ? .3 : DPR_FLOOR, tierDpr(lvl) * S.s); if (Math.abs(d - renderer.getPixelRatio()) > .005) { dpr = d; renderer.setPixelRatio(d); resize(); }
   grassK(S.g); foliageTier(lvl, S.f); U.uShK.value = lvl === 2 && S.sk ? 1 : 0; fxOut.uniforms.uDofOn.value = S.dof;
-  if (fx.level >= 0 && fx.on !== (lvl > 0 && S.fx > 0)) fxSetup(lvl);
+  if (fx.level >= 0 && fx.on !== (lvl > (LOWDEV ? 1 : 0) && S.fx > 0)) fxSetup(lvl);
 }
 function applyQuality() {
   var q = SET.qual, lvl = q === 'high' ? 2 : q === 'low' ? 0 : q === 'medium' ? 1 : quality.auto != null ? quality.auto : quality.start;
-  quality.level = lvl; quality.fx = lvl === 2 ? 1 : lvl === 1 ? .6 : .3; if (q !== 'auto') quality.shed = 0; // a tier you pick is drawn as it is
-  dpr = Math.max(SOFTGL ? .3 : .6, tierDpr(lvl) * SHED[quality.shed].s); renderer.setPixelRatio(dpr);
+  quality.level = lvl; quality.fx = lvl === 2 ? 1 : lvl === 1 ? .6 : .3; if (q !== 'auto') { quality.shed = 0; quality.lock30 = false; } // a tier you pick is drawn as it is
+  dpr = Math.max(SOFTGL ? .3 : DPR_FLOOR, tierDpr(lvl) * SHED[quality.shed].s); renderer.setPixelRatio(dpr);
   var sm = lvl === 2 ? (LOWDEV ? 1024 : 2048) : lvl === 1 ? 1024 : 512; // Bruno Quality.js: 2048, 512 on low
   if (sun.shadow.mapSize.x !== sm) { sun.shadow.mapSize.set(sm, sm); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } }
   shadowMode(!!shTitle); // (every tier: the scenery's map re-drawn on demand plus a small live one round the car)
@@ -4338,12 +4358,18 @@ function applyQuality() {
 function precompileTiers() {
   var mats = [foliage.mat, grassMat, groundMat], had = mats.map(function (m) { return !!m.defines.LOWQ; });
   function setLow(on) { mats.forEach(function (m) { if (on) m.defines.LOWQ = 1; else delete m.defines.LOWQ; m.needsUpdate = true; }); }
+  if (!LOWDEV) { // (round 16: a phone compiles the other tier's three shaders if Auto ever changes tier, which waits for the car to be parked;
+  // here, on the title, it was a second's freeze of the globe on a phone)
   setLow(true); renderer.compile(scene, camera); setLow(false); renderer.compile(scene, camera);
-  mats.forEach(function (m, i) { if (had[i]) m.defines.LOWQ = 1; else delete m.defines.LOWQ; m.needsUpdate = true; });
+  mats.forEach(function (m, i) { if (had[i]) m.defines.LOWQ = 1; else delete m.defines.LOWQ; m.needsUpdate = true; }); }
+  // (round 16: the shaders a drive used to compile on first use, each a hitch on a phone: the landmarks' tags, the wheel tracks' stamp and fade)
+  STOPS.forEach(function (d) { if (d.tagR) d.tagR.visible = d.tagL.visible = true; }); renderer.compile(scene, camera); STOPS.forEach(function (d) { if (d.tagR) d.tagR.visible = d.tagL.visible = false; });
+  renderer.compile(tracks.sc, tracks.cam); renderer.compile(tracks.sf, tracks.cam);
+  if (!LOWDEV) { // (a phone's tiers below Pretty have no post passes: they are compiled if Pretty is picked, from the menu)
   var nm = fxOut.defines.NM, dof = fxOut.defines.DOF, q0 = fxq.q.material; fxq.q.material = fxOut;
   [[2, 0], [5, 1], [5, 0], [2, 1]].forEach(function (v) { fxOut.defines.NM = v[0]; fxOut.defines.DOF = v[1]; fxOut.needsUpdate = true; renderer.compile(fxq.sc, fxq.cam); });
   fxOut.defines.NM = nm; fxOut.defines.DOF = dof; fxOut.needsUpdate = true;
-  [fxHigh].concat(fxBlur).forEach(function (m) { fxq.q.material = m; renderer.compile(fxq.sc, fxq.cam); }); fxq.q.material = q0;
+  [fxHigh].concat(fxBlur).forEach(function (m) { fxq.q.material = m; renderer.compile(fxq.sc, fxq.cam); }); fxq.q.material = q0; }
   // the shadow passes' depth programs for the casters only the upper tiers switch on (the leaf cards, the fallen leaves, the pebbles):
   // one draw of both maps with every caster on, into a 4 px target
   var cs = [leaves.mesh].concat(foliage.meshes, pebbles.meshes || []), was = cs.map(function (m) { return m.castShadow; }), rt = new THREE.WebGLRenderTarget(4, 4), au = sunD.shadow.autoUpdate;
@@ -4370,7 +4396,7 @@ function govern(dtMs, cpuMs, now) {
   if (avg > 20) { // under 50 fps
     gov.good = 0;
     if (now - gov.lastUp < 8000) gov.upHold = Math.min(64, gov.upHold * 2);
-    if (cpu > avg * .7 || quality.shed >= SHED.length - 1) { if (quality.level > 0 && quality.want == null) { quality.want = quality.level - 1; gov.log.push(['tier', avg, cpu]); } return; }
+    if (cpu > avg * .7 || quality.shed >= SHED.length - 1) { if (quality.level > 0 && quality.want == null) { quality.want = quality.level - 1; gov.log.push(['tier', avg, cpu]); } else if (quality.level === 0 && quality.shed >= SHED.length - 1 && avg > 24 && !quality.lock30) { quality.lock30 = true; gov.log.push(['lock30', avg]); } return; }
     if (!gov.bad) { gov.bad = 1; gov.before = avg; gov.from = quality.shed; }
     gov.log.push(['down', avg, cpu, quality.shed + 1]); applyShed(quality.shed + 1); govReset(now, 600); return;
   }
@@ -4391,7 +4417,7 @@ function benchTitle(dtMs, now) {
 }
 
 // ============================================================================ per frame
-var running = false, raf = 0, last = 0, acc = 0, elapsed = 0, fpsAcc = 0, fpsN = 0, lastInputT = 0, capMs = 0;
+var fN = 0, running = false, raf = 0, last = 0, acc = 0, elapsed = 0, fpsAcc = 0, fpsN = 0, lastInputT = 0, capMs = 0;
 ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach(function (ev) { addEventListener(ev, function () { lastInputT = performance.now(); }, { passive: true, capture: true }); });
 function quietNow(now) { return !nip.active && !auto && !trial.on && car.xzSpeed < .1 && now - lastInputT > 1500 && !gp.on && !ctl.forward && !ctl.backward && !ctl.left && !ctl.right; }
 function idleNow(now) { return state === 'play' && quietNow(now) && now - lastInputT > 8000; }
@@ -4437,30 +4463,46 @@ function physicsTick() {
   if (tapJumpT > 0) tapJumpT -= DT; if (honkT > 0) honkT -= DT;
   if (state === 'play' || state === 'map' || state === 'enter' || state === 'intro') { playerInput(); if (state !== 'play') { player.acc = 0; player.steer = 0; player.boost = 0; } vehiclePre(); }
   if (roadShed.length) shedTick();
+  car.tp.copy(car.pos); car.tq.copy(car.quat); dynPrev();
   pw.step(DTS); elapsed += DT;
   while (pendingBoom.length) { var pb = pendingBoom.shift(); if (!pb.gone) explode(pb); }
-  vehiclePost(elapsed);
+  vehiclePost(elapsed); car.rp.copy(car.pos); car.rq.copy(car.quat); IA = 1;
+}
+// round 16: the drawn world sits between the last two physics steps (Glenn Fiedler, "Fix your timestep": the state is blended by the
+// accumulator's remainder). The physics keeps its fixed 1/60 s step, but a frame that lands between steps no longer shows the car (and the
+// camera that follows it) standing still one frame and jumping two the next: the judder a phone shows below 60 fps, at 90 Hz, or whenever
+// the browser's frame clock wobbles. Bruno gets the same by stepping his physics with each frame's own delta; this keeps our tuning.
+var IA = 1, _dq = new Q();
+function dynPrev() { for (var i = 0; i < dyn.length; i++) { var o = dyn[i], b = o.b; if (b.sleepState === CANNON.Body.SLEEPING || o.inTitle || o.gone) { o.ip = false; continue; } if (!o.pp) { o.pp = new V3(); o.pq = new Q(); } o.pp.set(b.position.x, b.position.y, b.position.z); o.pq.set(b.quaternion.x, b.quaternion.y, b.quaternion.z, b.quaternion.w); o.ip = true; } }
+function carLerp(a) {
+  IA = a; if (a >= 1 || car.tp.distanceToSquared(car.pos) > 9) { car.rp.copy(car.pos); car.rq.copy(car.quat); return; } // (a respawn is a cut, not a slide)
+  car.rp.lerpVectors(car.tp, car.pos, a); car.rq.slerpQuaternions(car.tq, car.quat, a);
 }
 function frame(now) {
   raf = requestAnimationFrame(frame);
-  capMs = COARSE ? (idleNow(now) ? 31 : 13.5) : 0; if (now - last < capMs) return;
+  // round 16: a touch screen draws every refresh up to 90 Hz (it skipped every other one at 90, a steady 45) and every other one at 120;
+  // parked and idle it rests at 30, and a phone that can't hold more after every step Auto has is held at an even 30 (lock30): with
+  // the physics blended between steps, an even 30 reads as smooth where a ragged 40 to 50 reads as stutter
+  capMs = COARSE && idleNow(now) || quality.lock30 ? 31 : COARSE ? 10 : 0; if (now - last < capMs) return;
   var c0 = performance.now(), rawMs = now - last, dt = Math.min(.05, rawMs / 1000 || .016); last = now;
   U.uTime.value = now / 1000;
-  if (state === 'intro') { updateIntro(dt); if (intro && (intro.n = (intro.n || 0) + 1) % 3 === 0 && letters.some(function (o) { return o.fly; })) shadowDirty = true; } // the letters' shadows follow them down (round 15: every third frame, and only while they fly: each is the whole island's map)
+  fN++;
+  if (state === 'intro') { updateIntro(dt); if (intro && (intro.n = (intro.n || 0) + 1) % (LOWDEV ? 6 : 3) === 0 && letters.some(function (o) { return o.fly; })) shadowDirty = true; } // the letters' shadows follow them down (round 15: every third frame, and only while they fly: each is the whole island's map)
   if (mailBump > 0) shadowDirty = true;
-  for (var li = 0; li < letters.length; li++) if (letters[li].b.sleepState !== CANNON.Body.SLEEPING && !letters[li].inTitle) { shadowDirty = true; break; }
+  // (round 16: on a phone the tumbling letters' shadows follow them at 15 a second, not every frame: each is a re-draw of the scenery's map)
+  if (!LOWDEV || fN % 4 === 0) for (var li = 0; li < letters.length; li++) if (letters[li].b.sleepState !== CANNON.Body.SLEEPING && !letters[li].inTitle) { shadowDirty = true; break; }
   if (state === 'title') { updateTitleLetters(now); titlePose(now); }
   // (round 15: a slow frame catches up at most 4 ticks, and past 2 only while the frame has spent under 8 ms, so a slow phone can't spiral:
   // it runs a touch slower instead)
-  if (state !== 'title' && state !== 'boot') { acc += dt; var n = 0; while (acc >= DT && n < 4 && (n < 2 || performance.now() - c0 < 8)) { physicsTick(); acc -= DT; n++; } if (acc >= DT) acc = 0; }
-  for (var i = 0; i < dyn.length; i++) { var o = dyn[i]; if (o.inTitle || o.fly || o.gone) continue; var b = o.b; if (b.position.y < -12) { var sp = o.start.p; b.position.set(sp.x, sp.y, sp.z); b.velocity.set(0, 0, 0); b.angularVelocity.set(0, 0, 0); } if (b.sleepState !== CANNON.Body.SLEEPING || o.dirty !== false) { o.m.position.set(b.position.x, b.position.y, b.position.z); o.m.quaternion.set(b.quaternion.x, b.quaternion.y, b.quaternion.z, b.quaternion.w); o.dirty = b.sleepState !== CANNON.Body.SLEEPING; } }
+  if (state !== 'title' && state !== 'boot') { acc += dt; var n = 0; while (acc >= DT && n < 4 && (n < 2 || performance.now() - c0 < 8)) { physicsTick(); acc -= DT; n++; } if (acc >= DT) acc = 0; carLerp(acc / DT); }
+  for (var i = 0; i < dyn.length; i++) { var o = dyn[i]; if (o.inTitle || o.fly || o.gone) continue; var b = o.b; if (b.position.y < -12) { var sp = o.start.p; b.position.set(sp.x, sp.y, sp.z); b.velocity.set(0, 0, 0); b.angularVelocity.set(0, 0, 0); } if (b.sleepState !== CANNON.Body.SLEEPING || o.dirty !== false) { o.m.position.set(b.position.x, b.position.y, b.position.z); o.m.quaternion.set(b.quaternion.x, b.quaternion.y, b.quaternion.z, b.quaternion.w); if (o.ip && IA < 1 && o.pp.distanceToSquared(o.m.position) < 4) { o.m.position.lerpVectors(o.pp, o.m.position, IA); _dq.copy(o.m.quaternion); o.m.quaternion.slerpQuaternions(o.pq, _dq, IA); } o.dirty = b.sleepState !== CANNON.Body.SLEEPING || !!o.ip && IA < 1; } }
   if (state === 'play' || state === 'map' || state === 'enter' || state === 'intro') { updateVisualCar(dt * 2); updateTracks(); nipFrame(); nipJumpAnim(now); }
   if (state === 'play') { updateView(dt); applyPlayCam(); }
   else if (state === 'map') { view.mapK = mapCamera(dt); }
   else if (state === 'enter') updateEnter(dt);
   // speed lines (Player.updatePostPhysics: boosting, accelerating and faster than 15 game units)
   var slS = speedLines.material.uniforms.uS; slS.value = lerp(slS.value, state === 'play' && player.boost && player.acc && car.speed > 15 && !RM() ? 1 : 0, Math.min(1, dt * 2)); speedLines.visible = slS.value > .01;
-  if (speedLines.visible) { var cp = car.pos.clone().project(camera); speedLines.material.uniforms.uC.value.set(cp.x, cp.y); speedLines.material.uniforms.uT.value = elapsed * 2; }
+  if (speedLines.visible) { var cp = car.rp.clone().project(camera); speedLines.material.uniforms.uC.value.set(cp.x, cp.y); speedLines.material.uniforms.uT.value = elapsed * 2; }
   // panels: the map sits on the left on wide screens; the settings sheet covers a phone's lower half
   var land = phoneLand(), wantX = state === 'map' && innerWidth > 760 ? Math.min(560, innerWidth * .4) / 2 : setOpen && land ? -Math.min(380, innerWidth * .48) / 2 : 0, wantY = setOpen && innerWidth <= 760 && !land ? innerHeight * .24 : 0;
   view.offX = (view.offX || 0) + (wantX - (view.offX || 0)) * Math.min(1, dt * 5); view.offY = (view.offY || 0) + (wantY - (view.offY || 0)) * Math.min(1, dt * 5);
@@ -4513,7 +4555,7 @@ if (!FROM) { lettersHome(); showTitle(); titlePose(0); }
 fontsReady.then(function () {
   makeTags(); makePaint(); signTexs.forEach(function (t) { t.redraw(); }); // (the signs are drawn again in their own faces: a quicker build could beat the fonts to it)
   if (state === 'title') setTitleLook(true);
-  setTimeout(function () { try { buildMapImage(); } catch (e) { if (window.console) console.warn(e); } }, FROM ? 200 : 1600);
+  mapImageWhenCalm();
   if (FROM) {
     html.classList.add('ready', 'started'); lettersHome(); U.uBend.value = 0; setTitleLook(false);
     var d = byId[FROM] || byId.contact; visited[d.id] = 1; backFrom = d;
