@@ -126,3 +126,30 @@ never reached that line, so every test here passed.
   - Laptops: "Apple GPU", Apple M2, M3 Pro, Intel UHD 620, Iris Xe, HD 4000, GeForce RTX 3060.
   - Phones: "Apple GPU", Adreno 610, Mali-G710.
   - Result: no errors, world up on each.
+
+## Glitches: the kerbs and a sweep for their kind (3 October)
+
+Husam: "some of the red track tiles are a little glitchy sometimes and make sure no other glitches."
+
+- **The kerbs.** The tiles were laid every 1.4 m from the loop's start, and the loop (567.09 m) isn't a whole number of tiles. The last
+  tile on each side ran 1.3 m past the end, onto the first, at the same height. A red and a white tile fought over the same pixels by
+  the start line, tearing as the view moved (`SP/r16/kerb-crop.png`). Now there is an even number of tiles (406), each 1.397 m, ending
+  exactly where they start. `SP/r16/kerbgeo.js` (tiles that overlap): 2 before, 0 after.
+- **The sweep** (`SP/r16/coplanar.js`). Every visible static triangle in the world (114 k across 288 meshes, the car's included), paired
+  with any other that lies in the same plane within 3 mm, faces the same way and overlaps it. Same-colour pairs can't flicker (identical
+  shading): stepping stones, bracket corners, fence rails. The different-colour ones were fixed:
+  - **The wagon's cream side lines** stood 3 mm off its walnut panel. At a phone's 55 m that is about the depth buffer's own step, so
+    the stripe shimmered. They now stand 1.8 cm proud.
+  - **A tyre's sidewall ring on the left wheels** sat 2 mm inside its whitewall. It now matches the right side, 7 mm.
+  - **The Capitol's top step** met its platform at the same height in another colour. It is now 1 cm lower.
+
+  Two pairs are left. One faces away from the fixed camera; the other is 2.4 cm².
+- **Shadows that crawl.** Neither map that follows the view moved in whole texels of its own grid:
+  - the scenery's map, at each 3 m step (42.7 of its 7 cm texels);
+  - the living things' map, every frame, round the car.
+
+  So the texels slid under the shadows' edges, a jump every few metres and a constant shimmer round the car. Both are now aimed at a
+  target rounded to their texel along the light's own axes (`aimShadow`).
+- **Checks.**
+  - The regression suite all passes (`SP/r16/suite-3.txt`). `qa.js island` reports 0 issues.
+  - The spoofed-chip check passes, stepping through every tier: Apple M2, Intel UHD 620, and an iPhone.

@@ -1181,8 +1181,19 @@ function placeSun(fx, fz) {
   if (SC.right !== ext) { SC.left = SC.bottom = -ext; SC.right = SC.top = ext; SC.far = D * 2 + 10; SC.updateProjectionMatrix(); shadowDirty = true; }
   var st = ext > 40 ? 6 : 3, sx = Math.round(fx / st) * st, sz = Math.round(fz / st) * st; // the scenery's map moves in 3 m steps (its shadows are fixed in the world, so a step never shows)
   if (sx !== shSnap.x || sz !== shSnap.z || shSnap.d.dot(SUN_DIR) < .99999) { shSnap.x = sx; shSnap.z = sz; shSnap.d.copy(SUN_DIR); shadowDirty = true; }
-  if (shadowDirty) { shAt.x = sx; shAt.z = sz; sun.target.position.set(sx, 0, sz); sun.position.set(sx + SUN_DIR.x * D, SUN_DIR.y * D, sz + SUN_DIR.z * D); sun.target.updateMatrixWorld(); sun.shadow.needsUpdate = true; shadowDirty = false; window.__shN = (window.__shN || 0) + 1; }
-  var cx = car.pos.x, cz = car.pos.z; sunD.target.position.set(cx, 0, cz); sunD.position.set(cx + SUN_DIR.x * 70, SUN_DIR.y * 70, cz + SUN_DIR.z * 70); sunD.target.updateMatrixWorld();
+  if (shadowDirty) { shAt.x = sx; shAt.z = sz; aimShadow(sun, sx, sz, D, ext); sun.shadow.needsUpdate = true; shadowDirty = false; window.__shN = (window.__shN || 0) + 1; }
+  aimShadow(sunD, car.pos.x, car.pos.z, 70, SCD.right);
+}
+// round 16: a shadow map that follows the view has to move in whole texels of its own grid, or every move slides the texels under the
+// shadows' edges and they crawl (the scenery's map at each 3 m step, which is 42.7 of its 7 cm texels; the living things' map every frame,
+// a constant shimmer round the car). The light's own axes as three's lookAt builds them (z toward the light, x = up x z), the target
+// rounded to the texel in x and y; the depth axis is left alone
+var _sz = new V3(), _sx = new V3(), _sy = new V3(), _st = new V3(), _up = new V3(0, 1, 0);
+function aimShadow(L, x, z, D, ext) {
+  _sz.copy(SUN_DIR).normalize(); _sx.crossVectors(_up, _sz).normalize(); _sy.crossVectors(_sz, _sx);
+  var tex = 2 * ext / Math.max(1, L.shadow.mapSize.x); _st.set(x, 0, z);
+  var a = _st.dot(_sx), b = _st.dot(_sy); _st.addScaledVector(_sx, Math.round(a / tex) * tex - a).addScaledVector(_sy, Math.round(b / tex) * tex - b);
+  L.target.position.copy(_st); L.position.copy(_st).addScaledVector(_sz, D); L.target.updateMatrixWorld();
 }
 // the shadow set-up for the globe (one island-wide map holding everything, re-drawn on demand) and for play (the tier's own, applyQuality)
 // round 15: every tier plays with the split (it was the low tier's alone; the others re-drew one big map of everything every frame, 55
@@ -1576,8 +1587,10 @@ function flatMesh(P, pal, lift) {
 }
 // kerbs: red and white blocks along both edges of every bend (Bruno's circuit), a touch raised
 (function kerbs() {
-  var R = [], Wt = [], step = 1.4, hw = ROAD_W / 2;
-  for (var s = 0, k = 0; s < ROAD_LEN; s += step, k++) {
+  // round 16: an even number of tiles that divides the loop exactly (about 1.4 m each). The last tile used to run 1.3 m past the loop's end,
+  // onto the first one, at the same height: a red and a white tile fighting over the same pixels by the start, flickering as the view moved
+  var nK = 2 * Math.round(ROAD_LEN / 2.8), R = [], Wt = [], step = ROAD_LEN / nK, hw = ROAD_W / 2;
+  for (var k = 0; k < nK; k++) { var s = k * step;
     var cv = Math.max(Math.abs(roadCurv(s)), Math.abs(roadCurv(s + step)));
     if (cv < .012) continue;
     [-1, 1].forEach(function (sd) {
@@ -1650,7 +1663,7 @@ gantry(FINISH_S + .5, ['CAMBRIDGE', 'FINISH: THE LONG WAY'], ['CAMBRIDGE', 'FRES
 // ============================================================================ the landmarks, each on its plaza (+z faces the road)
 var BUILD = {
   bill: function (k) { // a Capitol: steps, colonnade, drum, gold dome, lantern, flag
-    k.add(G.box, 4, 0, 0, 0, 9, .5, 6.4).add(G.box, 4, 0, .5, 0, 8.2, .5, 5.6).add(G.box, 20, 0, 0, 3.4, 4, .25, 1).add(G.box, 20, 0, .25, 3.2, 4, .25, .7);
+    k.add(G.box, 4, 0, 0, 0, 9, .5, 6.4).add(G.box, 4, 0, .5, 0, 8.2, .5, 5.6).add(G.box, 20, 0, 0, 3.4, 4, .25, 1).add(G.box, 20, 0, .25, 3.2, 4, .24, .7); // (round 16: the top step a centimetre under the platform's top, which it ran into at the same height: two colours fighting)
     k.add(G.box, 4, 0, 1, -.6, 7.6, 3.2, 3.6);
     for (var i = -3; i <= 3; i++) k.add(G.cyl, 20, i * 1.05, 1, 1.9, .5, 3, .5);
     k.add(G.box, 4, 0, 4, 1.1, 7.8, .5, 2.4).add(G.wedge, 20, 0, 4.5, 1.9, 5.2, 1.3, .6);
@@ -2424,7 +2437,7 @@ function buildCar(kind) {
     k.add(RB(3.02, .5, 1.62, .2), BODY, -.02, -.74, 0);                                   // the lower body
     k.add(RB(.9, .12, 1.5, .06), BODY, .98, -.29, 0, 1, 1, 1, 0, 0, -.1);                // the bonnet's crown, sloping to the nose
     [-1, 1].forEach(function (sd) {
-      k.add(G.box, 60, -.38, -.61, sd * .812, 1.86, .24, .03).add(G.box, CREAM, -.38, -.36, sd * .815, 1.9, .035, .03).add(G.box, CREAM, -.38, -.625, sd * .815, 1.9, .03, .03); // walnut panel between two cream lines
+      k.add(G.box, 60, -.38, -.61, sd * .812, 1.86, .24, .03).add(G.box, CREAM, -.38, -.36, sd * .83, 1.9, .035, .03).add(G.box, CREAM, -.38, -.625, sd * .83, 1.9, .03, .03); // walnut panel between two cream lines (round 16: the lines stand 1.8 cm proud of the panel, not 3 mm: at a phone's 55 m that was inside the depth buffer's step, and the stripe shimmered)
       k.add(G.box, INK, .28, -.47, sd * .83, .12, .03, .02).add(G.box, INK, -.62, -.47, sd * .83, .12, .03, .02); // door handles
       k.add(G.box, CHROME, .5, -.2, sd * .8, .06, .08, .14).add(G.box, CHROME, .5, -.16, sd * .88, .1, .1, .04); // a mirror
     });
@@ -2465,7 +2478,7 @@ function buildCar(kind) {
   ant.position.copy(ref.ant); body.add(ant); carParts.ant = ant;
   // wheels: black tyres, whitewalls, chrome caps; each in a container eased to its suspension length
   var R = ref.wheelR, TW = ref.tyreW, wk = new Kit(); wk.add(G.cyl, 34, 0, -TW / 2, 0, R * 2, TW, R * 2);
-  [-1, 1].forEach(function (sd) { wk.add(G.cyl, 63, 0, sd > 0 ? TW / 2 - .005 : -TW / 2 - .01, 0, R * 1.42, .015, R * 1.42).add(G.cyl, 34, 0, sd > 0 ? TW / 2 : -TW / 2 - .012, 0, R * 1.06, .017, R * 1.06).add(G.cyl8, 61, 0, sd > 0 ? TW / 2 : -TW / 2 - .03, 0, R * .9, .03, R * .9).add(G.cyl6, INK, 0, sd > 0 ? TW / 2 + .02 : -TW / 2 - .04, 0, .1, .025, .1); });
+  [-1, 1].forEach(function (sd) { wk.add(G.cyl, 63, 0, sd > 0 ? TW / 2 - .005 : -TW / 2 - .01, 0, R * 1.42, .015, R * 1.42).add(G.cyl, 34, 0, sd > 0 ? TW / 2 : -TW / 2 - .017, 0, R * 1.06, .017, R * 1.06).add(G.cyl8, 61, 0, sd > 0 ? TW / 2 : -TW / 2 - .03, 0, R * .9, .03, R * .9).add(G.cyl6, INK, 0, sd > 0 ? TW / 2 + .02 : -TW / 2 - .04, 0, .1, .025, .1); });
   [-1, 1].forEach(function (sd) { for (var t = 0; t < 3; t++) { var a = t / 3 * TAU; wk.add(G.cyl6, INK, Math.cos(a) * R * .24, sd > 0 ? TW / 2 + .015 : -TW / 2 - .045, Math.sin(a) * R * .24, .07, .03, .07); } }); // three bolts on each cap, so the turning reads
   var wgeo = merge(wk.parts); wgeo.rotateX(PI / 2);
   carParts.wheels = [[.9, .75], [.9, -.75], [-.9, .75], [-.9, -.75]].map(function (p) {
