@@ -4113,7 +4113,7 @@ var fxOut = new THREE.ShaderMaterial({ depthTest: false, depthWrite: false, defi
 function fxSetup(level) {
   var size = renderer.getDrawingBufferSize(new V2()), gl = renderer.getContext();
   fx.hdr = renderer.capabilities.isWebGL2 ? renderer.extensions.has('EXT_color_buffer_float') || renderer.extensions.has('EXT_color_buffer_half_float') : renderer.extensions.has('OES_texture_half_float') && renderer.extensions.has('EXT_color_buffer_half_float');
-  fx.on = level > (LOWDEV ? 1 : 0) && SHED[quality.shed].fx > 0; // (round 16: a phone's Balanced is one pass, as Messenger; its lamps keep their glow cards) fx.level = level; fx.nMips = level === 2 ? 5 : 2; fx.dof = level === 2; // (round 15: Auto may drop the passes under load)
+  fx.on = level > (LOWDEV ? 1 : 0) && SHED[quality.shed].fx > 0; /* (round 16: a phone's Balanced is one pass, as Messenger; its lamps keep their glow cards) */ fx.level = level; fx.nMips = level === 2 ? 5 : 2; fx.dof = level === 2; // (round 15: Auto may drop the passes under load)
   if (fx.rt) { if (fx.rt.depthTexture) fx.rt.depthTexture.dispose(); fx.rt.dispose(); fx.rt = null; } if (fx.half) { fx.half.dispose(); fx.half = null; } fx.mips.forEach(function (m) { m.a.dispose(); m.b.dispose(); }); fx.mips = [];
   if (!fx.on) return;
   var type = fx.hdr ? THREE.HalfFloatType : THREE.UnsignedByteType;
@@ -4127,7 +4127,10 @@ function fxSetup(level) {
   fxOut.defines.NM = fx.nMips; fxOut.defines.DOF = fx.dof ? 1 : 0; fxOut.needsUpdate = true;
   var u = fxOut.uniforms; u.tDiffuse.value = fx.rt.texture; u.tHalf.value = fx.half ? fx.half.texture : null; ['tB0', 'tB1', 'tB2', 'tB3', 'tB4'].forEach(function (k, i) { u[k].value = (fx.mips[i] || fx.mips[fx.mips.length - 1]).a.texture; });
 }
-function fxResize() { if (fx.level >= 0) fxSetup(fx.level); }
+// round 16: the post passes are a garnish. If setting them up ever fails on some graphics chip (a target type it refuses, a bug of ours, as on
+// 3 October: every laptop got the list instead of the world), the world goes on drawing in one pass rather than giving up
+function safeFx(level) { try { fxSetup(level); } catch (e) { if (window.console) console.warn('post passes off:', e); fx.on = false; fx.level = level; } }
+function fxResize() { if (fx.level >= 0) safeFx(fx.level); }
 function renderFx(amt, cx, cy) {
   renderer.setRenderTarget(fx.rt); renderer.clear(); renderer.render(scene, camera);
   var dofOn = fx.dof && fxOut.uniforms.uDofOn.value > .5;
@@ -4245,7 +4248,7 @@ function propBatch(all) {
     }
     A.set(d.A, v); v += n;
   }
-  var g = PB.mesh.geometry; g.setDrawRange(0, v); PB.n = v; if (shNeed) { if (!LOWDEV || ext || fN % 4 === 0) shadowDirty = true; else PB.shOwed = true; } // (round 16: a phone re-draws the scenery's map for tumbling props 15 times a second) window.__pbN = (window.__pbN || 0) + 1;
+  var g = PB.mesh.geometry; g.setDrawRange(0, v); PB.n = v; if (shNeed) { if (!LOWDEV || ext || fN % 4 === 0) shadowDirty = true; else PB.shOwed = true; } /* (round 16: a phone re-draws the scenery's map for tumbling props 15 times a second) */ window.__pbN = (window.__pbN || 0) + 1;
   ['position', 'normal'].forEach(function (k) { var at = g.attributes[k]; at.updateRange.offset = 0; at.updateRange.count = v * 3; at.needsUpdate = true; });
   g.attributes.pal.updateRange.offset = 0; g.attributes.pal.updateRange.count = v; g.attributes.pal.needsUpdate = true;
 }
@@ -4281,7 +4284,7 @@ function applyArtQuality(level) {
   if (!!grassMat.defines.LOWQ !== (level === 0)) { if (level === 0) grassMat.defines.LOWQ = 1; else delete grassMat.defines.LOWQ; grassMat.needsUpdate = true; }
   if (!!groundMat.defines.LOWQ !== (level === 0)) { if (level === 0) groundMat.defines.LOWQ = 1; else delete groundMat.defines.LOWQ; groundMat.needsUpdate = true; }
   U.uShQ.value = level === 0 ? 0 : 1;
-  fxSetup(level);
+  safeFx(level);
 }
 function artResize() { if (fx.level < 0) return; var old = area.size; optimalArea(); if (Math.abs(area.size - old) > .5) { buildGrass(quality.level); leaves.placed = false; } fxResize(); }
 
@@ -4338,7 +4341,7 @@ function applyShed(i) { // (a render-scale change re-sizes the canvas and the pa
   i = clamp(i, 0, SHED.length - 1); var S = SHED[i], lvl = quality.level; quality.shed = i;
   var d = Math.max(SOFTGL ? .3 : DPR_FLOOR, tierDpr(lvl) * S.s); if (Math.abs(d - renderer.getPixelRatio()) > .005) { dpr = d; renderer.setPixelRatio(d); resize(); }
   grassK(S.g); foliageTier(lvl, S.f); U.uShK.value = lvl === 2 && S.sk ? 1 : 0; fxOut.uniforms.uDofOn.value = S.dof;
-  if (fx.level >= 0 && fx.on !== (lvl > (LOWDEV ? 1 : 0) && S.fx > 0)) fxSetup(lvl);
+  if (fx.level >= 0 && fx.on !== (lvl > (LOWDEV ? 1 : 0) && S.fx > 0)) safeFx(lvl);
 }
 function applyQuality() {
   var q = SET.qual, lvl = q === 'high' ? 2 : q === 'low' ? 0 : q === 'medium' ? 1 : quality.auto != null ? quality.auto : quality.start;

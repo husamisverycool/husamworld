@@ -111,3 +111,18 @@ Not measurable here: a real phone's frame rate. What should show on one:
 - a sharp, anti-aliased picture on every phone;
 - no freeze when the name pops in;
 - no hitch the first time a sign or a skid mark appears.
+
+## The laptop crash (3 October)
+
+Husam on a laptop: "The 3D world hit a snag. So here is the map instead". It was a bug of this round. A comment added mid-line in
+`fxSetup` commented out the rest of that line: the post passes' level, their number of mips and the depth of field. So setting up the
+passes threw on every computer with a real graphics chip. Phones (no post passes below Pretty) and the software renderer (the low tier)
+never reached that line, so every test here passed.
+
+- **Fixed:** the same mistake in `propBatch` too, which was harmless.
+- **The safety net (`safeFx`):** a failure setting up the post passes now turns them off and the world keeps drawing in one pass.
+- **The new check (`SP/r16/fakegpu.js`):** the page loaded with a real chip's name spoofed. It loads, starts, drives, opens the menu and
+  steps through every quality tier.
+  - Laptops: "Apple GPU", Apple M2, M3 Pro, Intel UHD 620, Iris Xe, HD 4000, GeForce RTX 3060.
+  - Phones: "Apple GPU", Adreno 610, Mali-G710.
+  - Result: no errors, world up on each.
